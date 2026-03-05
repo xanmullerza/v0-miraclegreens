@@ -88,6 +88,8 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
             return 'Create a Meal';
         } else if (pathLower.includes('/browse')) {
             return 'Discover & Learn';
+        } else if (pathLower.includes('/comparator')) {
+            return 'Ready to Compare';
         }
         
         return 'Ready to Search';

@@ -10,13 +10,13 @@ import { HeroSearch } from '@/components/ui/hero-search';
 import {
     Wallet, Search, X, ArrowRight, Loader2, Sparkles,
     Zap, Activity, Info, Utensils, ChefHat, Plus,
-    Beef, ChevronRight, Library, Calendar, Scale
+    Beef, ChevronRight, Library, Calendar, Scale, Droplet
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { searchLocalFood } from '@/lib/services/nutrition';
 import Link from 'next/link';
-import { calculateSurvivalStatus, SURVIVAL_PROFILES } from '@/lib/utils/survival-sim';
+import { calculateSurvivalStatus, SURVIVAL_PROFILES, INITIAL_STORES } from '@/lib/utils/survival-sim';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -546,6 +546,122 @@ export default function SurvivalModePage() {
                                             <span>The Red Line (Day 30)</span>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Survival Requirements Dashboard */}
+                            <div className="space-y-6 bg-slate-50 dark:bg-slate-800/30 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center gap-2">
+                                    <Zap size={16} className="text-purple-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Survival Requirements</h3>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {(() => {
+                                        const profile = SURVIVAL_PROFILES[profileType];
+                                        const dailyReqs = [
+                                            { label: 'Energy', val: profile.energy_floor, unit: 'kcal', icon: <Zap size={14} /> },
+                                            { label: 'Water', val: profile.water_floor, unit: 'L/day', icon: <Droplet size={14} /> },
+                                            { label: 'Thiamine', val: profile.b1_floor, unit: 'mg', icon: <Sparkles size={14} /> },
+                                            { label: 'Vitamin C', val: profile.vit_c_floor, unit: 'mg', icon: <Plus size={14} /> },
+                                            { label: 'Sodium', val: profile.sodium_floor, unit: 'mg', icon: <Activity size={14} /> },
+                                            { label: 'Potassium', val: profile.potassium_floor, unit: 'mg', icon: <Info size={14} /> }
+                                        ];
+                                        return dailyReqs.map(req => (
+                                            <div key={req.label} className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">{req.label}/Day</span>
+                                                    <div className="p-1 rounded-lg bg-purple-500/10 text-purple-500">{req.icon}</div>
+                                                </div>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-lg font-black text-slate-900 dark:text-white">{Math.round(req.val)}</span>
+                                                    <span className="text-[8px] font-bold text-slate-400">{req.unit}</span>
+                                                </div>
+                                                <p className="text-[7px] font-bold text-slate-400 mt-1">Total: {Math.round(req.val * simulationDay)} ({simulationDay}d)</p>
+                                            </div>
+                                        ));
+                                    })()}
+                                </div>
+                            </div>
+
+                            {/* Deficit Analysis - Required vs Actual */}
+                            <div className="space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/40 dark:to-slate-800/20 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center gap-2">
+                                    <Scale size={16} className="text-blue-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deficit Analysis</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {(() => {
+                                        const profile = SURVIVAL_PROFILES[profileType];
+                                        const analysis = [
+                                            { label: 'Energy', required: profile.energy_floor * simulationDay, actual: simStatus.results.energy, unit: 'kcal', deficit: (profile.energy_floor * simulationDay) - simStatus.results.energy },
+                                            { label: 'Hydration', required: profile.water_floor * simulationDay, actual: simStatus.results.water, unit: 'L', deficit: (profile.water_floor * simulationDay) - simStatus.results.water },
+                                            { label: 'Thiamine (B1)', required: profile.b1_floor * simulationDay, actual: simStatus.results.b1, unit: 'mg', deficit: (profile.b1_floor * simulationDay) - simStatus.results.b1 },
+                                            { label: 'Vitamin C', required: profile.vit_c_floor * simulationDay, actual: simStatus.results.vit_c, unit: 'mg', deficit: (profile.vit_c_floor * simulationDay) - simStatus.results.vit_c }
+                                        ];
+                                        return analysis.map(item => {
+                                            const percentMet = item.actual > 0 ? Math.round((item.actual / item.required) * 100) : 0;
+                                            const isDeficient = item.actual < item.required;
+                                            return (
+                                                <div key={item.label} className={cn("p-6 rounded-2xl border-2", isDeficient ? "bg-rose-50/50 dark:bg-rose-500/5 border-rose-200 dark:border-rose-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-500/30")}>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h4 className="text-[9px] font-black uppercase tracking-widest">{item.label}</h4>
+                                                        <div className={cn("px-2 py-1 rounded-lg text-[8px] font-black uppercase", isDeficient ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
+                                                            {percentMet}%
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div>
+                                                            <p className="text-[8px] font-bold text-slate-500 mb-1">Required: {Math.round(item.required)} {item.unit}</p>
+                                                            <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                                <div className="h-full bg-slate-400 dark:bg-slate-600" style={{ width: '100%' }} />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <p className={cn("text-[8px] font-bold mb-1", isDeficient ? "text-rose-600" : "text-emerald-600")}>Actual: {Math.round(item.actual)} {item.unit}</p>
+                                                            <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                                <div className={cn("h-full", isDeficient ? "bg-rose-500" : "bg-emerald-500")} style={{ width: `${Math.min(percentMet, 100)}%` }} />
+                                                            </div>
+                                                        </div>
+                                                        {isDeficient && (
+                                                            <p className="text-[8px] font-black text-rose-600 uppercase tracking-wider">Shortfall: {Math.round(item.deficit)} {item.unit}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        });
+                                    })()}
+                                </div>
+                            </div>
+
+                            {/* Critical Timeline - When nutrients run out */}
+                            <div className="space-y-6 bg-amber-50 dark:bg-amber-500/5 p-8 rounded-[3rem] border border-amber-200 dark:border-amber-500/30">
+                                <div className="flex items-center gap-2">
+                                    <Calendar size={16} className="text-amber-600 dark:text-amber-400" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Critical Timeline</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    {(() => {
+                                        const profile = SURVIVAL_PROFILES[profileType];
+                                        const timeline = [
+                                            { label: 'Energy Depletion', daysUntil: Math.max(0, Math.ceil((INITIAL_STORES.energy + inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0)) / profile.energy_floor)), critical: 21 },
+                                            { label: 'Dehydration Risk', daysUntil: Math.max(0, Math.ceil((INITIAL_STORES.water + inventory.reduce((acc, i) => acc + (i.nutrition?.Potassium || 0) * (i.weight_g / 100), 0) / 1000) / profile.water_floor)), critical: 3 },
+                                            { label: 'Vitamin C Depletion', daysUntil: Math.max(0, Math.ceil((INITIAL_STORES.vit_c * profile.vit_c_floor + inventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['Vitamin C'] || 0) * (i.weight_g / 100), 0)) / profile.vit_c_floor)), critical: 14 },
+                                            { label: 'Thiamine Deficiency', daysUntil: Math.max(0, Math.ceil((INITIAL_STORES.b1 * profile.b1_floor + inventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['B1 (Thiamine)'] || 0) * (i.weight_g / 100), 0)) / profile.b1_floor)), critical: 7 }
+                                        ];
+                                        return timeline.map(item => (
+                                            <div key={item.label} className={cn("p-4 rounded-2xl border-l-4 flex items-center justify-between", item.daysUntil <= item.critical ? "bg-rose-100 dark:bg-rose-500/10 border-l-rose-500" : "bg-emerald-100 dark:bg-emerald-500/10 border-l-emerald-500")}>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-900 dark:text-white">{item.label}</p>
+                                                    <p className={cn("text-[10px] font-bold mt-1", item.daysUntil <= item.critical ? "text-rose-600" : "text-emerald-600")}>
+                                                        {item.daysUntil > 365 ? 'Beyond Sim' : `Day ${item.daysUntil}`}
+                                                    </p>
+                                                </div>
+                                                <div className={cn("px-4 py-2 rounded-xl text-[9px] font-black uppercase", item.daysUntil <= item.critical ? "bg-rose-600 text-white" : "bg-emerald-600 text-white")}>
+                                                    {item.daysUntil}d
+                                                </div>
+                                            </div>
+                                        ));
+                                    })()}
                                 </div>
                             </div>
 
