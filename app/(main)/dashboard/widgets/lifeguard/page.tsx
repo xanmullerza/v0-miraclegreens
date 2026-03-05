@@ -736,12 +736,14 @@ export default function SurvivalModePage() {
                                                         const results = await searchLocalFood(foodName);
                                                         if (results.length > 0) {
                                                             const food = results[0];
-                                                            newInv.push({
-                                                                id: food.id,
-                                                                name: food.common_name || food.name,
-                                                                weight_g: 800,
-                                                                nutrition: food
-                                                            });
+                                                            if (food.id && food.name) {
+                                                                newInv.push({
+                                                                    id: food.id,
+                                                                    name: food.common_name || food.name,
+                                                                    weight_g: 800,
+                                                                    nutrition: food
+                                                                });
+                                                            }
                                                         }
                                                     } catch (e) { console.error('Failed to load scenario food', e); }
                                                 }
