@@ -66,10 +66,21 @@ export default function SurvivalModePage() {
     // Achievements / Boosts
     const [boosts, setBoosts] = useState<{ id: string, message: string }[]>([]);
 
+    // Scenario Comparison
+    const [comparisonMode, setComparisonMode] = useState(false);
+    const [comparisonInventory, setComparisonInventory] = useState<InventoryItem[]>([]);
+    const [comparisonWaterStatus, setComparisonWaterStatus] = useState<'clean' | 'dirty' | 'none' | null>(null);
+
     const addBoost = (message: string) => {
         const id = Math.random().toString(36).substr(2, 9);
         setBoosts(prev => [...prev, { id, message }]);
         setTimeout(() => setBoosts(prev => prev.filter(b => b.id !== id)), 4000);
+    };
+
+    const startComparison = () => {
+        setComparisonInventory([...inventory]);
+        setComparisonWaterStatus(waterStatus);
+        setComparisonMode(true);
     };
 
     // --- PERSISTENCE ENGINE ---
@@ -329,20 +340,54 @@ export default function SurvivalModePage() {
         waterStatus === 'clean'
     );
 
+    // Comparison mode simulation
+    const comparisonAdjustedInventory = useMemo(() => {
+        if (comparisonWaterStatus === 'none' || comparisonWaterStatus === null) {
+            return comparisonInventory.map(item => ({
+                ...item,
+                nutrition: {
+                    ...item.nutrition,
+                    energy_kcal: (item.nutrition?.energy_kcal || 0) * 0.85
+                }
+            }));
+        } else if (comparisonWaterStatus === 'dirty') {
+            return comparisonInventory.map(item => ({
+                ...item,
+                nutrition: {
+                    ...item.nutrition,
+                    energy_kcal: (item.nutrition?.energy_kcal || 0) * 0.75,
+                    micronutrients: item.nutrition?.micronutrients ? Object.fromEntries(
+                        Object.entries(item.nutrition.micronutrients).map(([k, v]: [string, any]) => [k, v * 0.85])
+                    ) : {}
+                }
+            }));
+        }
+        return comparisonInventory;
+    }, [comparisonInventory, comparisonWaterStatus]);
+
+    const comparisonSimStatus = useMemo(() => {
+        if (!comparisonMode) return null;
+        return calculateSurvivalStatus(
+            comparisonAdjustedInventory,
+            simulationDay,
+            profileType,
+            comparisonWaterStatus === 'clean'
+        );
+    }, [comparisonMode, comparisonAdjustedInventory, simulationDay, profileType, comparisonWaterStatus]);
+
     return (
         <PageContainer>
             {/* Boost Toasts */}
-            <div className="fixed top-24 right-8 z-50 flex flex-col gap-2 pointer-events-none">
+            <div className="fixed top-20 md:top-24 right-4 md:right-8 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw] md:max-w-none">
                 {boosts.map(boost => (
-                    <div key={boost.id} className="bg-emerald-500 text-white px-6 py-3 rounded-2xl shadow-xl font-black uppercase text-[10px] tracking-widest animate-in slide-in-from-right-8 fade-in flex items-center gap-3">
-                        <Sparkles size={16} />
-                        {boost.message}
+                    <div key={boost.id} className="bg-emerald-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-2xl shadow-xl font-black uppercase text-[8px] md:text-[10px] tracking-widest animate-in slide-in-from-right-8 fade-in flex items-center gap-2 md:gap-3">
+                        <Sparkles size={14} className="shrink-0" />
+                        <span className="line-clamp-2">{boost.message}</span>
                     </div>
                 ))}
             </div>
 
-            <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700 pb-20">
-
+            <div className="max-w-4xl mx-auto space-y-8 md:space-y-12 animate-in fade-in duration-700 pb-20 px-3 md:px-4">
                 {/* Always-visible Hero Search with navigation */}
                 <HeroSearch
                     searchQuery={heroSearchQuery}
@@ -527,21 +572,21 @@ export default function SurvivalModePage() {
                     )}
 
                     {step === 'lifeline' && (
-                        <div className="space-y-12 animate-in slide-in-from-bottom-8 duration-700">
-                            {/* LONGEVITY METER - Compact Header */}
-                            <div className="sticky top-20 z-40 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 backdrop-blur-xl p-4 rounded-2xl border-2 border-amber-500/20 shadow-2xl overflow-hidden relative">
+                        <div className="space-y-8 md:space-y-12 animate-in slide-in-from-right-4 duration-500">
+                            {/* LONGEVITY METER - Compact Header (Mobile Optimized) */}
+                            <div className="sticky top-16 md:top-20 z-40 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 backdrop-blur-xl p-3 md:p-4 rounded-xl md:rounded-2xl border-2 border-amber-500/20 shadow-2xl overflow-hidden relative">
                                 {/* Animated Background */}
                                 <div className="absolute inset-0 opacity-10">
                                     <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-transparent to-transparent animate-pulse" />
                                 </div>
                                 
-                                <div className="relative space-y-2">
+                                <div className="relative space-y-1 md:space-y-2">
                                     {/* Title + Ring Row */}
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-baseline gap-2">
-                                                <p className="text-[8px] font-black uppercase tracking-widest text-amber-400">Survival Window:</p>
-                                                <h2 className="text-3xl font-black italic text-white tracking-tighter">{(() => {
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-baseline gap-1 md:gap-2 flex-wrap">
+                                                <p className="text-[7px] md:text-[8px] font-black uppercase tracking-widest text-amber-400">Survival:</p>
+                                                <h2 className="text-2xl md:text-3xl font-black italic text-white tracking-tighter">{(() => {
                                                     // Calculate days until critical failure
                                                     const profile = SURVIVAL_PROFILES[profileType];
                                                     const energyDays = inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0) / profile.energy_floor;
@@ -552,30 +597,30 @@ export default function SurvivalModePage() {
                                             </div>
                                         </div>
                                         
-                                        {/* Status Ring - Compact */}
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <div className={cn("w-16 h-16 rounded-full flex items-center justify-center border-3 animate-pulse", simStatus.isTerminal ? "border-rose-500 bg-rose-500/10" : "border-emerald-500 bg-emerald-500/10")}>
+                                        {/* Status Ring - Compact (Mobile Optimized) */}
+                                        <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+                                            <div className={cn("w-12 md:w-16 h-12 md:h-16 rounded-full flex items-center justify-center border-3 animate-pulse", simStatus.isTerminal ? "border-rose-500 bg-rose-500/10" : "border-emerald-500 bg-emerald-500/10")}>
                                                 <div className="text-center">
-                                                    <p className={cn("text-2xl font-black", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
+                                                    <p className={cn("text-lg md:text-2xl font-black", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
                                                         {simStatus.results.energy > 0 ? '✓' : '✗'}
                                                     </p>
-                                                    <p className="text-[6px] font-black uppercase leading-none text-white">
+                                                    <p className="text-[5px] md:text-[6px] font-black uppercase leading-none text-white">
                                                         {simStatus.isTerminal ? 'CRIT' : 'OK'}
                                                     </p>
                                                 </div>
                                             </div>
                                             
-                                            <div className={cn("px-2 py-1 rounded-full text-[7px] font-black uppercase tracking-widest whitespace-nowrap", profileType === 'starvation' ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
+                                            <div className={cn("px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-[6px] md:text-[7px] font-black uppercase tracking-widest whitespace-nowrap", profileType === 'starvation' ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
                                                 {profileType === 'starvation' ? 'STARV' : 'MAINT'}
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Slider Row - Compact */}
-                                    <div className="space-y-1 pt-2 border-t border-slate-700">
-                                        <div className="flex items-center justify-between gap-2">
+                                    {/* Slider Row - Compact (Mobile Optimized) */}
+                                    <div className="space-y-0.5 md:space-y-1 pt-2 border-t border-slate-700">
+                                        <div className="flex items-center justify-between gap-1 md:gap-2">
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-[8px] font-bold text-white truncate">
+                                                <p className="text-[7px] md:text-[8px] font-bold text-white truncate">
                                                     Day {simulationDay} • Energy: <span className={simStatus.results.energy > 0 ? "text-emerald-400" : "text-rose-400"}>{Math.round(simStatus.results.energy)}</span> kcal
                                                 </p>
                                             </div>
@@ -604,6 +649,164 @@ export default function SurvivalModePage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* SCENARIO COMPARISON TOGGLE */}
+                            {inventory.length > 0 && (
+                                <div className="flex gap-2 md:gap-3 flex-wrap justify-center">
+                                    <Button
+                                        onClick={startComparison}
+                                        disabled={comparisonMode}
+                                        className="text-[8px] uppercase font-black px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white disabled:opacity-50"
+                                    >
+                                        ⚖️ Compare Scenario
+                                    </Button>
+                                    {comparisonMode && (
+                                        <Button
+                                            onClick={() => setComparisonMode(false)}
+                                            className="text-[8px] uppercase font-black px-4 py-2 rounded-xl bg-slate-500 hover:bg-slate-600 text-white"
+                                        >
+                                            ✕ Close Comparison
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* VISUAL SURVIVAL CALENDAR - 30-day depletion timeline */}
+                            {inventory.length > 0 && (
+                                <div className="space-y-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/40 dark:to-slate-800/20 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
+                                    <div className="flex items-center gap-2">
+                                        <Calendar size={16} className="text-indigo-500" />
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Survival Timeline</h3>
+                                        <p className="text-[7px] text-slate-500 ml-auto">30-day nutrient depletion forecast</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {(() => {
+                                            const profile = SURVIVAL_PROFILES[profileType];
+                                            const nutrients = [
+                                                { label: 'Energy', calc: () => Math.ceil((INITIAL_STORES.energy + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0)) / profile.energy_floor), color: 'from-red-500 to-orange-500', icon: '🔥' },
+                                                { label: 'Vitamin C', calc: () => Math.ceil((INITIAL_STORES.vit_c * profile.vit_c_floor + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['Vitamin C'] || 0) * (i.weight_g / 100), 0)) / profile.vit_c_floor), color: 'from-orange-500 to-amber-500', icon: '🍊' },
+                                                { label: 'B1 (Thiamine)', calc: () => Math.ceil((INITIAL_STORES.b1 * profile.b1_floor + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['B1 (Thiamine)'] || 0) * (i.weight_g / 100), 0)) / profile.b1_floor), color: 'from-purple-500 to-pink-500', icon: '💊' },
+                                                { label: 'Water', calc: () => waterStatus === 'clean' ? 30 : (waterStatus === 'dirty' ? 8 : 3), color: 'from-blue-500 to-cyan-500', icon: '💧' }
+                                            ];
+
+                                            return nutrients.map((nutrient) => {
+                                                const daysLeft = Math.min(nutrient.calc(), 30);
+                                                return (
+                                                    <div key={nutrient.label} className="space-y-1">
+                                                        <div className="flex items-center justify-between text-[8px]">
+                                                            <div className="flex items-center gap-1.5 font-black uppercase">
+                                                                <span>{nutrient.icon}</span>
+                                                                <span className="text-slate-900 dark:text-white">{nutrient.label}</span>
+                                                            </div>
+                                                            <span className={`font-black px-2 py-0.5 rounded-full ${daysLeft > 20 ? 'bg-emerald-500 text-white' : daysLeft > 10 ? 'bg-amber-500 text-white' : 'bg-rose-500 text-white'}`}>
+                                                                Day {daysLeft}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex gap-0.5 h-4">
+                                                            {Array.from({ length: 30 }).map((_, day) => {
+                                                                const isDepleted = day >= daysLeft;
+                                                                return (
+                                                                    <div
+                                                                        key={day}
+                                                                        className={`flex-1 rounded-sm transition-all ${isDepleted ? 'bg-slate-200 dark:bg-slate-700' : `bg-gradient-to-r ${nutrient.color}`}`}
+                                                                        title={`Day ${day + 1}`}
+                                                                    />
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            });
+                                        })()}
+                                    </div>
+
+                                    <div className="text-[7px] text-slate-500 dark:text-slate-400 mt-3 p-2 bg-slate-100 dark:bg-slate-900/50 rounded border border-slate-200 dark:border-slate-700">
+                                        {waterStatus && waterStatus !== 'clean' && (
+                                            <p className="font-bold text-amber-600 dark:text-amber-400">⚠️ Water penalty active: {waterStatus === 'dirty' ? '-25% nutrients' : '-15% energy'} (affects calculations above)</p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* COMPARISON PANEL */}
+                            {comparisonMode && comparisonSimStatus && (
+                                <div className="space-y-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 p-6 rounded-2xl border-2 border-indigo-200 dark:border-indigo-500/30">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400">Scenario Comparison</h3>
+                                        <p className="text-[7px] text-slate-500">Modify the alternate scenario below</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Original */}
+                                        <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-lg border border-emerald-200 dark:border-emerald-500/30 space-y-2">
+                                            <p className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400">Current Scenario</p>
+                                            <div className="text-[8px] space-y-1 font-bold">
+                                                <p>Survival Window: <span className="text-emerald-600 dark:text-emerald-400">{Math.min(30, Math.max(0, Math.ceil((INITIAL_STORES.energy + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0)) / SURVIVAL_PROFILES[profileType].energy_floor + 20)))} days</span></p>
+                                                <p>Items: <span className="text-emerald-600 dark:text-emerald-400">{inventory.length}</span></p>
+                                                <p>Water: <span className="text-emerald-600 dark:text-emerald-400">{waterStatus || 'none'}</span></p>
+                                            </div>
+                                        </div>
+
+                                        {/* Comparison */}
+                                        <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-lg border border-indigo-200 dark:border-indigo-500/30 space-y-2">
+                                            <p className="text-[9px] font-black uppercase text-indigo-600 dark:text-indigo-400">Alternate Scenario</p>
+                                            <div className="text-[8px] space-y-1 font-bold">
+                                                <p>Survival Window: <span className="text-indigo-600 dark:text-indigo-400">{Math.min(30, Math.max(0, Math.ceil((INITIAL_STORES.energy + comparisonAdjustedInventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0)) / SURVIVAL_PROFILES[profileType].energy_floor + 20)))} days</span></p>
+                                                <p>Items: <span className="text-indigo-600 dark:text-indigo-400">{comparisonInventory.length}</span></p>
+                                                <p>Water: <span className="text-indigo-600 dark:text-indigo-400">{comparisonWaterStatus || 'none'}</span></p>
+                                            </div>
+
+                                            <div className="space-y-2 pt-3 border-t border-indigo-200 dark:border-indigo-500/30">
+                                                <div className="space-y-1">
+                                                    <label className="text-[7px] font-black uppercase text-slate-600 dark:text-slate-400">Water Source</label>
+                                                    <div className="grid grid-cols-3 gap-1">
+                                                        {['clean', 'dirty', 'none'].map((status) => (
+                                                            <button
+                                                                key={status}
+                                                                onClick={() => setComparisonWaterStatus(status as any)}
+                                                                className={`text-[7px] font-black uppercase px-2 py-1 rounded ${comparisonWaterStatus === status ? 'bg-indigo-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                                            >
+                                                                {status}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-[7px] text-indigo-700 dark:text-indigo-300 bg-indigo-100/50 dark:bg-indigo-500/20 p-2 rounded border border-indigo-200 dark:border-indigo-500/30 font-bold">
+                                        💡 Tip: Adjust comparison inventory items below and change water status to test different scenarios
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* COMPARISON INVENTORY EDITOR */}
+                            {comparisonMode && (
+                                <div className="space-y-3 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-indigo-200 dark:border-indigo-500/30">
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Edit Comparison Inventory</h3>
+                                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                                        {comparisonInventory.map((item) => (
+                                            <div key={item.id} className="p-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="2000"
+                                                    step="50"
+                                                    value={item.weight_g}
+                                                    onChange={(e) => setComparisonInventory(comparisonInventory.map(i => i.id === item.id ? { ...i, weight_g: parseInt(e.target.value) } : i))}
+                                                    className="flex-1 h-1.5 accent-indigo-500"
+                                                />
+                                                <span className="text-[8px] font-black text-slate-600 dark:text-slate-400 w-12 text-right">{item.weight_g}g</span>
+                                                <button onClick={() => setComparisonInventory(comparisonInventory.filter(i => i.id !== item.id))} className="text-rose-500 hover:text-rose-600">
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* INVENTORY MANAGER - Interactive */}
                             <div className="space-y-4 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
