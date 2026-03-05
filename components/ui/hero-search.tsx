@@ -186,7 +186,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                     )}
                 </div>
                 {/* Footer */}
-                <div className="p-2 md:p-4 flex items-center gap-2 bg-transparent dark:bg-transparent order-2 rounded-b-[2.5rem]">
+                <div className="p-2 md:p-4 flex items-center gap-2 bg-slate-50/50 dark:bg-slate-800/10 order-2 rounded-b-[2.5rem]">
                     {props.powerButton}
                     <div className="flex-1 relative flex items-center">
                         <div className={cn("absolute left-4 transition-colors", isActive ? style.accent : 'text-slate-300')}>
