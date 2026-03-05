@@ -450,23 +450,23 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                     };
                     const c = colors[tier];
                     return (
-                        <div className="hidden lg:grid grid-cols-2 gap-1.5">
+                        <div className="hidden lg:grid grid-cols-2 gap-1">
                             <button
                                 onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
-                                className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1", c.btn, activePanel === 'stocked' && "ring-2 ring-offset-1 ring-current")}
+                                className={cn("text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-0.5", c.btn, activePanel === 'stocked' && "ring-2 ring-offset-1 ring-current")}
                             >
-                                <ShoppingBasket size={9} />
+                                <ShoppingBasket size={8} />
                                 {matchCount}/{recipeIngs.length} Stocked
                             </button>
                             {toBuyState === 'ready' ? (
-                                <div className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1">
-                                    <Sparkles size={9} /> Ready
+                                <div className="text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-0.5">
+                                    <Sparkles size={8} /> Ready
                                 </div>
                             ) : (
                                 <button
                                     onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
                                     className={cn(
-                                        "text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1",
+                                        "text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-0.5",
                                         toBuyState === 'toBuy'
                                             ? "border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500"
                                             : "border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500",
@@ -474,8 +474,8 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                     )}
                                 >
                                     {toBuyState === 'toBuy'
-                                        ? <><ShoppingCart size={9} />{uniqueMissing.length}/{recipeIngs.length} To Buy</>
-                                        : <><ShoppingBasket size={9} />{uniqueMissing.length}/{recipeIngs.length} To Add</>
+                                        ? <><ShoppingCart size={8} />{uniqueMissing.length}/{recipeIngs.length} To Buy</>
+                                        : <><ShoppingBasket size={8} />{uniqueMissing.length}/{recipeIngs.length} To Add</>
                                     }
                                 </button>
                             )}
@@ -483,22 +483,22 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                 <button
                                     onClick={(e: React.MouseEvent) => { e.stopPropagation(); if (!isEaten) onMarkEaten(); }}
                                     className={cn(
-                                        "text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border transition-all flex items-center justify-center gap-1",
+                                        "text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border transition-all flex items-center justify-center gap-0.5",
                                         isEaten
                                             ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default"
                                             : "border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
                                     )}
                                 >
-                                    {isEaten && <Check size={9} />}
+                                    {isEaten && <Check size={8} />}
                                     {isEaten ? "Eaten" : "Eaten?"}
                                 </button>
                             ) : <div />}
                             {onRegenerate && !isEaten ? (
                                 <button
                                     onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRegenerate(); }}
-                                    className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-1"
+                                    className="text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-0.5"
                                 >
-                                    <RotateCcw size={9} /> Shuffle
+                                    <RotateCcw size={8} /> Shuffle
                                 </button>
                             ) : <div />}
                         </div>
@@ -1725,14 +1725,14 @@ export function MealPlannerContent({
                 {step === 3 && plan && (
                     <div className="space-y-6 animate-in fade-in-up duration-500">
                         {/* List Header */}
-                        <div className="hidden lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center gap-2"><Camera size={14} /> Plate</div>
-                            <div className="flex items-center gap-2"><ChefHat size={14} /> Meal Details</div>
-                            <div className="text-right flex items-center justify-end gap-2"><Zap size={14} /> Energy</div>
-                            <div className="text-right flex items-center justify-end gap-2"><Wheat size={14} /> Carbs</div>
-                            <div className="text-right flex items-center justify-end gap-2"><Droplet size={14} /> Fat</div>
-                            <div className="text-right flex items-center justify-end gap-2"><Beef size={14} /> Protein</div>
-                            <div className="text-right flex items-center justify-end gap-2"><Activity size={14} /> Control</div>
+                        <div className="hidden lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-3 px-8 pb-3 text-[8px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1.5"><Camera size={12} /> Plate</div>
+                            <div className="flex items-center gap-1.5"><ChefHat size={12} /> Meal Details</div>
+                            <div className="text-right flex items-center justify-end gap-1.5"><Zap size={12} /> Energy</div>
+                            <div className="text-right flex items-center justify-end gap-1.5"><Wheat size={12} /> Carbs</div>
+                            <div className="text-right flex items-center justify-end gap-1.5"><Droplet size={12} /> Fat</div>
+                            <div className="text-right flex items-center justify-end gap-1.5"><Beef size={12} /> Protein</div>
+                            <div className="text-right flex items-center justify-end gap-1.5"><Activity size={12} /> Control</div>
                         </div>
 
                         <div className="space-y-4">
