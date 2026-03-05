@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DidYouKnow } from '@/components/DidYouKnow';
+import { PageContainer } from '@/components/ui/page-container';
 import { cn } from '@/lib/utils';
 
 import {
@@ -1364,8 +1365,9 @@ export function MealPlannerContent({
     const isFormComplete = Boolean(age && weight && height);
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
-            {/* Hero Search */}
+        <PageContainer maxWidth="max-w-7xl">
+            <div className="space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
+                {/* Hero Search */}
             <HeroSearch
                 searchQuery={heroSearchQuery}
                 onQueryChange={handleHeroInput}
@@ -2583,7 +2585,8 @@ export function MealPlannerContent({
                 )
             }
 
-        </div >
+            </div>
+        </PageContainer>
     );
 }
 
