@@ -266,8 +266,7 @@ export default function PantryPage() {
         <PageContainer maxWidth="max-w-7xl">
             <div className="space-y-8 animate-in fade-in duration-700">
                 {/* Hero Search */}
-                <div className="pt-6">
-                    <HeroSearch
+                <HeroSearch
                         searchQuery={searchQuery}
                         onQueryChange={setSearchQuery}
                         results={searchResults}
@@ -307,7 +306,6 @@ export default function PantryPage() {
                             </>
                         )}
                     />
-                </div>
 
                 {/* Quick Add Panel */}
                 {showAddModal && selectedFood && (

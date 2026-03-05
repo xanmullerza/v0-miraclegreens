@@ -35,7 +35,6 @@ export default function IngredientsPage() {
                     theme="emerald"
                     placeholder="SEARCH FOOD LIBRARY..."
                     idleTitle="Food Library"
-                    idleSubtitle="Browse and search our foods library"
                 />
 
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">

@@ -94,7 +94,7 @@ export default function WidgetsPage() {
                     theme="emerald"
                     placeholder="SEARCH WIDGETS..."
                     idleTitle="Widgets Library"
-                    idleSubtitle="Mini-apps for nutrition analysis and comparison"
+
                 />
 
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">

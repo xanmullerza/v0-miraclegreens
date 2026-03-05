@@ -39,7 +39,6 @@ export default function MealsPage() {
                         theme="emerald"
                         placeholder="SEARCH MEALS LIBRARY..."
                         idleTitle="Meals Library"
-                        idleSubtitle="Browse and search our meals library"
                     />
 
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
