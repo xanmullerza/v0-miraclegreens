@@ -38,7 +38,7 @@ export default function MealsPage() {
                         hideResults
                         theme="emerald"
                         placeholder="SEARCH MEALS LIBRARY..."
-                        idleTitle="Meals Library"
+                        idleTitle="Recipes"
                     />
 
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">

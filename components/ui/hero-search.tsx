@@ -83,7 +83,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
         } else if (pathLower.includes('/shopping')) {
             return 'Shopping List';
         } else if (pathLower.includes('/planner')) {
-            return 'Plan Your Meals';
+            return 'Meal Planner';
         } else if (pathLower.includes('/maker')) {
             return 'Create a Meal';
         } else if (pathLower.includes('/browse')) {

@@ -93,7 +93,7 @@ export default function WidgetsPage() {
                     hideResults
                     theme="emerald"
                     placeholder="SEARCH WIDGETS..."
-                    idleTitle="Widgets Library"
+                    idleTitle="Widgets"
 
                 />
 
