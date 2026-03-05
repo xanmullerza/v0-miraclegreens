@@ -311,7 +311,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
         <div
             onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
             className={cn(
-                "group relative rounded-2xl border hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0",
+                "group relative rounded-2xl border hover:shadow-lg transition-all cursor-pointer overflow-hidden p-1 lg:p-0",
                 isEaten
                     ? "bg-emerald-50/60 dark:bg-emerald-900/20 border-emerald-400/40 opacity-75"
                     : "bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:border-emerald-500/30"
@@ -322,34 +322,34 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                     <CheckCircle2 size={10} /> Eaten
                 </div>
             )}
-            <div className="lg:grid lg:grid-cols-[110px_1fr_80px_70px_70px_70px_220px] gap-2 lg:items-center lg:px-8">
+            <div className="lg:grid lg:grid-cols-[100px_1fr_60px_60px_60px_60px_240px] gap-1.5 lg:items-center lg:px-6">
                 {/* Thumbnail */}
-                <div className="aspect-[4/3] lg:aspect-square w-full lg:w-30 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                <div className="aspect-[4/3] lg:aspect-square w-full lg:w-24 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                     {recipe.image ? (
                         <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-slate-300">
-                            <ChefHat size={24} className="opacity-20" />
+                            <ChefHat size={18} className="opacity-20" />
                         </div>
                     )}
-                    <div className="absolute top-2 left-2 bg-black/60 text-white text-[8px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm uppercase">{mealLabel}</div>
+                    <div className="absolute top-1 left-1 bg-black/60 text-white text-[7px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-sm uppercase">{mealLabel}</div>
                 </div>
 
                 {/* Info */}
-                <div className="p-3 lg:p-0">
-                    <h3 className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                <div className="p-1 lg:p-0">
+                    <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                         {recipe.title}
                     </h3>
-                    <div className="flex items-center gap-3 mt-1">
-                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
-                            <Clock size={10} />
+                    <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter">
+                            <Clock size={8} />
                             {recipe.prepTime}m
                         </div>
-                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
-                            <Users size={10} />
+                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter">
+                            <Users size={8} />
                             {recipe.servings}P
                         </div>
-                        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest px-1.5 py-0">
+                        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[7px] border-none uppercase tracking-wide px-1 py-0">
                             {recipe.type}
                         </Badge>
                     </div>
@@ -365,7 +365,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         };
                         const c = colors[tier];
                         return (
-                            <div className="mt-3 grid grid-cols-2 gap-2 lg:hidden">
+                            <div className="mt-2 grid grid-cols-2 gap-1 lg:hidden">
                                 <button
                                     onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
                                     className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5", c.btn, activePanel === 'stocked' && "ring-2 ring-offset-1 ring-current")}
@@ -423,21 +423,21 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                 </div>
 
                 {/* Stats (Desktop View) */}
-                <div className="hidden lg:flex flex-col items-end">
-                    <span className="text-[9px] uppercase font-black text-slate-400">Energy</span>
-                    <span className="font-black text-sm text-slate-900 dark:text-white">{formatEnergy(recipe.calories, unit)}</span>
+                <div className="hidden lg:flex flex-col items-end gap-0.5">
+                    <span className="text-[7px] uppercase font-black text-slate-400">Energy</span>
+                    <span className="font-black text-[10px] text-slate-900 dark:text-white">{formatEnergy(recipe.calories, unit)}</span>
                 </div>
-                <div className="hidden lg:flex flex-col items-end">
-                    <span className="text-[9px] uppercase font-black text-slate-400">Carbs</span>
-                    <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.carbs.toFixed(1)}g</span>
+                <div className="hidden lg:flex flex-col items-end gap-0.5">
+                    <span className="text-[7px] uppercase font-black text-slate-400">Carbs</span>
+                    <span className="font-black text-[10px] text-slate-900 dark:text-white">{recipe.carbs.toFixed(1)}g</span>
                 </div>
-                <div className="hidden lg:flex flex-col items-end">
-                    <span className="text-[9px] uppercase font-black text-slate-400">Fat</span>
-                    <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.fat.toFixed(1)}g</span>
+                <div className="hidden lg:flex flex-col items-end gap-0.5">
+                    <span className="text-[7px] uppercase font-black text-slate-400">Fat</span>
+                    <span className="font-black text-[10px] text-slate-900 dark:text-white">{recipe.fat.toFixed(1)}g</span>
                 </div>
-                <div className="hidden lg:flex flex-col items-end">
-                    <span className="text-[9px] uppercase font-black text-slate-400">Protein</span>
-                    <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
+                <div className="hidden lg:flex flex-col items-end gap-0.5">
+                    <span className="text-[7px] uppercase font-black text-slate-400">Protein</span>
+                    <span className="font-black text-[10px] text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
                 </div>
 
                 {/* Action Grid (Desktop only — last column) */}
@@ -1725,7 +1725,7 @@ export function MealPlannerContent({
                 {step === 3 && plan && (
                     <div className="space-y-6 animate-in fade-in-up duration-500">
                         {/* List Header */}
-                        <div className="hidden lg:grid lg:grid-cols-[110px_1fr_80px_70px_70px_70px_220px] gap-2 px-8 pb-3 text-[8px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                        <div className="hidden lg:grid lg:grid-cols-[100px_1fr_60px_60px_60px_60px_240px] gap-1.5 px-6 pb-2 text-[8px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5"><Camera size={12} /> Plate</div>
                             <div className="flex items-center gap-1.5"><ChefHat size={12} /> Meal Details</div>
                             <div className="text-right flex items-center justify-end gap-1.5"><Zap size={12} /> Energy</div>
