@@ -114,7 +114,7 @@ export default function FoodDetailsPage() {
     const [user, setUser] = useState<any>(null);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [activeSection, setActiveSection] = useState<'facts' | 'nutrition' | 'recipes' | 'management' | null>('recipes');
+    const [activeSection, setActiveSection] = useState<'facts' | 'nutrition' | 'recipes' | 'management' | null>('facts');
     const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
     const [quickAddQty, setQuickAddQty] = useState('1');
     const [quickAddWeight, setQuickAddWeight] = useState('');
