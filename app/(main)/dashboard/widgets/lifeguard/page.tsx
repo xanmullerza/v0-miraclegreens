@@ -578,6 +578,112 @@ export default function SurvivalModePage() {
                                 </div>
                             </div>
 
+                            {/* INVENTORY MANAGER - Interactive */}
+                            <div className="space-y-4 bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Library size={16} className="text-blue-500" />
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Survival Pantry</h3>
+                                        <Badge className="bg-blue-500/20 text-blue-600 dark:text-blue-300 text-[8px] font-black">
+                                            {inventory.length} items
+                                        </Badge>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-[8px] uppercase font-black text-blue-500 hover:text-blue-400 px-2 py-1 h-auto gap-1"
+                                        onClick={() => {
+                                            setIsHeroActive(!isHeroActive);
+                                            setHeroSearchQuery('');
+                                            setHeroResults([]);
+                                        }}
+                                    >
+                                        <Plus size={12} />
+                                        Add Item
+                                    </Button>
+                                </div>
+
+                                {isHeroActive && (
+                                    <div className="space-y-2 p-3 bg-white dark:bg-slate-900 rounded-lg border border-blue-200 dark:border-blue-500/30">
+                                        <input
+                                            type="text"
+                                            placeholder="Search foods..."
+                                            value={heroSearchQuery}
+                                            onChange={(e) => handleHeroSearchInput(e.target.value)}
+                                            className="w-full px-3 py-2 text-[10px] rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            autoFocus
+                                        />
+                                        {isHeroSearching && (
+                                            <div className="flex items-center justify-center py-4">
+                                                <Loader2 size={14} className="animate-spin text-blue-500" />
+                                            </div>
+                                        )}
+                                        {heroResults.length > 0 && (
+                                            <div className="space-y-1 max-h-40 overflow-y-auto">
+                                                {heroResults.slice(0, 8).map((food) => (
+                                                    <button
+                                                        key={food.id}
+                                                        onClick={() => addIngredient(food)}
+                                                        className="w-full text-left px-3 py-2 text-[8px] rounded-lg bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-100 dark:border-blue-500/20 transition-colors"
+                                                    >
+                                                        <p className="font-black uppercase text-slate-900 dark:text-white">{food.common_name || food.name}</p>
+                                                        <p className="text-[7px] text-slate-500 dark:text-slate-400">Energy: {Math.round(food.energy_kcal || 0)} kcal/100g</p>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {heroSearchQuery && !isHeroSearching && heroResults.length === 0 && (
+                                            <p className="text-[8px] text-slate-500 py-2 text-center">No results found</p>
+                                        )}
+                                    </div>
+                                )}
+
+                                {inventory.length > 0 ? (
+                                    <div className="space-y-3">
+                                        {inventory.map((item) => (
+                                            <div key={item.id} className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-[9px] font-black uppercase text-slate-900 dark:text-white truncate">
+                                                            {item.name}
+                                                        </p>
+                                                        <p className="text-[7px] text-slate-500 dark:text-slate-400">
+                                                            {Math.round(item.weight_g)}g • ~{Math.round((item.nutrition?.energy_kcal || 0) * (item.weight_g / 100))} kcal
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeInventoryItem(item.id)}
+                                                        className="shrink-0 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors text-rose-500"
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="space-y-1">
+                                                    <input
+                                                        type="range"
+                                                        min="0"
+                                                        max="5000"
+                                                        step="50"
+                                                        value={item.weight_g}
+                                                        onChange={(e) => updateInventoryWeight(item.id, parseInt(e.target.value))}
+                                                        className="w-full h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500"
+                                                    />
+                                                    <div className="flex justify-between text-[7px] text-slate-400">
+                                                        <span>0g</span>
+                                                        <span>5kg</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="py-6 text-center">
+                                        <p className="text-[9px] font-black uppercase text-slate-500 dark:text-slate-400">No items yet. Click "Add Item" to start.</p>
+                                    </div>
+                                )}
+                            </div>
+
                             {/* NUTRIENT CASCADE TIMELINE */}
                             <div className="space-y-6 bg-slate-50 dark:bg-slate-800/30 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700">
                                 <div className="flex items-center gap-2">
