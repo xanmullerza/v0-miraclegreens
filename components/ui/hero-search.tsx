@@ -134,8 +134,8 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                 <div className="flex-1 min-w-0">
                 <div
                     className={cn(
-                        'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[240px]',
-                        isActive ? `${style.ring} ${style.border}` : ''
+                        'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[240px]',
+                        isActive ? `${style.ring}` : ''
                     )}
                 >
                 {/* Dynamic content */}
