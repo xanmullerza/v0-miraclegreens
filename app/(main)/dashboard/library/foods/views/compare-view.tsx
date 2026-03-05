@@ -461,11 +461,11 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                     <table className="w-full border-collapse table-fixed md:table-auto">
                         <thead className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
                             <tr>
-                                <th className="p-2 md:p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-[100px] md:w-1/4 min-w-[100px] md:min-w-[200px] sticky left-0 z-40 bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-100 dark:border-slate-800">
+                                <th className="p-2 md:p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-1/4 sticky left-0 z-40 bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-100 dark:border-slate-800">
                                     <p className="text-[7px] md:text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none">per 100g</p>
                                 </th>
                                 {[0, 1, 2].map((i) => (
-                                    <th key={i} className="p-2 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-[85px] md:w-1/4 min-w-[85px] md:min-w-0">
+                                    <th key={i} className="p-2 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-1/4">
                                         <div className="flex flex-col items-center gap-1 md:gap-2">
                                             {selectedFoods[i] ? (
                                                 <div className="relative group/card flex flex-col items-center">
