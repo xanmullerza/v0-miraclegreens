@@ -263,7 +263,7 @@ export default function PantryPage() {
     };
 
     return (
-        <PageContainer maxWidth="max-w-5xl">
+        <PageContainer maxWidth="max-w-7xl">
             <div className="space-y-8 animate-in fade-in duration-700">
                 {/* Hero Search */}
                 <div className="pt-6">

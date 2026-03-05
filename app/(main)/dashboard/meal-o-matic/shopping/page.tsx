@@ -222,7 +222,7 @@ export default function ShoppingListPage() {
 
 
     return (
-        <PageContainer>
+        <PageContainer maxWidth="max-w-7xl">
             <div className="space-y-8 animate-in fade-in duration-500">
                 <HeroSearch
                     searchQuery={searchQuery}
