@@ -1,9 +1,8 @@
 ﻿'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, LayoutDashboard, User, LogOut, Leaf } from 'lucide-react';
+import { LayoutDashboard, User, LogOut, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect } from 'react';
 // import { ModeToggle } from '@/components/mode-toggle';
@@ -31,42 +30,11 @@ export function Header() {
 		<header className="sticky top-0 z-50 bg-emerald-500 border-b border-emerald-600 text-white">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="flex h-16 items-center justify-between">
-					{/* Mobile menu (only Shop & Donate) */}
-					<Sheet>
-						<SheetTrigger asChild className="lg:hidden">
-							<Button
-								variant="ghost"
-								size="icon"
-								className="text-white hover:bg-white/10"
-							>
-								<Menu className="h-5 w-5" />
-								<span className="sr-only">Open menu</span>
-							</Button>
-						</SheetTrigger>
-						<SheetContent side="left" className="w-[300px] bg-background">
-							<div className="flex flex-col gap-6 mt-8">
-								{showDashboard && (
-									<Button className="gap-2 mt-4" asChild>
-										<Link href="/dashboard">
-											<LayoutDashboard className="h-4 w-4" />
-											Dashboard
-										</Link>
-									</Button>
-								)}
-
-								{/* <div className="flex items-center gap-2 mt-2">
-									<ModeToggle />
-									<span className="text-muted-foreground text-sm">Switch Theme</span>
-								</div> */}
-							</div>
-						</SheetContent>
-					</Sheet>
-
 					{/* Logo */}
 					<Link href="/" className="flex items-center gap-2">
-					<Leaf className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-					<span className="hidden sm:inline font-semibold text-lg text-white">VITALA</span>
-				</Link>
+						<Leaf className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+						<span className="font-semibold text-lg text-white">VITALA</span>
+					</Link>
 					<div className="flex items-center gap-2">
 						{user ? (
 							<>
