@@ -184,7 +184,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                             )}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-start pt-2 md:pt-4 text-center h-full animate-in fade-in duration-700">
+                        <div className="flex flex-col items-center justify-start text-center h-full animate-in fade-in duration-700">
                             <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">{finalIdleTitle}</h3>
                             {idleSubtitle && <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">{idleSubtitle}</p>}
                             {props.idleExtra}
