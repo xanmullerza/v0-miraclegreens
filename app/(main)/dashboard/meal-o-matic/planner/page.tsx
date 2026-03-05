@@ -322,7 +322,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                     <CheckCircle2 size={10} /> Eaten
                 </div>
             )}
-            <div className="lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 lg:items-center lg:px-8">
+            <div className="lg:grid lg:grid-cols-[110px_1fr_80px_70px_70px_70px_220px] gap-2 lg:items-center lg:px-8">
                 {/* Thumbnail */}
                 <div className="aspect-[4/3] lg:aspect-square w-full lg:w-30 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                     {recipe.image ? (
@@ -1725,7 +1725,7 @@ export function MealPlannerContent({
                 {step === 3 && plan && (
                     <div className="space-y-6 animate-in fade-in-up duration-500">
                         {/* List Header */}
-                        <div className="hidden lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-3 px-8 pb-3 text-[8px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                        <div className="hidden lg:grid lg:grid-cols-[110px_1fr_80px_70px_70px_70px_220px] gap-2 px-8 pb-3 text-[8px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-1.5"><Camera size={12} /> Plate</div>
                             <div className="flex items-center gap-1.5"><ChefHat size={12} /> Meal Details</div>
                             <div className="text-right flex items-center justify-end gap-1.5"><Zap size={12} /> Energy</div>
