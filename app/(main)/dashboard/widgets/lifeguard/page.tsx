@@ -30,6 +30,7 @@ interface InventoryItem {
     name: string;
     weight_g: number;
     nutrition: any; // We'll store per-100g or total
+    expirationDate?: string;  // YYYY-MM-DD format
 }
 
 interface LifeSign {
@@ -70,6 +71,118 @@ export default function SurvivalModePage() {
     const [comparisonMode, setComparisonMode] = useState(false);
     const [comparisonInventory, setComparisonInventory] = useState<InventoryItem[]>([]);
     const [comparisonWaterStatus, setComparisonWaterStatus] = useState<'clean' | 'dirty' | 'none' | null>(null);
+
+    // === FEATURE 1: Calorie Burn Rate ===
+    const [activityLevel, setActivityLevel] = useState<'sedentary' | 'light' | 'moderate' | 'high'>('moderate');
+    const activityMultipliers = { sedentary: 0.5, light: 0.75, moderate: 1.0, high: 1.5 };
+
+    // === FEATURE 2: Alerts & Thresholds ===
+    const [alerts, setAlerts] = useState<{ id: string, type: 'critical' | 'warning' | 'info', message: string, timestamp: number }[]>([]);
+
+    // === FEATURE 3: Emergency Checklist ===
+    const [checklist, setChecklist] = useState<{ id: string, category: string, items: { id: string, name: string, packed: boolean }[] }[]>([
+        {
+            id: 'water-shelter',
+            category: 'Water & Shelter',
+            items: [
+                { id: 'w1', name: 'Clean water (1L per person/day)', packed: false },
+                { id: 'w2', name: 'Water purification tablets', packed: false },
+                { id: 'w3', name: 'Emergency shelter/tent', packed: false },
+                { id: 'w4', name: 'Waterproof tarp', packed: false }
+            ]
+        },
+        {
+            id: 'food-nutrition',
+            category: 'Food & Nutrition',
+            items: [
+                { id: 'f1', name: 'Non-perishable high-calorie foods', packed: false },
+                { id: 'f2', name: 'Canned fruits/vegetables', packed: false },
+                { id: 'f3', name: 'Protein bars & nuts', packed: false },
+                { id: 'f4', name: 'Salt & essential condiments', packed: false }
+            ]
+        },
+        {
+            id: 'first-aid',
+            category: 'First Aid & Medical',
+            items: [
+                { id: 'fa1', name: 'First aid kit with bandages', packed: false },
+                { id: 'fa2', name: 'Pain relievers & antacids', packed: false },
+                { id: 'fa3', name: 'Prescription medications (2-week supply)', packed: false },
+                { id: 'fa4', name: 'Tweezers, scissors, thermometer', packed: false }
+            ]
+        },
+        {
+            id: 'fire-tools',
+            category: 'Fire & Tools',
+            items: [
+                { id: 'ft1', name: 'Waterproof matches/lighter', packed: false },
+                { id: 'ft2', name: 'Flashlight with extra batteries', packed: false },
+                { id: 'ft3', name: 'Multi-tool or knife', packed: false },
+                { id: 'ft4', name: 'Rope/cordage (50ft)', packed: false }
+            ]
+        }
+    ]);
+
+    // === FEATURE 4: Shelf Life Tracking ===
+    interface InventoryItemWithDate extends InventoryItem {
+        expirationDate?: string;
+    }
+
+    // === FEATURE 5: Medical Conditions ===
+    const [medicalConditions, setMedicalConditions] = useState<('diabetic' | 'vegetarian' | 'vegan' | 'gluten-free' | 'nut-allergy' | 'lactose-intolerant' | 'shellfish-allergy')[]>([]);
+
+    // === FEATURE 6: Environmental Factors ===
+    const [environment, setEnvironment] = useState<{
+        climate: 'tropical' | 'temperate' | 'cold' | 'desert';
+        altitude: 'sea-level' | 'medium' | 'high';
+        temperature: number; // celsius
+    }>({ climate: 'temperate', altitude: 'sea-level', temperature: 20 });
+
+    // === FEATURE 7: Gamification ===
+    const [preparednesScore, setPreparednessScore] = useState(0);
+    const [achievements, setAchievements] = useState<{ id: string, name: string, icon: string, unlockedAt: number }[]>([]);
+
+    // === FEATURE 8: Recipe-based Meals ===
+    const [emergencyMeals] = useState<{ id: string, name: string, items: string[], servings: number, benefit: string }[]>([
+        { id: 'meal1', name: 'Energy Ration', items: ['grain', 'fat'], servings: 250, benefit: '+500 kcal' },
+        { id: 'meal2', name: 'Vitamin Boost', items: ['vegetable', 'fruit'], servings: 150, benefit: '+Vitamins A & C' },
+        { id: 'meal3', name: 'Protein Pack', items: ['protein', 'grain'], servings: 200, benefit: '+20g protein' }
+    ]);
+
+    // === FEATURE 9: Family Profiles ===
+    const [familyProfiles, setFamilyProfiles] = useState<{
+        id: string;
+        name: string;
+        age: number;
+        role: 'adult' | 'child' | 'elder';
+        active: boolean;
+        inventory: InventoryItem[];
+    }[]>([
+        {
+            id: 'self',
+            name: 'You',
+            age: 30,
+            role: 'adult',
+            active: true,
+            inventory: []
+        }
+    ]);
+
+    // === FEATURE 10: Export & Reporting ===
+    const generateReport = () => {
+        const profile = SURVIVAL_PROFILES[profileType];
+        return {
+            timestamp: new Date().toISOString(),
+            profileType,
+            activityLevel,
+            environment,
+            inventoryCount: inventory.length,
+            preparednesScore,
+            estimatedSurvivalDays: Math.ceil((INITIAL_STORES.energy + inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0)) / (profile.energy_floor * activityMultipliers[activityLevel])),
+            alerts: alerts.length,
+            checklistProgress: Math.round((checklist.reduce((acc, c) => acc + c.items.filter(i => i.packed).length, 0) / checklist.reduce((acc, c) => acc + c.items.length, 0)) * 100)
+        };
+    };
 
     const addBoost = (message: string) => {
         const id = Math.random().toString(36).substr(2, 9);
@@ -138,7 +251,7 @@ export default function SurvivalModePage() {
         if (inventory.length === 0 && step === 'security') return; // Don't save empty initial state
 
         const savePersistence = async () => {
-            const state = { step, security: securityStatus, water: waterStatus, profile: profileType };
+            const state = { step, security: securityStatus, water: waterStatus, profile: profileType, activityLevel, environment, medicalConditions };
 
             // Save to LocalStorage
             localStorage.setItem('miraclegreens_survival_inventory', JSON.stringify(inventory));
@@ -158,10 +271,131 @@ export default function SurvivalModePage() {
 
         const timer = setTimeout(savePersistence, 1000);
         return () => clearTimeout(timer);
-    }, [inventory, step, securityStatus, waterStatus, profileType]);
+    }, [inventory, step, securityStatus, waterStatus, profileType, activityLevel, environment, medicalConditions]);
     // --- END PERSISTENCE ---
 
-    const performLocalSearch = async (query: string) => {
+    // === FEATURE: Alerts & Thresholds ===
+    useEffect(() => {
+        const newAlerts = [];
+        const profile = SURVIVAL_PROFILES[profileType];
+
+        // Check nutrient levels
+        const energy = INITIAL_STORES.energy + inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0);
+        const daysEnergy = energy / (profile.energy_floor * activityMultipliers[activityLevel]);
+        if (daysEnergy < 3) {
+            newAlerts.push({
+                id: 'energy-critical',
+                type: 'critical' as const,
+                message: `⚠️ CRITICAL: Energy stores deplete in ${Math.ceil(daysEnergy)} days`,
+                timestamp: Date.now()
+            });
+        } else if (daysEnergy < 7) {
+            newAlerts.push({
+                id: 'energy-warning',
+                type: 'warning' as const,
+                message: `⚠️ WARNING: Energy stores deplete in ${Math.ceil(daysEnergy)} days`,
+                timestamp: Date.now()
+            });
+        }
+
+        // Check water status
+        if (waterStatus === 'none') {
+            newAlerts.push({
+                id: 'water-critical',
+                type: 'critical' as const,
+                message: '🚨 CRITICAL: No water source - dehydration in 3 days',
+                timestamp: Date.now()
+            });
+        }
+
+        // Check if medical conditions have appropriate foods
+        if (medicalConditions.length > 0 && inventory.length === 0) {
+            newAlerts.push({
+                id: 'medical-needs',
+                type: 'warning' as const,
+                message: `⚕️ Medical needs: Add foods compatible with ${medicalConditions.join(', ')}`,
+                timestamp: Date.now()
+            });
+        }
+
+        setAlerts(newAlerts);
+    }, [inventory, profileType, waterStatus, activityLevel, medicalConditions]);
+
+    // === FEATURE: Preparedness Score & Gamification ===
+    useEffect(() => {
+        let score = 0;
+
+        // Checklist completion (25 points max)
+        const checklistTotal = checklist.reduce((acc, c) => acc + c.items.length, 0);
+        const checklistPacked = checklist.reduce((acc, c) => acc + c.items.filter(i => i.packed).length, 0);
+        score += (checklistPacked / checklistTotal) * 25;
+
+        // Inventory diversity (25 points max)
+        score += Math.min(inventory.length * 2, 25);
+
+        // Water security (15 points max)
+        if (waterStatus === 'clean') score += 15;
+        else if (waterStatus === 'dirty') score += 8;
+
+        // Medical compliance (15 points max)
+        if (medicalConditions.length > 0) {
+            score += inventory.length > 0 ? 10 : 0;
+        } else {
+            score += 15;
+        }
+
+        // Family preparedness (20 points max)
+        score += Math.min((familyProfiles.filter(p => p.inventory.length > 0).length / familyProfiles.length) * 20, 20);
+
+        setPreparednessScore(Math.round(score));
+
+        // Unlock achievements
+        const newAchievements = [...achievements];
+        if (checklistPacked === checklistTotal && !achievements.find(a => a.id === 'complete-checklist')) {
+            newAchievements.push({
+                id: 'complete-checklist',
+                name: '🎖️ Go Bag Master',
+                icon: '🎒',
+                unlockedAt: Date.now()
+            });
+        }
+        if (inventory.length > 20 && !achievements.find(a => a.id === 'stockpile')) {
+            newAchievements.push({
+                id: 'stockpile',
+                name: '📦 Stockpile Expert',
+                icon: '📦',
+                unlockedAt: Date.now()
+            });
+        }
+        if (score >= 80 && !achievements.find(a => a.id === 'legendary')) {
+            newAchievements.push({
+                id: 'legendary',
+                name: '⭐ Survival Legend',
+                icon: '⭐',
+                unlockedAt: Date.now()
+            });
+        }
+        setAchievements(newAchievements);
+    }, [checklist, inventory, waterStatus, medicalConditions, familyProfiles]);
+
+    // === FEATURE: Environmental & Activity Burn Rate Effects ===
+    const adjustedEnergyRequirement = useMemo(() => {
+        const profile = SURVIVAL_PROFILES[profileType];
+        const envMultiplier = {
+            'cold': 1.5,    // Cold burns more calories
+            'desert': 1.3,  // Desert heat stress
+            'tropical': 1.1, // High humidity
+            'temperate': 1.0
+        }[environment.climate];
+        
+        const altMultiplier = {
+            'sea-level': 1.0,
+            'medium': 1.1,   // 5000-10000 ft
+            'high': 1.3      // 10000+ ft
+        }[environment.altitude];
+
+        return profile.energy_floor * activityMultipliers[activityLevel] * envMultiplier * altMultiplier;
+    }, [profileType, activityLevel, environment]);
         if (!query || query.length < 2) {
             setHeroResults([]);
             return;
@@ -388,6 +622,258 @@ export default function SurvivalModePage() {
             </div>
 
             <div className="max-w-4xl mx-auto space-y-8 md:space-y-12 animate-in fade-in duration-700 pb-20 px-3 md:px-4">
+                {/* === ALERTS BANNER === */}
+                {alerts.length > 0 && (
+                    <div className="space-y-2">
+                        {alerts.map((alert) => (
+                            <div
+                                key={alert.id}
+                                className={cn(
+                                    "p-3 rounded-lg font-bold text-[9px] animate-in slide-in-from-top",
+                                    alert.type === 'critical' ? 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30' :
+                                    alert.type === 'warning' ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30' :
+                                    'bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30'
+                                )}
+                            >
+                                {alert.message}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* === PREPAREDNESS SCORE & ACHIEVEMENTS === */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Preparedness Score Card */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 p-6 rounded-2xl border border-indigo-200 dark:border-indigo-500/30">
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-[8px] font-black uppercase text-indigo-600 dark:text-indigo-400">Preparedness</p>
+                            <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400">{preparednesScore}/100</span>
+                        </div>
+                        <div className="w-full h-3 bg-indigo-200 dark:bg-indigo-900/30 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+                                style={{ width: `${preparednesScore}%` }}
+                            />
+                        </div>
+                        <p className="text-[7px] text-slate-600 dark:text-slate-400 mt-2">
+                            {preparednesScore >= 80 ? '🌟 Excellent preparation!' :
+                             preparednesScore >= 60 ? '⚠️ Good progress - add more items' :
+                             preparednesScore >= 40 ? '📋 More preparation needed' :
+                             '🚨 Start building your kit'}
+                        </p>
+                    </div>
+
+                    {/* Recent Achievements */}
+                    <div className="md:col-span-2 bg-amber-50 dark:bg-amber-500/10 p-6 rounded-2xl border border-amber-200 dark:border-amber-500/30">
+                        <p className="text-[8px] font-black uppercase text-amber-600 dark:text-amber-400 mb-3">Unlocked Achievements</p>
+                        {achievements.length === 0 ? (
+                            <p className="text-[8px] text-slate-500 dark:text-slate-400">Complete challenges to earn achievements</p>
+                        ) : (
+                            <div className="flex flex-wrap gap-2">
+                                {achievements.map((ach) => (
+                                    <div key={ach.id} className="px-3 py-1.5 bg-white dark:bg-slate-900 rounded-full border border-amber-200 dark:border-amber-500/30 text-[8px] font-bold flex items-center gap-1.5">
+                                        <span className="text-lg">{ach.icon}</span>
+                                        <span>{ach.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* === SETTINGS PANEL === */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 dark:bg-slate-900/20 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    {/* Activity Level */}
+                    <div className="space-y-2">
+                        <label className="text-[8px] font-black uppercase text-slate-600 dark:text-slate-400">Activity Level</label>
+                        <div className="space-y-1">
+                            {(['sedentary', 'light', 'moderate', 'high'] as const).map((level) => (
+                                <button
+                                    key={level}
+                                    onClick={() => setActivityLevel(level)}
+                                    className={cn(
+                                        'w-full text-[7px] font-black uppercase px-3 py-2 rounded-lg transition-all',
+                                        activityLevel === level
+                                            ? 'bg-emerald-500 text-white'
+                                            : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                    )}
+                                >
+                                    {level === 'sedentary' && '😑 Sedentary (×0.5)'}
+                                    {level === 'light' && '🚶 Light (×0.75)'}
+                                    {level === 'moderate' && '🏃 Moderate (×1.0)'}
+                                    {level === 'high' && '💪 High (×1.5)'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Climate/Environment */}
+                    <div className="space-y-2">
+                        <label className="text-[8px] font-black uppercase text-slate-600 dark:text-slate-400">Climate</label>
+                        <div className="space-y-1">
+                            {(['temperate', 'tropical', 'cold', 'desert'] as const).map((clim) => (
+                                <button
+                                    key={clim}
+                                    onClick={() => setEnvironment({ ...environment, climate: clim })}
+                                    className={cn(
+                                        'w-full text-[7px] font-black uppercase px-3 py-2 rounded-lg transition-all',
+                                        environment.climate === clim
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                    )}
+                                >
+                                    {clim === 'temperate' && '🌤️ Temperate'}
+                                    {clim === 'tropical' && '🌴 Tropical'}
+                                    {clim === 'cold' && '❄️ Cold'}
+                                    {clim === 'desert' && '🏜️ Desert'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Medical Conditions */}
+                    <div className="space-y-2">
+                        <label className="text-[8px] font-black uppercase text-slate-600 dark:text-slate-400">Medical Needs</label>
+                        <div className="text-[7px] space-y-1 max-h-28 overflow-y-auto">
+                            {(['diabetic', 'vegetarian', 'vegan', 'gluten-free', 'nut-allergy', 'lactose-intolerant'] as const).map((cond) => (
+                                <label key={cond} className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={medicalConditions.includes(cond)}
+                                        onChange={() => {
+                                            if (medicalConditions.includes(cond)) {
+                                                setMedicalConditions(medicalConditions.filter(c => c !== cond));
+                                            } else {
+                                                setMedicalConditions([...medicalConditions, cond]);
+                                            }
+                                        }}
+                                        className="w-3 h-3"
+                                    />
+                                    <span className="font-bold text-slate-600 dark:text-slate-400">{cond}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* === EMERGENCY CHECKLIST === */}
+                <div className="bg-amber-50 dark:bg-amber-500/10 p-6 rounded-2xl border border-amber-200 dark:border-amber-500/30 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl">📋</span>
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-400">Go Bag Checklist</h3>
+                        </div>
+                        <div className="text-[9px] font-black text-amber-700 dark:text-amber-400">
+                            {checklist.reduce((acc, c) => acc + c.items.filter(i => i.packed).length, 0)} / {checklist.reduce((acc, c) => acc + c.items.length, 0)}
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {checklist.map((cat) => {
+                            const packed = cat.items.filter(i => i.packed).length;
+                            return (
+                                <div key={cat.id} className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-amber-100 dark:border-amber-500/20">
+                                    <p className="text-[8px] font-black text-amber-700 dark:text-amber-400 mb-2">{cat.category} ({packed}/{cat.items.length})</p>
+                                    <div className="space-y-1">
+                                        {cat.items.map((item) => (
+                                            <label key={item.id} className="flex items-center gap-2 cursor-pointer text-[7px]">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={item.packed}
+                                                    onChange={() => {
+                                                        setChecklist(checklist.map(c =>
+                                                            c.id === cat.id
+                                                                ? {
+                                                                    ...c,
+                                                                    items: c.items.map(i =>
+                                                                        i.id === item.id ? { ...i, packed: !i.packed } : i
+                                                                    )
+                                                                }
+                                                                : c
+                                                        ));
+                                                    }}
+                                                    className="w-3 h-3"
+                                                />
+                                                <span className={cn("font-bold", item.packed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-300')}>{item.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* === FAMILY PROFILES === */}
+                <div className="bg-purple-50 dark:bg-purple-500/10 p-6 rounded-2xl border border-purple-200 dark:border-purple-500/30 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <span className="text-2xl">👥</span>
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-purple-700 dark:text-purple-400">Family Preparedness</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {familyProfiles.map((member) => (
+                            <button
+                                key={member.id}
+                                onClick={() => {
+                                    // Switch to family member profile
+                                    if (member.id !== 'self') {
+                                        toast.success(`Switched to ${member.name}'s inventory`);
+                                    }
+                                }}
+                                className={cn(
+                                    'p-3 rounded-lg border-2 text-left transition-all',
+                                    member.active
+                                        ? 'border-purple-500 bg-purple-100 dark:bg-purple-500/20'
+                                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-purple-300'
+                                )}
+                            >
+                                <p className="text-[9px] font-black text-purple-700 dark:text-purple-400 mb-1">{member.name}</p>
+                                <p className="text-[7px] text-slate-600 dark:text-slate-400">
+                                    📦 {member.inventory.length} items • {member.role === 'adult' ? '👨' : member.role === 'child' ? '👧' : '👴'} {member.age}y
+                                </p>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* === EXPORT & REPORTING === */}
+                <div className="flex flex-wrap gap-3 justify-center">
+                    <Button
+                        onClick={() => {
+                            const report = generateReport();
+                            const dataStr = JSON.stringify(report, null, 2);
+                            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                            const url = URL.createObjectURL(dataBlob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `survival-report-${new Date().toISOString().split('T')[0]}.json`;
+                            link.click();
+                            toast.success('Report exported!');
+                        }}
+                        className="text-[8px] uppercase font-black px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white"
+                    >
+                        📊 Export Report
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            const csv = [
+                                ['Item', 'Weight (g)', 'Calories', 'Expires'].join(','),
+                                ...inventory.map(i => [i.name, i.weight_g, i.nutrition?.energy_kcal || 0, i.expirationDate || 'N/A'].join(','))
+                            ].join('\n');
+                            const blob = new Blob([csv], { type: 'text/csv' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `inventory-${new Date().toISOString().split('T')[0]}.csv`;
+                            link.click();
+                            toast.success('Inventory exported as CSV!');
+                        }}
+                        disabled={inventory.length === 0}
+                        className="text-[8px] uppercase font-black px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50"
+                    >
+                        📋 Inventory CSV
+                    </Button>
+                </div>
+
                 {/* Always-visible Hero Search with navigation */}
                 <HeroSearch
                     searchQuery={heroSearchQuery}
@@ -903,6 +1389,36 @@ export default function SurvivalModePage() {
                                                         <span>0g</span>
                                                         <span>5kg</span>
                                                     </div>
+                                                </div>
+
+                                                {/* === SHELF LIFE TRACKING === */}
+                                                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                                                    <div>
+                                                        <label className="text-[7px] font-bold text-slate-500 dark:text-slate-400 block mb-1">Expires:</label>
+                                                        <input
+                                                            type="date"
+                                                            value={item.expirationDate || ''}
+                                                            onChange={(e) => {
+                                                                setInventory(inventory.map(i =>
+                                                                    i.id === item.id ? { ...i, expirationDate: e.target.value } : i
+                                                                ));
+                                                            }}
+                                                            className="w-full px-2 py-1 text-[7px] rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                        />
+                                                    </div>
+                                                    {item.expirationDate && (
+                                                        <div className="flex items-end">
+                                                            <div className={cn(
+                                                                "flex-1 px-2 py-1 rounded text-[7px] font-bold text-center",
+                                                                new Date(item.expirationDate) < new Date() ? 'bg-rose-500/20 text-rose-600 dark:text-rose-300' :
+                                                                (new Date(item.expirationDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24) < 30 ? 'bg-amber-500/20 text-amber-600 dark:text-amber-300' :
+                                                                'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300'
+                                                            )}>
+                                                                {new Date(item.expirationDate) < new Date() ? '⚠️ EXPIRED' :
+                                                                 Math.ceil((new Date(item.expirationDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
