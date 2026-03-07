@@ -1,12 +1,12 @@
 ﻿'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { cn } from '@/lib/utils';
-import { Info, Shield, HelpCircle, BookOpen, Globe, Scale, Mail, MessageCircle, Phone } from 'lucide-react';import { DashboardNav } from '@/components/dashboard-nav';
+import { Info, Shield, HelpCircle, BookOpen, Globe, Scale, Mail, MessageCircle, Phone } from 'lucide-react';
+import { DashboardNav } from '@/components/dashboard-nav';
 import { Footer } from '@/components/footer';
-import { HeaderLogo } from '@/components/ui/header-logo';import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { HeaderLogo } from '@/components/ui/header-logo';
 
 const tabs = [
     { id: 'about', label: 'About Us', icon: Info },
@@ -17,26 +17,6 @@ const tabs = [
 
 export default function BrowsePage() {
     const [activeTab, setActiveTab] = useState('about');
-    const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-    const router = useRouter();
-
-    useEffect(() => {
-        const checkAdmin = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
-            const isUserAdmin = (user?.email || user?.user_metadata?.email || '').toLowerCase() === adminEmail.toLowerCase();
-
-            setIsAdmin(isUserAdmin);
-
-            if (!isUserAdmin) {
-                router.push('/dashboard');
-            }
-        };
-        checkAdmin();
-    }, [router]);
-
-    if (isAdmin === null) return null; // Or a loading spinner
-    if (!isAdmin) return null;
 
     const renderContent = () => {
         switch (activeTab) {
