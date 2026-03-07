@@ -10,7 +10,7 @@ export function DashboardNav() {
 
     // Determine active button
     const getActiveButton = () => {
-        if (pathname.includes('/browse')) return 'home';
+        if (pathname.includes('/home')) return 'home';
         if (pathname.includes('/dashboard/library/foods')) return 'foods';
         if (pathname.includes('/dashboard/library/meals')) return 'meals';
         if (pathname.includes('/dashboard/library/widgets')) return 'widgets';
@@ -23,7 +23,7 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'home', icon: Home, label: 'Home', path: '/browse', color: 'indigo' },
+        { id: 'home', icon: Home, label: 'Home', path: '/home', color: 'indigo' },
         { id: 'foods', icon: Apple, label: 'Foods', path: '/dashboard/library/foods', color: 'emerald' },
         { id: 'meals', icon: Salad, label: 'Meals', path: '/dashboard/library/meals', color: 'rose' },
         { id: 'widgets', icon: LayoutGrid, label: 'Widgets', path: '/dashboard/library/widgets', color: 'cyan' },

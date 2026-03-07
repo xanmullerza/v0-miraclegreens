@@ -18,21 +18,21 @@ export function HeaderLogo({
     userAvatarUrl,
 }: HeaderLogoProps) {
     const pathname = usePathname();
-    const isBrowse = pathname.includes('/browse');
+    const isHome = pathname.includes('/home');
 
     return (
         <div suppressHydrationWarning className={cn(
             "flex items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl w-full md:max-w-[900px] mx-auto xl:mx-0 transition-all duration-500"
         )}>
-            {/* Left - Browse/Home Toggle */}
+            {/* Left - Home/Dashboard Toggle */}
             <Link
-                href={isBrowse ? '/dashboard' : '/browse'}
+                href={isHome ? '/dashboard' : '/home'}
                 className={cn(
                     "flex h-12 w-12 border-r border-slate-200 dark:border-slate-800 items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:outline-none flex-shrink-0"
                 )}
-                title={isBrowse ? 'Home' : 'Browse'}
+                title={isHome ? 'Dashboard' : 'Home'}
             >
-                {isBrowse ? <Home size={18} /> : <Globe size={18} />}
+                {isHome ? <Home size={18} /> : <Globe size={18} />}
             </Link>
 
             {/* Center - Logo Area */}
