@@ -330,12 +330,12 @@ export default function BrowsePage() {
 
     return (
         <>
-            <DashboardNav />
             <div className="z-30 px-2 sm:px-4 w-full flex justify-center sticky top-0">
                 <div className="pointer-events-auto w-full max-w-[900px]">
                     <HeaderLogo />
                 </div>
             </div>
+            <DashboardNav />
             <PageContainer className="p-0 sm:p-0">
                 {/* Tabs */}
                 <div className="max-w-[800px] mx-auto xl:mx-0 flex items-center justify-center gap-4 px-6 overflow-x-auto no-scrollbar pb-4">
