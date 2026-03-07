@@ -330,6 +330,7 @@ export default function HomePage() {
 
     return (
         <>
+            <DashboardNav />
             <div className="z-30 px-2 sm:px-4 w-full flex justify-center sticky top-0">
                 <div className="pointer-events-auto w-full max-w-[900px]">
                     <HeaderLogo />
