@@ -46,10 +46,18 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const stored = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const shouldBeDark = stored ? stored === 'dark' : prefersDark;
-                document.documentElement.classList.toggle('dark', shouldBeDark);
+                (function() {
+                  try {
+                    var stored = localStorage.getItem('theme');
+                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    var shouldBeDark = stored ? stored === 'dark' : prefersDark;
+                    if (shouldBeDark) {
+                      document.documentElement.classList.add('dark');
+                    } else {
+                      document.documentElement.classList.remove('dark');
+                    }
+                  } catch (e) { }
+                })();
               } catch (e) {}
             `,
           }}
