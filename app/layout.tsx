@@ -46,8 +46,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const theme = localStorage.getItem('theme') || 'dark';
-                document.documentElement.classList.toggle('dark', theme === 'dark');
+                const stored = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const shouldBeDark = stored ? stored === 'dark' : prefersDark;
+                document.documentElement.classList.toggle('dark', shouldBeDark);
               } catch (e) {}
             `,
           }}
