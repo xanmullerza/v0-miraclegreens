@@ -26,10 +26,10 @@ export function DashboardNav() {
         { id: 'home', icon: Home, label: 'Home', path: '/browse', color: 'indigo' },
         { id: 'foods', icon: Apple, label: 'Foods', path: '/dashboard/library/foods', color: 'emerald' },
         { id: 'meals', icon: Salad, label: 'Meals', path: '/dashboard/library/meals', color: 'rose' },
+        { id: 'widgets', icon: LayoutGrid, label: 'Widgets', path: '/dashboard/library/widgets', color: 'cyan' },
         { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/dashboard/meal-o-matic/shopping', color: 'amber' },
         { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/dashboard/meal-o-matic/pantry', color: 'sky' },
         { id: 'planner', icon: Calendar, label: 'Planner', path: '/dashboard/meal-o-matic/planner', color: 'purple' },
-        { id: 'widgets', icon: LayoutGrid, label: 'Widgets', path: '/dashboard/library/widgets', color: 'cyan' },
     ];
 
     return (
