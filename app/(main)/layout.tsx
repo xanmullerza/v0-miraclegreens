@@ -52,14 +52,14 @@ function DashboardLayoutContent({
 
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
-            <div className="flex h-screen overflow-hidden">
+        <div suppressHydrationWarning className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
+            <div suppressHydrationWarning className="flex h-screen overflow-hidden">
 
 
                 {/* Main Content */}
                 <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
                     {/* Header & Nav Container */}
-                    <div className={cn(
+                    <div suppressHydrationWarning className={cn(
                         "z-40 sticky top-0 w-full flex flex-col transition-all duration-500 ease-in-out bg-slate-50 dark:bg-[#020617]",
                         showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
@@ -82,7 +82,7 @@ function DashboardLayoutContent({
                         <DashboardNav />
                     </div>
 
-                    <div className={cn(
+                    <div suppressHydrationWarning className={cn(
                         "px-2 sm:px-4 pt-4 pb-20 flex-1 flex justify-center transition-all duration-500 ease-in-out",
                         showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
@@ -91,7 +91,7 @@ function DashboardLayoutContent({
                         </div>
                     </div>
 
-                    <div className={cn(
+                    <div suppressHydrationWarning className={cn(
                         "w-full transition-all duration-500 ease-in-out",
                         showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
