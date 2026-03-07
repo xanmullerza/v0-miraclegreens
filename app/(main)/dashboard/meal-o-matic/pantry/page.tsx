@@ -16,10 +16,29 @@ import { useRouter } from 'next/navigation';
 
 export default function PantryPage() {
     const router = useRouter();
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isActive, setIsActive] = useState(false);
+
+    // Check authentication on mount
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    router.push('/auth/login');
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                router.push('/auth/login');
+            } finally {
+                setIsAuthLoading(false);
+            }
+        };
+        checkAuth();
+    }, [router]);
 
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedFood, setSelectedFood] = useState<any>(null);
@@ -261,6 +280,19 @@ export default function PantryPage() {
             setIsAdding(false);
         }
     };
+
+    if (isAuthLoading) {
+        return (
+            <PageContainer maxWidth="max-w-7xl">
+                <div className="h-96 flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500" />
+                        <p className="text-sm text-slate-500 font-medium">Loading pantry...</p>
+                    </div>
+                </div>
+            </PageContainer>
+        );
+    }
 
     return (
         <PageContainer maxWidth="max-w-7xl">

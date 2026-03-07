@@ -25,10 +25,29 @@ function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
 export default function ShoppingListPage() {
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
+
+    // Check authentication on mount
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    router.push('/auth/login');
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                router.push('/auth/login');
+            } finally {
+                setIsAuthLoading(false);
+            }
+        };
+        checkAuth();
+    }, [router]);
     const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const [showAddModal, setShowAddModal] = useState(false);
@@ -220,6 +239,19 @@ export default function ShoppingListPage() {
         }
     };
 
+
+    if (isAuthLoading) {
+        return (
+            <PageContainer maxWidth="max-w-7xl">
+                <div className="h-96 flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500" />
+                        <p className="text-sm text-slate-500 font-medium">Loading shopping list...</p>
+                    </div>
+                </div>
+            </PageContainer>
+        );
+    }
 
     return (
         <PageContainer maxWidth="max-w-7xl">

@@ -620,9 +620,28 @@ export function MealPlannerContent({
     setIsFilterOpen: externalSetIsFilterOpen
 }: MealPlannerContentProps) {
     const router = useRouter();
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
     const [pantryItems, setPantryItems] = useState<any[]>([]);
+
+    // Check authentication on mount
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    router.push('/auth/login');
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                router.push('/auth/login');
+            } finally {
+                setIsAuthLoading(false);
+            }
+        };
+        checkAuth();
+    }, [router]);
 
     // HeroSearch state
     const [heroSearchQuery, setHeroSearchQuery] = useState('');
@@ -1069,6 +1088,17 @@ export function MealPlannerContent({
     const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
     const selectedTypes = externalSelectedTypes !== undefined ? externalSelectedTypes : localSelectedTypes;
     const setSelectedTypes = externalSetSelectedTypes !== undefined ? externalSetSelectedTypes : setLocalSelectedTypes;
+
+    if (isAuthLoading) {
+        return (
+            <div className="h-96 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+                    <p className="text-sm text-slate-500 font-medium">Loading meal planner...</p>
+                </div>
+            </div>
+        );
+    }
 
     const [showSummary, setShowSummary] = useState(false);
     const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
