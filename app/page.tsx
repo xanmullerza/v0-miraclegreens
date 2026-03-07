@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { cn } from '@/lib/utils';
 import { Info, Shield, HelpCircle, BookOpen, Globe, Scale, Mail, MessageCircle, Phone } from 'lucide-react';
+import { DashboardNav } from '@/components/dashboard-nav';
+import { Footer } from '@/components/footer';
+import { HeaderLogo } from '@/components/ui/header-logo';
 
 const tabs = [
     { id: 'about', label: 'About Us', icon: Info },
@@ -326,35 +329,44 @@ export default function HomePage() {
     };
 
     return (
-        <PageContainer className="p-0 sm:p-0">
-            {/* Tabs */}
-            <div className="max-w-[800px] mx-auto xl:mx-0 flex items-center justify-center gap-4 px-6 overflow-x-auto no-scrollbar pb-4">
-                {tabs.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={cn(
-                            "flex items-center gap-2 px-3 md:px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
-                            activeTab === tab.id
-                                ? tab.id === 'about'
-                                    ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
-                                    : tab.id === 'privacy'
-                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                                    : tab.id === 'support'
-                                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                                    : "bg-yellow-500 text-white shadow-lg shadow-yellow-500/20"
-                                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
-                        )}
-                    >
-                        <tab.icon size={14} />
-                        <span className="hidden sm:inline">{tab.label}</span>
-                    </button>
-                ))}
+        <>
+            <DashboardNav />
+            <div className="z-30 px-2 sm:px-4 w-full flex justify-center sticky top-0">
+                <div className="pointer-events-auto w-full max-w-[900px]">
+                    <HeaderLogo />
+                </div>
             </div>
+            <PageContainer className="p-0 sm:p-0">
+                {/* Tabs */}
+                <div className="max-w-[800px] mx-auto xl:mx-0 flex items-center justify-center gap-4 px-6 overflow-x-auto no-scrollbar pb-4">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={cn(
+                                "flex items-center gap-2 px-3 md:px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
+                                activeTab === tab.id
+                                    ? tab.id === 'about'
+                                        ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
+                                        : tab.id === 'privacy'
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                        : tab.id === 'support'
+                                        ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+                                        : "bg-yellow-500 text-white shadow-lg shadow-yellow-500/20"
+                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                            )}
+                        >
+                            <tab.icon size={14} />
+                            <span className="hidden sm:inline">{tab.label}</span>
+                        </button>
+                    ))}
+                </div>
 
-            <main className="max-w-[800px] mx-auto xl:mx-0 p-8 pt-12">
-                {renderContent()}
-            </main>
-        </PageContainer>
+                <main className="max-w-[800px] mx-auto xl:mx-0 p-8 pt-12 mb-20">
+                    {renderContent()}
+                </main>
+            </PageContainer>
+            <Footer />
+        </>
     );
 }
