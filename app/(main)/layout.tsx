@@ -58,30 +58,27 @@ function DashboardLayoutContent({
 
                 {/* Main Content */}
                 <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
-                    {/* Main Header (Logo & Subtext) */}
+                    {/* Header & Nav Container */}
                     <div className={cn(
-                        "z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none transition-all duration-500 ease-in-out",
-                        "sticky top-0",
+                        "z-40 sticky top-0 w-full flex flex-col transition-all duration-500 ease-in-out bg-slate-50 dark:bg-[#020617]",
                         showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
-                        <div className="pointer-events-auto w-full max-w-[900px]">
-                            <HeaderLogo 
-                                showSubtext={true}
-                                userStatus={
-                                    user ? 'cloud' :
-                                        (profile.name || profile.nickname) ? 'local' :
-                                            'anonymous'
-                                }
-                                userAvatarUrl={user?.user_metadata?.avatar_url}
-                            />
+                        {/* Main Header (Logo & Subtext) */}
+                        <div className="px-2 sm:px-4 w-full flex justify-center pointer-events-none">
+                            <div className="pointer-events-auto w-full max-w-[900px]">
+                                <HeaderLogo 
+                                    showSubtext={true}
+                                    userStatus={
+                                        user ? 'cloud' :
+                                            (profile.name || profile.nickname) ? 'local' :
+                                                'anonymous'
+                                    }
+                                    userAvatarUrl={user?.user_metadata?.avatar_url}
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Navigation Bar */}
-                    <div className={cn(
-                        "w-full transition-all duration-500 ease-in-out",
-                        showRDADrawer && isDesktop && "lg:translate-x-[192px]"
-                    )}>
+                        {/* Navigation Bar */}
                         <DashboardNav />
                     </div>
 
