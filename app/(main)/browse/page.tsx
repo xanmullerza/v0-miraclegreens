@@ -5,8 +5,6 @@ import { PageContainer } from '@/components/ui/page-container';
 import { cn } from '@/lib/utils';
 import { Info, Shield, HelpCircle, BookOpen, Globe, Scale, Mail, MessageCircle, Phone } from 'lucide-react';
 import { DashboardNav } from '@/components/dashboard-nav';
-import { Footer } from '@/components/footer';
-import { HeaderLogo } from '@/components/ui/header-logo';
 
 const tabs = [
     { id: 'about', label: 'About Us', icon: Info },
@@ -330,11 +328,6 @@ export default function BrowsePage() {
 
     return (
         <>
-            <div className="z-30 px-2 sm:px-4 w-full flex justify-center">
-                <div className="pointer-events-auto w-full max-w-[900px]">
-                    <HeaderLogo />
-                </div>
-            </div>
             <DashboardNav />
             <PageContainer className="p-0 sm:p-0">
                 {/* Tabs */}
@@ -366,7 +359,6 @@ export default function BrowsePage() {
                     {renderContent()}
                 </main>
             </PageContainer>
-            <Footer />
         </>
     );
 }
