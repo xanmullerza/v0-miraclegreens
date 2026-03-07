@@ -1084,25 +1084,14 @@ export function MealPlannerContent({
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
     const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(['breakfast', 'lunch', 'dinner']);
 
+    const [showSummary, setShowSummary] = useState(false);
+    const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
+    const { searchQuery } = useSearch();
+
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
     const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
     const selectedTypes = externalSelectedTypes !== undefined ? externalSelectedTypes : localSelectedTypes;
     const setSelectedTypes = externalSetSelectedTypes !== undefined ? externalSetSelectedTypes : setLocalSelectedTypes;
-
-    if (isAuthLoading) {
-        return (
-            <div className="h-96 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-                    <p className="text-sm text-slate-500 font-medium">Loading meal planner...</p>
-                </div>
-            </div>
-        );
-    }
-
-    const [showSummary, setShowSummary] = useState(false);
-    const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
-    const { searchQuery } = useSearch();
 
     // Nutrient breakdown definitions
     const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string, isEssential?: boolean, hiddenByDefault?: boolean, isExpandable?: boolean }[]> = {
@@ -1393,6 +1382,20 @@ export function MealPlannerContent({
     };
 
     const isFormComplete = Boolean(age && weight && height);
+
+    // Check if still loading auth
+    if (isAuthLoading) {
+        return (
+            <PageContainer maxWidth="max-w-7xl">
+                <div className="h-96 flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+                        <p className="text-sm text-slate-500 font-medium">Loading meal planner...</p>
+                    </div>
+                </div>
+            </PageContainer>
+        );
+    }
 
     return (
         <PageContainer maxWidth="max-w-7xl">
