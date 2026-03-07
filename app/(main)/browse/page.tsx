@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { cn } from '@/lib/utils';
 import { Info, Shield, HelpCircle, BookOpen, Globe, Scale, Mail, MessageCircle, Phone } from 'lucide-react';
-import { DashboardNav } from '@/components/dashboard-nav';
 
 const tabs = [
     { id: 'about', label: 'About Us', icon: Info },
@@ -328,7 +327,6 @@ export default function BrowsePage() {
 
     return (
         <>
-            <DashboardNav />
             <PageContainer className="p-0 sm:p-0">
                 {/* Tabs */}
                 <div className="max-w-[800px] mx-auto xl:mx-0 flex items-center justify-center gap-4 px-6 overflow-x-auto no-scrollbar pb-4">

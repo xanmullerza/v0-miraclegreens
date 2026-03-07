@@ -20,6 +20,7 @@ import { HeaderLogo } from '@/components/ui/header-logo';
 
 
 import { Footer } from '@/components/footer';
+import { DashboardNav } from '@/components/dashboard-nav';
 import { RDADrawer } from '@/components/rda-drawer';
 
 function DashboardLayoutContent({
@@ -74,6 +75,14 @@ function DashboardLayoutContent({
                                 userAvatarUrl={user?.user_metadata?.avatar_url}
                             />
                         </div>
+                    </div>
+
+                    {/* Navigation Bar */}
+                    <div className={cn(
+                        "w-full transition-all duration-500 ease-in-out",
+                        showRDADrawer && isDesktop && "lg:translate-x-[192px]"
+                    )}>
+                        <DashboardNav />
                     </div>
 
                     <div className={cn(
