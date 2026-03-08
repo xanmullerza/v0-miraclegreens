@@ -478,10 +478,13 @@ Fat: ${item.fat_g || 0}g
 
         // Construct serving text
         let sText = '';
-        if (item.portions && Array.isArray(item.portions)) {
+        if (item.portions && Array.isArray(item.portions) && item.portions.length > 0) {
             item.portions.forEach((p: any) => {
                 sText += `1 ${p.label} = ${p.weight_g}g\n`;
             });
+        } else {
+            // Add default gram and kilogram sizes if no portions exist
+            sText = '1 gram = 1g\n1 kilogram = 1000g\n';
         }
         setServingText(sText);
 
