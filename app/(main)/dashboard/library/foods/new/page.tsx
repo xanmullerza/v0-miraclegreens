@@ -492,7 +492,7 @@ Fat: ${item.fat_g || 0}g
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+        <div className="max-w-7xl mx-auto space-y-4 pb-8 h-screen overflow-y-auto animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
 
             {loadingFood && (
                 <div className="flex items-center justify-center gap-3 p-6 bg-amber-50 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800/30">
@@ -502,7 +502,7 @@ Fat: ${item.fat_g || 0}g
             )}
 
             {/* Food Search Hero Workspace */}
-            <div className="pt-6">
+            <div className="pt-3">
                 <HeroSearch
                     searchQuery={searchQuery}
                     onQueryChange={handleSearchInput}
@@ -539,11 +539,11 @@ Fat: ${item.fat_g || 0}g
             </div>
 
             {/* Top Row: Info Entry */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* Extraction Section */}
                 {showParser && (
-                    <div className="lg:col-span-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                        <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03]">
+                    <div className="lg:col-span-8 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <Card className="p-6 border-emerald-500/30 bg-emerald-500/[0.03]">
                             <div className="flex items-center gap-3 mb-6">
                                 <Sparkles size={20} className="text-emerald-500" />
                                 <h3 className="font-black text-sm uppercase tracking-widest">Nutrients & Servings</h3>
@@ -745,7 +745,7 @@ Fat: ${item.fat_g || 0}g
                 )}
 
                 {/* Name Details Card */}
-                <Card className={cn(showParser ? "lg:col-span-4" : "lg:col-span-12", "p-8")}>
+                <Card className={cn(showParser ? "lg:col-span-4" : "lg:col-span-12", "p-6")}>
                     {/* Basic Info Section */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
@@ -792,8 +792,8 @@ Fat: ${item.fat_g || 0}g
             </div>
 
             {/* Photo Section - Full Width */}
-            <Card className="p-8 w-full">
-                <div className="space-y-6">
+            <Card className="p-6 w-full">
+                <div className="space-y-4">
                     <div className="flex items-center gap-3 mb-2">
                         <Camera size={20} className="text-emerald-500" />
                         <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
