@@ -441,10 +441,11 @@ export async function getUSDAFoodDetails(fdcId: number): Promise<{ portions: Foo
             }
         }
 
-        // Always add default base measures (gram and kilogram)
         const defaultMeasures: FoodMeasure[] = [
             { label: 'gram', weight_g: 1 },
-            { label: 'kilogram', weight_g: 1000 }
+            { label: 'kilogram', weight_g: 1000 },
+            { label: 'ounce', weight_g: 28.35 },
+            { label: 'pound', weight_g: 453.59 }
         ];
 
         // Add defaults if not already present
@@ -505,6 +506,8 @@ export async function syncToLocal(
         if (['tbsp', 'tablespoon', 'tbs'].includes(clean)) return 'tbsp';
         if (['tsp', 'teaspoon'].includes(clean)) return 'tsp';
         if (['unit', 'item', 'each', 'whole', 'piece'].includes(clean)) return 'piece';
+        if (['lb', 'lbs', 'pound', 'pounds', 'lb.'].includes(clean)) return 'pound';
+        if (['oz', 'oz.', 'ounce', 'ounces'].includes(clean)) return 'ounce';
 
         return clean;
     };

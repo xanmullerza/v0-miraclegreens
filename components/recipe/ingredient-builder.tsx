@@ -249,6 +249,15 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
         if (measures.length > 0) {
             const unitLower = unit.toLowerCase().replace(/\s*\(.*\)$/, '').replace(/s$/, '').trim(); // singularized unit
 
+            const standardMassUnits: Record<string, number> = {
+                'g': 1, 'gram': 1, 'ml': 1,
+                'kg': 1000, 'kilogram': 1000,
+                'lb': 453.59, 'lbs': 453.59, 'pound': 453.59, 'lb.': 453.59,
+                'oz': 28.35, 'ounce': 28.35, 'oz.': 28.35
+            };
+
+            const matchedStandard = standardMassUnits[unitLower];
+
             const matchedMeasure = unitLower ? measures.find(m => {
                 const labelLower = m.label.toLowerCase().replace(/s$/, '');
                 return labelLower === unitLower ||
@@ -256,7 +265,12 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                     unitLower.includes(labelLower);
             }) : null;
 
-            if (matchedMeasure) {
+            if (matchedStandard && !hasParsedWeight) {
+                weight_g = quantity * matchedStandard;
+                // Normalize label if it's one of the standard variants
+                if (unitLower.startsWith('lb')) unit = 'lb';
+                if (unitLower.startsWith('oz')) unit = 'oz';
+            } else if (matchedMeasure) {
                 // If we DON'T have a specific unit string already (manual add), use the matched label
                 if (!unit) unit = matchedMeasure.label;
 
@@ -264,12 +278,6 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                 if (!hasParsedWeight) {
                     weight_g = quantity * matchedMeasure.weight_g;
                 }
-            } else if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'ml') {
-                weight_g = quantity; // Mass is mass
-                unit = 'g';
-            } else if (unitLower === 'kg' || unitLower === 'kilogram') {
-                weight_g = quantity * 1000;
-                unit = 'kg';
             } else if (!unit || ['g', 'item', 'whole', 'unit'].includes(unitLower)) {
                 // Try harder to find a "natural" count measure
                 // Check for labels that mean "1 item"
@@ -323,7 +331,7 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                 const uL = unit.toLowerCase();
                 const standardWeights: Record<string, number> = {
                     'tsp': 5, 'teaspoon': 5, 'tbsp': 15, 'tablespoon': 15,
-                    'cup': 240, 'ml': 1, 'oz': 28, 'lb': 454, 'head': 800, 'medium': 150,
+                    'cup': 240, 'ml': 1, 'oz': 28.35, 'lb': 453.59, 'head': 800, 'medium': 150,
                     'large': 200, 'small': 100, 'clove': 5, 'pinch': 0.5, 'dash': 0.5,
                     'slice': 25, 'piece': 20, 'can': 400, 'jar': 400, 'bottle': 500
                 };
@@ -611,6 +619,10 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
             newWeight = newQuantity;
         } else if (unitLower === 'kg' || unitLower === 'kilogram') {
             newWeight = newQuantity * 1000;
+        } else if (['lb', 'lbs', 'pound', 'pounds', 'lb.'].includes(unitLower)) {
+            newWeight = newQuantity * 453.59;
+        } else if (['oz', 'oz.', 'ounce', 'ounces'].includes(unitLower)) {
+            newWeight = newQuantity * 28.35;
         } else {
             // Priority 1: Search standard available measures
             let measures = [...(ing.available_measures || [])];
@@ -692,6 +704,14 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
             newQuantity = ing.weight_g / 1000;
             newWeight = ing.weight_g;
         }
+        else if (['lb', 'lbs', 'pound', 'pounds', 'lb.'].includes(newUnitLower)) {
+            newQuantity = ing.weight_g / 453.59;
+            newWeight = ing.weight_g;
+        }
+        else if (['oz', 'oz.', 'ounce', 'ounces'].includes(newUnitLower)) {
+            newQuantity = ing.weight_g / 28.35;
+            newWeight = ing.weight_g;
+        }
         else {
             // Find density of the NEW unit
             let measures = [...(ing.available_measures || [])];
@@ -740,6 +760,10 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
             newQuantity = newWeight;
         } else if (unitLower === 'kg' || unitLower === 'kilogram') {
             newQuantity = newWeight / 1000;
+        } else if (['lb', 'lbs', 'pound', 'pounds', 'lb.'].includes(unitLower)) {
+            newQuantity = newWeight / 453.59;
+        } else if (['oz', 'oz.', 'ounce', 'ounces'].includes(unitLower)) {
+            newQuantity = newWeight / 28.35;
         } else {
             let measures = [...(ing.available_measures || [])];
             if (isSpice(ing.food_item_name)) {
