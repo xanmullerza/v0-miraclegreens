@@ -146,7 +146,10 @@ export function FoodItemCreatorContent() {
     const [nutrientPanel, setNutrientPanel] = useState<'paste' | 'add' | null>(null);
 
     // Manual serving entries: array of { name, weight_g }
-    const [manualServings, setManualServings] = useState<{ name: string; weight_g: string }[]>([{ name: '', weight_g: '' }]);
+    const [manualServings, setManualServings] = useState<{ name: string; weight_g: string }[]>([
+        { name: 'Gram', weight_g: '1' },
+        { name: 'Kilogram', weight_g: '1000' }
+    ]);
 
     // Manual nutrient entries: array of { nutrient, value }
     const [manualNutrients, setManualNutrients] = useState<{ nutrient: string; value: string }[]>([{ nutrient: '', value: '' }]);
@@ -630,51 +633,57 @@ Fat: ${item.fat_g || 0}g
                             {/* Serving Add Panel */}
                             {servingPanel === 'add' && (
                                 <div className="mb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Add Serving Sizes</Label>
-                                    <div className="space-y-2">
-                                        {manualServings.map((s, i) => (
-                                            <div key={i} className="flex items-center gap-2">
-                                                <Input
-                                                    placeholder="e.g. cup, tablespoon, slice"
-                                                    className="flex-1 h-9 text-sm rounded-lg bg-white dark:bg-slate-950"
-                                                    value={s.name}
-                                                    onChange={(e) => {
-                                                        const updated = [...manualServings];
-                                                        updated[i] = { ...updated[i], name: e.target.value };
-                                                        setManualServings(updated);
-                                                    }}
-                                                />
-                                                <Input
-                                                    placeholder="g"
-                                                    type="number"
-                                                    className="w-20 h-9 text-sm text-center rounded-lg bg-white dark:bg-slate-950"
-                                                    value={s.weight_g}
-                                                    onChange={(e) => {
-                                                        const updated = [...manualServings];
-                                                        updated[i] = { ...updated[i], weight_g: e.target.value };
-                                                        setManualServings(updated);
-                                                    }}
-                                                />
-                                                {manualServings.length > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setManualServings(manualServings.filter((_, idx) => idx !== i))}
-                                                        className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
-                                                    >
-                                                        <X size={14} />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Quick Add Serving Sizes</Label>
+                                    <div className="flex items-center gap-2">
+                                        <select
+                                            onChange={(e) => {
+                                                if (e.target.value) {
+                                                    const [name, weight] = e.target.value.split('|');
+                                                    setManualServings([...manualServings, { name, weight_g: weight }]);
+                                                    e.target.value = '';
+                                                }
+                                            }}
+                                            className="flex-1 h-10 px-3 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium appearance-none pr-10"
+                                        >
+                                            <option value="">Select a serving size to add...</option>
+                                            <option value="Gram|1">Gram (1g)</option>
+                                            <option value="Kilogram|1000">Kilogram (1000g)</option>
+                                            <option value="Milliliter|1">Milliliter (1ml)</option>
+                                            <option value="Liter|1000">Liter (1000ml)</option>
+                                            <option value="Teaspoon|5">Teaspoon (5g)</option>
+                                            <option value="Tablespoon|15">Tablespoon (15g)</option>
+                                            <option value="Cup|240">Cup (240g)</option>
+                                            <option value="Ounce|28">Ounce (28g)</option>
+                                            <option value="Pound|454">Pound (454g)</option>
+                                            <option value="Slice|30">Slice (30g)</option>
+                                            <option value="Handful|30">Handful (30g)</option>
+                                            <option value="Serving|100">Serving (100g)</option>
+                                        </select>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setManualServings([...manualServings, { name: '', weight_g: '' }])}
-                                        className="w-full h-8 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
-                                    >
-                                        <Plus size={12} />
-                                        Add More
-                                    </button>
+                                    
+                                    {manualServings.length > 0 && (
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Selected Servings:</Label>
+                                            <div className="space-y-1">
+                                                {manualServings.map((s, i) => (
+                                                    <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
+                                                        <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                                                            1 {s.name} = {s.weight_g}g
+                                                        </span>
+                                                        {manualServings.length > 1 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setManualServings(manualServings.filter((_, idx) => idx !== i))}
+                                                                className="p-1 text-emerald-400 hover:text-rose-500 transition-colors"
+                                                            >
+                                                                <X size={14} />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
