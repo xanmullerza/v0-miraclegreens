@@ -448,19 +448,54 @@ Fat: ${food.fat_g || 0}g
     };
 
     const handleImportSelect = (item: any) => {
+        // Calculate missing carbs from sugar components if not provided
+        let finalCarbs = item.carbs_g;
+        if (!finalCarbs || finalCarbs === 0) {
+            const micros = item.micronutrients || {};
+            const sugarComponents = [
+                'Glucose', 'Fructose', 'Sucrose', 'Lactose', 'Maltose', 
+                'Starch', 'Fiber', 'Sugar Alcohol', 'Sugars', 'Allulose', 'Galactose'
+            ];
+            
+            let calculatedCarbs = 0;
+            sugarComponents.forEach(comp => {
+                // Find the nutrient key (case-insensitive)
+                const key = Object.keys(micros).find(k => k.toLowerCase() === comp.toLowerCase());
+                if (key && micros[key]) {
+                    calculatedCarbs += parseFloat(micros[key]) || 0;
+                }
+            });
+            if (calculatedCarbs > 0) {
+                finalCarbs = calculatedCarbs;
+            }
+        }
+
+        // Calculate missing energy (calories) using Atwater factors if not provided
+        let finalEnergy = item.energy_kcal;
+        if (!finalEnergy || finalEnergy === 0) {
+            const protein = parseFloat(item.protein_g) || 0;
+            const carbs = finalCarbs || 0;
+            const fat = parseFloat(item.fat_g) || 0;
+            
+            // Atwater factors: Protein 4 kcal/g, Carbs 4 kcal/g, Fat 9 kcal/g
+            if (protein > 0 || carbs > 0 || fat > 0) {
+                finalEnergy = Math.round((protein * 4) + (carbs * 4) + (fat * 9));
+            }
+        }
+
         // Populate the form with the imported item's data
         setName(item.name);
         setCommonName(item.common_name || '');
-        setEnergyKcal(item.energy_kcal?.toString() || '');
-        setEnergyKj(item.energy_kj?.toString() || '');
+        setEnergyKcal(finalEnergy?.toString() || '');
+        setEnergyKj(item.energy_kj?.toString() || (finalEnergy ? Math.round(finalEnergy * 4.184).toString() : ''));
         setProtein(item.protein_g?.toString() || '');
         setFat(item.fat_g?.toString() || '');
-        setCarbs(item.carbs_g?.toString() || '');
+        setCarbs(finalCarbs?.toString() || '');
 
         // Construct nutrient text for display/editing
-        let nText = `Calories: ${item.energy_kcal || 0}
+        let nText = `Calories: ${finalEnergy || 0}
 Protein: ${item.protein_g || 0}g
-Carbs: ${item.carbs_g || 0}g
+Carbs: ${finalCarbs || 0}g
 Fat: ${item.fat_g || 0}g
 `;
         if (item.micronutrients) {
