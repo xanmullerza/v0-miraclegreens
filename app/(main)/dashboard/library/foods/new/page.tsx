@@ -38,7 +38,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 import { parseNutritionText, parseMeasures } from '@/lib/utils/nutrition-parser';
-import { searchUSDAFood } from '@/lib/services/nutrition';
+import { searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -447,11 +447,27 @@ Fat: ${food.fat_g || 0}g
         searchTimeoutRef.current = setTimeout(() => performSearch(val), 300);
     };
 
-    const handleImportSelect = (item: any) => {
+    const handleImportSelect = async (item: any) => {
+        // Fetch full details for USDA foods to get portions and complete micronutrients
+        let fullItem = item;
+        if (item.fdcId && item.source === 'usda') {
+            try {
+                const details = await getUSDAFoodDetails(item.fdcId);
+                fullItem = {
+                    ...item,
+                    portions: details.portions,
+                    micronutrients: details.micronutrients
+                };
+            } catch (error) {
+                console.error('Error fetching USDA food details:', error);
+                toast.warning("Partial data imported. Some details may be incomplete.");
+            }
+        }
+
         // Calculate missing carbs from sugar components if not provided
-        let finalCarbs = item.carbs_g;
+        let finalCarbs = fullItem.carbs_g || 0;
         if (!finalCarbs || finalCarbs === 0) {
-            const micros = item.micronutrients || {};
+            const micros = fullItem.micronutrients || {};
             const sugarComponents = [
                 'Glucose', 'Fructose', 'Sucrose', 'Lactose', 'Maltose', 
                 'Starch', 'Fiber', 'Sugar Alcohol', 'Sugars', 'Allulose', 'Galactose'
@@ -471,11 +487,11 @@ Fat: ${food.fat_g || 0}g
         }
 
         // Calculate missing energy (calories) using Atwater factors if not provided
-        let finalEnergy = item.energy_kcal;
+        let finalEnergy = fullItem.energy_kcal || 0;
         if (!finalEnergy || finalEnergy === 0) {
-            const protein = parseFloat(item.protein_g) || 0;
+            const protein = parseFloat(fullItem.protein_g) || 0;
             const carbs = finalCarbs || 0;
-            const fat = parseFloat(item.fat_g) || 0;
+            const fat = parseFloat(fullItem.fat_g) || 0;
             
             // Atwater factors: Protein 4 kcal/g, Carbs 4 kcal/g, Fat 9 kcal/g
             if (protein > 0 || carbs > 0 || fat > 0) {
@@ -484,37 +500,37 @@ Fat: ${food.fat_g || 0}g
         }
 
         // Populate the form with the imported item's data
-        setName(item.name);
-        setCommonName(item.common_name || '');
+        setName(fullItem.name);
+        setCommonName(fullItem.common_name || '');
         setEnergyKcal(finalEnergy?.toString() || '');
-        setEnergyKj(item.energy_kj?.toString() || (finalEnergy ? Math.round(finalEnergy * 4.184).toString() : ''));
-        setProtein(item.protein_g?.toString() || '');
-        setFat(item.fat_g?.toString() || '');
+        setEnergyKj(fullItem.energy_kj?.toString() || (finalEnergy ? Math.round(finalEnergy * 4.184).toString() : ''));
+        setProtein(fullItem.protein_g?.toString() || '');
+        setFat(fullItem.fat_g?.toString() || '');
         setCarbs(finalCarbs?.toString() || '');
 
         // Construct nutrient text for display/editing
         let nText = `Calories: ${finalEnergy || 0}
-Protein: ${item.protein_g || 0}g
+Protein: ${fullItem.protein_g || 0}g
 Carbs: ${finalCarbs || 0}g
-Fat: ${item.fat_g || 0}g
+Fat: ${fullItem.fat_g || 0}g
 `;
-        if (item.micronutrients) {
-            Object.entries(item.micronutrients).forEach(([key, val]) => {
+        if (fullItem.micronutrients) {
+            Object.entries(fullItem.micronutrients).forEach(([key, val]) => {
                 nText += `${key}: ${val}\n`;
             });
             // Update state map directly too
             const newMicros: Record<string, string> = {};
-            Object.entries(item.micronutrients as Record<string, number>).forEach(([k, v]) => {
+            Object.entries(fullItem.micronutrients as Record<string, number>).forEach(([k, v]) => {
                 newMicros[k] = v.toString();
             });
             setMicronutrients(newMicros);
         }
         setNutrientText(nText);
 
-        // Construct serving text
+        // Construct serving text with portions
         let sText = '';
-        if (item.portions && Array.isArray(item.portions) && item.portions.length > 0) {
-            item.portions.forEach((p: any) => {
+        if (fullItem.portions && Array.isArray(fullItem.portions) && fullItem.portions.length > 0) {
+            fullItem.portions.forEach((p: any) => {
                 sText += `1 ${p.label} = ${p.weight_g}g\n`;
             });
         } else {
