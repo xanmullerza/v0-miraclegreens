@@ -515,63 +515,43 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
         setPendingIngredients(newUpdated);
     };
 
+    const evaluateLocalQty = (amt: string): number => {
+        if (!amt) return 1;
+        let cleanAmt = amt.replace(/,/g, '.').trim();
+        const unicodeFractions: Record<string, number> = {
+            '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
+        };
+        for (const [char, val] of Object.entries(unicodeFractions)) {
+            if (cleanAmt.includes(char)) {
+                const parts = cleanAmt.split(char);
+                const whole = parseFloat(parts[0].trim()) || 0;
+                return whole + val;
+            }
+        }
+        const match = cleanAmt.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
+        if (!match) return 1;
+        const val = match[1].trim();
+        if (val.includes('/')) {
+            if (val.includes(' ')) {
+                const [whole, frac] = val.split(/\s+/);
+                const [num, den] = frac.split('/').map(n => parseFloat(n.trim()));
+                return (parseFloat(whole) || 0) + (num / (den || 1));
+            }
+            const [num, den] = val.split('/').map(n => parseFloat(n.trim()));
+            return num / (den || 1);
+        }
+        const numVal = parseFloat(val);
+        return isNaN(numVal) ? 1 : numVal;
+    };
+
     const confirmPendingIngredient = async (index: number) => {
         const item = pendingIngredients[index];
-        if (!item.selectedMatch) return;
+        if (!item || !item.selectedMatch) return;
 
-        // Resolve weight/quantity from raw parsing
         let weightG = item.raw.weightG;
-        let amountStr = item.raw.amount || "";
-
-        // Pre-clean internal "or" artifacts (e.g. "1 or 2" -> "1.5", "2 tspor" -> "2 tsp")
-        amountStr = amountStr.replace(/or\b/gi, '').trim();
-
-        // Basic amount evaluator for local use
-        const evaluateLocalQty = (amt: string): number => {
-            if (!amt) return 1;
-
-            // Normalize: Replace comma with dot for decimal parsing
-            let cleanAmt = amt.replace(/,/g, '.').trim();
-
-            // Handle unicode fractions
-            const unicodeFractions: Record<string, number> = {
-                '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
-            };
-            for (const [char, val] of Object.entries(unicodeFractions)) {
-                if (cleanAmt.includes(char)) {
-                    const parts = cleanAmt.split(char);
-                    const whole = parseFloat(parts[0].trim()) || 0;
-                    return whole + val;
-                }
-            }
-
-            // Standard regex for numbers, fractions like "1 1/2", and decimals
-            const match = cleanAmt.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
-            if (!match) return 1;
-            const val = match[1].trim();
-            if (val.includes('/')) {
-                if (val.includes(' ')) {
-                    const [whole, frac] = val.split(/\s+/);
-                    const [num, den] = frac.split('/').map(n => parseFloat(n.trim()));
-                    return (parseFloat(whole) || 0) + (num / (den || 1));
-                }
-                const [num, den] = val.split('/').map(n => parseFloat(n.trim()));
-                return num / (den || 1);
-            }
-            const numVal = parseFloat(val);
-            return isNaN(numVal) ? 1 : numVal;
-        };
-
+        let amountStr = (item.raw.amount || "").replace(/or\b/gi, '').trim();
         const qty = evaluateLocalQty(amountStr);
-        // Better unit extraction: use cleaner string
         const unit = amountStr.replace(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[\d\s¼½¾⅛⅜⅝⅞/.]+))\s*/, '').trim();
-
-        console.log(`[IngredientBuilder] Confirming: "${item.raw.item}"`, {
-            rawWeightG: weightG,
-            qty,
-            unit,
-            rawAmount: amountStr
-        });
 
         await handleAddIngredient(item.selectedMatch, {
             weightG: weightG,
@@ -580,8 +560,39 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
             modifier: item.raw.modifier
         });
 
-        // Remove from pending
         setPendingIngredients(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const confirmAllIngredients = async () => {
+        const matchedItems = pendingIngredients.filter(item => item.status === 'matched' && item.selectedMatch);
+        if (matchedItems.length === 0) return;
+
+        setIsParsing(true); // Reuse parsing state for loading
+        try {
+            // Sequential is safer for handleAddIngredient as it uses state internally
+            for (const item of matchedItems) {
+                let weightG = item.raw.weightG;
+                let amountStr = (item.raw.amount || "").replace(/or\b/gi, '').trim();
+                const qty = evaluateLocalQty(amountStr);
+                const unit = amountStr.replace(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[\d\s¼½¾⅛⅜⅝⅞/.]+))\s*/, '').trim();
+
+                await handleAddIngredient(item.selectedMatch, {
+                    weightG: weightG,
+                    quantity: qty,
+                    unit: unit,
+                    modifier: item.raw.modifier
+                });
+            }
+
+            // Remove all matched items from pending
+            setPendingIngredients(prev => prev.filter(item => item.status !== 'matched'));
+            toast.success(`Ported ${matchedItems.length} ingredients to Protocol Workspace`);
+        } catch (err) {
+            console.error("Add All Error:", err);
+            toast.error("Failed to add all ingredients");
+        } finally {
+            setIsParsing(false);
+        }
     };
 
     const rejectPendingIngredient = (index: number) => {
@@ -1168,7 +1179,17 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                     ) : (
                         <div className="space-y-3">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] font-black uppercase text-amber-800/50">{pendingIngredients.length} Items Found</span>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[10px] font-black uppercase text-amber-800/50">{pendingIngredients.length} Items Found</span>
+                                    {pendingIngredients.some(item => item.status === 'matched' && item.selectedMatch) && (
+                                        <button
+                                            onClick={confirmAllIngredients}
+                                            className="text-[10px] font-black uppercase text-emerald-600 hover:text-emerald-700 transition flex items-center gap-1.5"
+                                        >
+                                            <Plus size={12} /> Add All Matched
+                                        </button>
+                                    )}
+                                </div>
                                 <button
                                     onClick={() => {
                                         setPendingIngredients([]);
@@ -1254,8 +1275,13 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                                                 {item.status === 'matched' && (
                                                     <button
                                                         onClick={() => confirmPendingIngredient(idx)}
-                                                        className="h-10 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
-                                                        title="Add to Protocol"
+                                                        className={cn(
+                                                            "h-10 px-4 rounded-xl text-white shadow-lg flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95",
+                                                            item.selectedMatch?.source === 'local'
+                                                                ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10"
+                                                                : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10"
+                                                        )}
+                                                        title={item.selectedMatch?.source === 'local' ? "Add Local Match" : "Add USDA Match"}
                                                     >
                                                         <Plus size={14} /> Add
                                                     </button>
