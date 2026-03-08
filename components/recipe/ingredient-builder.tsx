@@ -406,7 +406,7 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                 const rawItem = item.raw.item;
                 const parenIndex = rawItem.indexOf('(');
                 let coreName = parenIndex !== -1 ? rawItem.substring(0, parenIndex).trim() : rawItem;
-                coreName = coreName.replace(/[,;:]\s*$/, '').trim();
+                coreName = coreName.replace(/[*,;:]+\s*$/, '').trim();
 
                 // 2. Search Local Registry
                 let localMatches = await searchLocalFood(coreName);

@@ -77,7 +77,7 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
             }
         }
 
-        const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line) || lowerLine.startsWith('optional');
+        const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞*•\-☐☑☒]/.test(line) || /^\[[ xX]?\]/.test(line) || lowerLine.startsWith('optional');
 
         // If it has a quantity, flush buffer and start new
         if (hasQuantity) {
@@ -306,8 +306,8 @@ function isProbablyIngredient(line: string): boolean {
         return false;
     }
 
-    // 2. Inclusion: Starts with a quantity marker
-    return /^[\d¼½¾⅛⅜⅝⅞.\-\s*•]+/.test(line);
+    // 2. Inclusion: Starts with a quantity marker or common bullet/checkbox
+    return /^[\d¼½¾⅛⅜⅝⅞.\-\s*•+☐☑☒]|\[[ xX]?\]/.test(line);
 }
 
 function isProbablyInstruction(line: string): boolean {
@@ -388,7 +388,8 @@ function extractModifier(text: string): { modifier?: string, cleanText: string }
 }
 
 function parseIngredientLine(line: string): ParsedIngredient {
-    let cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
+    // Remove leading bullets, numbers followed by punctuation, or checkboxes
+    let cleanLine = line.replace(/^([*•\-+☐☑☒]|\[[ xX]?\]|\d+[.)])\s*/, '').trim();
 
     // Aggressive cleanup for "or", "original", etc. artifacts
     const artifacts = ['or', 'original', 'scaled', 'serving'];
