@@ -212,7 +212,7 @@ function LoginContent() {
                         </Link>
 
                         <Link
-                            href="/dashboard/widgets/compare"
+                            href="/dashboard/widgets/comparator"
                             className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-indigo-500/10"
                         >
                             <div className="w-12 h-12 shrink-0 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover/nudge:scale-110 transition-transform duration-500">
