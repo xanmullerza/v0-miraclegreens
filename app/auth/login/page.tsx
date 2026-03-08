@@ -66,7 +66,7 @@ function LoginContent() {
 
             <Link
                 href="/"
-                className="absolute top-8 left-8 flex items-center gap-3 text-slate-400 hover:text-emerald-500 transition-all font-black uppercase tracking-[0.2em] text-[10px] z-50 group"
+                className="absolute top-8 left-8 flex items-center gap-3 text-slate-400 hover:text-emerald-500 transition-all font-bold uppercase tracking-[0.2em] text-[10px] z-50 group"
             >
                 <div className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center group-hover:bg-emerald-500 group-hover:border-emerald-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-lg group-hover:shadow-emerald-500/20">
                     <ArrowLeft size={16} />
@@ -86,13 +86,13 @@ function LoginContent() {
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white italic uppercase leading-tight">
+                    <div className="space-y-3">
+                        <h1 className="text-5xl font-medium tracking-tight text-slate-900 dark:text-white leading-tight font-serif italic">
                             Personalize Your <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-sky-500">Kitchen.</span>
                         </h1>
-                        <p className="text-slate-400 text-[11px] font-bold uppercase tracking-[0.3em] max-w-[300px] mx-auto leading-relaxed">
-                            Sign in to secure your custom data & plans
+                        <p className="text-slate-400 text-sm font-medium tracking-wide max-w-[340px] mx-auto leading-relaxed">
+                            Sign in to secure your custom data, sync your pantry, and generate tailored meal plans.
                         </p>
                     </div>
                 </div>
@@ -104,27 +104,27 @@ function LoginContent() {
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full group-hover/card:bg-emerald-500/10 transition-colors duration-1000" />
 
                     {/* Explainer Sections */}
-                    <div className="grid gap-5">
-                        <div className="group/item flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-emerald-500 group-hover/item:border-emerald-500/30 group-hover/item:bg-emerald-500/5 transition-all duration-300 shrink-0 shadow-sm">
-                                <Calendar size={18} />
+                    <div className="grid gap-6">
+                        <div className="group/item flex items-start gap-5">
+                            <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-emerald-500 group-hover/item:border-emerald-500/30 group-hover/item:bg-emerald-500/5 transition-all duration-300 shrink-0 shadow-sm">
+                                <Calendar size={20} />
                             </div>
-                            <div className="space-y-1">
-                                <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Bespoke Meal Plans</h3>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                                    Our planner adapts to <span className="text-emerald-500 dark:text-emerald-400 font-bold italic">your body</span>. Sign in to save your biometric data and health goals.
+                            <div className="space-y-1.5">
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Tailored Meal Plans</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                    Our planner adapts to <span className="text-emerald-500 dark:text-emerald-400 font-semibold">your unique body</span>. Sign in to save your biometric data and health goals.
                                 </p>
                             </div>
                         </div>
 
-                        <div className="group/item flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-sky-500 group-hover/item:border-sky-500/30 group-hover/item:bg-sky-500/5 transition-all duration-300 shrink-0 shadow-sm">
-                                <Package size={18} />
+                        <div className="group/item flex items-start gap-5">
+                            <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-sky-500 group-hover/item:border-sky-500/30 group-hover/item:bg-sky-500/5 transition-all duration-300 shrink-0 shadow-sm">
+                                <Package size={20} />
                             </div>
-                            <div className="space-y-1">
-                                <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Pocket Pantry</h3>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                                    Keep your inventory and shopping lists <span className="text-sky-500 dark:text-sky-400 font-bold italic">in sync</span> across all your devices, anywhere you go.
+                            <div className="space-y-1.5">
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Sync Across Devices</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                    Keep your inventory and shopping lists <span className="text-sky-500 dark:text-sky-400 font-semibold">in sync</span> across all your devices, anywhere you go.
                                 </p>
                             </div>
                         </div>
@@ -135,7 +135,7 @@ function LoginContent() {
                         <Button
                             onClick={handleLogin}
                             disabled={loading}
-                            className="w-full h-16 bg-slate-950 hover:bg-black dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 border-none shadow-2xl font-black text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 group/btn relative overflow-hidden shadow-emerald-500/10"
+                            className="w-full h-16 bg-slate-950 hover:bg-black dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 border-none shadow-2xl font-bold text-sm rounded-2xl flex items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 group/btn relative overflow-hidden shadow-emerald-500/10"
                         >
                             {loading ? (
                                 <div className="flex items-center gap-3">
@@ -158,7 +158,7 @@ function LoginContent() {
 
                         <div className="flex items-center justify-center gap-3">
                             <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800/50" />
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Privacy First</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Privacy First</span>
                             <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800/50" />
                         </div>
                     </div>
@@ -166,9 +166,11 @@ function LoginContent() {
 
                 {/* Nudge / Guest Section */}
                 <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 rounded-[3rem] p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 shadow-xl">
-                    <div className="space-y-1 text-center mb-2">
-                        <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 italic">Not ready for a profile?</h4>
-                        <p className="text-[10px] text-slate-500 font-medium italic">Explore our ecosystem as a guest.</p>
+                    <div className="space-y-1.5 text-center mb-2">
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Not ready for a profile?</h4>
+                        <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                            Explore our ecosystem as a guest.
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -180,8 +182,8 @@ function LoginContent() {
                                 <Home size={24} />
                             </div>
                             <div className="min-w-0">
-                                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Home</span>
-                                <p className="text-[9px] text-slate-500 truncate font-medium">Front page access.</p>
+                                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">Home</span>
+                                <p className="text-[11px] text-slate-500 truncate font-medium">Front page access.</p>
                             </div>
                         </Link>
 
@@ -193,8 +195,8 @@ function LoginContent() {
                                 <Apple size={24} />
                             </div>
                             <div className="min-w-0">
-                                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Foods</span>
-                                <p className="text-[9px] text-slate-500 truncate font-medium">Atomic nutrition facts.</p>
+                                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">Foods</span>
+                                <p className="text-[11px] text-slate-500 truncate font-medium">Atomic nutrition facts.</p>
                             </div>
                         </Link>
 
@@ -206,8 +208,8 @@ function LoginContent() {
                                 <Utensils size={24} />
                             </div>
                             <div className="min-w-0">
-                                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Recipes</span>
-                                <p className="text-[9px] text-slate-500 truncate font-medium">Healthy meal discovery.</p>
+                                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">Recipes</span>
+                                <p className="text-[11px] text-slate-500 truncate font-medium">Healthy meal discovery.</p>
                             </div>
                         </Link>
 
@@ -219,8 +221,8 @@ function LoginContent() {
                                 <LayoutGrid size={24} />
                             </div>
                             <div className="min-w-0">
-                                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Widgets</span>
-                                <p className="text-[9px] text-slate-500 truncate font-medium">Comparative analytics.</p>
+                                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">Widgets</span>
+                                <p className="text-[11px] text-slate-500 truncate font-medium">Comparative analytics.</p>
                             </div>
                         </Link>
                     </div>
@@ -228,7 +230,7 @@ function LoginContent() {
 
                 {/* Footer Credits */}
                 <div className="flex flex-col items-center gap-3">
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] italic opacity-50">
+                    <p className="text-[11px] text-slate-400 font-medium uppercase tracking-[0.3em] opacity-60">
                         Vitala Research Systems &copy; {new Date().getFullYear()}
                     </p>
                     <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
