@@ -1453,9 +1453,9 @@ export function MealPlannerContent({
 
             {/* Maker Overlay */}
             {activeMaker && (
-                <div className="animate-in slide-in-from-top-3 fade-in duration-300 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden mt-4">
+                <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 animate-in fade-in duration-300 flex flex-col">
                     {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
                         <div className="flex items-center gap-3">
                             {activeMaker !== 'menu' && (
                                 <button
@@ -1488,7 +1488,7 @@ export function MealPlannerContent({
                     </div>
                     {/* Maker Options */}
                     {activeMaker === 'menu' && (
-                        <div className="p-4 grid gap-3 max-w-2xl mx-auto py-8">
+                        <div className="flex-1 overflow-y-auto p-4 grid gap-3 max-w-2xl mx-auto py-8">
                             {MAKER_OPTIONS.map((option) => {
                                 const Icon = option.icon;
                                 return (
@@ -1524,21 +1524,21 @@ export function MealPlannerContent({
                     )}
                     {/* Inline Workspaces */}
                     {activeMaker === 'food' && (
-                        <div className="p-4 md:p-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8">
                             <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
                                 <FoodItemCreatorContent />
                             </Suspense>
                         </div>
                     )}
                     {activeMaker === 'meal' && (
-                        <div className="p-4 md:p-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8">
                             <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
                                 <MealBuilderContent />
                             </Suspense>
                         </div>
                     )}
                     {activeMaker === 'mix' && (
-                        <div className="p-4 md:p-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8">
                             <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
                                 <MixBuilderContent />
                             </Suspense>
