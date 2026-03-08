@@ -165,62 +165,62 @@ function LoginContent() {
                 </div>
 
                 {/* Nudge / Guest Section */}
-                <div className="bg-slate-900/5 dark:bg-white/5 border border-slate-200/50 dark:border-white/5 rounded-[2.5rem] p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+                <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 rounded-[3rem] p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 shadow-xl">
                     <div className="space-y-1 text-center mb-2">
                         <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 italic">Not ready for a profile?</h4>
-                        <p className="text-[10px] text-slate-500 font-medium">You can still explore our public tools as a guest.</p>
+                        <p className="text-[10px] text-slate-500 font-medium italic">Explore our ecosystem as a guest.</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <Link
                             href="/"
-                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-500/[0.02] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-emerald-500/5"
+                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-emerald-500/10"
                         >
-                            <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-400 group-hover/nudge:text-emerald-500 group-hover/nudge:bg-emerald-500/10 transition-all">
-                                <Home size={20} />
+                            <div className="w-12 h-12 shrink-0 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover/nudge:scale-110 transition-transform duration-500">
+                                <Home size={24} />
                             </div>
                             <div className="min-w-0">
-                                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Public Home</span>
-                                <p className="text-[9px] text-slate-500 truncate">Back to the front page.</p>
+                                <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Home</span>
+                                <p className="text-[9px] text-slate-500 truncate font-medium">Front page access.</p>
                             </div>
                         </Link>
 
                         <Link
                             href="/dashboard/library/foods"
-                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-500/[0.02] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-emerald-500/5"
+                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-rose-500/50 hover:bg-rose-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-rose-500/10"
                         >
-                            <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-400 group-hover/nudge:text-emerald-500 group-hover/nudge:bg-emerald-500/10 transition-all">
-                                <Apple size={20} />
+                            <div className="w-12 h-12 shrink-0 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover/nudge:scale-110 transition-transform duration-500">
+                                <Apple size={24} />
                             </div>
                             <div className="min-w-0">
                                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Foods</span>
-                                <p className="text-[9px] text-slate-500 truncate">Explore nutrition facts.</p>
+                                <p className="text-[9px] text-slate-500 truncate font-medium">Atomic nutrition facts.</p>
                             </div>
                         </Link>
 
                         <Link
                             href="/dashboard/library/meals"
-                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50 hover:bg-sky-500/[0.02] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-sky-500/5"
+                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 hover:bg-amber-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-amber-500/10"
                         >
-                            <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-400 group-hover/nudge:text-sky-500 group-hover/nudge:bg-sky-500/10 transition-all">
-                                <Utensils size={20} />
+                            <div className="w-12 h-12 shrink-0 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/nudge:scale-110 transition-transform duration-500">
+                                <Utensils size={24} />
                             </div>
                             <div className="min-w-0">
                                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Recipes</span>
-                                <p className="text-[9px] text-slate-500 truncate">Discover healthy meals.</p>
+                                <p className="text-[9px] text-slate-500 truncate font-medium">Healthy meal discovery.</p>
                             </div>
                         </Link>
 
                         <Link
                             href="/dashboard/widgets/compare"
-                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50 hover:bg-sky-500/[0.02] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-sky-500/5"
+                            className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-indigo-500/10"
                         >
-                            <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-400 group-hover/nudge:text-sky-500 group-hover/nudge:bg-sky-500/10 transition-all">
-                                <LayoutGrid size={20} />
+                            <div className="w-12 h-12 shrink-0 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover/nudge:scale-110 transition-transform duration-500">
+                                <LayoutGrid size={24} />
                             </div>
                             <div className="min-w-0">
                                 <span className="block text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Widgets</span>
-                                <p className="text-[9px] text-slate-500 truncate">Compare and analyze.</p>
+                                <p className="text-[9px] text-slate-500 truncate font-medium">Comparative analytics.</p>
                             </div>
                         </Link>
                     </div>
