@@ -16,29 +16,10 @@ import { useRouter } from 'next/navigation';
 
 export default function PantryPage() {
     const router = useRouter();
-    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isActive, setIsActive] = useState(false);
-
-    // Check authentication on mount
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) {
-                    router.push('/auth/login');
-                }
-            } catch (error) {
-                console.error('Auth check error:', error);
-                router.push('/auth/login');
-            } finally {
-                setIsAuthLoading(false);
-            }
-        };
-        checkAuth();
-    }, [router]);
 
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedFood, setSelectedFood] = useState<any>(null);
@@ -153,7 +134,7 @@ export default function PantryPage() {
                             .eq('user_id', user.id)
                             .eq('food_item_id', selectedFood.id)
                             .maybeSingle();
-                        
+
                         if (!existing) {
                             await supabase.from('pantry_items').insert({
                                 user_id: user.id,
@@ -281,63 +262,50 @@ export default function PantryPage() {
         }
     };
 
-    if (isAuthLoading) {
-        return (
-            <PageContainer maxWidth="max-w-7xl">
-                <div className="h-96 flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500" />
-                        <p className="text-sm text-slate-500 font-medium">Loading pantry...</p>
-                    </div>
-                </div>
-            </PageContainer>
-        );
-    }
-
     return (
         <PageContainer maxWidth="max-w-7xl">
             <div className="space-y-8 animate-in fade-in duration-700">
                 {/* Hero Search */}
                 <HeroSearch
-                        searchQuery={searchQuery}
-                        onQueryChange={setSearchQuery}
-                        results={searchResults}
-                        isLoading={isSearching}
-                        isActive={isActive}
-                        setIsActive={setIsActive}
-                        onSelect={handleSelectFood}
-                        theme="amber"
-                        placeholder="SEARCH FOOD LIBRARY..."
-                        noResultsMessage="No matching items found"
-                        enterMessage="Enter item name to search"
-                        searchingMessage="Searching Library..."
-                        powerButton={
-                            <button
-                                onClick={() => {
-                                    // TODO: Wire up receipt scanner
-                                }}
-                                className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-amber-500 hover:bg-amber-500/10 shrink-0"
-                            >
-                                <Receipt size={16} className="text-slate-900 dark:text-white" />
-                            </button>
-                        }
-                        renderResult={(food: any) => (
-                            <>
-                                <div className="flex items-center gap-4 min-w-0">
-                                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
-                                        {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{formatFoodName(food.common_name || food.name)}</h4>
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                            {(food.energy_kcal ?? 0).toFixed(0)} kcal <span className="text-slate-200 dark:text-slate-700">|</span> 100g
-                                        </p>
-                                    </div>
+                    searchQuery={searchQuery}
+                    onQueryChange={setSearchQuery}
+                    results={searchResults}
+                    isLoading={isSearching}
+                    isActive={isActive}
+                    setIsActive={setIsActive}
+                    onSelect={handleSelectFood}
+                    theme="amber"
+                    placeholder="SEARCH FOOD LIBRARY..."
+                    noResultsMessage="No matching items found"
+                    enterMessage="Enter item name to search"
+                    searchingMessage="Searching Library..."
+                    powerButton={
+                        <button
+                            onClick={() => {
+                                // TODO: Wire up receipt scanner
+                            }}
+                            className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-amber-500 hover:bg-amber-500/10 shrink-0"
+                        >
+                            <Receipt size={16} className="text-slate-900 dark:text-white" />
+                        </button>
+                    }
+                    renderResult={(food: any) => (
+                        <>
+                            <div className="flex items-center gap-4 min-w-0">
+                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                                    {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
                                 </div>
-                                <ChevronRight className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0" size={20} />
-                            </>
-                        )}
-                    />
+                                <div className="min-w-0">
+                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{formatFoodName(food.common_name || food.name)}</h4>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                        {(food.energy_kcal ?? 0).toFixed(0)} kcal <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                    </p>
+                                </div>
+                            </div>
+                            <ChevronRight className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0" size={20} />
+                        </>
+                    )}
+                />
 
                 {/* Quick Add Panel */}
                 {showAddModal && selectedFood && (
@@ -389,14 +357,14 @@ export default function PantryPage() {
                                     >
                                         <option value="">Select a serving...</option>
                                         {(() => {
-                                                const seen = new Set<number>();
-                                                return selectedFood.portions
-                                                    ?.filter((p: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label))
-                                                    .filter((p: any) => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; })
-                                                    .map((p: any) => (
-                                                        <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                                    ));
-                                            })()}
+                                            const seen = new Set<number>();
+                                            return selectedFood.portions
+                                                ?.filter((p: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label))
+                                                .filter((p: any) => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; })
+                                                .map((p: any) => (
+                                                    <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                ));
+                                        })()}
                                     </select>
                                 </div>
                             ) : (

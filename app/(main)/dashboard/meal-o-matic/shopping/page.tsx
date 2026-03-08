@@ -25,29 +25,11 @@ function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
 export default function ShoppingListPage() {
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
-    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
 
-    // Check authentication on mount
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) {
-                    router.push('/auth/login');
-                }
-            } catch (error) {
-                console.error('Auth check error:', error);
-                router.push('/auth/login');
-            } finally {
-                setIsAuthLoading(false);
-            }
-        };
-        checkAuth();
-    }, [router]);
     const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const [showAddModal, setShowAddModal] = useState(false);
@@ -64,13 +46,13 @@ export default function ShoppingListPage() {
     useEffect(() => {
         try {
             const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            const needsCleanup = currentList.some((item: any) => 
+            const needsCleanup = currentList.some((item: any) =>
                 item.name?.startsWith('Replenish: ') || item.source === 'auto-replenish'
             );
-            
+
             if (needsCleanup) {
                 // Remove old replenish format items and auto-replenish entries
-                const cleaned = currentList.filter((item: any) => 
+                const cleaned = currentList.filter((item: any) =>
                     !item.name?.startsWith('Replenish: ') && item.source !== 'auto-replenish'
                 );
                 localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(cleaned));
@@ -134,34 +116,34 @@ export default function ShoppingListPage() {
     const combineQuantities = (existing: string, newQty: string): string => {
         // Try to parse both quantities
         // Format examples: "1 kilogram (1000g)", "2 x 100g", "3"
-        
+
         const parseQty = (qty: string): { value: number; unit: string; full: string } | null => {
             // Pattern: "number unit (weight)" or "number x weight-unit" or just "number"
             const portionMatch = qty.match(/^(\d+(?:\.\d+)?)\s+([^(]+)\s*\(/);
             if (portionMatch) {
                 return { value: parseFloat(portionMatch[1]), unit: portionMatch[2].trim(), full: qty };
             }
-            
+
             const weightMatch = qty.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)(g|ml|oz|lb)/);
             if (weightMatch) {
                 return { value: parseFloat(weightMatch[1]), unit: `x ${weightMatch[2]}${weightMatch[3]}`, full: qty };
             }
-            
+
             const simpleMatch = qty.match(/^(\d+(?:\.\d+)?)$/);
             if (simpleMatch) {
                 return { value: parseFloat(simpleMatch[1]), unit: '', full: qty };
             }
-            
+
             return null;
         };
-        
+
         const existingParsed = parseQty(existing);
         const newParsed = parseQty(newQty);
-        
+
         // If both parsed successfully and have the same unit, combine them
         if (existingParsed && newParsed && existingParsed.unit === newParsed.unit) {
             const combinedValue = existingParsed.value + newParsed.value;
-            
+
             // Reconstruct the quantity string
             if (existingParsed.unit) {
                 // Has a unit, reconstruct: "3 kilogram (1000g)" format
@@ -171,7 +153,7 @@ export default function ShoppingListPage() {
                     const newWeight = baseWeight * (combinedValue / existingParsed.value);
                     return `${combinedValue} ${existingParsed.unit} (${newWeight.toFixed(0)}g)`;
                 }
-                
+
                 // For "x weight-unit" format
                 const xMatch = existingParsed.unit.match(/^x\s*(\d+(?:\.\d+)?)(g|ml|oz|lb)$/);
                 if (xMatch) {
@@ -182,7 +164,7 @@ export default function ShoppingListPage() {
                 return `${combinedValue}`;
             }
         }
-        
+
         // Fall back to concatenation with " + "
         return `${existing} + ${newQty}`;
     };
@@ -197,10 +179,10 @@ export default function ShoppingListPage() {
                 : quickAddQty;
 
             const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            
+
             // Check if item already exists by food_item_id
             const existingIndex = currentList.findIndex((item: any) => item.food_item_id === selectedFood.id);
-            
+
             if (existingIndex !== -1) {
                 // Try to intelligently combine quantities
                 const existingQty = currentList[existingIndex].quantity;
@@ -223,7 +205,7 @@ export default function ShoppingListPage() {
                 currentList.push(newItem);
                 toast.success(`${selectedFood.common_name || selectedFood.name} added to shopping list`);
             }
-            
+
             localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
             window.dispatchEvent(new Event('storage'));
 
@@ -240,18 +222,6 @@ export default function ShoppingListPage() {
     };
 
 
-    if (isAuthLoading) {
-        return (
-            <PageContainer maxWidth="max-w-7xl">
-                <div className="h-96 flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500" />
-                        <p className="text-sm text-slate-500 font-medium">Loading shopping list...</p>
-                    </div>
-                </div>
-            </PageContainer>
-        );
-    }
 
     return (
         <PageContainer maxWidth="max-w-7xl">
@@ -268,14 +238,14 @@ export default function ShoppingListPage() {
                     placeholder="SEARCH FOODS TO ADD..."
                     noResultsMessage="No matching foods found"
                     enterMessage="Enter food name to search"
-                    searchingMessage="Searching Foods..."                    powerButton={
+                    searchingMessage="Searching Foods..." powerButton={
                         <button
                             onClick={() => setScannerOpen(true)}
                             className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0"
                         >
                             <ScanLine size={16} className="text-slate-900 dark:text-white" />
                         </button>
-                    }                    renderResult={(food: any) => (
+                    } renderResult={(food: any) => (
                         <div className="flex items-center gap-4 min-w-0 w-full">
                             <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
                                 {food.image ? (

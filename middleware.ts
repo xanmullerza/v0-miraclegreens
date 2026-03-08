@@ -49,6 +49,16 @@ export async function middleware(request: NextRequest) {
         }
     }
 
+    // Require login for Shopping, Pantry, Planner, and Maker
+    const protectedRoutes = ['/dashboard/meal-o-matic', '/dashboard/maker'];
+    if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
+        if (!user) {
+            const redirectUrl = new URL('/auth/login', request.url);
+            redirectUrl.searchParams.set('from', request.nextUrl.pathname);
+            return NextResponse.redirect(redirectUrl);
+        }
+    }
+
     return response
 }
 

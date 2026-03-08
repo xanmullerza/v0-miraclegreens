@@ -98,7 +98,6 @@ export function FoodItemCreatorContent() {
     const { energyUnit } = useUserPreferences();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-    const [authLoading, setAuthLoading] = useState(true);
     const [loadingFood, setLoadingFood] = useState(false);
     const [editingFoodId, setEditingFoodId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -111,7 +110,6 @@ export function FoodItemCreatorContent() {
         // Get initial session
         supabase.auth.getSession().then(({ data: { session } }) => {
             setUser(session?.user ?? null);
-            setAuthLoading(false);
         });
 
         // Listen for auth changes
@@ -412,16 +410,6 @@ Fat: ${food.fat_g || 0}g
         }
     };
 
-    if (authLoading) {
-        return (
-            <div className="max-w-7xl mx-auto min-h-[60vh] flex flex-col items-center justify-center gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic animate-pulse">
-                    Verifying Workspace...
-                </p>
-            </div>
-        );
-    }
 
     const updateMicro = (name: string, value: string) => {
         setMicronutrients(prev => ({ ...prev, [name]: value }));
@@ -660,7 +648,7 @@ Fat: ${item.fat_g || 0}g
                                             <option value="Serving|100">Serving (100g)</option>
                                         </select>
                                     </div>
-                                    
+
                                     {manualServings.length > 0 && (
                                         <div className="space-y-2">
                                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Selected Servings:</Label>
