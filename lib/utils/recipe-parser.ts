@@ -34,10 +34,12 @@ function isJunkLine(line: string): boolean {
     if (/^\d+\s*(mins?|minutes?|hr|hours?|seconds?|sec)\s*$/i.test(line)) return true;
 
     // Detect single numbers or list markers alone
-    if (/^[\d¼½¾⅛⅜⅝⅞*•\-]\s*$/i.test(line)) return true;
+    // Detect single numbers or list markers alone
+    if (/^[\d¼½¾⅛⅜⅝⅞*•\-☐☑☒\u2610-\u2612\u25A0-\u25FF]\s*$/i.test(line) || /^\[[ xX]?\]\s*$/i.test(line)) return true;
 
     // Skip lines that look like instruction steps or long descriptive text
-    if (line.length > 150 && !/^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line)) return true;
+    // Skip lines that look like instruction steps or long descriptive text
+    if (line.length > 150 && !/^([\d¼½¾⅛⅜⅝⅞*•\-☐☑☒\u2610-\u2612\u25A0-\u25FF]|\[[ xX]?\])/.test(line)) return true;
 
     return false;
 }
@@ -59,7 +61,8 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
         // Use stricter isProbablyIngredient for mid-list filtering
         if (!isProbablyIngredient(line)) {
             // If we're already parsing ingredients, a non-ingredient line might be junk or a buffer
-            if (ingredients.length > 0 && !/^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line)) {
+            // If we're already parsing ingredients, a non-ingredient line might be junk or a buffer
+            if (ingredients.length > 0 && !/^([\d¼½¾⅛⅜⅝⅞*•\-☐☑☒\u2610-\u2612\u25A0-\u25FF]|\[[ xX]?\])/.test(line)) {
                 nameBuffer.push(line);
                 continue;
             }
@@ -77,7 +80,7 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
             }
         }
 
-        const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞*•\-☐☑☒]/.test(line) || /^\[[ xX]?\]/.test(line) || lowerLine.startsWith('optional');
+        const hasQuantity = /^([\d¼½¾⅛⅜⅝⅞*•\-☐☑☒\u2610-\u2612\u25A0-\u25FF]|\[[ xX]?\])/.test(line) || lowerLine.startsWith('optional');
 
         // If it has a quantity, flush buffer and start new
         if (hasQuantity) {
@@ -307,7 +310,8 @@ function isProbablyIngredient(line: string): boolean {
     }
 
     // 2. Inclusion: Starts with a quantity marker or common bullet/checkbox
-    return /^[\d¼½¾⅛⅜⅝⅞.\-\s*•+☐☑☒]|\[[ xX]?\]/.test(line);
+    // 2. Inclusion: Starts with a quantity marker or common bullet/checkbox
+    return /^([\d¼½¾⅛⅜⅝⅞.\-\s*•+☐☑☒\u2610-\u2612\u25A0-\u25FF]|\[[ xX]?\])/.test(line);
 }
 
 function isProbablyInstruction(line: string): boolean {
@@ -389,7 +393,8 @@ function extractModifier(text: string): { modifier?: string, cleanText: string }
 
 function parseIngredientLine(line: string): ParsedIngredient {
     // Remove leading bullets, numbers followed by punctuation, or checkboxes
-    let cleanLine = line.replace(/^([*•\-+☐☑☒]|\[[ xX]?\]|\d+[.)])\s*/, '').trim();
+    // Remove leading bullets, numbers followed by punctuation, or checkboxes
+    let cleanLine = line.replace(/^([*•\-+☐☑☒\u2610-\u2612\u25A0-\u25FF]|\[[ xX]?\]|\d+[.)])\s*/, '').trim();
 
     // Aggressive cleanup for "or", "original", etc. artifacts
     const artifacts = ['or', 'original', 'scaled', 'serving'];
