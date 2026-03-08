@@ -1,0 +1,124 @@
+id,name,common_name,details_empty,phytonutrients_empty,details_length,phytos_length
+"69638ba3-b73f-4a23-820d-da71b872b049","Allspice ground","Allspice",false,false,389,209
+"58c8e0c0-8a4d-45a5-967f-a6d547e45da2","Almonds, Raw","Almonds",false,false,382,200
+"739a6ee4-c1d5-4466-8d79-e370d3e55ec9","Anise seed","Anise",false,false,552,194
+"bb036fb6-f627-4331-b873-0b2df153ad08","Apple, Fresh, With Skin","Apples",false,false,305,338
+"58e35d9c-38e2-4a55-a917-36bbab37c388","Apricot jam","Apricot Jam",false,false,274,206
+"a785d796-5357-426a-9b24-b461d95a21a0","Apricot, Fresh","Apricots",false,false,317,206
+"9a63c5e0-a413-4aee-8546-56ca544745b3","Avocado Oil","Avocado Oil",false,false,491,195
+"d01aaba1-8e39-4c13-92f8-2f4e02d252c6","Baking Powder","Baking Powder",false,false,396,214
+"011a47ca-121d-4ee0-964e-69d3b365ee84","Baking Yeast, Active Dry","Baking Yeast",false,false,526,133
+"62850562-6065-4dd6-bd25-c2928591acb4","Balsamic vinegar","Vinegar",false,false,415,297
+"0fcd3dfd-5224-4029-bdd2-8e06206b21db","Banana, Fresh","Bananas",false,false,294,225
+"72e34333-0ac5-454c-9d06-be213f35814e","Basil dried","Basil",false,false,286,285
+"77de6b5e-7d72-46f4-9180-0b805786c83e","Bay leaf dried","Bay Leaves",false,false,278,206
+"7393e46a-3b99-4232-ac09-525aa64d8262","Beef Liver","Beef Livers",false,false,415,346
+"a9e04a36-36f4-4fac-9a12-662905fa3f5f","Beets, Raw","Beetroots",false,false,309,237
+"cd939756-0ae5-46bf-be67-877e307c45a0","Black peppercorns whole","Black Peppercorns",false,false,310,237
+"00fd122c-a0d0-44be-a4a1-e607508beccc","Black peppercorns whole, ground","Black Peppercorns (ground)",false,false,310,237
+"3cc6bfa7-2aba-496b-a597-ab14d23801b6","Blackberries, Fresh","Blackberries",false,false,294,230
+"307f57e3-7ad4-447f-aed1-4745136256ef","Blueberries, Fresh","Blueberries",false,false,330,216
+"333e93d7-de21-4dcf-a265-6aa1a36edff4","Brazil Nuts, Unsalted","Brazil Nuts",false,false,457,206
+"84e9b89d-ffd1-4481-ad09-c1fb49449dc5","Broccoli, Cooked From Fresh","Broccoli (Cooked)",false,false,290,327
+"3478ee76-f52d-42f9-a0b3-08db2eb5335c","Brown sugar","Brown Sugar",false,false,376,173
+"604a2c48-c9f9-4b59-8fe1-f784d44d404f","Butternut Squash","Butternuts",false,false,247,237
+"c165b859-ca2d-47a2-8a19-b8c01747b65c","Cabbage, Green, Cooked","Cabbage (Cooked)",false,false,483,274
+"2a7cc236-d750-4440-ae7e-0ea35d270d4d","Cabbage, Green, Raw","Cabbage",false,false,286,274
+"024fda25-7aa2-4bc7-8a01-1e19b5b94987","Canola Oil","Canola Oil",false,false,384,112
+"d359b24f-c50b-48da-a61f-3778a4bd50b8","Cardamom","Ground Cardomom (Elachi)",false,false,231,223
+"974bbda0-d7db-46a4-900d-a2bd7c1e4261","Carrots, Raw","Carrots",false,false,289,315
+"4bcd0992-c1ed-42de-b452-bf4ccd3be3f9","Cashews, Raw","Cashews",false,false,597,239
+"7aa47385-55ac-4df7-b71b-c7a01d162a1d","Cauliflower, Cooked from Fresh","Cauliflower (Cooked)",false,false,282,182
+"2405eee2-0625-4b7e-928b-6c2b9dde36a3","Chia Seeds","Chia Seeds",false,false,270,259
+"45c06987-a1c9-407e-bcd6-e83ef131e44f","Chicken Breast, Skin Removed Before Cooking","Chicken Breasts",false,false,505,141
+"f6635c23-a4af-4cd5-8c94-a26b0f6a5e78","Chicken Liver","Chicken Livers",false,false,392,307
+"38dfd70c-bc04-4ad5-8d35-44aa2af55454","Chili powder","Chili Powder",false,false,558,221
+"d93a80f8-91bc-4477-8089-a17973eb951c","Chinese Cabbage, Pak-Choi, Cooked","Chinese Cabbage (Cooked)",false,false,445,274
+"957fe51b-2a01-44ba-a0c9-8c44bff49725","Chinese Cabbage, Pak-Choi, Raw","Chinese Cabbage",false,false,436,206
+"08b6a425-4064-46ee-a588-a6c50802d2a4","Cinnamon ground","Gound Cinnamon",false,false,312,274
+"7a9ea9d6-6cf0-4cc4-883d-7fcb83d1ac76","Cloves ground","Ground Cloves ",false,false,279,234
+"af191b14-81e1-4911-b3c4-5313bc71deac","Coriander (cilantro) leaves, raw","Fresh Coriander Leaves (Dhania)",false,false,254,192
+"696e2069-55fe-4f5b-a4f2-ebadfacbf272","Coriander seed","Coriander Seeds",false,false,232,192
+"82df62de-8891-48f3-a351-65d3aba2c767","Coriander, Seed","Coriander Seeds",false,false,434,190
+"718615a0-d293-441e-9db5-816d51b4af62","Cornmeal Mush, Plain","Maize Meal (Cooked)",false,false,494,208
+"9991b994-0de6-4557-8806-e2ac0eae4360","Cornmeal, White, Whole Grain, Dry","Maize Meal",false,false,399,286
+"596ae074-33c5-418c-b054-305c0d0672de","Cucumber, Raw, With Peel","Cucumbers",false,false,332,222
+"8fe1bcd4-7868-4f9b-9518-3b8b0fbf8656","Cumin seed","Cumin",false,false,250,184
+"7196948c-2954-4b7a-a5b5-66aea353cdf2","Cumin, Ground","Ground Cumin",false,false,498,198
+"a7cb72ac-b9a0-4169-ad83-9b24294efc03","Cumin, Seed","Cumin, Seed",false,false,515,179
+"773a08f2-f06b-40e3-a113-3a31c208764d","Curry powder","Curry Powder",false,false,313,262
+"1de968ac-0f77-4600-ab7f-ea7fecbe5d71","Extra Virgin Olive Oil","Extra Virgin Olive Oil",false,false,491,207
+"c2c5d3b1-b38c-4a20-9210-dcc0b0c6777e","Fennel Seed","Fennel Seeds",false,false,505,212
+"bf88d2f3-e95a-43ca-8a8c-e5dfa09c80e5","Filberts, Raw","Hazelnuts",false,false,215,184
+"cc5a7bf5-f998-4240-8f83-dbf962bbc370","Flax Seeds, Not Fortified","Flax Seeds",false,false,258,236
+"a3703653-d3b4-46e6-a258-0c49d6d6d45a","Garlic powder","Garlic Powder",false,false,324,221
+"1ecc17ea-7e0e-410c-bf9a-e74be71c5251","Grapes, Fresh","Grapes",false,false,271,321
+"9644af5f-4e84-498f-a853-bbb0e7cbe877","Green Bell Peppers, Raw","Green Bell Peppers",false,false,232,199
+"dc022ed7-f593-4160-acb6-b72eafa0d7c8","Green Peas, Cooked from Frozen","Peas (Cooked)",false,false,246,173
+"24bcc0f2-d5c6-4822-9d4b-0065e622b5d1","Ground ginger","Ginger Powder",false,false,246,195
+"d8ddffa0-a471-4d70-a5f6-1429b9f7f0e8","Honey","Honey",false,false,281,206
+"53e70c6a-439b-4335-afd9-4b98bd3bc321","Hot cocoa mix powder","Cocoa",false,false,321,319
+"280dfb32-5c94-44bb-9fd9-3a32afe19a1e","Kale, Cooked from Fresh","Kale (Cooked)",false,false,231,227
+"2d0a2b1c-fe92-4f31-9ef4-9d5461f1c3b3","Kale, Raw","Kale",false,false,261,227
+"136100ac-37d1-4ae6-ad61-2ec52cd14d9d","Lamb Kidney","Lamb Kidneys",false,false,434,414
+"e2d31ba9-a191-4ee0-96ab-4e2ee872c1b6","Lemon juice bottled","Lemon Juice",false,false,379,217
+"198cecbf-a7e6-401a-bb07-703f25829a89","Lemon, Fresh","Lemons",false,false,251,217
+"3f840840-7bff-4e0d-935a-1d185e716192","Lentil Sprouts, Raw","Lentil Sprouts",false,false,244,168
+"88d2624c-2a52-4253-9a73-3be16b9f9553","Lentils, Pink or Red, Raw","Dahl",false,false,241,164
+"573fa358-25b5-4191-90b8-e5c492f02f7f","Lettuce, Iceberg","Lettuce",false,false,338,162
+"be056368-7c6e-457c-bbfe-c4ceeb5f10e4","Macadamia Nuts, Raw","Macadamia Nuts",false,false,260,193
+"3b7d5a14-4dc5-4e9c-b4a3-25f6f61c611c","Mace","Ground Mace",false,false,462,208
+"46efac71-54c9-44eb-abde-d9e25e7f0ebb","Mandarin Orange, Fresh","Naartjies",false,false,228,208
+"bc2e44c9-08e7-4d71-aa79-d5fbddbb6b0e","Margarine (Homemade)","Margarine (Homemade)",false,false,495,107
+"89ee01b8-9e29-4468-a8e0-570aaf4cb18f","Mayonnaise regular, salted","Mayonnaise",false,false,404,179
+"513ea54b-e0c1-482e-833e-952d2bb39566","Moringa, 100% Organic Leaf Powder","Moringa Powder",false,false,267,319
+"eccf6374-0769-48b5-b7a5-4839ba31f22f","Nutmeg","Ground Nutmeg",false,false,506,224
+"f4f08e89-8cac-4916-8122-dc637ef7b40d","Nutmeg ground","Ground Nutmeg",false,false,266,180
+"1881dd83-8dcb-46a6-8418-94cacadf4043","nuts and seeds, coconut, cream (liquid from grated meat)","Coconut Cream",false,false,440,120
+"290b81f0-9020-4955-bea2-1e980a55db94","Olive Oil","Olive Oil",false,false,458,209
+"402849cc-f982-4e59-96d3-052e02e587a2","Onion powder","Onion Powder",false,false,276,214
+"e785383f-c432-4afd-baf8-ed3dbc5ef6e1","Onion, White, Yellow or Red, Raw","Onions",false,false,217,214
+"a9b10712-4295-45b9-85e9-5513a02a7be9","Orange, Fresh","Oranges",false,false,224,221
+"591898f0-aea9-4a83-beb6-c37021a10705","Papaya, Fresh","Papaya",false,false,225,307
+"034eb664-ecb3-4a47-8c5a-535103122f37","Paprika","Paprika",false,false,291,270
+"4f4a813a-0c5b-4bbd-bda5-d5bb0e987f14","Parboiled Rice, Converted, Cooked in Salted Water","White Rice (Cooked)",false,false,415,279
+"24eb3945-6332-489e-8e1c-d5a51b450c4d","Parsley, Dried","Parsley",false,false,480,189
+"31356e60-f778-4423-99f6-54e910894012","Parsley, Fresh","Parsley",false,false,465,189
+"3b3aa628-da31-4eb0-9b5c-ea74e5cc29be","Peach, Fresh","Peaches",false,false,217,205
+"3eb50184-e3c5-4d5a-b09f-caa29ba068ed","Peanut Butter, Regular, Salted","Peanut Butter",false,false,261,215
+"5218eef3-f5ca-4bf7-977d-e894e600d753","Pear, Fresh","Pears",false,false,261,194
+"f5e6990f-579e-434f-8522-1b571043b2b1","Pecans, Raw","Pecans",false,false,267,186
+"c3ff5fb1-1b3d-4c3e-afed-afb6c361db2e","Plum, Fresh","Plums",false,false,264,193
+"7b59d2ea-a8ad-4b7d-b7a6-5790562a45d9","PNP No Name Baked Beans","Baked Beans",false,false,382,256
+"27a9db01-b800-4cb6-a5e3-f2e2086929df","Potato, Boiled with Skin","Potatoes",false,false,272,196
+"76661020-51f2-407c-9305-75aae253a1e3","Pumpkin, Cooked from Fresh","Pumpkin (Cooked)",false,false,395,281
+"950bc457-23b4-4db2-86f8-60d6ea3341b3","Quinoa, Dry","Quinoa",false,false,356,295
+"6ca3343d-9083-4da8-a434-120a8d364f9d","Raspberries, Fresh, Red","Raspberries",false,false,365,311
+"bbbde49a-7e9e-460f-ad26-cd95c7135083","Raw Egg","Eggs",false,false,382,360
+"7cd3e495-5978-4d37-af61-208dac7bf61f","Rosemary dried","Rosemary",false,false,598,220
+"11385e4e-c3cc-4073-8c3b-cdb3e00bdd15","Salt, table, iodized","Salt (Iodized)",false,false,404,155
+"63043a71-c781-4320-a417-c468e5a72576","Sesame Seeds, Unhulled, Dried","Sesame Seeds",false,false,277,190
+"1dfdcfec-8357-4f20-be4c-1b159bd51186","South African Pilchard","Pilchards",false,false,391,346
+"4bede918-646b-4dcf-823d-b7343b435f61","Soybean Oil, Unhydrogenated","Soybean Oil",false,false,513,213
+"a21c3ba9-3352-4c66-aa79-70f45080ec1e","Spearmint dried","Mint",false,false,231,194
+"a82b8a77-7dcb-4279-8a4d-b03854df20d5","Spinach, Cooked from Fresh","Spinach (Cooked)",false,false,261,227
+"3f8e3bed-83be-4b76-8d3e-ba5830cfffd9","Spinach, Raw","Spinach",false,false,438,192
+"078ff8ee-e9dc-44ef-b717-09a01249e860","Split Peas, Yellow or Green, Cooked From Dried","Split Peas",false,false,283,164
+"0378b666-c6a9-4b6f-8ffd-500e70532c5b","Strawberries, Fresh","Strawberries",false,false,391,334
+"9b8da72e-9baa-4269-a9e4-d6f0bfe91aec","Sunflower Oil","Sunflower Oil",false,false,588,257
+"a5c60c46-52fe-4e8a-b73b-094130218f07","Sunflower Seeds, Raw","Sunflower Seeds",false,false,256,159
+"b2d71b8c-66d3-4e48-a513-2372d0d6a7df","Sweet Potato, Raw","Sweet Potatoes",false,false,258,196
+"27b3c797-f1f6-4dc6-8b7a-23aa5127b00b","Thyme dried","Thyme",false,false,270,293
+"b0493416-25d4-4a95-b523-9cb842e7a4b3","Tomato paste canned, salted","Tomato Paste",false,false,283,137
+"29f2a6ee-bb6e-4569-bccb-1179abcca23f","Tomato Raw, Includes Cherry, Grape, Roma","Tomatoes",false,false,341,137
+"6a79976c-f45c-4971-9ea9-f6efc5dddec6","Tomato sauce unsalted","Tomato Sauce (Unsalted)",false,false,272,137
+"2d77d3e3-ccf2-45f4-aa8a-d3f25da0cd15","Turmeric, Ground","Ground Turmeric",false,false,485,213
+"e70eb21b-eb8b-4af8-9532-294778cfd57b","Vanilla extract","Vanilla Essence",false,false,364,107
+"a1564f83-a04f-4684-bc86-7287f8ba9ccf","vegetables, squash, zucchini, cooked from fresh","Baby Marrow ",false,false,327,167
+"6c4d071c-5509-4ff1-8957-6a9e6eb63eb2","Walnuts","Walnuts",false,false,259,308
+"bb9a7c62-1985-411f-94fe-8448ac366203","Watermelon, Fresh","Watermelon",false,false,291,235
+"7d43c712-3f81-40a3-b5ed-57e793d9c595","White All-Purpose Flour, Unenriched","Cake Wheat Flour",false,false,367,158
+"cb13a961-d4ce-4be4-b903-ade0a00e5237","White Bread, Store Bought","White Bread",false,false,393,250
+"9ef7db8d-ad9f-4294-a20c-5702a689f351","Yellow Bell Pepper, Raw","Yellow Bell Peppers",false,false,450,179
+"c3f9cbbd-db8f-48b3-943a-bfc172021cea","Yellow mustard","Mustard",false,false,551,225
+"64cfa9a0-b1a0-4804-9f7e-063381d50d7b","Zucchini, Cooked from Fresh","Baby Marrows (Cooked)",false,false,284,167
