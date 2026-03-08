@@ -20,7 +20,21 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+import { Suspense } from 'react';
+
 export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
+    );
+}
+
+function LoginContent() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
