@@ -136,11 +136,45 @@ export function FoodItemCreatorContent() {
 
     const [servingText, setServingText] = useState('');
     const [nutrientText, setNutrientText] = useState('');
+    const [pastedCombinedText, setPastedCombinedText] = useState('');
     const [showParser, setShowParser] = useState(true);
     const [showImportPicker, setShowImportPicker] = useState(false);
 
     // Panel modes: null = show buttons, 'paste' = show textarea, 'add' = show manual form
     const [infoMode, setInfoMode] = useState<'write' | 'paste' | 'upload' | null>(null);
+
+    // Intelligently separate pasted content into servings and nutrients
+    const separatePastedContent = (content: string) => {
+        const lines = content.split('\n').filter(line => line.trim());
+        const servingLines: string[] = [];
+        const nutrientLines: string[] = [];
+
+        lines.forEach(line => {
+            // Lines with "=" are servings (e.g., "1 cup = 240g")
+            if (line.includes('=')) {
+                servingLines.push(line);
+            } 
+            // Lines with common nutrient keywords/formats
+            else if (
+                /calories|protein|carbs?|fat|fiber|sugar|sodium|calcium|iron|magnesium|potassium|zinc|vitamin|b1|b2|b3|b6|b12|folate|choline/i.test(line) ||
+                /\d+(\.\d+)?\s*(g|mg|mcg|iu|%)/i.test(line)
+            ) {
+                nutrientLines.push(line);
+            }
+            // If unknown, try to guess - if it looks like measure data, it's serving
+            else if (/cup|tbsp|tsp|gram|oz|ml|portion|serving|slice|piece|whole/i.test(line)) {
+                servingLines.push(line);
+            } else {
+                // Default to nutrient if unsure
+                nutrientLines.push(line);
+            }
+        });
+
+        return {
+            servings: servingLines.join('\n'),
+            nutrients: nutrientLines.join('\n')
+        };
+    };
 
     // Manual serving entries: array of { name, weight_g }
     const [manualServings, setManualServings] = useState<{ name: string; weight_g: string }[]>([
@@ -717,12 +751,13 @@ Fat: ${item.fat_g || 0}g
                                     <Textarea
                                         placeholder="Paste servings (e.g. '1 cup = 240g'), nutrients, and other food info here..."
                                         className="min-h-[200px] bg-white dark:bg-slate-950 border-blue-500/20 text-xs focus:ring-blue-500/20 rounded-2xl font-mono p-4"
-                                        value={servingText + '\n' + nutrientText}
+                                        value={pastedCombinedText}
                                         onChange={(e) => {
-                                            const combined = e.target.value;
-                                            const lines = combined.split('\n');
-                                            setServingText(combined);
-                                            setNutrientText(combined);
+                                            setPastedCombinedText(e.target.value);
+                                            // Auto-separate as they type
+                                            const separated = separatePastedContent(e.target.value);
+                                            setServingText(separated.servings);
+                                            setNutrientText(separated.nutrients);
                                         }}
                                     />
                                 </div>
