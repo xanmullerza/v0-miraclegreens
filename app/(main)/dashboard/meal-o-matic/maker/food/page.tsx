@@ -149,7 +149,10 @@ export function FoodItemCreatorContent() {
     ]);
 
     // Manual nutrient entries: array of { nutrient, value }
-    const [manualNutrients, setManualNutrients] = useState<{ nutrient: string; value: string }[]>([{ nutrient: '', value: '' }]);
+    const [manualNutrients, setManualNutrients] = useState<{ nutrient: string; value: string }[]>([]);
+
+    // State for temporary add nutrient input
+    const [newNutrient, setNewNutrient] = useState({ nutrient: '', value: '' });
 
     // Sync manual entries into text strings for the existing parser
     const syncManualToText = () => {
@@ -159,8 +162,8 @@ export function FoodItemCreatorContent() {
             .map(s => `1 ${s.name.trim()} = ${s.weight_g.trim()}g`);
         const combinedServingText = [servingText, ...manualServingLines].filter(Boolean).join('\n');
 
-        // Build nutrient text from manual entries
-        const manualNutrientLines = manualNutrients
+        // Build nutrient text from manual entries - include existing list AND temporary new one
+        const manualNutrientLines = [...manualNutrients, newNutrient]
             .filter(n => n.nutrient.trim() && n.value.trim())
             .map(n => `${n.nutrient} ${n.value}`);
         const combinedNutrientText = [nutrientText, ...manualNutrientLines].filter(Boolean).join('\n');
@@ -225,7 +228,7 @@ export function FoodItemCreatorContent() {
                         if (food.micronutrients) {
                             const micros: Record<string, string> = {};
                             const manualNutrientsList: { nutrient: string; value: string }[] = [];
-                            
+
                             Object.entries(food.micronutrients).forEach(([key, val]) => {
                                 micros[key] = val?.toString() || '';
                                 manualNutrientsList.push({
@@ -252,7 +255,7 @@ export function FoodItemCreatorContent() {
                             });
                         }
                         setManualServings(manualServingsList);
-                        
+
                         // Auto-open the Write panel when editing to show the loaded nutrients
                         setInfoMode('write');
                     }
@@ -332,19 +335,24 @@ export function FoodItemCreatorContent() {
 
             // Merge parsed micronutrients with any manually entered ones
             const finalMicros: Record<string, number> = {};
-            if (parsed.micronutrients) {
-                Object.entries(parsed.micronutrients).forEach(([key, val]) => {
-                    finalMicros[key] = val;
-                });
-            }
+
+            // 1. Initial values from the micronutrients state (stashed from load or import)
             Object.entries(micronutrients).forEach(([key, val]) => {
                 if (val !== undefined && val !== '') {
                     finalMicros[key] = parseFloat(val);
                 }
             });
 
-            // Also add manually entered nutrients from the Write panel - these override everything
-            manualNutrients.forEach((n) => {
+            // 2. Parsed values from text fields (Paste mode)
+            if (parsed.micronutrients) {
+                Object.entries(parsed.micronutrients).forEach(([key, val]) => {
+                    finalMicros[key] = val;
+                });
+            }
+
+            // 3. Manually entered nutrients from the Write panel - these OVERRIDE everything
+            // Also include the newNutrient if it has values
+            [...manualNutrients, newNutrient].forEach((n) => {
                 if (n.nutrient && n.value) {
                     const numVal = parseFloat(n.value);
                     if (!isNaN(numVal)) {
@@ -424,9 +432,6 @@ export function FoodItemCreatorContent() {
     };
 
 
-    const updateMicro = (name: string, value: string) => {
-        setMicronutrients(prev => ({ ...prev, [name]: value }));
-    };
 
     // Perform Search
     const performSearch = async (query: string) => {
@@ -666,59 +671,85 @@ Fat: ${item.fat_g || 0}g
                                         </div>
 
                                         {/* Nutrients Section */}
-                                        <div>
-                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1 mb-2 block">Add Nutrients</Label>
-                                            <div className="space-y-2">
-                                                {manualNutrients.map((n, i) => (
-                                                    <div key={i} className="flex items-center gap-2">
+                                        <div className="space-y-4 pt-2 border-t border-emerald-100 dark:border-emerald-800/50 mt-4">
+                                            <div>
+                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1 mb-2 block">Nutrients & Values</Label>
+
+                                                {/* Listed Nutrients (Existing) */}
+                                                {manualNutrients.length > 0 && (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                                                        {manualNutrients.map((n, i) => (
+                                                            <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-left-2 duration-200">
+                                                                <div className="flex-1 min-w-0">
+                                                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 truncate">{n.nutrient}</p>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <Input
+                                                                            value={n.value}
+                                                                            onChange={(e) => {
+                                                                                const updated = [...manualNutrients];
+                                                                                updated[i] = { ...updated[i], value: e.target.value };
+                                                                                setManualNutrients(updated);
+                                                                            }}
+                                                                            className="h-7 border-none bg-transparent p-0 text-sm font-bold text-slate-900 dark:text-white focus-visible:ring-0 shadow-none text-right"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setManualNutrients(manualNutrients.filter((_, idx) => idx !== i))}
+                                                                    className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
+                                                                >
+                                                                    <X size={14} />
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Add New Nutrient Row */}
+                                                <div className="flex items-center gap-2 p-3 rounded-2xl bg-emerald-500/[0.03] border border-dashed border-emerald-200 dark:border-emerald-800">
+                                                    <div className="flex-1 min-w-0">
                                                         <select
-                                                            value={n.nutrient}
-                                                            onChange={(e) => {
-                                                                const updated = [...manualNutrients];
-                                                                updated[i] = { ...updated[i], nutrient: e.target.value };
-                                                                setManualNutrients(updated);
-                                                            }}
-                                                            className="flex-1 h-9 px-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium"
+                                                            value={newNutrient.nutrient}
+                                                            onChange={(e) => setNewNutrient(prev => ({ ...prev, nutrient: e.target.value }))}
+                                                            className="w-full h-9 px-3 text-[11px] font-black uppercase tracking-widest rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white"
                                                         >
-                                                            <option value="">Select nutrient...</option>
+                                                            <option value="">Select Nutrient...</option>
                                                             {Object.entries(CATEGORIZED_MARKERS).map(([group, markers]) => (
                                                                 <optgroup key={group} label={group}>
-                                                                    {markers.map(m => (
-                                                                        <option key={m} value={m}>{m}</option>
-                                                                    ))}
+                                                                    {markers
+                                                                        .filter(m => !manualNutrients.some(n => n.nutrient === m))
+                                                                        .map(m => (
+                                                                            <option key={m} value={m}>{m}</option>
+                                                                        ))
+                                                                    }
                                                                 </optgroup>
                                                             ))}
                                                         </select>
+                                                    </div>
+                                                    <div className="w-24">
                                                         <Input
                                                             placeholder="Value"
-                                                            className="w-24 h-9 text-sm text-center rounded-lg bg-white dark:bg-slate-950"
-                                                            value={n.value}
-                                                            onChange={(e) => {
-                                                                const updated = [...manualNutrients];
-                                                                updated[i] = { ...updated[i], value: e.target.value };
-                                                                setManualNutrients(updated);
-                                                            }}
+                                                            className="h-9 text-center bg-white dark:bg-slate-950 font-bold"
+                                                            value={newNutrient.value}
+                                                            onChange={(e) => setNewNutrient(prev => ({ ...prev, value: e.target.value }))}
                                                         />
-                                                        {manualNutrients.length > 1 && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setManualNutrients(manualNutrients.filter((_, idx) => idx !== i))}
-                                                                className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
-                                                            >
-                                                                <X size={14} />
-                                                            </button>
-                                                        )}
                                                     </div>
-                                                ))}
+                                                    <button
+                                                        type="button"
+                                                        disabled={!newNutrient.nutrient || !newNutrient.value}
+                                                        onClick={() => {
+                                                            if (newNutrient.nutrient && newNutrient.value) {
+                                                                setManualNutrients([...manualNutrients, newNutrient]);
+                                                                setNewNutrient({ nutrient: '', value: '' });
+                                                            }
+                                                        }}
+                                                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-20 transition-all shadow-lg shadow-emerald-500/20"
+                                                    >
+                                                        <Plus size={18} strokeWidth={3} />
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => setManualNutrients([...manualNutrients, { nutrient: '', value: '' }])}
-                                                className="w-full h-8 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors mt-2"
-                                            >
-                                                <Plus size={12} />
-                                                Add More Nutrients
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
