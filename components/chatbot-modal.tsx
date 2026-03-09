@@ -85,8 +85,16 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-end md:justify-center p-4">
-            <div className="w-full md:w-96 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col max-h-[600px]">
+        <>
+            {/* Backdrop - only on mobile */}
+            <div
+                onClick={onClose}
+                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+            />
+            {/* Drawer */}
+            <div className="fixed inset-0 z-50 pointer-events-none">
+                <div className="absolute inset-y-0 right-0 pointer-events-auto w-full md:w-1/3 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+                    
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
                     <div>
@@ -103,7 +111,7 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
                         <div
                             key={message.id}
@@ -153,7 +161,8 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                         <Send size={16} />
                     </button>
                 </div>
-            </div>
-        </div>
+                    </div>
+                </div>
+        </>
     );
 }
