@@ -37,6 +37,8 @@ export function DashboardNav() {
         <>
             <div suppressHydrationWarning className="w-full bg-slate-950/95 backdrop-blur-sm">
                 <div className="flex items-center justify-center gap-2 px-4 py-4">
+                    {/* Debug: Show state */}
+                    {/* {isChatbotOpen ? "OPEN" : "CLOSED"} */}
                 {buttons.map((btn) => {
                     const Icon = btn.icon;
                     const isActive = activeButton === btn.id;

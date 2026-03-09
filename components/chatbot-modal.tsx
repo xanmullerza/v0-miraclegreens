@@ -85,16 +85,16 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
     };
 
     return (
-        <>
+        <div className="fixed inset-0 z-50 flex pointer-events-none">
             {/* Backdrop - only on mobile */}
             <div
                 onClick={onClose}
-                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm md:hidden pointer-events-auto"
             />
+            
             {/* Drawer */}
-            <div className="fixed inset-0 z-50 pointer-events-none">
-                <div className="absolute inset-y-0 right-0 pointer-events-auto w-full md:w-1/3 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-                    
+            <div className="absolute inset-y-0 right-0 w-full md:w-1/3 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col pointer-events-auto">
+                
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
                     <div>
@@ -116,7 +116,7 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                         <div
                             key={message.id}
                             className={cn(
-                                'flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300',
+                                'flex gap-3',
                                 message.type === 'user' ? 'justify-end' : 'justify-start'
                             )}
                         >
@@ -161,8 +161,7 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                         <Send size={16} />
                     </button>
                 </div>
-                    </div>
-                </div>
-        </>
+            </div>
+        </div>
     );
 }
