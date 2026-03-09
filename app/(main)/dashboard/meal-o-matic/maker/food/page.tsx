@@ -334,8 +334,18 @@ Fat: ${food.fat_g || 0}g
                 });
             }
             Object.entries(micronutrients).forEach(([key, val]) => {
-                if (val && !finalMicros[key]) {
+                if (val !== undefined && val !== '' && !finalMicros[key]) {
                     finalMicros[key] = parseFloat(val);
+                }
+            });
+
+            // Also add manually entered nutrients from the Write panel
+            manualNutrients.forEach((n) => {
+                if (n.nutrient && n.value) {
+                    const numVal = parseFloat(n.value);
+                    if (!isNaN(numVal)) {
+                        finalMicros[n.nutrient] = numVal;
+                    }
                 }
             });
 
