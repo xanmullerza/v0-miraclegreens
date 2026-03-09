@@ -556,57 +556,105 @@ Fat: ${item.fat_g || 0}g
                 />
             </div>
 
-            {/* Top Row: Info Entry */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Extraction Section */}
+            {/* Top Row: Info Entry - Three Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                {/* Data Input Section - Left */}
                 {showParser && (
-                    <div className="lg:col-span-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                        <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03]">
+                    <Card className="p-6 animate-in fade-in slide-in-from-left-4 duration-300">
+                        {/* Basic Info Section */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Beef size={18} className="text-emerald-500" />
+                                <h3 className="font-black text-sm uppercase tracking-widest">Food Details</h3>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] uppercase font-black text-slate-400">Official Name</Label>
+                                    <Input
+                                        placeholder="e.g. Potatoes, raw, white"
+                                        className="h-10 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs rounded-xl font-bold"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] uppercase font-black text-slate-400">Common Name</Label>
+                                    <Input
+                                        placeholder="e.g. White Potato"
+                                        className="h-10 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs rounded-xl"
+                                        value={commonName}
+                                        onChange={(e) => setCommonName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] uppercase font-black text-slate-400">Category</Label>
+                                    <div className="relative">
+                                        <select
+                                            value={category}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                            className="flex h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-xs ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-bold appearance-none pr-10"
+                                        >
+                                            {CATEGORIES.map(cat => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                )}
+
+                {/* Food Information Section - Center */}
+                {showParser && (
+                    <div className="lg:col-span-1 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <Card className="p-6 border-emerald-500/30 bg-emerald-500/[0.03]">
                             <div className="flex items-center gap-3 mb-6">
                                 <Sparkles size={20} className="text-emerald-500" />
                                 <h3 className="font-black text-sm uppercase tracking-widest">Nutrients & Servings</h3>
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                            <div className="flex flex-col gap-2 mb-6">
                                 <button
                                     type="button"
                                     onClick={() => setInfoMode(infoMode === 'write' ? null : 'write')}
                                     className={cn(
-                                        "flex-1 h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        "w-full h-10 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest rounded-lg transition-all",
                                         infoMode === 'write'
                                             ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
                                             : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-950/50"
                                     )}
                                 >
-                                    <Plus size={16} />
-                                    Write Food Info
+                                    <Plus size={14} />
+                                    Write
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setInfoMode(infoMode === 'paste' ? null : 'paste')}
                                     className={cn(
-                                        "flex-1 h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        "w-full h-10 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest rounded-lg transition-all",
                                         infoMode === 'paste'
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                                             : "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-950/50"
                                     )}
                                 >
-                                    <Scale size={16} />
-                                    Paste Food Info
+                                    <Scale size={14} />
+                                    Paste
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setInfoMode(infoMode === 'upload' ? null : 'upload')}
                                     className={cn(
-                                        "flex-1 h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        "w-full h-10 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest rounded-lg transition-all",
                                         infoMode === 'upload'
                                             ? "bg-purple-600 text-white shadow-lg shadow-purple-500/20"
                                             : "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-950/50"
                                     )}
                                 >
-                                    <Upload size={16} />
-                                    Upload Food Info
+                                    <Upload size={14} />
+                                    Upload
                                 </button>
                             </div>
 
@@ -814,62 +862,14 @@ Fat: ${item.fat_g || 0}g
                     </div>
                 )}
 
-                {/* Name Details Card */}
-                <Card className={cn(showParser ? "lg:col-span-4" : "lg:col-span-12", "p-8")}>
-                    {/* Basic Info Section */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-2">
-                            <Beef size={20} className="text-emerald-500" />
-                            <h3 className="font-black text-sm uppercase tracking-widest">Name</h3>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Official Name</Label>
-                                <Input
-                                    placeholder="e.g. Potatoes, raw, white"
-                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl font-bold"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Common Name / Nickname</Label>
-                                <Input
-                                    placeholder="e.g. White Potato"
-                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl"
-                                    value={commonName}
-                                    onChange={(e) => setCommonName(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Category</Label>
-                                <div className="relative">
-                                    <select
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value)}
-                                        className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-bold appearance-none pr-10"
-                                    >
-                                        {CATEGORIES.map(cat => (
-                                            <option key={cat} value={cat}>{cat}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-
-            {/* Photo Section - Full Width */}
-            <Card className="p-8 w-full">
-                <div className="space-y-6">
-                    <div className="flex items-center gap-3 mb-2">
-                        <Camera size={20} className="text-emerald-500" />
-                        <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
-                    </div>
+                {/* Photo Section - Right */}
+                <Card className="p-6 animate-in fade-in slide-in-from-right-4 duration-300">
                     <div className="space-y-4">
-                        <label className="relative aspect-video md:aspect-auto md:h-[120px] rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center cursor-pointer block">
+                        <div className="flex items-center gap-3 mb-2">
+                            <Camera size={18} className="text-emerald-500" />
+                            <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
+                        </div>
+                        <label className="relative aspect-square rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center cursor-pointer block">
                             <input
                                 type="file"
                                 accept="image/*"
@@ -903,10 +903,9 @@ Fat: ${item.fat_g || 0}g
                                 </div>
                             )}
                         </label>
-
                     </div>
-                </div>
-            </Card>
+                </Card>
+            </div>
 
             {/* parser control bar moved here for mobile bottom placement */}
             {showParser && (
