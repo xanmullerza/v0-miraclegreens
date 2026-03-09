@@ -34,8 +34,9 @@ export function DashboardNav() {
     ];
 
     return (
-        <div suppressHydrationWarning className="w-full bg-slate-950/95 backdrop-blur-sm">
-            <div className="flex items-center justify-center gap-2 px-4 py-4">
+        <>
+            <div suppressHydrationWarning className="w-full bg-slate-950/95 backdrop-blur-sm">
+                <div className="flex items-center justify-center gap-2 px-4 py-4">
                 {buttons.map((btn) => {
                     const Icon = btn.icon;
                     const isActive = activeButton === btn.id;
@@ -97,7 +98,8 @@ export function DashboardNav() {
                     <MessageCircle size={16} />
                 </button>
             </div>
-        </div>
-        {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
+            </div>
+            {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
+        </>
     );
 }
