@@ -68,7 +68,7 @@ export default function MakerPage() {
                 </div>
 
                 {/* Option Cards */}
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex flex-col md:flex-row md:flex-wrap md:justify-center gap-4">
                     {MAKER_OPTIONS.map((option) => {
                         const Icon = option.icon;
                         return (
@@ -77,7 +77,8 @@ export default function MakerPage() {
                                 onClick={() => router.push(option.href)}
                                 className={cn(
                                     'group text-left p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer',
-                                    'min-w-[220px] max-w-[300px] w-full',
+                                    'w-full md:flex-1',
+                                    'min-w-[220px] md:min-w-[240px] md:max-w-[320px]',
                                     'bg-white dark:bg-slate-900/50',
                                     option.borderColor,
                                     option.hoverBorder,
