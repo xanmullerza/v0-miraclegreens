@@ -237,33 +237,20 @@ export function FoodItemCreatorContent() {
                             setManualNutrients(manualNutrientsList);
                         }
 
-                        // Construct nutrient text for the textarea
-                        let nText = `Calories: ${food.energy_kcal || 0}
-Protein: ${food.protein_g || 0}g
-Carbs: ${food.carbs_g || 0}g
-Fat: ${food.fat_g || 0}g
-`;
-                        if (food.micronutrients) {
-                            Object.entries(food.micronutrients).forEach(([key, val]) => {
-                                nText += `${key}: ${val}\n`;
-                            });
-                        }
-                        setNutrientText(nText);
+                        // Don't populate text fields when editing - use form inputs only
+                        setNutrientText('');
+                        setServingText('');
 
-                        // Construct serving text for the textarea
-                        let sText = '';
+                        // Build manual servings from portions instead
                         const manualServingsList: { name: string; weight_g: string }[] = [];
-                        
                         if (food.portions && Array.isArray(food.portions)) {
                             food.portions.forEach((p: any) => {
-                                sText += `1 ${p.label} = ${p.weight_g}g\n`;
                                 manualServingsList.push({
                                     name: p.label,
                                     weight_g: p.weight_g?.toString() || ''
                                 });
                             });
                         }
-                        setServingText(sText);
                         setManualServings(manualServingsList);
                         
                         // Auto-open the Write panel when editing to show the loaded nutrients
