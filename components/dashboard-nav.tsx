@@ -1,16 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, Apple, Calendar, ShoppingBasket, Shapes, Salad, LayoutGrid } from 'lucide-react';
+import { Apple, Calendar, ShoppingBasket, Shapes, Salad, LayoutGrid, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ChatbotModal } from './chatbot-modal';
 
 export function DashboardNav() {
     const router = useRouter();
     const pathname = usePathname();
+    const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
     // Determine active button
     const getActiveButton = () => {
-        if (pathname.includes('/home')) return 'home';
         if (pathname.includes('/dashboard/library/foods')) return 'foods';
         if (pathname.includes('/dashboard/library/meals')) return 'meals';
         if (pathname.includes('/dashboard/library/widgets')) return 'widgets';
@@ -83,7 +85,19 @@ export function DashboardNav() {
                         </button>
                     );
                 })}
+                {/* Chatbot Button */}
+                <button
+                    onClick={() => setIsChatbotOpen(true)}
+                    className={cn(
+                        "w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95",
+                        "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-blue-500 hover:border-blue-500/40 hover:bg-blue-500/5"
+                    )}
+                    title="Chatbot"
+                >
+                    <MessageCircle size={16} />
+                </button>
             </div>
+            {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
         </div>
     );
 }
