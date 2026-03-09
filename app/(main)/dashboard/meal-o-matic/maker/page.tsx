@@ -22,7 +22,7 @@ const MAKER_OPTIONS = [
     },
     {
         id: 'meal',
-        label: 'New Meal',
+        label: 'New Recipe',
         description: 'Build a meal recipe with ingredients and instructions',
         icon: ChefHat,
         href: '/dashboard/meal-o-matic/maker/meal',
@@ -32,19 +32,6 @@ const MAKER_OPTIONS = [
         bgColor: 'bg-amber-500/10',
         hoverBorder: 'hover:border-amber-500/60',
         shadowColor: 'hover:shadow-amber-500/10',
-    },
-    {
-        id: 'mix',
-        label: 'New Mix',
-        description: 'Create a custom ingredient blend or base mix',
-        icon: Beaker,
-        href: '/dashboard/meal-o-matic/maker/mix',
-        color: 'indigo',
-        iconColor: 'text-indigo-500',
-        borderColor: 'border-indigo-500/30',
-        bgColor: 'bg-indigo-500/10',
-        hoverBorder: 'hover:border-indigo-500/60',
-        shadowColor: 'hover:shadow-indigo-500/10',
     },
 ];
 
