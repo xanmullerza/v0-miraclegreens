@@ -1448,7 +1448,7 @@ export function MealPlannerContent({
                         </div>
                         {/* Maker Options */}
                         {makerMode === 'menu' && (
-                            <div className="flex-1 overflow-y-auto p-8 flex items-center justify-center">
+                            <div className="flex-1 overflow-y-auto p-8 flex items-start justify-center pt-12">
                                 <div className="flex flex-col md:flex-row gap-6 w-full max-w-3xl">
                                     {MAKER_OPTIONS.map((option) => {
                                         const Icon = option.icon;
