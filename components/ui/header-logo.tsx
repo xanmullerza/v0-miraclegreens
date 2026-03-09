@@ -25,11 +25,11 @@ export function HeaderLogo({
         )}>
             {/* Left - Home Button */}
             <Link
-                href="/dashboard"
+                href="/home"
                 className={cn(
                     "flex h-12 w-12 border-r border-slate-200 dark:border-slate-800 items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:outline-none flex-shrink-0"
                 )}
-                title="Dashboard"
+                title="Home"
             >
                 <Home size={18} />
             </Link>

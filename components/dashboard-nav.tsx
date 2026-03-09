@@ -23,7 +23,6 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'home', icon: Home, label: 'Home', path: '/home', color: 'indigo' },
         { id: 'foods', icon: Apple, label: 'Foods', path: '/dashboard/library/foods', color: 'emerald' },
         { id: 'meals', icon: Salad, label: 'Meals', path: '/dashboard/library/meals', color: 'rose' },
         { id: 'widgets', icon: LayoutGrid, label: 'Widgets', path: '/dashboard/library/widgets', color: 'cyan' },
