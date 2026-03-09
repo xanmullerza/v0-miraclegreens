@@ -224,10 +224,17 @@ export function FoodItemCreatorContent() {
                         // Set micronutrients
                         if (food.micronutrients) {
                             const micros: Record<string, string> = {};
+                            const manualNutrientsList: { nutrient: string; value: string }[] = [];
+                            
                             Object.entries(food.micronutrients).forEach(([key, val]) => {
                                 micros[key] = val?.toString() || '';
+                                manualNutrientsList.push({
+                                    nutrient: key,
+                                    value: val?.toString() || ''
+                                });
                             });
                             setMicronutrients(micros);
+                            setManualNutrients(manualNutrientsList);
                         }
 
                         // Construct nutrient text for the textarea
@@ -245,12 +252,19 @@ Fat: ${food.fat_g || 0}g
 
                         // Construct serving text for the textarea
                         let sText = '';
+                        const manualServingsList: { name: string; weight_g: string }[] = [];
+                        
                         if (food.portions && Array.isArray(food.portions)) {
                             food.portions.forEach((p: any) => {
                                 sText += `1 ${p.label} = ${p.weight_g}g\n`;
+                                manualServingsList.push({
+                                    name: p.label,
+                                    weight_g: p.weight_g?.toString() || ''
+                                });
                             });
                         }
                         setServingText(sText);
+                        setManualServings(manualServingsList);
                     }
                 } catch (error) {
                     console.error('Failed to load food for editing:', error);
@@ -334,12 +348,12 @@ Fat: ${food.fat_g || 0}g
                 });
             }
             Object.entries(micronutrients).forEach(([key, val]) => {
-                if (val !== undefined && val !== '' && !finalMicros[key]) {
+                if (val !== undefined && val !== '') {
                     finalMicros[key] = parseFloat(val);
                 }
             });
 
-            // Also add manually entered nutrients from the Write panel
+            // Also add manually entered nutrients from the Write panel - these override everything
             manualNutrients.forEach((n) => {
                 if (n.nutrient && n.value) {
                     const numVal = parseFloat(n.value);
