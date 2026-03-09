@@ -649,7 +649,7 @@ export function MealPlannerContent({
         },
         {
             id: 'meal',
-            label: 'New Meal',
+            label: 'New Recipe',
             description: 'Build a meal recipe with ingredients and instructions',
             icon: ChefHat,
             iconColor: 'text-amber-500',
@@ -657,17 +657,6 @@ export function MealPlannerContent({
             bgColor: 'bg-amber-500/10',
             hoverBorder: 'hover:border-amber-500/60',
             shadowColor: 'hover:shadow-amber-500/10',
-        },
-        {
-            id: 'mix',
-            label: 'New Mix',
-            description: 'Create a custom ingredient blend or base mix',
-            icon: FlaskConical,
-            iconColor: 'text-indigo-500',
-            borderColor: 'border-indigo-500/30',
-            bgColor: 'bg-indigo-500/10',
-            hoverBorder: 'hover:border-indigo-500/60',
-            shadowColor: 'hover:shadow-indigo-500/10',
         },
     ];
 
@@ -1458,38 +1447,46 @@ export function MealPlannerContent({
                         </div>
                         {/* Maker Options */}
                         {makerMode === 'menu' && (
-                            <div className="flex-1 overflow-y-auto p-4 grid gap-3 max-w-2xl mx-auto py-8">
-                                {MAKER_OPTIONS.map((option) => {
-                                    const Icon = option.icon;
-                                    return (
-                                        <button
-                                            key={option.id}
-                                            onClick={() => setMakerMode(option.id as any)}
-                                            className={cn(
-                                                'group w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer',
-                                                'bg-white dark:bg-slate-900',
-                                                option.borderColor,
-                                                option.hoverBorder,
-                                                'hover:shadow-lg',
-                                                option.shadowColor,
-                                            )}
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className={cn(
-                                                    'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110',
-                                                    option.bgColor,
-                                                )}>
-                                                    <Icon size={20} className={option.iconColor} />
+                            <div className="flex-1 overflow-y-auto p-8 flex items-center justify-center">
+                                <div className="flex flex-col md:flex-row gap-6 w-full max-w-3xl">
+                                    {MAKER_OPTIONS.map((option) => {
+                                        const Icon = option.icon;
+                                        return (
+                                            <button
+                                                key={option.id}
+                                                onClick={() => setMakerMode(option.id as any)}
+                                                className={cn(
+                                                    'group text-left p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer flex-1',
+                                                    'bg-white dark:bg-slate-900',
+                                                    option.borderColor,
+                                                    option.hoverBorder,
+                                                    'hover:shadow-xl',
+                                                    option.shadowColor,
+                                                )}
+                                            >
+                                                <div className="flex flex-col items-start gap-4">
+                                                    <div className={cn(
+                                                        'w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110',
+                                                        option.bgColor,
+                                                    )}>
+                                                        <Icon size={24} className={option.iconColor} />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">{option.label}</h4>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-2">{option.description}</p>
+                                                    </div>
+                                                    <ArrowRight
+                                                        size={20}
+                                                        className={cn(
+                                                            'shrink-0 transition-all duration-300 text-slate-300 dark:text-slate-600 self-end',
+                                                            'group-hover:translate-x-1',
+                                                        )}
+                                                    />
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">{option.label}</h4>
-                                                    <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">{option.description}</p>
-                                                </div>
-                                                <ChevronRight size={16} className={cn('shrink-0 transition-all duration-300 text-slate-300 dark:text-slate-600 group-hover:translate-x-0.5', `group-hover:${option.iconColor}`)} />
-                                            </div>
-                                        </button>
-                                    );
-                                })}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         )}
                         {/* Inline Workspaces */}
