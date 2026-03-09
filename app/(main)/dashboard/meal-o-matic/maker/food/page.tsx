@@ -140,8 +140,7 @@ export function FoodItemCreatorContent() {
     const [showImportPicker, setShowImportPicker] = useState(false);
 
     // Panel modes: null = show buttons, 'paste' = show textarea, 'add' = show manual form
-    const [servingPanel, setServingPanel] = useState<'paste' | 'add' | null>(null);
-    const [nutrientPanel, setNutrientPanel] = useState<'paste' | 'add' | null>(null);
+    const [infoMode, setInfoMode] = useState<'write' | 'paste' | 'upload' | null>(null);
 
     // Manual serving entries: array of { name, weight_g }
     const [manualServings, setManualServings] = useState<{ name: string; weight_g: string }[]>([
@@ -550,119 +549,147 @@ Fat: ${item.fat_g || 0}g
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                            <div className="flex flex-col sm:flex-row gap-3 mb-6">
                                 <button
                                     type="button"
-                                    onClick={() => setServingPanel(servingPanel === 'add' ? null : 'add')}
+                                    onClick={() => setInfoMode(infoMode === 'write' ? null : 'write')}
                                     className={cn(
-                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                                        servingPanel === 'add'
+                                        "flex-1 h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        infoMode === 'write'
                                             ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
                                             : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-950/50"
                                     )}
                                 >
                                     <Plus size={16} />
-                                    Add Servings
+                                    Write Food Info
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setServingPanel(servingPanel === 'paste' ? null : 'paste')}
+                                    onClick={() => setInfoMode(infoMode === 'paste' ? null : 'paste')}
                                     className={cn(
-                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                                        servingPanel === 'paste'
+                                        "flex-1 h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        infoMode === 'paste'
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                                             : "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-950/50"
                                     )}
                                 >
                                     <Scale size={16} />
-                                    Paste Servings
+                                    Paste Food Info
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setNutrientPanel(nutrientPanel === 'add' ? null : 'add')}
+                                    onClick={() => setInfoMode(infoMode === 'upload' ? null : 'upload')}
                                     className={cn(
-                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                                        nutrientPanel === 'add'
-                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
-                                            : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-950/50"
+                                        "flex-1 h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        infoMode === 'upload'
+                                            ? "bg-purple-600 text-white shadow-lg shadow-purple-500/20"
+                                            : "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-950/50"
                                     )}
                                 >
-                                    <Plus size={16} />
-                                    Add Nutrients
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setNutrientPanel(nutrientPanel === 'paste' ? null : 'paste')}
-                                    className={cn(
-                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                                        nutrientPanel === 'paste'
-                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                                            : "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-950/50"
-                                    )}
-                                >
-                                    <Activity size={16} />
-                                    Paste Nutrients
+                                    <Upload size={16} />
+                                    Upload Food Info
                                 </button>
                             </div>
 
-                            {/* Serving Paste Panel */}
-                            {servingPanel === 'paste' && (
-                                <div className="mb-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600 ml-1">Paste Servings & Sizes</Label>
-                                    <Textarea
-                                        placeholder="Paste things like '1 cup = 240g' or serving info here..."
-                                        className="min-h-[160px] bg-white dark:bg-slate-950 border-blue-500/20 text-xs focus:ring-blue-500/20 rounded-2xl font-mono p-4"
-                                        value={servingText}
-                                        onChange={(e) => setServingText(e.target.value)}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Serving Add Panel */}
-                            {servingPanel === 'add' && (
+                            {/* Write Food Info Panel */}
+                            {infoMode === 'write' && (
                                 <div className="mb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Quick Add Serving Sizes</Label>
-                                    <div className="flex items-center gap-2">
-                                        <select
-                                            onChange={(e) => {
-                                                if (e.target.value) {
-                                                    const [name, weight] = e.target.value.split('|');
-                                                    setManualServings([...manualServings, { name, weight_g: weight }]);
-                                                    e.target.value = '';
-                                                }
-                                            }}
-                                            className="flex-1 h-10 px-3 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium appearance-none pr-10"
-                                        >
-                                            <option value="">Select a serving size to add...</option>
-                                            <option value="Gram|1">Gram (1g)</option>
-                                            <option value="Kilogram|1000">Kilogram (1000g)</option>
-                                            <option value="Milliliter|1">Milliliter (1ml)</option>
-                                            <option value="Liter|1000">Liter (1000ml)</option>
-                                            <option value="Teaspoon|5">Teaspoon (5g)</option>
-                                            <option value="Tablespoon|15">Tablespoon (15g)</option>
-                                            <option value="Cup|240">Cup (240g)</option>
-                                            <option value="Ounce|28">Ounce (28g)</option>
-                                            <option value="Pound|454">Pound (454g)</option>
-                                            <option value="Slice|30">Slice (30g)</option>
-                                            <option value="Handful|30">Handful (30g)</option>
-                                            <option value="Serving|100">Serving (100g)</option>
-                                        </select>
-                                    </div>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Write Servings, Nutrients & Details</Label>
+                                    <div className="space-y-4">
+                                        {/* Servings Section */}
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1 mb-2 block">Quick Add Serving Sizes</Label>
+                                            <div className="flex items-center gap-2">
+                                                <select
+                                                    onChange={(e) => {
+                                                        if (e.target.value) {
+                                                            const [name, weight] = e.target.value.split('|');
+                                                            setManualServings([...manualServings, { name, weight_g: weight }]);
+                                                            e.target.value = '';
+                                                        }
+                                                    }}
+                                                    className="flex-1 h-10 px-3 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium appearance-none pr-10"
+                                                >
+                                                    <option value="">Select a serving size to add...</option>
+                                                    <option value="Gram|1">Gram (1g)</option>
+                                                    <option value="Kilogram|1000">Kilogram (1000g)</option>
+                                                    <option value="Milliliter|1">Milliliter (1ml)</option>
+                                                    <option value="Liter|1000">Liter (1000ml)</option>
+                                                    <option value="Teaspoon|5">Teaspoon (5g)</option>
+                                                    <option value="Tablespoon|15">Tablespoon (15g)</option>
+                                                    <option value="Cup|240">Cup (240g)</option>
+                                                    <option value="Ounce|28">Ounce (28g)</option>
+                                                    <option value="Pound|454">Pound (454g)</option>
+                                                    <option value="Slice|30">Slice (30g)</option>
+                                                    <option value="Handful|30">Handful (30g)</option>
+                                                    <option value="Serving|100">Serving (100g)</option>
+                                                </select>
+                                            </div>
 
-                                    {manualServings.length > 0 && (
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Selected Servings:</Label>
-                                            <div className="space-y-1">
-                                                {manualServings.map((s, i) => (
-                                                    <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
-                                                        <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
-                                                            1 {s.name} = {s.weight_g}g
-                                                        </span>
-                                                        {manualServings.length > 1 && (
+                                            {manualServings.length > 0 && (
+                                                <div className="space-y-2 mt-2">
+                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Selected Servings:</Label>
+                                                    <div className="space-y-1">
+                                                        {manualServings.map((s, i) => (
+                                                            <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
+                                                                <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                                                                    1 {s.name} = {s.weight_g}g
+                                                                </span>
+                                                                {manualServings.length > 1 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setManualServings(manualServings.filter((_, idx) => idx !== i))}
+                                                                        className="p-1 text-emerald-400 hover:text-rose-500 transition-colors"
+                                                                    >
+                                                                        <X size={14} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Nutrients Section */}
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1 mb-2 block">Add Nutrients</Label>
+                                            <div className="space-y-2">
+                                                {manualNutrients.map((n, i) => (
+                                                    <div key={i} className="flex items-center gap-2">
+                                                        <select
+                                                            value={n.nutrient}
+                                                            onChange={(e) => {
+                                                                const updated = [...manualNutrients];
+                                                                updated[i] = { ...updated[i], nutrient: e.target.value };
+                                                                setManualNutrients(updated);
+                                                            }}
+                                                            className="flex-1 h-9 px-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium"
+                                                        >
+                                                            <option value="">Select nutrient...</option>
+                                                            {Object.entries(CATEGORIZED_MARKERS).map(([group, markers]) => (
+                                                                <optgroup key={group} label={group}>
+                                                                    {markers.map(m => (
+                                                                        <option key={m} value={m}>{m}</option>
+                                                                    ))}
+                                                                </optgroup>
+                                                            ))}
+                                                        </select>
+                                                        <Input
+                                                            placeholder="Value"
+                                                            className="w-24 h-9 text-sm text-center rounded-lg bg-white dark:bg-slate-950"
+                                                            value={n.value}
+                                                            onChange={(e) => {
+                                                                const updated = [...manualNutrients];
+                                                                updated[i] = { ...updated[i], value: e.target.value };
+                                                                setManualNutrients(updated);
+                                                            }}
+                                                        />
+                                                        {manualNutrients.length > 1 && (
                                                             <button
                                                                 type="button"
-                                                                onClick={() => setManualServings(manualServings.filter((_, idx) => idx !== i))}
-                                                                className="p-1 text-emerald-400 hover:text-rose-500 transition-colors"
+                                                                onClick={() => setManualNutrients(manualNutrients.filter((_, idx) => idx !== i))}
+                                                                className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
                                                             >
                                                                 <X size={14} />
                                                             </button>
@@ -670,79 +697,62 @@ Fat: ${item.fat_g || 0}g
                                                     </div>
                                                 ))}
                                             </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setManualNutrients([...manualNutrients, { nutrient: '', value: '' }])}
+                                                className="w-full h-8 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors mt-2"
+                                            >
+                                                <Plus size={12} />
+                                                Add More Nutrients
+                                            </button>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Nutrient Paste Panel */}
-                            {nutrientPanel === 'paste' && (
+                            {/* Paste Food Info Panel */}
+                            {infoMode === 'paste' && (
                                 <div className="mb-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600 ml-1">Paste Nutrient List</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600 ml-1">Paste Servings & Nutrient Information</Label>
                                     <Textarea
-                                        placeholder="Paste the list of calories, vitamins, and minerals here..."
-                                        className="min-h-[160px] bg-white dark:bg-slate-950 border-blue-500/20 text-xs focus:ring-blue-500/20 rounded-2xl font-mono p-4"
-                                        value={nutrientText}
-                                        onChange={(e) => setNutrientText(e.target.value)}
+                                        placeholder="Paste servings (e.g. '1 cup = 240g'), nutrients, and other food info here..."
+                                        className="min-h-[200px] bg-white dark:bg-slate-950 border-blue-500/20 text-xs focus:ring-blue-500/20 rounded-2xl font-mono p-4"
+                                        value={servingText + '\n' + nutrientText}
+                                        onChange={(e) => {
+                                            const combined = e.target.value;
+                                            const lines = combined.split('\n');
+                                            setServingText(combined);
+                                            setNutrientText(combined);
+                                        }}
                                     />
                                 </div>
                             )}
 
-                            {/* Nutrient Add Panel */}
-                            {nutrientPanel === 'add' && (
+                            {/* Upload Food Info Panel */}
+                            {infoMode === 'upload' && (
                                 <div className="mb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Add Nutrients</Label>
-                                    <div className="space-y-2">
-                                        {manualNutrients.map((n, i) => (
-                                            <div key={i} className="flex items-center gap-2">
-                                                <select
-                                                    value={n.nutrient}
-                                                    onChange={(e) => {
-                                                        const updated = [...manualNutrients];
-                                                        updated[i] = { ...updated[i], nutrient: e.target.value };
-                                                        setManualNutrients(updated);
-                                                    }}
-                                                    className="flex-1 h-9 px-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium"
-                                                >
-                                                    <option value="">Select nutrient...</option>
-                                                    {Object.entries(CATEGORIZED_MARKERS).map(([group, markers]) => (
-                                                        <optgroup key={group} label={group}>
-                                                            {markers.map(m => (
-                                                                <option key={m} value={m}>{m}</option>
-                                                            ))}
-                                                        </optgroup>
-                                                    ))}
-                                                </select>
-                                                <Input
-                                                    placeholder="Value"
-                                                    className="w-24 h-9 text-sm text-center rounded-lg bg-white dark:bg-slate-950"
-                                                    value={n.value}
-                                                    onChange={(e) => {
-                                                        const updated = [...manualNutrients];
-                                                        updated[i] = { ...updated[i], value: e.target.value };
-                                                        setManualNutrients(updated);
-                                                    }}
-                                                />
-                                                {manualNutrients.length > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setManualNutrients(manualNutrients.filter((_, idx) => idx !== i))}
-                                                        className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
-                                                    >
-                                                        <X size={14} />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-purple-600 ml-1">Upload Food Information</Label>
+                                    <div className="border-2 border-dashed border-purple-300 dark:border-purple-800 rounded-2xl p-8 text-center space-y-3">
+                                        <Camera size={32} className="mx-auto text-purple-400" />
+                                        <div>
+                                            <p className="text-sm font-bold text-purple-700 dark:text-purple-300">Upload Nutrition Label Screenshot</p>
+                                            <p className="text-xs text-purple-600 dark:text-purple-400">Take a photo or upload a screenshot of a nutrition label</p>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            id="food-upload"
+                                            onChange={handleImageUpload}
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={() => document.getElementById('food-upload')?.click()}
+                                            className="bg-purple-600 hover:bg-purple-700 text-white"
+                                        >
+                                            Choose Image
+                                        </Button>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setManualNutrients([...manualNutrients, { nutrient: '', value: '' }])}
-                                        className="w-full h-8 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
-                                    >
-                                        <Plus size={12} />
-                                        Add More
-                                    </button>
                                 </div>
                             )}
 
