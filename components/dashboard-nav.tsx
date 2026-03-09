@@ -97,7 +97,7 @@ export function DashboardNav() {
                     <MessageCircle size={16} />
                 </button>
             </div>
-            {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
         </div>
+        {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
     );
 }
