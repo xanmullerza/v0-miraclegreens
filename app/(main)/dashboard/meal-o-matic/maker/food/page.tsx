@@ -77,18 +77,13 @@ const CATEGORIZED_MARKERS: Record<string, string[]> = {
 };
 
 export default function AddFoodPage() {
-    return (
-        <Suspense fallback={
-            <div className="max-w-7xl mx-auto min-h-[60vh] flex flex-col items-center justify-center gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic animate-pulse">
-                    Initializing Food Workspace...
-                </p>
-            </div>
-        }>
-            <FoodItemCreatorContent />
-        </Suspense>
-    );
+    const router = useRouter();
+    
+    useEffect(() => {
+        router.replace('/dashboard/meal-o-matic/planner');
+    }, [router]);
+
+    return null;
 }
 
 export function FoodItemCreatorContent() {

@@ -631,8 +631,9 @@ export function MealPlannerContent({
     const [isHeroActive, setIsHeroActive] = useState(false);
     const heroSearchTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
-    // Maker overlay state
-    const [activeMaker, setActiveMaker] = useState<'menu' | 'food' | 'meal' | 'mix' | null>(null);
+    // Page mode state - planner or maker
+    const [pageMode, setPageMode] = useState<'planner' | 'maker'>('planner');
+    const [makerMode, setMakerMode] = useState<'menu' | 'food' | 'meal' | 'mix'>('menu');
 
     const MAKER_OPTIONS = [
         {
@@ -1382,16 +1383,19 @@ export function MealPlannerContent({
                     placeholder="SEARCH RECIPES..."
                     powerButton={
                         <button
-                            onClick={() => setActiveMaker(prev => prev ? null : 'menu')}
+                            onClick={() => {
+                                setPageMode(pageMode === 'maker' ? 'planner' : 'maker');
+                                setMakerMode('menu');
+                            }}
                             className={cn(
                                 "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
-                                activeMaker
+                                pageMode === 'maker'
                                     ? "bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/30"
                                     : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-amber-500 hover:bg-amber-500/10"
                             )}
                             title="Open Maker"
                         >
-                            <Plus size={16} className={activeMaker ? 'text-white rotate-45 transition-transform' : 'text-slate-900 dark:text-white transition-transform'} />
+                            <Plus size={16} className={pageMode === 'maker' ? 'text-white rotate-45 transition-transform' : 'text-slate-900 dark:text-white transition-transform'} />
                         </button>
                     }
                     noResultsMessage="No matching recipes found"
@@ -1418,14 +1422,14 @@ export function MealPlannerContent({
                 />
 
                 {/* Maker Overlay */}
-                {activeMaker && (
+                {pageMode === 'maker' && (
                     <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 animate-in fade-in duration-300 flex flex-col">
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
                             <div className="flex items-center gap-3">
-                                {activeMaker !== 'menu' && (
+                                {makerMode !== 'menu' && (
                                     <button
-                                        onClick={() => setActiveMaker('menu')}
+                                        onClick={() => setMakerMode('menu')}
                                         className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
                                         title="Back to Menu"
                                     >
@@ -1437,15 +1441,15 @@ export function MealPlannerContent({
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                                        {activeMaker === 'menu' ? 'Maker' : `New ${activeMaker}`}
+                                        {makerMode === 'menu' ? 'Maker' : `New ${makerMode}`}
                                     </h3>
                                     <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                                        {activeMaker === 'menu' ? 'Create new foods, meals & mixes' : 'Inline builder workspace'}
+                                        {makerMode === 'menu' ? 'Create new foods, meals & mixes' : 'Builder workspace'}
                                     </p>
                                 </div>
                             </div>
                             <button
-                                onClick={() => setActiveMaker(null)}
+                                onClick={() => setPageMode('planner')}
                                 className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
                                 title="Close"
                             >
@@ -1453,14 +1457,14 @@ export function MealPlannerContent({
                             </button>
                         </div>
                         {/* Maker Options */}
-                        {activeMaker === 'menu' && (
+                        {makerMode === 'menu' && (
                             <div className="flex-1 overflow-y-auto p-4 grid gap-3 max-w-2xl mx-auto py-8">
                                 {MAKER_OPTIONS.map((option) => {
                                     const Icon = option.icon;
                                     return (
                                         <button
                                             key={option.id}
-                                            onClick={() => setActiveMaker(option.id as any)}
+                                            onClick={() => setMakerMode(option.id as any)}
                                             className={cn(
                                                 'group w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer',
                                                 'bg-white dark:bg-slate-900',
@@ -1489,21 +1493,21 @@ export function MealPlannerContent({
                             </div>
                         )}
                         {/* Inline Workspaces */}
-                        {activeMaker === 'food' && (
+                        {makerMode === 'food' && (
                             <div className="flex-1 overflow-y-auto p-4 md:p-8">
                                 <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
                                     <FoodItemCreatorContent />
                                 </Suspense>
                             </div>
                         )}
-                        {activeMaker === 'meal' && (
+                        {makerMode === 'meal' && (
                             <div className="flex-1 overflow-y-auto p-4 md:p-8">
                                 <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
                                     <MealBuilderContent />
                                 </Suspense>
                             </div>
                         )}
-                        {activeMaker === 'mix' && (
+                        {makerMode === 'mix' && (
                             <div className="flex-1 overflow-y-auto p-4 md:p-8">
                                 <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
                                     <MixBuilderContent />
