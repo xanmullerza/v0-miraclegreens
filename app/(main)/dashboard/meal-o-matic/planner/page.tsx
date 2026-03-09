@@ -58,7 +58,8 @@ import {
     Package,
     ShoppingBag,
     Leaf,
-    Loader2
+    Loader2,
+    ArrowRight
 } from 'lucide-react';
 import {
     Sheet,
