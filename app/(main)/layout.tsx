@@ -14,11 +14,10 @@ import { Header } from '@/components/header';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { HeaderActionsProvider, useHeaderActions } from '@/lib/context/header-actions-context';
 import { SearchProvider } from '@/lib/context/search-context';
+import { ChatbotProvider, useChatbot } from '@/lib/context/chatbot-context';
 import { supabase } from '@/lib/supabase';
 import { HeaderLogo } from '@/components/ui/header-logo';
-
-
-
+import { ChatbotModal } from '@/components/chatbot-modal';
 import { Footer } from '@/components/footer';
 import { DashboardNav } from '@/components/dashboard-nav';
 import { RDADrawer } from '@/components/rda-drawer';
@@ -32,6 +31,7 @@ function DashboardLayoutContent({
     const router = useRouter();
     const { profile, showRDADrawer } = useUserPreferences();
     const { actions } = useHeaderActions();
+    const { isChatbotOpen, setIsChatbotOpen } = useChatbot();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
 
@@ -101,8 +101,11 @@ function DashboardLayoutContent({
             </div>
 
 
-            {/* Removed the old fixed-overlay that was in the wrong stacking context */}
+            {/* RDA Drawer */}
             <RDADrawer />
+
+            {/* Chatbot Modal - rendered at top level outside stacking context */}
+            {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
         </div>
     );
 }
@@ -113,10 +116,12 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <SearchProvider>
-            <HeaderActionsProvider>
-                <DashboardLayoutContent>{children}</DashboardLayoutContent>
-            </HeaderActionsProvider>
-        </SearchProvider>
+        <ChatbotProvider>
+            <SearchProvider>
+                <HeaderActionsProvider>
+                    <DashboardLayoutContent>{children}</DashboardLayoutContent>
+                </HeaderActionsProvider>
+            </SearchProvider>
+        </ChatbotProvider>
     );
 }

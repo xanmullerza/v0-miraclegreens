@@ -1,15 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Apple, Calendar, ShoppingBasket, Shapes, Salad, LayoutGrid, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ChatbotModal } from './chatbot-modal';
+import { useChatbot } from '@/lib/context/chatbot-context';
 
 export function DashboardNav() {
     const router = useRouter();
     const pathname = usePathname();
-    const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+    const { setIsChatbotOpen } = useChatbot();
 
     // Determine active button
     const getActiveButton = () => {
@@ -101,7 +100,6 @@ export function DashboardNav() {
                 </button>
             </div>
             </div>
-            {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
         </>
     );
 }
