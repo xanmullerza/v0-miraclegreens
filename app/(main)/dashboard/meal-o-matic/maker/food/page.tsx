@@ -265,6 +265,9 @@ Fat: ${food.fat_g || 0}g
                         }
                         setServingText(sText);
                         setManualServings(manualServingsList);
+                        
+                        // Auto-open the Write panel when editing to show the loaded nutrients
+                        setInfoMode('write');
                     }
                 } catch (error) {
                     console.error('Failed to load food for editing:', error);
