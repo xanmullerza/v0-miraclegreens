@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf, Home, Globe, User } from 'lucide-react';
+import { Leaf, Home, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderLogoProps {
@@ -18,21 +18,20 @@ export function HeaderLogo({
     userAvatarUrl,
 }: HeaderLogoProps) {
     const pathname = usePathname();
-    const isHome = pathname.includes('/home');
 
     return (
         <div suppressHydrationWarning className={cn(
             "flex items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl w-full md:max-w-[900px] mx-auto xl:mx-0 transition-all duration-500"
         )}>
-            {/* Left - Home/Dashboard Toggle */}
+            {/* Left - Home Button */}
             <Link
-                href={isHome ? '/dashboard' : '/home'}
+                href="/dashboard"
                 className={cn(
                     "flex h-12 w-12 border-r border-slate-200 dark:border-slate-800 items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:outline-none flex-shrink-0"
                 )}
-                title={isHome ? 'Dashboard' : 'Home'}
+                title="Dashboard"
             >
-                {isHome ? <Home size={18} /> : <Globe size={18} />}
+                <Home size={18} />
             </Link>
 
             {/* Center - Logo Area */}
