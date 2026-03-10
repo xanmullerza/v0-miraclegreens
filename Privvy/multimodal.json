@@ -12,10 +12,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        32,
-        496
+        2016,
+        608
       ],
-      "id": "e6b65279-7cf0-43d4-ab66-7caa3a5531b2",
+      "id": "c2f325cb-1609-4cbb-99c4-203ca8d6a5ad",
       "name": "AI Agent"
     },
     {
@@ -128,10 +128,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -864,
-        176
+        1344,
+        384
       ],
-      "id": "423dd6d5-d420-4a0c-a4cd-383753efdfe2",
+      "id": "c06540e8-1334-4785-a0ce-60a3162700a2",
       "name": "Content Type Router"
     },
     {
@@ -142,10 +142,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -192,
-        496
+        1792,
+        704
       ],
-      "id": "b99fada0-685a-4410-b964-156716d49862"
+      "id": "88bde4f3-386a-46ad-9df0-0495d2fdc45e"
     },
     {
       "parameters": {
@@ -156,10 +156,10 @@
       },
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        -416,
-        192
+        1792,
+        512
       ],
-      "id": "5b32597c-d528-48b0-99b5-d6600b19dd85",
+      "id": "753b3942-c272-4c48-baf1-fc5f2286d37f",
       "name": "Image to Base64",
       "typeVersion": 1
     },
@@ -172,10 +172,10 @@
       },
       "type": "n8n-nodes-base.webhook",
       "position": [
-        -1072,
-        192
+        1120,
+        416
       ],
-      "id": "f672ce4a-7005-4252-ab93-232457dbddf5",
+      "id": "39a95b95-a6b6-4cb4-badc-d17556cc2484",
       "name": "Webhook",
       "typeVersion": 2,
       "webhookId": "06779100-8d0e-4ed7-9916-14a9ece2b41f"
@@ -186,10 +186,10 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "position": [
-        384,
-        192
+        2368,
+        512
       ],
-      "id": "31898178-3cc6-4d77-ab08-bbc7b31210e9",
+      "id": "01a0caf8-2e38-49f4-8f3b-99f4ecb761f9",
       "name": "Respond",
       "typeVersion": 1.1
     },
@@ -201,46 +201,11 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        32,
-        672
+        2016,
+        832
       ],
-      "id": "962adcc8-710f-4934-91af-8cec754c10a1",
+      "id": "30e35f90-b5c2-4d34-8729-3bbbcce742b3",
       "name": "Groq Chat Model",
-      "credentials": {
-        "groqApi": {
-          "id": "tPNA8xQI2Nvaa6PH",
-          "name": "Groq account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.groq.com/openai/v1/chat/completions",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "groqApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Webhook').item.json.body.message || 'What is in this image?' }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:image/jpeg;base64,{{ $json.file }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"model\": \"meta-llama/llama-4-scout-17b-16e-instruct\"\n}",
-        "options": {}
-      },
-      "id": "9513582a-10fe-48c1-9f85-01fc9046c992",
-      "name": "HTTP Request GROQ Scout",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [
-        -192,
-        192
-      ],
-      "typeVersion": 4.2,
       "credentials": {
         "groqApi": {
           "id": "tPNA8xQI2Nvaa6PH",
@@ -256,10 +221,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        96,
-        192
+        2080,
+        1008
       ],
-      "id": "efbbb639-6579-4073-a533-0d4a8af89f54"
+      "id": "5cc90eb3-5cd0-4c92-a62f-dc5bc4a3e628"
     },
     {
       "parameters": {
@@ -269,10 +234,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        144,
-        672
+        2144,
+        832
       ],
-      "id": "ca2f7988-40be-4047-add2-d51691431ac3",
+      "id": "79f9349c-0feb-49f8-853c-5e05720746fa",
       "name": "Simple Memory"
     },
     {
@@ -282,10 +247,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -416,
-        0
+        1568,
+        320
       ],
-      "id": "6aca38d6-cac5-4e3e-b4b0-b61a32ac4cb1",
+      "id": "040f740b-1217-4225-94fb-2bc65c841512",
       "name": "Process Audio",
       "continueOnFail": true
     },
@@ -296,10 +261,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        96,
-        0
+        2080,
+        320
       ],
-      "id": "181c065f-1bb6-4bf4-80ec-7b3946b0762a",
+      "id": "1ce1f50d-97dd-48ec-91d8-e4ddd028477f",
       "name": "Format Response1",
       "continueOnFail": true
     },
@@ -341,10 +306,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -192,
-        0
+        1792,
+        320
       ],
-      "id": "f8b87b29-2fd4-457a-b177-f9bccf2a9547",
+      "id": "04ad5857-43cc-416c-a36a-c1c3b1e428c8",
       "name": "Audio Transcription",
       "credentials": {
         "groqApi": {
@@ -360,10 +325,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -640,
-        192
+        1568,
+        512
       ],
-      "id": "132a6f19-e1fd-4544-9c71-b06a70533b73",
+      "id": "8209fc35-517a-4fdf-9c9a-b35b380da0d6",
       "name": "Process Image",
       "continueOnFail": true
     },
@@ -405,22 +370,16 @@
           ]
         },
         "options": {
-          "timeout": 60000,
-          "response": {
-            "response": {
-              "fullResponse": false,
-              "responseFormat": "text"
-            }
-          }
+          "timeout": 60000
         }
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -640,
-        -192
+        1536,
+        128
       ],
-      "id": "a7b1c2d3-e4f5-4a5b-9c6d-7e8f9a0b1c2d",
+      "id": "80371dd5-58fc-44f8-82ef-9a930c1a0704",
       "name": "Fetch Recipe Page",
       "continueOnFail": true
     },
@@ -431,10 +390,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -192,
-        -192
+        1792,
+        128
       ],
-      "id": "b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e",
+      "id": "e5fd38de-d7ab-4fd0-a340-e3e182d94da6",
       "name": "Extract Recipe Metadata"
     },
     {
@@ -444,10 +403,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        96,
-        -192
+        2080,
+        128
       ],
-      "id": "c5d6e7f8-9a0b-1c2d-3e4f-5a6b7c8d9e0f",
+      "id": "c798507f-e3d5-41d1-8cf4-abcc9ec3db01",
       "name": "Format Recipe"
     }
   ],
@@ -507,17 +466,6 @@
         ]
       ]
     },
-    "Image to Base64": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request GROQ LLAVA1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Process Image": {
       "main": [
         [
@@ -546,17 +494,6 @@
           {
             "node": "AI Agent",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request GROQ LLAVA1": {
-      "main": [
-        [
-          {
-            "node": "Format Text1",
-            "type": "main",
             "index": 0
           }
         ]
@@ -651,17 +588,18 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "2a0ee6e5-fdab-478d-901b-f0cde990fc31",
+  "versionId": "a71a083c-d308-4297-a9d8-38d5d4820961",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "3a03056b3ae25ed7627ebd0b40dc7c7af839a6375f05a7e809eefe543dd430d8"
   },
-  "id": "p0mBlT9M8Ud71a32",
+  "id": "BDjnT5KnTbX3JgR2",
   "tags": []
 }
