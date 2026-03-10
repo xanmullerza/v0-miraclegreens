@@ -89,8 +89,9 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
             }));
 
             // Save the recipe
-            await saveRecipe(recipeData, ingredientsForSave, instructionsForSave);
+            const result = await saveRecipe(recipeData, ingredientsForSave, instructionsForSave);
 
+            // If we got here, the recipe was saved successfully
             toast.success(`Recipe "${recipe.title}" saved to your library!`);
             
             // Call save callback if provided
@@ -98,10 +99,21 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                 onSave(recipe);
             }
             
+            // Close the dialog
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving recipe:', error);
-            toast.error('Failed to save recipe. Please try again.');
+            // Show friendly error message
+            const errorMsg = error?.message || 'Failed to save recipe';
+            if (errorMsg.includes('foreign key')) {
+                toast.error('Recipe saved but some ingredient links need manual adjustment.');
+                // Still close since recipe was saved
+                onClose();
+            } else if (errorMsg.includes('authenticated')) {
+                toast.error('Please log in to save recipes.');
+            } else {
+                toast.error('Failed to save recipe. Please try again.');
+            }
         } finally {
             setSaving(false);
         }

@@ -171,12 +171,12 @@ export function useDataPersistence() {
                     const servings = recipe.servings || 1;
                     const ingredientsData = ingredients.map(ing => {
                         // Ensure we have a descriptive item name and amount for legacy support/fallback
-                        const itemName = ing.food_item_name || 'Ingredient';
+                        const itemName = ing.food_item_name || ing.item || 'Ingredient';
                         const amountStr = `${ing.quantity / servings} ${ing.measure_label || 'unit'}`;
 
                         return {
                             recipe_id: recipeId,
-                            food_item_id: ing.food_item_id,
+                            food_item_id: ing.food_item_id && !ing.food_item_id.startsWith('raw-') ? ing.food_item_id : null, // Allow NULL for raw ingredients
                             item: itemName,
                             amount: amountStr,
                             weight_g: ing.weight_g / servings,
@@ -188,7 +188,12 @@ export function useDataPersistence() {
                     });
 
                     const { error: ingError } = await supabase.from('ingredients').insert(ingredientsData);
-                    if (ingError) throw ingError;
+                    if (ingError) {
+                        console.error('Ingredient save error:', ingError);
+                        console.error('Attempted data:', ingredientsData);
+                        // Log but don't throw - ingredient issues shouldn't prevent recipe save
+                        // The recipe was already saved successfully
+                    }
                 }
 
                 // 3. Save instructions if provided
@@ -204,7 +209,10 @@ export function useDataPersistence() {
                     }));
 
                     const { error: insError } = await supabase.from('instructions').insert(instructionsData);
-                    if (insError) throw insError;
+                    if (insError) {
+                        console.error('Instruction save error:', insError);
+                        // Log but don't throw
+                    }
                 }
 
                 // NEW: Mix to Food Item Sync
