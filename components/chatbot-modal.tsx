@@ -16,6 +16,66 @@ interface ChatbotModalProps {
     onClose: () => void;
 }
 
+// Simple formatter component for markdown-like text
+function FormattedText({ content }: { content: string }) {
+    const lines = content.split('\n');
+    
+    return (
+        <div className="space-y-2">
+            {lines.map((line, idx) => {
+                // Handle numbered lists
+                if (/^\d+\.\s/.test(line)) {
+                    return (
+                        <div key={idx} className="flex gap-2 ml-2">
+                            <span className="flex-shrink-0 font-bold text-emerald-600 dark:text-emerald-400">
+                                {line.match(/^\d+\./)?.[0]}
+                            </span>
+                            <span>
+                                {line.replace(/^\d+\.\s/, '')}
+                            </span>
+                        </div>
+                    );
+                }
+                
+                // Handle bullet points
+                if (/^[\*\-]\s/.test(line)) {
+                    return (
+                        <div key={idx} className="flex gap-2 ml-2">
+                            <span className="flex-shrink-0 text-emerald-600 dark:text-emerald-400 font-bold">•</span>
+                            <span>{line.replace(/^[\*\-]\s/, '')}</span>
+                        </div>
+                    );
+                }
+                
+                // Handle bold text
+                const parts = line.split(/\*\*(.+?)\*\*/);
+                if (parts.length > 1) {
+                    return (
+                        <p key={idx} className="leading-relaxed">
+                            {parts.map((part, i) => 
+                                i % 2 === 1 ? (
+                                    <strong key={i} className="font-bold text-emerald-600 dark:text-emerald-400">
+                                        {part}
+                                    </strong>
+                                ) : (
+                                    <span key={i}>{part}</span>
+                                )
+                            )}
+                        </p>
+                    );
+                }
+                
+                // Regular text
+                return line.trim() ? (
+                    <p key={idx} className="leading-relaxed">{line}</p>
+                ) : (
+                    <div key={idx} className="h-1" />
+                );
+            })}
+        </div>
+    );
+}
+
 export function ChatbotModal({ onClose }: ChatbotModalProps) {
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -151,13 +211,17 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                         >
                             <div
                                 className={cn(
-                                    'max-w-xs px-4 py-2.5 rounded-xl text-sm font-medium leading-relaxed',
+                                    'px-4 py-2.5 rounded-xl text-sm leading-relaxed',
                                     message.type === 'user'
-                                        ? 'bg-emerald-500 text-white rounded-br-none'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-none'
+                                        ? 'max-w-xs bg-emerald-500 text-white rounded-br-none font-medium'
+                                        : 'max-w-sm bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-none'
                                 )}
                             >
-                                {message.content}
+                                {message.type === 'bot' ? (
+                                    <FormattedText content={message.content} />
+                                ) : (
+                                    message.content
+                                )}
                             </div>
                         </div>
                     ))}
