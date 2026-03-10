@@ -12,8 +12,19 @@ interface Message {
     timestamp: Date;
 }
 
+interface ParsedRecipe {
+    title: string;
+    ingredients_text: string;
+    instructions_text: string;
+    servings?: number;
+    prep_time?: number;
+    source_url: string;
+    image_url?: string;
+}
+
 interface ChatbotModalProps {
     onClose: () => void;
+    onRecipeDetected?: (recipe: ParsedRecipe) => void;
 }
 
 // Simple formatter component for markdown-like text
@@ -99,17 +110,36 @@ function FormattedText({ content }: { content: string }) {
     );
 }
 
-export function ChatbotModal({ onClose }: ChatbotModalProps) {
+// URL detection helper
+function detectURL(text: string): string | null {
+    const urlRegex = /(https?:\/\/[^\s]+)/gi;
+    const match = text.match(urlRegex);
+    return match ? match[0] : null;
+}
+
+// Extract domain from URL
+function getDomainFromURL(url: string): string {
+    try {
+        const domain = new URL(url).hostname;
+        return domain.replace('www.', '');
+    } catch {
+        return url;
+    }
+}
+
+export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
             type: 'bot',
-            content: 'Hello! I\'m Zum, your child-friendly AI assistant. I can help with nutrition questions, recipes, meal planning, and more. What can I help you with?',
+            content: 'Hello! I\'m Zum, your child-friendly AI assistant. I can help with nutrition questions, recipes, meal planning, and more. I can also add recipes from URLs! Just share a recipe link.',
             timestamp: new Date(),
         }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [recipeLoading, setRecipeLoading] = useState(false);
+    const [detectedURL, setDetectedURL] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -124,6 +154,115 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
     const handleSend = async () => {
         if (!input.trim()) return;
 
+        // Check if input contains a URL
+        const detectedUrl = detectURL(input);
+        
+        if (detectedUrl) {
+            // Handle recipe URL
+            setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                type: 'user',
+                content: `📎 Recipe URL: ${getDomainFromURL(detectedUrl)}`,
+                timestamp: new Date(),
+            }]);
+            setInput('');
+            setDetectedURL(detectedUrl);
+            setRecipeLoading(true);
+
+            try {
+                // Get current user
+                const { data: { user } } = await supabase.auth.getUser();
+                const userId = user?.id || 'anonymous';
+
+                // Show parsing message
+                setMessages(prev => [...prev, {
+                    id: (Date.now() + 1).toString(),
+                    type: 'bot',
+                    content: `🔍 Parsing recipe from ${getDomainFromURL(detectedUrl)}...`,
+                    timestamp: new Date(),
+                }]);
+
+                // Call n8n webhook with recipe-url content type
+                const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: detectedUrl,
+                        userId: userId,
+                        contentType: 'recipe-url'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Parse response - expect { title, ingredients_text, instructions_text, servings, prep_time, source_url, image_url }
+                let recipeData: ParsedRecipe | null = null;
+
+                if (data.recipe || data.data) {
+                    const recipe = data.recipe || data.data;
+                    recipeData = {
+                        title: recipe.title || 'Untitled Recipe',
+                        ingredients_text: recipe.ingredients_text || recipe.ingredients || '',
+                        instructions_text: recipe.instructions_text || recipe.instructions || '',
+                        servings: recipe.servings || 4,
+                        prep_time: recipe.prep_time || recipe.prepTime || 30,
+                        source_url: detectedUrl,
+                        image_url: recipe.image_url || recipe.image || undefined,
+                    };
+                }
+
+                if (recipeData) {
+                    // Remove the "Parsing..." message and show success
+                    setMessages(prev => [
+                        ...prev.slice(0, -1),
+                        {
+                            id: (Date.now() + 1).toString(),
+                            type: 'bot',
+                            content: `✅ Recipe "${recipeData.title}" parsed successfully! Click below to add it to your library.`,
+                            timestamp: new Date(),
+                        }
+                    ]);
+
+                    // Trigger callback to open recipe editor
+                    if (onRecipeDetected) {
+                        onRecipeDetected(recipeData);
+                    }
+                } else {
+                    setMessages(prev => [
+                        ...prev.slice(0, -1),
+                        {
+                            id: (Date.now() + 1).toString(),
+                            type: 'bot',
+                            content: '⚠️ Could not parse recipe from that URL. Try copying and pasting the recipe text directly, or check that the URL points to a recipe page.',
+                            timestamp: new Date(),
+                        }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Error parsing recipe URL:', error);
+                setMessages(prev => [
+                    ...prev.slice(0, -1),
+                    {
+                        id: (Date.now() + 1).toString(),
+                        type: 'bot',
+                        content: '❌ Sorry, I encountered an error parsing that recipe URL. Please try again or paste the recipe text directly.',
+                        timestamp: new Date(),
+                    }
+                ]);
+            } finally {
+                setRecipeLoading(false);
+                setDetectedURL(null);
+            }
+            return;
+        }
+
+        // Regular text message handling
         // Add user message
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -346,7 +485,7 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                        placeholder="Ask a question..."
+                        placeholder="Ask a question or paste a recipe URL..."
                         className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                     <input
@@ -355,11 +494,11 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                         accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
-                        disabled={isLoading}
+                        disabled={isLoading || recipeLoading}
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={isLoading}
+                        disabled={isLoading || recipeLoading}
                         className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                         title="Upload image"
                     >
@@ -367,11 +506,11 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                     </button>
                     <button
                         onClick={handleSend}
-                        disabled={!input.trim() || isLoading}
+                        disabled={!input.trim() || isLoading || recipeLoading}
                         className="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                         title="Send"
                     >
-                        <Send size={16} />
+                        {isLoading || recipeLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                     </button>
                 </div>
             </div>

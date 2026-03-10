@@ -9,6 +9,7 @@ import {
     ArrowRight, Plus, ListOrdered, Beaker, X
 } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
+import { downloadAndUploadRecipeImage } from '@/lib/utils/recipe-image-upload';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -29,26 +30,50 @@ interface RecipeFormDialogProps {
     onClose: () => void;
     onSave?: () => void;
     isMix?: boolean;
+    initialData?: {
+        title?: string;
+        source?: string;
+        type?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+        prepTime?: number;
+        servings?: number;
+        ingredients_text?: string;
+        instructions_text?: string;
+        image?: string;
+    };
 }
 
-export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false }: RecipeFormDialogProps) {
+export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false, initialData }: RecipeFormDialogProps) {
     const router = useRouter();
     const { user, saveRecipe, loading: authLoading } = useDataPersistence();
 
-    const [title, setTitle] = useState('');
-    const [source, setSource] = useState('');
-    const [type, setType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
-    const [prepTime, setPrepTime] = useState(30);
-    const [servings, setServings] = useState(4);
+    const [title, setTitle] = useState(initialData?.title || '');
+    const [source, setSource] = useState(initialData?.source || '');
+    const [type, setType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>(initialData?.type || 'dinner');
+    const [prepTime, setPrepTime] = useState(initialData?.prepTime || 30);
+    const [servings, setServings] = useState(initialData?.servings || 4);
     const [diet, setDiet] = useState<string[]>([]);
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [isMix, setIsMix] = useState(initialIsMix);
-    const [instructions, setInstructions] = useState<string[]>(['']);
-    const [image, setImage] = useState('');
+    const [instructions, setInstructions] = useState<string[]>(
+        initialData?.instructions_text 
+            ? initialData.instructions_text.split('\n').filter(i => i.trim())
+            : ['']
+    );
+    const [image, setImage] = useState(initialData?.image || '');
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [isFavorite, setIsFavorite] = useState(true);
     const [step, setStep] = useState(1);
+    const [recipeUrl, setRecipeUrl] = useState('');
+    const [parsingleUrl, setParsingUrl] = useState(false);
+
+    // Process initial ingredients if provided
+    useEffect(() => {
+        if (initialData?.ingredients_text && ingredients.length === 0) {
+            // Parse ingredients text later when builder is ready
+            // For now, we'll let the user manually add them or import from the text
+        }
+    }, [initialData, ingredients.length]);
 
     const instructionsRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);
@@ -58,6 +83,85 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false 
         if (builderRef.current) {
             builderRef.current.handleAddIngredient(item);
             toast.success(`Imported "${item.common_name || item.name}" from Library`);
+        }
+    };
+
+    const handleParseRecipeURL = async () => {
+        if (!recipeUrl.trim()) {
+            toast.error('Please enter a recipe URL');
+            return;
+        }
+
+        setParsingUrl(true);
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            const userId = user?.id || 'anonymous';
+
+            // Call n8n webhook to parse recipe
+            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: recipeUrl,
+                    userId: userId,
+                    contentType: 'recipe-url'
+                })
+            });
+
+            if (!response.ok) throw new Error(`Parse error: ${response.status}`);
+            const data = await response.json();
+
+            if (data.recipe) {
+                // Populate form with parsed data
+                setTitle(data.recipe.title || '');
+                setSource(recipeUrl);
+                setPrepTime(data.recipe.prep_time || 30);
+                setServings(data.recipe.servings || 4);
+                setInstructions(
+                    (data.recipe.instructions_text || '')
+                        .split('\n')
+                        .filter((i: string) => i.trim())
+                        .filter((i: string) => i) || ['']
+                );
+
+                // Download and upload recipe image if available
+                if (data.recipe.image_url) {
+                    setUploading(true);
+                    try {
+                        const uploadedImageUrl = await downloadAndUploadRecipeImage(
+                            data.recipe.image_url,
+                            data.recipe.title || 'Recipe'
+                        );
+                        if (uploadedImageUrl) {
+                            setImage(uploadedImageUrl);
+                            toast.success('Recipe image uploaded!');
+                        } else {
+                            // If download fails, show it as data URL or skip
+                            // Just let the user upload manually
+                            console.log('Could not auto-upload image, user can upload manually');
+                        }
+                    } catch (imgError) {
+                        console.error('Image upload error:', imgError);
+                        // Continue anyway, image is optional
+                    } finally {
+                        setUploading(false);
+                    }
+                }
+                
+                setRecipeUrl('');
+                toast.success('Recipe parsed! Fill in the remaining details and ingredients.');
+                setStep(2);
+                setTimeout(() => {
+                    instructionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            } else {
+                toast.error('Could not parse recipe from URL. Try pasting the recipe text directly.');
+            }
+        } catch (error) {
+            console.error('Recipe URL parsing error:', error);
+            toast.error('Failed to parse recipe URL. Please try again.');
+        } finally {
+            setParsingUrl(false);
         }
     };
 
@@ -187,6 +291,36 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false 
 
             {/* Form Content */}
             <div className="p-6 space-y-6">
+                {/* Recipe URL Import */}
+                <Card className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40">
+                    <div className="space-y-3">
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+                            <Upload size={12} /> Import from Recipe URL
+                        </h3>
+                        <div className="flex gap-2">
+                            <Input
+                                type="url"
+                                value={recipeUrl}
+                                onChange={(e) => setRecipeUrl(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleParseRecipeURL()}
+                                placeholder="Paste recipe URL (AllRecipes, BBC Food, etc)..."
+                                className="text-xs bg-white dark:bg-slate-950 border-emerald-200 dark:border-emerald-800/40 focus:border-emerald-400"
+                                disabled={parsingleUrl}
+                            />
+                            <Button
+                                onClick={handleParseRecipeURL}
+                                disabled={!recipeUrl.trim() || parsingleUrl}
+                                className="whitespace-nowrap bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest h-10 rounded-lg"
+                            >
+                                {parsingleUrl ? <Loader2 size={14} className="animate-spin" /> : 'Parse'}
+                            </Button>
+                        </div>
+                        <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-medium">
+                            Or manually enter ingredients and instructions below
+                        </p>
+                    </div>
+                </Card>
+
                 {/* Library Search */}
                 <LibraryHeroSearch
                     onSelect={handleImportSelect}

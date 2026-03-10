@@ -18,9 +18,20 @@ import { ChatbotProvider, useChatbot } from '@/lib/context/chatbot-context';
 import { supabase } from '@/lib/supabase';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { ChatbotModal } from '@/components/chatbot-modal';
+import { RecipeURLHandler } from '@/components/recipe/recipe-url-handler';
 import { Footer } from '@/components/footer';
 import { DashboardNav } from '@/components/dashboard-nav';
 import { RDADrawer } from '@/components/rda-drawer';
+
+interface ParsedRecipe {
+    title: string;
+    ingredients_text: string;
+    instructions_text: string;
+    servings?: number;
+    prep_time?: number;
+    source_url: string;
+    image_url?: string;
+}
 
 function DashboardLayoutContent({
     children,
@@ -34,6 +45,8 @@ function DashboardLayoutContent({
     const { isChatbotOpen, setIsChatbotOpen } = useChatbot();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [recipeEditorOpen, setRecipeEditorOpen] = useState(false);
+    const [detectedRecipe, setDetectedRecipe] = useState<ParsedRecipe | null>(null);
 
     useEffect(() => {
         const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
@@ -49,6 +62,11 @@ function DashboardLayoutContent({
         };
         getUser();
     }, []);
+
+    const handleRecipeDetected = (recipe: ParsedRecipe) => {
+        setDetectedRecipe(recipe);
+        setRecipeEditorOpen(true);
+    };
 
 
     return (
@@ -105,7 +123,26 @@ function DashboardLayoutContent({
             <RDADrawer />
 
             {/* Chatbot Modal - rendered at top level outside stacking context */}
-            {isChatbotOpen && <ChatbotModal onClose={() => setIsChatbotOpen(false)} />}
+            {isChatbotOpen && (
+                <ChatbotModal 
+                    onClose={() => setIsChatbotOpen(false)}
+                    onRecipeDetected={handleRecipeDetected}
+                />
+            )}
+
+            {/* Recipe Editor Modal for URL-parsed recipes */}
+            <RecipeURLHandler
+                isOpen={recipeEditorOpen}
+                recipe={detectedRecipe}
+                onClose={() => {
+                    setRecipeEditorOpen(false);
+                    setDetectedRecipe(null);
+                }}
+                onSave={() => {
+                    setRecipeEditorOpen(false);
+                    setDetectedRecipe(null);
+                }}
+            />
         </div>
     );
 }
