@@ -238,7 +238,7 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                 </div>
 
                 {/* Input */}
-                <div className="flex gap-2 p-4 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                <div className="flex gap-2 p-4 pb-6 border-t border-slate-200 dark:border-slate-800 shrink-0">
                     <input
                         type="text"
                         value={input}
