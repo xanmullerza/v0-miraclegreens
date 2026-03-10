@@ -33,6 +33,30 @@
                 "conditions": [
                   {
                     "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "recipe-url",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c8f9e7d1-a9b2-4c3d-b5e6-f7g8h9i0j1k2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "recipe-url"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body?.contentType}}",
                     "rightValue": "audio",
                     "operator": {
                       "type": "string",
@@ -342,6 +366,63 @@
       "id": "132a6f19-e1fd-4544-9c71-b06a70533b73",
       "name": "Process Image",
       "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "{{ $json.body.message }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (compatible; VitalaGreens/1.0)"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -640,
+        -192
+      ],
+      "id": "a7b1c2d3-e4f5-4a5b-9c6d-7e8f9a0b1c2d",
+      "name": "Fetch Recipe Page"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = items[0].json.body;\n\n// Try to extract JSON-LD recipe data\nconst jsonLdMatch = html.match(/<script type=\"application\\/ld\\+json\">[\\s\\S]*?<\\/script>/i);\nlet recipeData = null;\n\nif (jsonLdMatch) {\n  try {\n    const jsonLdText = jsonLdMatch[0].replace(/<script[^>]*>|<\\/script>/g, '');\n    const jsonLd = JSON.parse(jsonLdText);\n    // Handle both direct Recipe objects and arrays\n    const recipe = Array.isArray(jsonLd) ? jsonLd.find(item => item['@type'] === 'Recipe') : jsonLd;\n    \n    if (recipe) {\n      recipeData = {\n        title: recipe.name || 'Untitled Recipe',\n        ingredients_text: recipe.recipeIngredient?.join('\\n') || '',\n        instructions_text: recipe.recipeInstructions?.[0]?.text || \n                          (Array.isArray(recipe.recipeInstructions) \n                            ? recipe.recipeInstructions.map(i => i.text || i).join('\\n') \n                            : recipe.recipeInstructions || ''),\n        servings: recipe.recipeYield?.replace(/\\D/g, '') || 4,\n        prep_time: recipe.prepTime?.match(/\\d+/)?.[0] || recipe.cookTime?.match(/\\d+/)?.[0] || 30,\n        image_url: recipe.image?.url || recipe.image?.[0]?.url || recipe.image || undefined,\n        source_url: $('Webhook').item.json.body.message\n      };\n    }\n  } catch (error) {\n    console.error('JSON-LD parsing error:', error);\n  }\n}\n\n// Fallback: Simple regex parsing if JSON-LD not found\nif (!recipeData) {\n  try {\n    // Extract from common HTML patterns\n    const titleMatch = html.match(/<h1[^>]*>([^<]+)<\\/h1>/i);\n    const ingredientsMatch = html.match(/<(ul|ol)[^>]*class=\"ingredients\"[^>]*>[\\s\\S]*?<\\/(ul|ol)>/i);\n    const instructionsMatch = html.match(/<(ul|ol)[^>]*class=\"instructions\"[^>]*>[\\s\\S]*?<\\/(ul|ol)>/i);\n    const imageMatch = html.match(/<img[^>]*src=\"([^\"]*)\"[^>]*alt=\"recipe\"/i) || \n                       html.match(/<img[^>]*src=\"([^\"]*)recip[^\"]*\"[^>]*>/i);\n    \n    recipeData = {\n      title: titleMatch?.[1]?.trim() || 'Recipe from URL',\n      ingredients_text: ingredientsMatch ? ingredientsMatch[2].replace(/<[^>]*>/g, '').split('</li>').join('\\n') : '',\n      instructions_text: instructionsMatch ? instructionsMatch[2].replace(/<[^>]*>/g, '').split('</li>').join('\\n') : '',\n      servings: 4,\n      prep_time: 30,\n      image_url: imageMatch?.[1],\n      source_url: $('Webhook').item.json.body.message\n    };\n  } catch (error) {\n    console.error('Regex parsing error:', error);\n  }\n}\n\nreturn {\n  json: recipeData || { error: 'Could not extract recipe data' }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        -192
+      ],
+      "id": "b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e",
+      "name": "Extract Recipe Metadata"
+    },
+    {
+      "parameters": {
+        "jsCode": "const recipe = items[0].json;\n\nif (!recipe || recipe.error) {\n  return { json: { error: 'Recipe parsing failed' } };\n}\n\n// Clean and normalize the recipe data\nreturn {\n  json: {\n    recipe: {\n      title: recipe.title?.trim() || 'Untitled Recipe',\n      ingredients_text: recipe.ingredients_text?.trim() || '',\n      instructions_text: recipe.instructions_text?.trim() || '',\n      servings: parseInt(recipe.servings) || 4,\n      prep_time: parseInt(recipe.prep_time) || 30,\n      image_url: recipe.image_url,\n      source_url: recipe.source_url\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        -192
+      ],
+      "id": "c5d6e7f8-9a0b-1c2d-3e4f-5a6b7c8d9e0f",
+      "name": "Format Recipe"
     }
   ],
   "pinData": {},
@@ -376,6 +457,13 @@
         [
           {
             "node": "Format Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Recipe Page",
             "type": "main",
             "index": 0
           }
@@ -497,6 +585,39 @@
         [
           {
             "node": "Format Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Recipe Page": {
+      "main": [
+        [
+          {
+            "node": "Extract Recipe Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Recipe Metadata": {
+      "main": [
+        [
+          {
+            "node": "Format Recipe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Recipe": {
+      "main": [
+        [
+          {
+            "node": "Respond",
             "type": "main",
             "index": 0
           }
