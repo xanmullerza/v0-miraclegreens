@@ -140,6 +140,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [recipeLoading, setRecipeLoading] = useState(false);
     const [detectedURL, setDetectedURL] = useState<string | null>(null);
+    const [successRecipe, setSuccessRecipe] = useState<ParsedRecipe | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -249,10 +250,13 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         {
                             id: (Date.now() + 1).toString(),
                             type: 'bot',
-                            content: `✅ Recipe "${recipeData.title}" parsed successfully! Click below to add it to your library.`,
+                            content: `✅ Recipe "${recipeData.title}" parsed successfully! Click the button below to add it to your library.`,
                             timestamp: new Date(),
                         }
                     ]);
+
+                    // Store the recipe for the button
+                    setSuccessRecipe(recipeData);
 
                     // Trigger callback to open recipe editor
                     if (onRecipeDetected) {
@@ -501,6 +505,23 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             </div>
                         </div>
                     )}
+                    
+                    {/* Recipe Success Button */}
+                    {successRecipe && (
+                        <div className="flex gap-2 justify-center my-2">
+                            <button
+                                onClick={() => {
+                                    if (onRecipeDetected) {
+                                        onRecipeDetected(successRecipe);
+                                    }
+                                }}
+                                className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors active:scale-95"
+                            >
+                                <span>✓ Add to Library</span>
+                            </button>
+                        </div>
+                    )}
+                    
                     <div ref={messagesEndRef} />
                 </div>
 
