@@ -104,8 +104,8 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{$json.headers['content-type']}}",
-                    "rightValue": "application/json",
+                    "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "text",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
