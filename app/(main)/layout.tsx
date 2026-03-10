@@ -18,7 +18,7 @@ import { ChatbotProvider, useChatbot } from '@/lib/context/chatbot-context';
 import { supabase } from '@/lib/supabase';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { ChatbotModal } from '@/components/chatbot-modal';
-import { RecipeURLHandler } from '@/components/recipe/recipe-url-handler';
+import { RecipePreview } from '@/components/recipe/recipe-preview';
 import { Footer } from '@/components/footer';
 import { DashboardNav } from '@/components/dashboard-nav';
 import { RDADrawer } from '@/components/rda-drawer';
@@ -130,15 +130,16 @@ function DashboardLayoutContent({
                 />
             )}
 
-            {/* Recipe Editor Modal for URL-parsed recipes */}
-            <RecipeURLHandler
+            {/* Recipe Preview Modal for URL-parsed recipes */}
+            <RecipePreview
                 isOpen={recipeEditorOpen}
                 recipe={detectedRecipe}
                 onClose={() => {
                     setRecipeEditorOpen(false);
                     setDetectedRecipe(null);
                 }}
-                onSave={() => {
+                onSave={(recipe) => {
+                    // TODO: Save recipe to database
                     setRecipeEditorOpen(false);
                     setDetectedRecipe(null);
                 }}
