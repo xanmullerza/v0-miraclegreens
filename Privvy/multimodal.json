@@ -369,12 +369,53 @@
     },
     {
       "parameters": {
+        "method": "GET",
         "url": "={{ $json.body.message }}",
-        "timeout": 60000,
-        "waitFor": "domcontentloaded"
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br"
+            },
+            {
+              "name": "DNT",
+              "value": "1"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Upgrade-Insecure-Requests",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "text"
+            }
+          }
+        }
       },
-      "type": "@n8n/n8n-nodes-puppeteer.browser",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         -640,
         -192
@@ -385,7 +426,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const response = items[0];\n\n// Browser node returns html directly in json.html or as string in json\nlet html = response.json?.html || response.json?.body || response.json?.content || (typeof response.json === 'string' ? response.json : null);\n\nif (!html) {\n  // Try to get from other possible locations\n  if (response.json && typeof response.json === 'object') {\n    const keys = Object.keys(response.json).sort().join(', ');\n    console.error('No HTML found. Available keys:', keys);\n    return [{ json: { error: 'No HTML content extracted. Keys: ' + keys } }];\n  }\n  return [{ json: { error: 'No HTML content from page' } }];\n}\n\nif (!html || html.length === 0) {\n  return [{ json: { error: 'Empty HTML response' } }];\n}\n\nconsole.log('HTML extracted, length:', html.length);\n\n// Try to extract JSON-LD recipe data\nconst jsonLdMatch = html.match(/<script type=\"application\\/ld\\+json\">[\\s\\S]*?<\\/script>/i);\nlet recipeData = null;\n\nif (jsonLdMatch) {\n  try {\n    const jsonLdText = jsonLdMatch[0].replace(/<script[^>]*>|<\\/script>/g, '');\n    const jsonLd = JSON.parse(jsonLdText);\n    // Handle both direct Recipe objects and arrays\n    const recipe = Array.isArray(jsonLd) ? jsonLd.find(item => item['@type'] === 'Recipe') : (jsonLd['@type'] === 'Recipe' ? jsonLd : null);\n    \n    if (recipe) {\n      recipeData = {\n        title: recipe.name || 'Untitled Recipe',\n        ingredients_text: recipe.recipeIngredient?.join('\\n') || '',\n        instructions_text: recipe.recipeInstructions?.[0]?.text || \n                          (Array.isArray(recipe.recipeInstructions) \n                            ? recipe.recipeInstructions.map(i => i.text || i).join('\\n') \n                            : recipe.recipeInstructions || ''),\n        servings: recipe.recipeYield?.replace(/\\D/g, '') || 4,\n        prep_time: recipe.prepTime?.match(/\\d+/)?.[0] || recipe.cookTime?.match(/\\d+/)?.[0] || 30,\n        image_url: recipe.image?.url || recipe.image?.[0]?.url || recipe.image || undefined,\n        source_url: $('Webhook').item.json.body.message\n      };\n      console.log('✓ Successfully extracted JSON-LD recipe data');\n    } else {\n      console.log('No Recipe type found in JSON-LD');\n    }\n  } catch (error) {\n    console.error('JSON-LD parsing error:', error.message);\n  }\n}\n\n// Fallback: Simple regex parsing if JSON-LD not found\nif (!recipeData) {\n  try {\n    // Extract from common HTML patterns\n    const titleMatch = html.match(/<h1[^>]*>([^<]+)<\\/h1>/i);\n    const ingredientsMatch = html.match(/<(ul|ol)[^>]*class=\"ingredients\"[^>]*>[\\s\\S]*?<\\/(ul|ol)>/i);\n    const instructionsMatch = html.match(/<(ul|ol)[^>]*class=\"instructions\"[^>]*>[\\s\\S]*?<\\/(ul|ol)>/i);\n    const imageMatch = html.match(/<img[^>]*src=\"([^\"]*)\"[^>]*alt=\"recipe\"/i) || \n                       html.match(/<img[^>]*src=\"([^\"]*)recip[^\"]*\"[^>]*>/i);\n    \n    recipeData = {\n      title: titleMatch?.[1]?.trim() || 'Recipe from URL',\n      ingredients_text: ingredientsMatch ? ingredientsMatch[0].replace(/<[^>]*>/g, '').split('</li>').join('\\n') : '',\n      instructions_text: instructionsMatch ? instructionsMatch[0].replace(/<[^>]*>/g, '').split('</li>').join('\\n') : '',\n      servings: 4,\n      prep_time: 30,\n      image_url: imageMatch?.[1],\n      source_url: $('Webhook').item.json.body.message\n    };\n    console.log('✓ Used fallback regex parsing');\n  } catch (error) {\n    console.error('Regex parsing error:', error.message);\n    return [{ json: { error: 'Could not parse recipe from URL' } }];\n  }\n}\n\nreturn [{\n  json: recipeData || { error: 'Could not extract recipe data' }\n}];"
+        "jsCode": "const response = items[0].json;\n\n// HTTP request returns the HTML directly as a string in the response\nlet html = response;\n\nif (!html || typeof html !== 'string') {\n  console.error('Invalid response format:', typeof response);\n  return [{ json: { error: 'No HTML content from page' } }];\n}\n\nif (html.length === 0) {\n  return [{ json: { error: 'Empty HTML response' } }];\n}\n\nconsole.log('✓ HTML fetched, length:', html.length);\n\n// Try to extract JSON-LD recipe data\nconst jsonLdMatch = html.match(/<script type=\"application\\/ld\\+json\">[\\s\\S]*?<\\/script>/i);\nlet recipeData = null;\n\nif (jsonLdMatch) {\n  try {\n    const jsonLdText = jsonLdMatch[0].replace(/<script[^>]*>|<\\/script>/g, '');\n    const jsonLd = JSON.parse(jsonLdText);\n    \n    // Handle both direct Recipe objects and arrays\n    let recipe = null;\n    if (Array.isArray(jsonLd)) {\n      recipe = jsonLd.find(item => item['@type'] === 'Recipe');\n    } else if (jsonLd['@type'] === 'Recipe') {\n      recipe = jsonLd;\n    }\n    \n    if (recipe) {\n      recipeData = {\n        title: recipe.name || 'Untitled Recipe',\n        ingredients_text: recipe.recipeIngredient?.join('\\n') || '',\n        instructions_text: recipe.recipeInstructions?.[0]?.text || \n                          (Array.isArray(recipe.recipeInstructions) \n                            ? recipe.recipeInstructions.map(i => i.text || i).join('\\n') \n                            : recipe.recipeInstructions || ''),\n        servings: recipe.recipeYield?.toString().replace(/\\D/g, '') || 4,\n        prep_time: recipe.prepTime?.match(/\\d+/)?.[0] || recipe.cookTime?.match(/\\d+/)?.[0] || 30,\n        image_url: recipe.image?.url || recipe.image?.[0]?.url || recipe.image || undefined,\n        source_url: $('Webhook').item.json.body.message\n      };\n      console.log('✓ Successfully extracted JSON-LD recipe data');\n    } else {\n      console.log('No Recipe type found in JSON-LD structure');\n    }\n  } catch (error) {\n    console.error('JSON-LD parsing error:', error.message);\n  }\n}\n\n// Fallback: Simple regex parsing if JSON-LD not found\nif (!recipeData) {\n  try {\n    // Extract from common HTML patterns\n    const titleMatch = html.match(/<h1[^>]*>([^<]+)<\\/h1>/i) || html.match(/<title>([^<]+)<\\/title>/i);\n    const ingredientsMatch = html.match(/<(ul|ol)[^>]*class=\"ingredients\"[^>]*>[\\s\\S]*?<\\/(ul|ol)>/i);\n    const instructionsMatch = html.match(/<(ul|ol)[^>]*class=\"instructions\"[^>]*>[\\s\\S]*?<\\/(ul|ol)>/i);\n    const imageMatch = html.match(/<img[^>]*src=\"([^\"]*)\"[^>]*alt=\"recipe\"/i) || \n                       html.match(/<img[^>]*src=\"([^\"]*)recip[^\"]*\"[^>]*>/i);\n    \n    recipeData = {\n      title: titleMatch?.[1]?.trim() || 'Recipe from URL',\n      ingredients_text: ingredientsMatch ? ingredientsMatch[0].replace(/<[^>]*>/g, '').split('</li>').join('\\n') : '',\n      instructions_text: instructionsMatch ? instructionsMatch[0].replace(/<[^>]*>/g, '').split('</li>').join('\\n') : '',\n      servings: 4,\n      prep_time: 30,\n      image_url: imageMatch?.[1],\n      source_url: $('Webhook').item.json.body.message\n    };\n    console.log('✓ Used fallback regex parsing');\n  } catch (error) {\n    console.error('Regex parsing error:', error.message);\n    return [{ json: { error: 'Could not parse recipe from URL' } }];\n  }\n}\n\nreturn [{\n  json: recipeData || { error: 'Could not extract recipe data' }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
