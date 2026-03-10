@@ -250,7 +250,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         {
                             id: (Date.now() + 1).toString(),
                             type: 'bot',
-                            content: `✅ Recipe "${recipeData.title}" parsed successfully! Click the button below to add it to your library.`,
+                            content: `✅ Great! "${recipeData.title}" has been saved to your library! You can now view it in your My Recipes section, edit it, adjust servings, and add more ingredients whenever you'd like.`,
                             timestamp: new Date(),
                         }
                     ]);
@@ -517,7 +517,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                 }}
                                 className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors active:scale-95"
                             >
-                                <span>✓ Add to Library</span>
+                                <span>✓ View Recipe</span>
                             </button>
                         </div>
                     )}
