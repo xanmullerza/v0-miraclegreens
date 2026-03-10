@@ -80,6 +80,8 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
             let botResponse = '';
             if (typeof data === 'string') {
                 botResponse = data;
+            } else if (data.output) {
+                botResponse = data.output;
             } else if (data.response) {
                 botResponse = data.response;
             } else if (data.content) {
