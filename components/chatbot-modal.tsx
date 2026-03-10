@@ -196,16 +196,39 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
                 }
 
-                const data = await response.json();
+                // Handle empty responses
+                const responseText = await response.text();
+                if (!responseText) {
+                    throw new Error('Empty response from recipe parser');
+                }
 
-                // Parse response - expect { title, ingredients_text, instructions_text, servings, prep_time, source_url, image_url }
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error. Response was:', responseText);
+                    throw new Error('Invalid response format from recipe parser');
+                }
+
+                // Parse response - expect { recipe: { title, ingredients_text, instructions_text, servings, prep_time, source_url, image_url } }
                 let recipeData: ParsedRecipe | null = null;
+
+                // Check if n8n returned an error
+                if (data.error) {
+                    throw new Error(`Recipe parsing failed: ${data.error}`);
+                }
 
                 if (data.recipe || data.data) {
                     const recipe = data.recipe || data.data;
+                    
+                    // Validate we have at least a title
+                    if (!recipe.title) {
+                        throw new Error('Recipe parsing returned incomplete data (missing title)');
+                    }
+                    
                     recipeData = {
                         title: recipe.title || 'Untitled Recipe',
                         ingredients_text: recipe.ingredients_text || recipe.ingredients || '',
@@ -215,6 +238,8 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         source_url: detectedUrl,
                         image_url: recipe.image_url || recipe.image || undefined,
                     };
+                } else if (!data.recipe && !data.data) {
+                    throw new Error('Unexpected response format from recipe parser');
                 }
 
                 if (recipeData) {
@@ -246,12 +271,13 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 }
             } catch (error) {
                 console.error('Error parsing recipe URL:', error);
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 setMessages(prev => [
                     ...prev.slice(0, -1),
                     {
                         id: (Date.now() + 1).toString(),
                         type: 'bot',
-                        content: '❌ Sorry, I encountered an error parsing that recipe URL. Please try again or paste the recipe text directly.',
+                        content: `❌ Sorry, I encountered an error parsing that recipe URL: ${errorMessage}\n\nPlease try again or paste the recipe text directly.`,
                         timestamp: new Date(),
                     }
                 ]);

@@ -46,6 +46,10 @@
         "/^powershell -Command \"Get-Content 'Privvy/multimodal\\.json' \\| ConvertFrom-Json \\| Out-Null; Write-Host '✓ JSON is valid and properly formatted'\"$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^Get-Content 'Privvy/multimodal\\.json' \\| ConvertFrom-Json \\| Out-Null; Write-Host '✓ JSON is valid'$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }
