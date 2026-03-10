@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Loader2, Upload } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 
@@ -128,6 +129,7 @@ function getDomainFromURL(url: string): string {
 }
 
 export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
+    const router = useRouter();
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -151,6 +153,43 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    const handleViewSavedRecipe = async () => {
+        if (!successRecipe) return;
+
+        try {
+            // Get current user
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user?.id) return;
+
+            // Find the saved recipe by source_url and user_id
+            const { data: recipe, error } = await supabase
+                .from('recipes')
+                .select('id')
+                .eq('source_url', successRecipe.source_url)
+                .eq('user_id', user.id)
+                .eq('is_curated', false)
+                .single();
+
+            if (error || !recipe) {
+                console.error('Recipe not found:', error);
+                // Fallback to modal if recipe not found
+                if (onRecipeDetected) {
+                    onRecipeDetected(successRecipe);
+                }
+                return;
+            }
+
+            // Navigate directly to recipe detail page
+            router.push(`/dashboard/library/my-recipes/${recipe.id}`);
+        } catch (error) {
+            console.error('Error navigating to recipe:', error);
+            // Fallback to modal on error
+            if (onRecipeDetected) {
+                onRecipeDetected(successRecipe);
+            }
+        }
+    };
 
     const handleSend = async () => {
         if (!input.trim()) return;
@@ -510,11 +549,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     {successRecipe && (
                         <div className="flex gap-2 justify-center my-2">
                             <button
-                                onClick={() => {
-                                    if (onRecipeDetected) {
-                                        onRecipeDetected(successRecipe);
-                                    }
-                                }}
+                                onClick={handleViewSavedRecipe}
                                 className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors active:scale-95"
                             >
                                 <span>✓ View Recipe</span>
