@@ -41,17 +41,38 @@ function FormattedText({ content }: { content: string }) {
             {lines.map((line, idx) => {
                 // Handle numbered lists
                 if (/^\d+\.\s/.test(line)) {
-                    const match = line.match(/^\d+\.\s(.+)$/);
-                    return (
-                        <div key={idx} className="flex gap-2 ml-2">
-                            <span className="flex-shrink-0 font-bold text-emerald-600 dark:text-emerald-400">
-                                {line.match(/^\d+\./)?.[0]}
-                            </span>
-                            <span>
-                                {renderBoldText(match?.[1] || '')}
-                            </span>
-                        </div>
-                    );
+                    const match = line.match(/^\d+\.\s(.+?):\s(.+)$/);
+                    if (match) {
+                        const number = line.match(/^\d+\./)?.[0];
+                        const heading = match[1];
+                        const rest = match[2];
+                        const capitalizedRest = rest.charAt(0).toUpperCase() + rest.slice(1);
+                        
+                        return (
+                            <div key={idx} className="flex gap-2 ml-2">
+                                <span className="flex-shrink-0 font-bold text-emerald-600 dark:text-emerald-400">
+                                    {number}
+                                </span>
+                                <span>
+                                    <strong className="font-bold text-emerald-600 dark:text-emerald-400">
+                                        {heading}
+                                    </strong>
+                                    <strong className="font-bold text-emerald-600 dark:text-emerald-400">:</strong>
+                                    {' '}{renderBoldText(capitalizedRest)}
+                                </span>
+                            </div>
+                        );
+                    } else {
+                        const text = line.replace(/^\d+\.\s/, '');
+                        return (
+                            <div key={idx} className="flex gap-2 ml-2">
+                                <span className="flex-shrink-0 font-bold text-emerald-600 dark:text-emerald-400">
+                                    {line.match(/^\d+\./)?.[0]}
+                                </span>
+                                <span>{renderBoldText(text)}</span>
+                            </div>
+                        );
+                    }
                 }
                 
                 // Handle bullet points
