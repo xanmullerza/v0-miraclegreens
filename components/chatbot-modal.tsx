@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2 } from 'lucide-react';
+import { X, Send, Loader2, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 
@@ -111,6 +111,7 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -196,6 +197,86 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
         }
     };
 
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Add user message showing file was uploaded
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            type: 'user',
+            content: `📷 Uploaded image: ${file.name}`,
+            timestamp: new Date(),
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setIsLoading(true);
+
+        try {
+            // Get current user
+            const { data: { user } } = await supabase.auth.getUser();
+            const userId = user?.id || 'anonymous';
+
+            // Create FormData with file
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('message', `Analyze this image: ${file.name}`);
+            formData.append('userId', userId);
+            formData.append('contentType', 'image');
+
+            // Call n8n webhook
+            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // Extract bot response
+            let botResponse = '';
+            if (typeof data === 'string') {
+                botResponse = data;
+            } else if (data.output) {
+                botResponse = data.output;
+            } else if (data.response) {
+                botResponse = data.response;
+            } else if (data.content) {
+                botResponse = data.content;
+            } else if (data.message) {
+                botResponse = data.message;
+            } else {
+                botResponse = JSON.stringify(data);
+            }
+
+            const botMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: botResponse,
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, botMessage]);
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: 'Sorry, I encountered an error analyzing the image. Please try again.',
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
+            // Reset file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex pointer-events-none">
             {/* Backdrop - only on mobile */}
@@ -268,6 +349,22 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
                         placeholder="Ask a question..."
                         className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isLoading}
+                    />
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isLoading}
+                        className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                        title="Upload image"
+                    >
+                        <Upload size={16} />
+                    </button>
                     <button
                         onClick={handleSend}
                         disabled={!input.trim() || isLoading}
