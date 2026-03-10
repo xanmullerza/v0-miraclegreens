@@ -370,7 +370,7 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "{{ $json.body.message }}",
+        "url": "={{ $json.body.message }}",
         "authentication": "none",
         "sendHeaders": true,
         "headerParameters": {
