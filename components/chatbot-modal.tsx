@@ -154,8 +154,9 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         scrollToBottom();
     }, [messages]);
 
-    const handleViewSavedRecipe = async () => {
-        if (!successRecipe) return;
+    const handleViewSavedRecipe = async (recipe?: ParsedRecipe) => {
+        const recipeToView = recipe || successRecipe;
+        if (!recipeToView) return;
 
         try {
             // Get current user
@@ -163,30 +164,30 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             if (!user?.id) return;
 
             // Find the saved recipe by source_url and user_id
-            const { data: recipe, error } = await supabase
+            const { data: savedRecipe, error } = await supabase
                 .from('recipes')
                 .select('id')
-                .eq('source_url', successRecipe.source_url)
+                .eq('source_url', recipeToView.source_url)
                 .eq('user_id', user.id)
                 .eq('is_curated', false)
                 .single();
 
-            if (error || !recipe) {
+            if (error || !savedRecipe) {
                 console.error('Recipe not found:', error);
                 // Fallback to modal if recipe not found
-                if (onRecipeDetected) {
-                    onRecipeDetected(successRecipe);
+                if (onRecipeDetected && !recipe) {
+                    onRecipeDetected(recipeToView);
                 }
                 return;
             }
 
             // Navigate directly to recipe detail page
-            router.push(`/dashboard/library/my-recipes/${recipe.id}`);
+            router.push(`/dashboard/library/my-recipes/${savedRecipe.id}`);
         } catch (error) {
             console.error('Error navigating to recipe:', error);
             // Fallback to modal on error
-            if (onRecipeDetected) {
-                onRecipeDetected(successRecipe);
+            if (onRecipeDetected && !recipe) {
+                onRecipeDetected(recipeToView);
             }
         }
     };
@@ -294,13 +295,9 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         }
                     ]);
 
-                    // Store the recipe for the button
+                    // Store the recipe as fallback and navigate directly to the saved recipe
                     setSuccessRecipe(recipeData);
-
-                    // Trigger callback to open recipe editor
-                    if (onRecipeDetected) {
-                        onRecipeDetected(recipeData);
-                    }
+                    handleViewSavedRecipe(recipeData);
                 } else {
                     setMessages(prev => [
                         ...prev.slice(0, -1),
@@ -549,7 +546,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     {successRecipe && (
                         <div className="flex gap-2 justify-center my-2">
                             <button
-                                onClick={handleViewSavedRecipe}
+                                onClick={() => handleViewSavedRecipe()}
                                 className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors active:scale-95"
                             >
                                 <span>✓ View Recipe</span>
