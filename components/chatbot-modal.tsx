@@ -55,7 +55,7 @@ function FormattedText({ content }: { content: string }) {
                                 </span>
                                 <span>
                                     <strong className="font-bold text-emerald-600 dark:text-emerald-400">
-                                        {heading}
+                                        {renderBoldText(heading)}
                                     </strong>
                                     <strong className="font-bold text-emerald-600 dark:text-emerald-400">:</strong>
                                     {' '}{renderBoldText(capitalizedRest)}
