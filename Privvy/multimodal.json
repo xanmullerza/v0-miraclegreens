@@ -370,13 +370,8 @@
     {
       "parameters": {
         "url": "={{ $json.body.message }}",
-        "options": {
-          "pagination": {
-            "pagination": false
-          },
-          "timeout": 60000,
-          "waitFor": "domcontentloaded"
-        }
+        "timeout": 60000,
+        "waitFor": "domcontentloaded"
       },
       "type": "@n8n/n8n-nodes-puppeteer.browser",
       "typeVersion": 1,
