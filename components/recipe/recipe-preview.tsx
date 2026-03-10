@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { X, ChefHat, Clock, Users, Save, ArrowLeft, Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
+import { toast } from 'sonner';
 
 interface ParsedRecipe {
     title: string;
@@ -23,31 +25,17 @@ interface RecipePreviewProps {
 
 export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreviewProps) {
     const [saving, setSaving] = useState(false);
+    const { saveRecipe, user } = useDataPersistence();
 
     if (!isOpen || !recipe) {
         return null;
     }
 
-    const handleSave = async () => {
-        setSaving(true);
-        try {
-            // Call save callback if provided
-            if (onSave) {
-                onSave(recipe);
-            }
-            // Brief delay to show save feedback
-            await new Promise(resolve => setTimeout(resolve, 500));
-        } finally {
-            setSaving(false);
-            onClose();
-        }
-    };
-
     // Parse ingredients into array
     const ingredientsList = recipe.ingredients_text
         .split('\n')
-        .filter(line => line.trim())
-        .map((line, idx) => ({
+        .filter((line: string) => line.trim())
+        .map((line: string, idx: number) => ({
             id: idx,
             text: line.trim()
         }));
@@ -55,11 +43,69 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
     // Parse instructions into array
     const instructionsList = recipe.instructions_text
         .split('\n')
-        .filter(line => line.trim())
-        .map((line, idx) => ({
+        .filter((line: string) => line.trim())
+        .map((line: string, idx: number) => ({
             id: idx,
             text: line.trim()
         }));
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            // Create recipe data object for saving
+            const recipeData = {
+                title: recipe.title,
+                type: 'dinner', // Default type - can be enhanced later
+                servings: recipe.servings || 4,
+                prep_time: recipe.prep_time || 30,
+                image: recipe.image_url,
+                is_favorite: true,
+                is_mix: false,
+                diet: [],
+                calories: 0, // Will calculate from ingredients later
+                protein: 0,
+                fat: 0,
+                carbs: 0,
+                source: recipe.source_url
+            };
+
+            // Create ingredients with basic structure
+            const ingredientsForSave = ingredientsList.map(ing => ({
+                food_item_name: ing.text,
+                food_item_id: `raw-${ing.id}`,
+                quantity: 1,
+                measure_label: 'item',
+                weight_g: 0,
+                calories: 0,
+                protein: 0,
+                fat: 0,
+                carbs: 0,
+            }));
+
+            // Create instructions with basic structure
+            const instructionsForSave = instructionsList.map(ins => ({
+                step_text: ins.text,
+                step_order: ins.id + 1
+            }));
+
+            // Save the recipe
+            await saveRecipe(recipeData, ingredientsForSave, instructionsForSave);
+
+            toast.success(`Recipe "${recipe.title}" saved to your library!`);
+            
+            // Call save callback if provided
+            if (onSave) {
+                onSave(recipe);
+            }
+            
+            onClose();
+        } catch (error) {
+            console.error('Error saving recipe:', error);
+            toast.error('Failed to save recipe. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
