@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
 
 interface Message {
     id: string;
@@ -20,7 +21,7 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
         {
             id: '1',
             type: 'bot',
-            content: 'Hello! I\'m the Miracle Greens Q&A Assistant. How can I help you today?',
+            content: 'Hello! I\'m Zum, your child-friendly AI assistant. I can help with nutrition questions, recipes, meal planning, and more. What can I help you with?',
             timestamp: new Date(),
         }
     ]);
@@ -51,37 +52,63 @@ export function ChatbotModal({ onClose }: ChatbotModalProps) {
         setInput('');
         setIsLoading(true);
 
-        // Simulate bot response (replace with actual API call later)
-        setTimeout(() => {
+        try {
+            // Get current user
+            const { data: { user } } = await supabase.auth.getUser();
+            const userId = user?.id || 'anonymous';
+
+            // Call n8n webhook
+            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: input,
+                    userId: userId,
+                    contentType: 'text'
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // Extract bot response - handle different response formats
+            let botResponse = '';
+            if (typeof data === 'string') {
+                botResponse = data;
+            } else if (data.response) {
+                botResponse = data.response;
+            } else if (data.content) {
+                botResponse = data.content;
+            } else if (data.message) {
+                botResponse = data.message;
+            } else {
+                botResponse = JSON.stringify(data);
+            }
+
             const botMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 type: 'bot',
-                content: generateBotResponse(input),
+                content: botResponse,
                 timestamp: new Date(),
             };
             setMessages(prev => [...prev, botMessage]);
+        } catch (error) {
+            console.error('Error calling n8n webhook:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: 'Sorry, I encountered an error. Please try again.',
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
             setIsLoading(false);
-        }, 1000);
-    };
-
-    const generateBotResponse = (userInput: string): string => {
-        const responses: Record<string, string> = {
-            nutrition: 'I can help you with nutrition information! Ask me about specific nutrients, foods, or meal recommendations.',
-            'recipe': 'I\'d be happy to help with recipes! You can ask about meal ideas, ingredients, or cooking instructions.',
-            'meal plan': 'I can assist with meal planning. Tell me your dietary preferences and goals, and I\'ll suggest suitable meals.',
-            'health': 'For health-related questions, I can provide nutritional information, but always consult a healthcare professional for medical advice.',
-            'default': 'That\'s a great question! I\'m still learning to answer all types of questions. Can you provide more details?'
-        };
-
-        const lowerInput = userInput.toLowerCase();
-        
-        for (const [key, response] of Object.entries(responses)) {
-            if (key !== 'default' && lowerInput.includes(key)) {
-                return response;
-            }
         }
-
-        return responses['default'];
     };
 
     return (
