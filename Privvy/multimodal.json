@@ -442,6 +442,13 @@
       "main": [
         [
           {
+            "node": "Fetch Recipe Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Process Audio",
             "type": "main",
             "index": 0
@@ -457,13 +464,6 @@
         [
           {
             "node": "Format Text",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fetch Recipe Page",
             "type": "main",
             "index": 0
           }
