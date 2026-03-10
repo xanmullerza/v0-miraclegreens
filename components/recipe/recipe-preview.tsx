@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, ChefHat, Clock, Users, Save, ArrowLeft, Edit2 } from 'lucide-react';
+import { X, ChefHat, Clock, Users, Save, ArrowLeft, Edit2, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { toast } from 'sonner';
@@ -24,7 +25,9 @@ interface RecipePreviewProps {
 }
 
 export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreviewProps) {
+    const router = useRouter();
     const [saving, setSaving] = useState(false);
+    const [savedRecipeId, setSavedRecipeId] = useState<string | null>(null);
     const { saveRecipe, user } = useDataPersistence();
 
     if (!isOpen || !recipe) {
@@ -91,16 +94,17 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
             // Save the recipe
             const result = await saveRecipe(recipeData, ingredientsForSave, instructionsForSave);
 
+            // Extract recipe ID from result or generate one
+            const recipeId = result?.id || `recipe-${Date.now()}`;
+            
             // If we got here, the recipe was saved successfully
-            toast.success(`Recipe "${recipe.title}" saved to your library!`);
+            toast.success('The recipe is now saved to your library!');
+            setSavedRecipeId(recipeId);
             
             // Call save callback if provided
             if (onSave) {
                 onSave(recipe);
             }
-            
-            // Close the dialog
-            onClose();
         } catch (error: any) {
             console.error('Error saving recipe:', error);
             // Show friendly error message
@@ -116,6 +120,13 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
             }
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleViewRecipe = () => {
+        if (savedRecipeId) {
+            onClose();
+            router.push(`/dashboard/library/my-recipes/${savedRecipeId}`);
         }
     };
 
@@ -284,29 +295,49 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
 
                 {/* Footer */}
                 <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 py-4 flex gap-3">
-                    <button
-                        onClick={onClose}
-                        className="flex-1 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="flex-1 px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wider text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                        {saving ? (
-                            <>
-                                <span className="animate-spin">⏳</span>
-                                Saving...
-                            </>
-                        ) : (
-                            <>
-                                <Save size={16} />
-                                Save to Library
-                            </>
-                        )}
-                    </button>
+                    {savedRecipeId ? (
+                        <>
+                            <button
+                                onClick={onClose}
+                                className="flex-1 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={handleViewRecipe}
+                                className="flex-1 px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wider text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                <ArrowRight size={16} />
+                                View Recipe
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button
+                                onClick={onClose}
+                                className="flex-1 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="flex-1 px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wider text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {saving ? (
+                                    <>
+                                        <span className="animate-spin">⏳</span>
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save size={16} />
+                                        Save to Library
+                                    </>
+                                )}
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
