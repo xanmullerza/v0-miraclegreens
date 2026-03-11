@@ -10,6 +10,9 @@ import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { RecipesView } from '@/components/ingredients/recipes-view';
 import { MyRecipesView } from '@/components/ingredients/my-recipes-view';
 import { ChatbotRecipeDetail } from '@/components/chatbot-recipe-detail';
+import { ChatbotShopping } from '@/components/chatbot-shopping';
+import { ChatbotPantry } from '@/components/chatbot-pantry';
+import { ChatbotPlanner } from '@/components/chatbot-planner';
 import { toast } from 'sonner';
 
 interface Message {
@@ -1450,53 +1453,17 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
                 {/* Shopping View */}
                 {!showRecipeBuilder && chatbotView === 'shopping' && (
-                    <div className="flex-1 overflow-y-auto px-4 py-6 flex items-center justify-center">
-                        <div className="text-center space-y-4">
-                            <ShoppingBag size={48} className="text-blue-500 mx-auto" />
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Shopping List</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">Access your complete shopping list from the full app</p>
-                            <button
-                                onClick={() => router.push('/dashboard/meal-o-matic/shopping')}
-                                className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-                            >
-                                Open Shopping
-                            </button>
-                        </div>
-                    </div>
+                    <ChatbotShopping />
                 )}
 
                 {/* Pantry View */}
                 {!showRecipeBuilder && chatbotView === 'pantry' && (
-                    <div className="flex-1 overflow-y-auto px-4 py-6 flex items-center justify-center">
-                        <div className="text-center space-y-4">
-                            <Package size={48} className="text-orange-500 mx-auto" />
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Pantry</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">Manage your pantry items from the full app</p>
-                            <button
-                                onClick={() => router.push('/dashboard/meal-o-matic/pantry')}
-                                className="inline-block px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
-                            >
-                                Open Pantry
-                            </button>
-                        </div>
-                    </div>
+                    <ChatbotPantry />
                 )}
 
                 {/* Planner View */}
                 {!showRecipeBuilder && chatbotView === 'planner' && (
-                    <div className="flex-1 overflow-y-auto px-4 py-6 flex items-center justify-center">
-                        <div className="text-center space-y-4">
-                            <Calendar size={48} className="text-pink-500 mx-auto" />
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Meal Planner</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">Plan your meals from the full app</p>
-                            <button
-                                onClick={() => router.push('/dashboard/meal-o-matic/planner')}
-                                className="inline-block px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium"
-                            >
-                                Open Planner
-                            </button>
-                        </div>
-                    </div>
+                    <ChatbotPlanner />
                 )}
 
                 {/* Input Area - Only shown in chat messages view */}
