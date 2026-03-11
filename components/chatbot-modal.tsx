@@ -203,10 +203,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
-    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail)
-    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail'>(storedState?.chatbotView || 'messages');
+    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail, shopping, pantry, planner)
+    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner'>(storedState?.chatbotView || 'messages');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(storedState?.selectedRecipeId || null);
-    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes'>(storedState?.previousView || 'all-recipes');
+    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner'>(storedState?.previousView || 'all-recipes');
     
     // Recipe builder state
     const [showRecipeBuilder, setShowRecipeBuilder] = useState(storedState?.showRecipeBuilder || false);
@@ -1050,10 +1050,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         )}
                         <div>
                             <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
-                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : 'Q&A Assistant'}
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : 'Q&A Assistant'}
                             </h3>
                             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">
-                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : 'Ask me anything'}
+                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : 'Ask me anything'}
                             </p>
                         </div>
                     </div>
@@ -1448,7 +1448,56 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     <ChatbotRecipeDetail recipeId={selectedRecipeId} onBack={handleBackFromRecipeDetail} />
                 )}
 
+                {/* Shopping View */}
+                {!showRecipeBuilder && chatbotView === 'shopping' && (
+                    <div className="flex-1 overflow-y-auto px-4 py-6 flex items-center justify-center">
+                        <div className="text-center space-y-4">
+                            <ShoppingBag size={48} className="text-blue-500 mx-auto" />
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Shopping List</h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">Access your complete shopping list from the full app</p>
+                            <button
+                                onClick={() => router.push('/dashboard/meal-o-matic/shopping')}
+                                className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                            >
+                                Open Shopping
+                            </button>
+                        </div>
+                    </div>
+                )}
 
+                {/* Pantry View */}
+                {!showRecipeBuilder && chatbotView === 'pantry' && (
+                    <div className="flex-1 overflow-y-auto px-4 py-6 flex items-center justify-center">
+                        <div className="text-center space-y-4">
+                            <Package size={48} className="text-orange-500 mx-auto" />
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Pantry</h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">Manage your pantry items from the full app</p>
+                            <button
+                                onClick={() => router.push('/dashboard/meal-o-matic/pantry')}
+                                className="inline-block px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                            >
+                                Open Pantry
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Planner View */}
+                {!showRecipeBuilder && chatbotView === 'planner' && (
+                    <div className="flex-1 overflow-y-auto px-4 py-6 flex items-center justify-center">
+                        <div className="text-center space-y-4">
+                            <Calendar size={48} className="text-pink-500 mx-auto" />
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Meal Planner</h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">Plan your meals from the full app</p>
+                            <button
+                                onClick={() => router.push('/dashboard/meal-o-matic/planner')}
+                                className="inline-block px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium"
+                            >
+                                Open Planner
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Input Area - Only shown in chat messages view */}
                 {chatbotView === 'messages' && !showRecipeBuilder && !isCreatingRecipe && (
@@ -1523,21 +1572,33 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                 {expandedAppsMenu && (
                                     <div className="mt-2 ml-4 space-y-2 pl-4 border-l-2 border-purple-500">
                                         <button
-                                            onClick={() => router.push('/dashboard/meal-o-matic/shopping')}
+                                            onClick={() => {
+                                                setPreviousView(previousView);
+                                                setChatbotView('shopping');
+                                                setShowQuickActions(false);
+                                            }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
                                             <ShoppingBag size={14} className="text-blue-500" />
                                             Shopping
                                         </button>
                                         <button
-                                            onClick={() => router.push('/dashboard/meal-o-matic/pantry')}
+                                            onClick={() => {
+                                                setPreviousView(previousView);
+                                                setChatbotView('pantry');
+                                                setShowQuickActions(false);
+                                            }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
                                             <Package size={14} className="text-orange-500" />
                                             Pantry
                                         </button>
                                         <button
-                                            onClick={() => router.push('/dashboard/meal-o-matic/planner')}
+                                            onClick={() => {
+                                                setPreviousView(previousView);
+                                                setChatbotView('planner');
+                                                setShowQuickActions(false);
+                                            }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
                                             <Calendar size={14} className="text-pink-500" />
