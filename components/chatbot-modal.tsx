@@ -1189,14 +1189,14 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
                 {/* All Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'all-recipes' && (
-                    <div className="flex-1 overflow-hidden">
+                    <div className="flex-1 overflow-y-auto">
                         <RecipesView />
                     </div>
                 )}
 
                 {/* My Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'my-recipes' && (
-                    <div className="flex-1 overflow-hidden">
+                    <div className="flex-1 overflow-y-auto">
                         <MyRecipesView />
                     </div>
                 )}
