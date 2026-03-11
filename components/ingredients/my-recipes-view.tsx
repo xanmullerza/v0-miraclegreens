@@ -42,9 +42,10 @@ export const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 
 interface MyRecipesViewProps {
     onRecipeClick?: (recipeId: string) => void;
+    hideControls?: boolean;
 }
 
-export function MyRecipesView({ onRecipeClick }: MyRecipesViewProps = {}) {
+export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipesViewProps = {}) {
     const router = useRouter();
     const PAGE_SIZE = 20;
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -171,6 +172,7 @@ export function MyRecipesView({ onRecipeClick }: MyRecipesViewProps = {}) {
             {/* List Container */}
             <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
                 {/* Controls Row */}
+                {!hideControls && (
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     {/* Filter Controls */}
                     <div className="flex items-center gap-2 w-full md:w-auto">
@@ -344,6 +346,7 @@ export function MyRecipesView({ onRecipeClick }: MyRecipesViewProps = {}) {
                         Add Recipe
                     </Button>
                 </div>
+                )}
 
                 {/* Content Area */}
                 <div className="p-4 md:p-6">

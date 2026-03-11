@@ -1242,15 +1242,21 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
                 {/* All Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'all-recipes' && (
-                    <div className="flex-1 overflow-y-auto">
-                        <RecipesView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'all-recipes')} />
+                    <div className="flex-1 overflow-y-auto px-2">
+                        <RecipesView 
+                            onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'all-recipes')}
+                            hideControls={true}
+                        />
                     </div>
                 )}
 
                 {/* My Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'my-recipes' && (
-                    <div className="flex-1 overflow-y-auto">
-                        <MyRecipesView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'my-recipes')} />
+                    <div className="flex-1 overflow-y-auto px-2">
+                        <MyRecipesView 
+                            onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'my-recipes')}
+                            hideControls={true}
+                        />
                     </div>
                 )}
 
