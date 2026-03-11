@@ -1132,9 +1132,33 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             {/* Option 2: Paste Content */}
                             <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-500/30">
                                 <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">📋 Option 2: Paste Recipe Text</h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400">
+                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                                     Copy-paste recipe instructions and we&apos;ll parse the ingredients automatically.
                                 </p>
+                                <textarea
+                                    ref={recipeContentRef}
+                                    value={pastedRecipeContent}
+                                    onChange={(e) => setPastedRecipeContent(e.target.value)}
+                                    placeholder="Paste recipe content here..."
+                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-3"
+                                    rows={4}
+                                />
+                                <button
+                                    onClick={handlePasteRecipeContent}
+                                    disabled={!pastedRecipeContent.trim() || isLoading}
+                                    className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" />
+                                            Parsing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>✓ Parse & Review</span>
+                                        </>
+                                    )}
+                                </button>
                             </div>
 
                             {/* Option 3: URL (existing) */}
