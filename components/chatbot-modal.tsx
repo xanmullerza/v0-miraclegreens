@@ -596,6 +596,31 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setSelectedRecipeId(null);
     };
 
+    const resetChatbotState = () => {
+        // Reset all state to initial values
+        setMessages(INITIAL_MESSAGES);
+        setInput('');
+        setIsLoading(false);
+        setDetectedURL(null);
+        setSuccessRecipe(null);
+        setShowQuickActions(false);
+        setExpandedRecipeMenu(false);
+        setIsCreatingRecipe(false);
+        setPastedRecipeContent('');
+        setpastedRecipeURL('');
+        setChatbotView('messages');
+        setSelectedRecipeId(null);
+        setPreviousView('all-recipes');
+        setShowRecipeBuilder(false);
+        
+        // Clear localStorage
+        clearChatbotState();
+    };
+
+    const handleBackToMessages = () => {
+        resetChatbotState();
+    };
+
     const handleCreateNewRecipe = () => {
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
@@ -1013,7 +1038,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                     } else if (chatbotView === 'recipe-detail') {
                                         handleBackFromRecipeDetail();
                                     } else {
-                                        setChatbotView('messages');
+                                        handleBackToMessages();
                                     }
                                 }}
                                 className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
