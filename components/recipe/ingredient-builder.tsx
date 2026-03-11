@@ -1395,178 +1395,87 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
 
             {
                 ingredients.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         {ingredients.map((ing, index) => (
-                            <div key={index} className="relative group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                            <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group">
+                                {/* Delete Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveIngredient(index)}
+                                    className="shrink-0 w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all"
+                                    title="Delete Ingredient"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                                    {/* Left Section: Identity & Quick Macros */}
-                                    <div className="lg:col-span-4 space-y-4">
-                                        <div className="flex items-center gap-4 group/name">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveIngredient(index)}
-                                                className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all shadow-sm border border-rose-500/20 shrink-0"
-                                                title="Delete Ingredient"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                            <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-                                                {ing.image ? (
-                                                    <img src={ing.image} alt="" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <Utensils size={20} className="text-slate-400 opacity-40 shadow-inner" />
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    {editingNameIndex === index ? (
-                                                        <input
-                                                            type="text"
-                                                            value={ing.food_item_name}
-                                                            onChange={(e) => handleUpdateName(index, e.target.value)}
-                                                            onBlur={() => setEditingNameIndex(null)}
-                                                            onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
-                                                            autoFocus
-                                                            className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-lg w-full outline-none"
-                                                        />
-                                                    ) : (
-                                                        <>
-                                                            <h4 className="font-black text-slate-900 dark:text-white truncate text-lg">{ing.food_item_name}</h4>
-                                                            <button
-                                                                onClick={() => setEditingNameIndex(index)}
-                                                                className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-emerald-500"
-                                                                title="Edit Name"
-                                                            >
-                                                                <Pencil size={12} />
-                                                            </button>
-                                                            {isSpice(ing.food_item_name) && ing.food_item_id && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        sessionStorage.setItem('moringa_spice_lab_pending', JSON.stringify(ingredients));
-                                                                        const returnUrl = encodeURIComponent(pathname);
-                                                                        router.push(`/admin/spice-converter?foodId=${ing.food_item_id}&returnTo=${returnUrl}&swapIndex=${index}`);
-                                                                    }}
-                                                                    className="ml-2 flex items-center gap-1.5 px-2 py-1 bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-200 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-sm group/lab"
-                                                                    title="Calibrate in Spice Lab"
-                                                                >
-                                                                    <Beaker size={10} className="group-hover/lab:scale-110 transition-transform" />
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest">Lab</span>
-                                                                </button>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
+                                {/* Ingredient Name */}
+                                <div className="flex-1 min-w-0">
+                                    {editingNameIndex === index ? (
+                                        <input
+                                            type="text"
+                                            value={ing.food_item_name}
+                                            onChange={(e) => handleUpdateName(index, e.target.value)}
+                                            onBlur={() => setEditingNameIndex(null)}
+                                            onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
+                                            autoFocus
+                                            className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-sm w-full outline-none"
+                                        />
+                                    ) : (
+                                        <div 
+                                            onClick={() => setEditingNameIndex(index)}
+                                            className="font-bold text-slate-900 dark:text-white truncate text-sm cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                                        >
+                                            {ing.food_item_name}
                                         </div>
-
-                                        <div className="flex flex-wrap gap-2">
-                                            <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                                <Zap size={10} className="fill-current" />
-                                                {useKilojoules ? (ing.energy_kj % 1 === 0 ? ing.energy_kj : ing.energy_kj.toFixed(1)) : (ing.calories % 1 === 0 ? ing.calories : ing.calories.toFixed(1))} {useKilojoules ? 'kJ' : 'kcal'}
-                                            </div>
-                                            <div className="flex gap-1">
-                                                <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">P: {ing.protein % 1 === 0 ? ing.protein : ing.protein.toFixed(2)}g</div>
-                                                <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">F: {ing.fat % 1 === 0 ? ing.fat : ing.fat.toFixed(2)}g</div>
-                                                <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">C: {ing.carbs % 1 === 0 ? ing.carbs : ing.carbs.toFixed(2)}g</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Right Section: Controls */}
-                                    <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Quantity</Label>
-                                            <input
-                                                type="number"
-                                                value={ing.quantity}
-                                                onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                                                className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl text-sm font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                                                min="0"
-                                                step="0.125"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Measure</Label>
-                                            <div className="relative">
-                                                <select
-                                                    value={ing.measure_label}
-                                                    onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                                    className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all appearance-none cursor-pointer"
-                                                >
-                                                    <option value="g">g</option>
-                                                    <option value="kg">kg</option>
-                                                    {(() => {
-                                                        const measures = [...(ing.available_measures || [])];
-                                                        if (isSpice(ing.food_item_name)) {
-                                                            const spiceMeasures = getSpiceMeasures(ing.food_item_name, ing.cooking_state);
-                                                            spiceMeasures.forEach(sm => {
-                                                                if (!measures.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
-                                                                    measures.push(sm);
-                                                                }
-                                                            });
-                                                        }
-                                                        return measures.map(m => (
-                                                            <option key={m.label} value={m.label}>{m.label}</option>
-                                                        ));
-                                                    })()}
-                                                    {/* If current label isn't in available, show it so it's selected */}
-                                                    {ing.measure_label !== 'g' && ing.measure_label !== 'kg' && !ing.available_measures?.some(m => m.label === ing.measure_label) && !isSpice(ing.food_item_name) && (
-                                                        <option value={ing.measure_label}>{ing.measure_label}</option>
-                                                    )}
-                                                </select>
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                                    <ChevronDown size={14} />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">End Result State</Label>
-                                            <div className="relative">
-                                                <select
-                                                    value={ing.cooking_state || 'raw'}
-                                                    onChange={(e) => handleUpdateState(index, e.target.value as CookingState)}
-                                                    className="w-full h-11 px-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-black focus:ring-2 focus:ring-amber-500/20 outline-none transition-all appearance-none cursor-pointer"
-                                                >
-                                                    {Object.entries(COOKING_STATES).filter(([key]) => {
-                                                        const allowed = getSpiceStates(ing.food_item_name);
-                                                        if (allowed) return allowed.includes(key);
-                                                        // Filter out whole/ground/dried for non-spices to keep it clean
-                                                        return !['ground', 'dried', 'whole'].includes(key);
-                                                    }).map(([key, state]) => {
-                                                        let label = state.label;
-                                                        if (key === 'stored') {
-                                                            const name = ing.food_item_name.toLowerCase();
-                                                            const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
-                                                            const source = (ing.source || 'USDA').toUpperCase();
-                                                            label = isCooked ? `Cooked (${source})` : `Raw (${source})`;
-                                                        }
-                                                        return <option key={key} value={key}>{label}</option>
-                                                    })}
-                                                </select>
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-amber-400">
-                                                    <ChevronDown size={14} />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Weight (g)</Label>
-                                            <div className="relative">
-                                                <input
-                                                    type="number"
-                                                    value={ing.weight_g % 1 === 0 ? ing.weight_g : Math.round(ing.weight_g * 10) / 10}
-                                                    onChange={(e) => handleUpdateWeight(index, Number(e.target.value))}
-                                                    step="0.1"
-                                                    className="w-full h-11 pl-4 pr-10 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                                                />
-                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 pointer-events-none">G</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
+
+                                {/* Quantity and Measure */}
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <input
+                                        type="number"
+                                        value={ing.quantity}
+                                        onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
+                                        className="w-14 h-8 px-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                        min="0"
+                                        step="0.125"
+                                    />
+                                    <select
+                                        value={ing.measure_label}
+                                        onChange={(e) => handleUpdateUnit(index, e.target.value)}
+                                        className="w-16 h-8 px-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all appearance-none cursor-pointer"
+                                    >
+                                        <option value="g">g</option>
+                                        <option value="kg">kg</option>
+                                        {(() => {
+                                            const measures = [...(ing.available_measures || [])];
+                                            if (isSpice(ing.food_item_name)) {
+                                                const spiceMeasures = getSpiceMeasures(ing.food_item_name, ing.cooking_state);
+                                                spiceMeasures.forEach(sm => {
+                                                    if (!measures.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
+                                                        measures.push(sm);
+                                                    }
+                                                });
+                                            }
+                                            return measures.map(m => (
+                                                <option key={m.label} value={m.label}>{m.label}</option>
+                                            ));
+                                        })()}
+                                        {ing.measure_label !== 'g' && ing.measure_label !== 'kg' && !ing.available_measures?.some(m => m.label === ing.measure_label) && !isSpice(ing.food_item_name) && (
+                                            <option value={ing.measure_label}>{ing.measure_label}</option>
+                                        )}
+                                    </select>
+                                </div>
+
+                                {/* Add Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPicker(true)}
+                                    className="shrink-0 w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                                    title="Add Ingredient"
+                                >
+                                    <Plus size={14} />
+                                </button>
                             </div>
                         ))}
                         <div className="flex justify-center pt-2">
