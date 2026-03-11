@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,7 @@ interface Recipe {
     diet: string[];
     is_favorite: boolean;
     source?: string;
+    micronutrients?: Record<string, number>;
 }
 
 interface Ingredient {
@@ -47,6 +48,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
+    const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
 
     useEffect(() => {
         fetchRecipeDetails();
@@ -112,6 +114,62 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     };
 
     const totalWeight = ingredients.reduce((sum, ing) => sum + (ing.weight_g || 0), 0);
+
+    // Simplified NutrientGrid for chatbot
+    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string }) => {
+        const themes = {
+            indigo: { text: "text-indigo-400" },
+            rose: { text: "text-rose-400" },
+            orange: { text: "text-orange-400" },
+            emerald: { text: "text-emerald-400" },
+            blue: { text: "text-blue-400" },
+            amber: { text: "text-amber-400" }
+        };
+        const t = (themes as any)[theme] || themes.indigo;
+
+        const micronutrients = recipe?.micronutrients || {};
+
+        const getNutrientValue = (keys: string[]): number => {
+            for (const key of keys) {
+                const lowerKey = key.toLowerCase();
+                for (const [dbKey, value] of Object.entries(micronutrients)) {
+                    if (dbKey.toLowerCase().includes(lowerKey) || lowerKey.includes(dbKey.toLowerCase())) {
+                        return value as number;
+                    }
+                }
+                if (key === 'Energy' || key === 'energy_kcal' || key === 'Calories' || key === 'calories') return recipe?.calories || 0;
+                if (key === 'Protein' || key === 'protein_g' || key === 'protein') return recipe?.protein || 0;
+                if (key === 'Carbohydrates' || key === 'carbs_g' || key === 'carbs') return recipe?.carbs || 0;
+                if (key === 'Fat' || key === 'fat_g' || key === 'fat') return recipe?.fat || 0;
+            }
+            return 0;
+        };
+
+        return (
+            <div className={cn("p-4 pt-3 rounded-2xl border bg-gradient-to-br mb-4 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700")}>
+                <h4 className={cn("font-bold flex items-center gap-2 mb-1 uppercase tracking-wider text-xs", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
+                {subtitle && <p className="text-[9px] text-slate-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">{subtitle}</p>}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {Object.entries(items).map(([label, keys]) => {
+                        const val = getNutrientValue(keys as string[]);
+                        const unitStr = (label === 'Energy') ? 'kcal' :
+                            (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars') ? 'g' :
+                                (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K') ? 'µg' : 'mg';
+
+                        return (
+                            <div key={label} className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                                <p className="text-[9px] font-semibold text-slate-600 dark:text-slate-400 mb-1 truncate">{label}</p>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{val.toFixed(1)}</span>
+                                    <span className="text-[9px] font-semibold text-slate-400">{unitStr}</span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
 
     if (loading) {
         return (
@@ -312,8 +370,113 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 )}
 
                 {activeSection === 'nutrition' && (
-                    <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-                        <p className="text-sm">Nutrition section</p>
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="pb-3">
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
+                                <Activity size={16} />
+                                Nutritional Profile
+                            </h3>
+                            <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Comprehensive analysis of nutrition</p>
+                        </div>
+
+                        <NutrientGrid 
+                            title="Macronutrients" 
+                            icon={Zap} 
+                            theme="orange" 
+                            subtitle="Energy and macro breakdown" 
+                            items={{
+                                'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
+                                'Protein': ['Protein', 'protein_g', 'protein'],
+                                'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
+                                'Fat': ['Fat', 'fat_g', 'fat']
+                            }} 
+                        />
+
+                        <NutrientGrid 
+                            title="Electrolytes" 
+                            icon={Zap} 
+                            theme="indigo" 
+                            subtitle="Essential minerals for hydration" 
+                            items={{
+                                'Sodium': ['Sodium', 'sodium_mg'],
+                                'Potassium': ['Potassium', 'potassium_mg'],
+                                'Magnesium': ['Magnesium', 'magnesium_mg'],
+                                'Calcium': ['Calcium', 'calcium_mg'],
+                                'Phosphorus': ['Phosphorus', 'phosphorus_mg']
+                            }} 
+                        />
+
+                        <NutrientGrid 
+                            title="Trace Minerals" 
+                            icon={Gem} 
+                            theme="rose" 
+                            subtitle="Essential minerals for energy support" 
+                            items={{
+                                'Iron': ['Iron', 'iron_mg'],
+                                'Zinc': ['Zinc', 'zinc_mg'],
+                                'Copper': ['Copper', 'copper_mg'],
+                                'Manganese': ['Manganese', 'manganese_mg'],
+                                'Selenium': ['Selenium', 'selenium_ug']
+                            }} 
+                        />
+
+                        <NutrientGrid 
+                            title="Water-Soluble Vitamins" 
+                            icon={Droplet} 
+                            theme="blue" 
+                            subtitle="Daily vitamins for health" 
+                            items={{
+                                'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                                'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                                'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                                'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                                'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                                'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                'Choline': ['Choline', 'choline_mg']
+                            }} 
+                        />
+
+                        <NutrientGrid 
+                            title="Fat-Soluble Vitamins" 
+                            icon={Battery} 
+                            theme="emerald" 
+                            subtitle="Stored vitamins for long-term vitality" 
+                            items={{
+                                'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                                'Vitamin K': ['Vitamin K', 'vitamin_k_ug']
+                            }} 
+                        />
+
+                        {/* Advanced Nutrition Toggle */}
+                        <button
+                            onClick={() => setShowAdvancedNutrition(prev => !prev)}
+                            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-dashed border-amber-300 dark:border-amber-700/50 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all text-[9px] font-bold uppercase tracking-wider"
+                        >
+                            <Dna size={13} />
+                            {showAdvancedNutrition ? 'Hide' : 'Show'} Advanced Bio-Markers
+                            {showAdvancedNutrition ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                        </button>
+
+                        {showAdvancedNutrition && (
+                            <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <NutrientGrid 
+                                    title="Extra Markers" 
+                                    icon={Activity} 
+                                    theme="amber" 
+                                    subtitle="Additional health markers" 
+                                    items={{
+                                        'Fiber': ['Fiber', 'fiber_g'],
+                                        'Sugars': ['Sugars', 'sugars_g'],
+                                        'Oxalate': ['Oxalate', 'oxalate_mg'],
+                                        'Cholesterol': ['Cholesterol', 'cholesterol_mg']
+                                    }} 
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
 
