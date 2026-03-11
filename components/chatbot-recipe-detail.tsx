@@ -31,6 +31,7 @@ interface Ingredient {
     amount: string;
     base_ingredient: string;
     weight_g: number;
+    food_item_id?: string;
 }
 
 interface Instruction {
@@ -50,6 +51,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
     const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
+    const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
+    const [loadingRelated, setLoadingRelated] = useState(false);
 
     useEffect(() => {
         fetchRecipeDetails();
@@ -131,6 +134,88 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             toast.error('Failed to update favourite status');
         }
     };
+
+    // Fetch related recipes
+    useEffect(() => {
+        const fetchRelated = async () => {
+            if (!ingredients || ingredients.length === 0) return;
+
+            setLoadingRelated(true);
+            try {
+                const foodIds = ingredients
+                    .map(ing => ing.food_item_id)
+                    .filter((id): id is string => !!id);
+
+                if (foodIds.length === 0) {
+                    setRelatedRecipes([]);
+                    return;
+                }
+
+                // Query ingredients table for other recipes using these food items
+                const { data: ingData, error: ingError } = await supabase
+                    .from('ingredients')
+                    .select('recipe_id, food_item_id')
+                    .in('food_item_id', foodIds)
+                    .neq('recipe_id', recipeId)
+                    .limit(50);
+
+                if (ingError) throw ingError;
+
+                // Create a mapping of food_item_id to its names for the current recipe
+                const sharedFoodNames: Record<string, string> = {};
+                ingredients.forEach(ing => {
+                    if (ing.food_item_id) {
+                        sharedFoodNames[ing.food_item_id] = ing.item || ing.base_ingredient || 'Unknown';
+                    }
+                });
+
+                // Count overlaps and track which ingredients are shared
+                const overlapCounts: Record<string, number> = {};
+                const sharedItemsMap: Record<string, string[]> = {};
+
+                ingData.forEach(i => {
+                    overlapCounts[i.recipe_id] = (overlapCounts[i.recipe_id] || 0) + 1;
+                    if (i.food_item_id && sharedFoodNames[i.food_item_id]) {
+                        if (!sharedItemsMap[i.recipe_id]) sharedItemsMap[i.recipe_id] = [];
+                        if (!sharedItemsMap[i.recipe_id].includes(sharedFoodNames[i.food_item_id])) {
+                            sharedItemsMap[i.recipe_id].push(sharedFoodNames[i.food_item_id]);
+                        }
+                    }
+                });
+
+                const recipeIds = Object.keys(overlapCounts);
+
+                if (recipeIds.length === 0) {
+                    setRelatedRecipes([]);
+                    return;
+                }
+
+                const { data: recipeData, error: recipeError } = await supabase
+                    .from('recipes')
+                    .select('id, title, image, type, diet, prep_time, calories')
+                    .in('id', recipeIds);
+
+                if (recipeError) throw recipeError;
+
+                // Sort by overlap count (descending)
+                const sortedRecipes = (recipeData || [])
+                    .map(r => ({
+                        ...r,
+                        overlapMatch: overlapCounts[r.id],
+                        sharedItems: sharedItemsMap[r.id] || []
+                    }))
+                    .sort((a, b) => b.overlapMatch - a.overlapMatch)
+                    .slice(0, 6);
+
+                setRelatedRecipes(sortedRecipes as any);
+            } catch (error) {
+                console.error("Error fetching related recipes:", error);
+            } finally {
+                setLoadingRelated(false);
+            }
+        };
+        fetchRelated();
+    }, [ingredients, recipeId]);
 
     const totalWeight = ingredients.reduce((sum, ing) => sum + (ing.weight_g || 0), 0);
 
@@ -541,8 +626,55 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 )}
 
                 {activeSection === 'related' && (
-                    <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-                        <p className="text-sm">Related recipes</p>
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {(relatedRecipes.length > 0 || loadingRelated) ? (
+                            <div className="space-y-4">
+                                <div className="pb-2">
+                                    <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
+                                        Related Meals
+                                    </h3>
+                                    <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Recipes with shared ingredients</p>
+                                </div>
+
+                                {loadingRelated ? (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {[0, 1, 2, 3].map((i) => (
+                                            <div key={i} className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {relatedRecipes.map((meal) => (
+                                            <a
+                                                key={meal.id}
+                                                href={`/dashboard/library/meals/${meal.id}`}
+                                                className="group relative flex flex-col items-center text-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 transition-all hover:-translate-y-0.5"
+                                            >
+                                                <div className="w-full aspect-square rounded-md overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-300 relative">
+                                                    {meal.image ? (
+                                                        <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
+                                                            <Layers size={16} className="opacity-20" />
+                                                        </div>
+                                                    )}
+
+                                                    <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-emerald-600 text-white rounded text-[7px] font-bold uppercase tracking-wider z-10">
+                                                        {(meal as any).overlapMatch} Shared
+                                                    </div>
+                                                </div>
+
+                                                <h4 className="font-bold text-[8px] uppercase text-slate-900 dark:text-white line-clamp-1 px-1">
+                                                    {meal.title}
+                                                </h4>
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-slate-400 font-semibold py-6 text-center">No related meals found.</p>
+                        )}
                     </div>
                 )}
 
