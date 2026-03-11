@@ -386,9 +386,12 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
                                                 router.push(`/dashboard/library/my-recipes/${recipe.id}`);
                                             }
                                         }}
-                                        className="group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-500 cursor-pointer overflow-hidden hover:border-emerald-400/50 hover:shadow-lg"
+                                        className={cn(
+                                            "group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-500 cursor-pointer overflow-hidden",
+                                            "hover:border-emerald-400/50 hover:shadow-lg"
+                                        )}
                                     >
-                                        <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto_auto] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
+                                        <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
                                             {/* Thumbnail */}
                                             <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
                                                 {recipe.image ? (
@@ -405,64 +408,6 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
                                                 <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize line-clamp-2">
                                                     {recipe.title}
                                                 </h3>
-
-                                                {/* Mobile-only stats row */}
-                                                <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
-                                                    <span className="text-emerald-500">{formatEnergy(recipe.calories, energyUnit)}</span>
-                                                    <span className="text-slate-300 text-[8px]">•</span>
-                                                    <span className="text-amber-500">{recipe.carbs.toFixed(0)}g C</span>
-                                                    <span className="text-slate-300 text-[8px]">•</span>
-                                                    <span className="text-rose-500">{recipe.fat.toFixed(0)}g F</span>
-                                                    <span className="text-slate-300 text-[8px]">•</span>
-                                                    <span className="text-emerald-500">{recipe.protein.toFixed(0)}g P</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Stats (Desktop View) */}
-                                            <div className="hidden lg:flex items-center justify-end gap-3">
-                                                <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{formatEnergy(recipe.calories, energyUnit)}</span>
-                                                <span className="text-slate-300 text-[8px]">•</span>
-                                                <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{recipe.carbs.toFixed(1)}g</span>
-                                                <span className="text-slate-300 text-[8px]">•</span>
-                                                <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{recipe.fat.toFixed(1)}g</span>
-                                                <span className="text-slate-300 text-[8px]">•</span>
-                                                <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{recipe.protein.toFixed(1)}g</span>
-                                            </div>
-
-                                            {/* Actions */}
-                                            <div className="hidden lg:flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        toggleFavorite(recipe);
-                                                    }}
-                                                    className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center justify-center"
-                                                    title={recipe.is_favorite ? "Remove from favorites" : "Add to favorites"}
-                                                >
-                                                    <Heart
-                                                        size={16}
-                                                        className={cn(
-                                                            "transition-all",
-                                                            recipe.is_favorite
-                                                                ? "fill-rose-500 text-rose-500"
-                                                                : "text-slate-400 hover:text-rose-500"
-                                                        )}
-                                                    />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleEdit(e, recipe.id)}
-                                                    className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center justify-center"
-                                                    title="Edit recipe"
-                                                >
-                                                    <Pencil size={14} className="text-slate-400 hover:text-slate-600" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleDelete(e, recipe)}
-                                                    className="w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center"
-                                                    title="Delete recipe"
-                                                >
-                                                    <Trash2 size={14} className="text-slate-400 hover:text-red-600" />
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
