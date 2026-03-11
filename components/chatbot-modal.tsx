@@ -1496,7 +1496,11 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             {/* Recipe Button */}
                             <div>
                                 <button
-                                    onClick={() => setExpandedRecipeMenu(!expandedRecipeMenu)}
+                                    onClick={() => {
+                                        setExpandedWidgetsMenu(false);
+                                        setExpandedAppsMenu(false);
+                                        setExpandedRecipeMenu(!expandedRecipeMenu);
+                                    }}
                                     className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors"
                                 >
                                     <div className="flex items-center gap-3">
@@ -1516,19 +1520,28 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                 {expandedRecipeMenu && (
                                     <div className="mt-2 ml-4 space-y-2 pl-4 border-l-2 border-emerald-500">
                                         <button
-                                            onClick={handleViewAllRecipes}
+                                            onClick={() => {
+                                                handleViewAllRecipes();
+                                                setExpandedRecipeMenu(false);
+                                            }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors"
                                         >
                                             📚 View All Recipes
                                         </button>
                                         <button
-                                            onClick={handleViewMyRecipes}
+                                            onClick={() => {
+                                                handleViewMyRecipes();
+                                                setExpandedRecipeMenu(false);
+                                            }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors"
                                         >
                                             ❤️ View My Recipes
                                         </button>
                                         <button
-                                            onClick={handleCreateNewRecipe}
+                                            onClick={() => {
+                                                handleCreateNewRecipe();
+                                                setExpandedRecipeMenu(false);
+                                            }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors"
                                         >
                                             ➕ Create New Recipe
@@ -1540,7 +1553,11 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             {/* Apps Button */}
                             <div>
                                 <button
-                                    onClick={() => setExpandedAppsMenu(!expandedAppsMenu)}
+                                    onClick={() => {
+                                        setExpandedRecipeMenu(false);
+                                        setExpandedWidgetsMenu(false);
+                                        setExpandedAppsMenu(!expandedAppsMenu);
+                                    }}
                                     className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors"
                                 >
                                     <div className="flex items-center gap-3">
@@ -1564,6 +1581,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                                 setPreviousView(previousView);
                                                 setChatbotView('shopping');
                                                 setShowQuickActions(false);
+                                                setExpandedAppsMenu(false);
                                             }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
@@ -1575,6 +1593,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                                 setPreviousView(previousView);
                                                 setChatbotView('pantry');
                                                 setShowQuickActions(false);
+                                                setExpandedAppsMenu(false);
                                             }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
@@ -1586,6 +1605,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                                 setPreviousView(previousView);
                                                 setChatbotView('planner');
                                                 setShowQuickActions(false);
+                                                setExpandedAppsMenu(false);
                                             }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
@@ -1599,7 +1619,11 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             {/* Widgets Button */}
                             <div>
                                 <button
-                                    onClick={() => setExpandedWidgetsMenu(!expandedWidgetsMenu)}
+                                    onClick={() => {
+                                        setExpandedRecipeMenu(false);
+                                        setExpandedAppsMenu(false);
+                                        setExpandedWidgetsMenu(!expandedWidgetsMenu);
+                                    }}
                                     className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors"
                                 >
                                     <div className="flex items-center gap-3">
@@ -1623,6 +1647,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                                 setPreviousView(previousView);
                                                 setChatbotView('nutridex');
                                                 setShowQuickActions(false);
+                                                setExpandedWidgetsMenu(false);
                                             }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
@@ -1634,6 +1659,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                                 setPreviousView(previousView);
                                                 setChatbotView('comparator');
                                                 setShowQuickActions(false);
+                                                setExpandedWidgetsMenu(false);
                                             }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
@@ -1645,6 +1671,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                                 setPreviousView(previousView);
                                                 setChatbotView('lifeguard');
                                                 setShowQuickActions(false);
+                                                setExpandedWidgetsMenu(false);
                                             }}
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                                         >
