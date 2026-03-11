@@ -13,9 +13,9 @@ import { ChatbotRecipeDetail } from '@/components/chatbot-recipe-detail';
 import { ChatbotShopping } from '@/components/chatbot-shopping';
 import { ChatbotPantry } from '@/components/chatbot-pantry';
 import { ChatbotPlanner } from '@/components/chatbot-planner';
-import { ChatbotNutridex } from '@/components/chatbot-nutridex';
-import { ChatbotComparator } from '@/components/chatbot-comparator';
-import { ChatbotLifeguard } from '@/components/chatbot-lifeguard';
+import { ChatbotNutridexFull } from '@/components/chatbot-nutridex-full';
+import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
+import { ChatbotLifeguardFull } from '@/components/chatbot-lifeguard-full';
 import { toast } from 'sonner';
 
 interface Message {
@@ -1474,17 +1474,17 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
                 {/* Nutridex View */}
                 {!showRecipeBuilder && chatbotView === 'nutridex' && (
-                    <ChatbotNutridex />
+                    <ChatbotNutridexFull />
                 )}
 
                 {/* Comparator View */}
                 {!showRecipeBuilder && chatbotView === 'comparator' && (
-                    <ChatbotComparator />
+                    <ChatbotComparatorFull />
                 )}
 
                 {/* Lifeguard View */}
                 {!showRecipeBuilder && chatbotView === 'lifeguard' && (
-                    <ChatbotLifeguard />
+                    <ChatbotLifeguardFull />
                 )}
 
                 {/* Input Area - Only shown in chat messages view */}
