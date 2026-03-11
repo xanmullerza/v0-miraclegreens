@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense, useImperativeHandle, forwardRef } from '
 import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight, Beaker } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
 import { findSpiceFactor, isSpice, getSpiceMeasures, getSpiceStates } from '@/lib/utils/spice-conversion';
@@ -97,6 +96,12 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
     const [isAdmin, setIsAdmin] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
 
+    // Inline ingredient picker state
+    const [inlineSearchQuery, setInlineSearchQuery] = useState('');
+    const [inlineSearchResults, setInlineSearchResults] = useState<any[]>([]);
+    const [inlineSearchLoading, setInlineSearchLoading] = useState(false);
+    const [inlineSearchView, setInlineSearchView] = useState<'local' | 'usda'>('local');
+
 
     const { energyUnit, setEnergyUnit, nutrientDisplayMode, profile } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
@@ -120,6 +125,39 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
             await handleAddIngredient(foodItem, initialValues);
         }
     }));
+
+    // Inline ingredient search handlers
+    const handleInlineSearch = async (query: string) => {
+        setInlineSearchQuery(query);
+        if (query.length < 2) {
+            setInlineSearchResults([]);
+            return;
+        }
+
+        setInlineSearchLoading(true);
+        try {
+            if (inlineSearchView === 'local') {
+                const results = await searchLocalFood(query);
+                setInlineSearchResults(results);
+            } else {
+                const results = await searchUSDAFood(query);
+                setInlineSearchResults(results);
+            }
+        } catch (err) {
+            console.error("Inline search error:", err);
+            setInlineSearchResults([]);
+        } finally {
+            setInlineSearchLoading(false);
+        }
+    };
+
+    const handleInlineSelectIngredient = async (item: any) => {
+        await handleAddIngredient(item);
+        // Clear search after selection
+        setInlineSearchQuery('');
+        setInlineSearchResults([]);
+        setShowPicker(false);
+    };
 
     useEffect(() => {
         if (initialShowPicker) setShowPicker(true);
@@ -1810,15 +1848,139 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                 )
             }
 
-            {
-                showPicker && (
-                    <FoodItemPicker
-                        onSelect={handleAddIngredient}
-                        onClose={() => setShowPicker(false)}
-                        isAdmin={isAdmin}
-                    />
-                )
-            }
+            {showPicker && (
+                <div className="w-full space-y-3 p-6 bg-gradient-to-b from-emerald-50 to-emerald-50/30 dark:from-slate-800/40 dark:to-slate-800/20 rounded-2xl border-2 border-emerald-200 dark:border-emerald-900/40 animate-in slide-in-from-top-4 duration-300">
+                    {/* Header */}
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="space-y-1">
+                            <h3 className="font-black text-sm uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Search Ingredients</h3>
+                            <p className="text-xs text-emerald-600/60 dark:text-emerald-300/50">Type to find and add items to your recipe</p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                setShowPicker(false);
+                                setInlineSearchQuery('');
+                                setInlineSearchResults([]);
+                            }}
+                            className="p-2 hover:bg-emerald-200 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 rounded-lg transition-colors"
+                        >
+                            <CloseIcon size={18} />
+                        </button>
+                    </div>
+
+                    {/* Search Input */}
+                    <div className="space-y-3">
+                        <input
+                            type="text"
+                            placeholder="Search for ingredients (e.g., chicken, spinach, olive oil)..."
+                            value={inlineSearchQuery}
+                            onChange={(e) => handleInlineSearch(e.target.value)}
+                            autoFocus
+                            className="w-full px-4 py-3 border-2 border-emerald-200 dark:border-emerald-900/50 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-slate-400 transition-all text-sm font-medium"
+                        />
+
+                        {/* View Toggle (for admins) */}
+                        {isAdmin && (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        setInlineSearchView('local');
+                                        handleInlineSearch(inlineSearchQuery);
+                                    }}
+                                    className={`flex-1 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                        inlineSearchView === 'local'
+                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                            : 'bg-emerald-100/50 dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-slate-600'
+                                    }`}
+                                >
+                                    Local Registry
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setInlineSearchView('usda');
+                                        handleInlineSearch(inlineSearchQuery);
+                                    }}
+                                    className={`flex-1 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                        inlineSearchView === 'usda'
+                                            ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
+                                            : 'bg-violet-100/50 dark:bg-slate-700 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-slate-600'
+                                    }`}
+                                >
+                                    USDA Database
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Results */}
+                    <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                        {inlineSearchLoading && (
+                            <div className="flex items-center justify-center py-8 gap-2 text-emerald-600 dark:text-emerald-400">
+                                <Loader2 size={16} className="animate-spin" />
+                                <span className="text-xs font-medium">Searching...</span>
+                            </div>
+                        )}
+
+                        {!inlineSearchLoading && inlineSearchQuery.length < 2 && (
+                            <div className="text-center py-6 text-emerald-600/60 dark:text-emerald-300/50 text-xs font-medium">
+                                Type at least 2 characters to search
+                            </div>
+                        )}
+
+                        {!inlineSearchLoading && inlineSearchQuery.length >= 2 && inlineSearchResults.length === 0 && (
+                            <div className="text-center py-6 text-emerald-600/60 dark:text-emerald-300/50 text-xs font-medium">
+                                No results found for "{inlineSearchQuery}"
+                            </div>
+                        )}
+
+                        {!inlineSearchLoading && inlineSearchResults.length > 0 && (
+                            <div className="space-y-2">
+                                {inlineSearchResults.map((item, idx) => (
+                                    <button
+                                        key={item.id || item.fdcId || idx}
+                                        onClick={() => handleInlineSelectIngredient(item)}
+                                        className="w-full text-left p-3 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900/40 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-all group"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            {item.image ? (
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                                                />
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                                                    <Apple size={14} className="text-slate-400" />
+                                                </div>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-bold text-sm text-slate-900 dark:text-white truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                                                    {item.common_name || item.name}
+                                                </div>
+                                                {item.common_name && (
+                                                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                                                        {item.name}
+                                                    </div>
+                                                )}
+                                                <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex gap-2">
+                                                    <span>{Math.round(item.energy_kcal)} kcal</span>
+                                                    <span>•</span>
+                                                    <span>P: {item.protein_g?.toFixed(1)}g</span>
+                                                    <span>F: {item.fat_g?.toFixed(1)}g</span>
+                                                    <span>C: {item.carbs_g?.toFixed(1)}g</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Plus size={14} />
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* NUTRIENT INFO MODAL */}
             {
