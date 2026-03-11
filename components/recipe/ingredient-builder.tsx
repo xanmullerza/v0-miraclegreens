@@ -1471,25 +1471,13 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                                 <button
                                     type="button"
                                     onClick={() => setShowPicker(true)}
-                                    className="shrink-0 w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                                    className="shrink-0 w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-all"
                                     title="Add Ingredient"
                                 >
                                     <Plus size={14} />
                                 </button>
                             </div>
                         ))}
-                        <div className="flex justify-center pt-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowPicker(true)}
-                                className="group flex items-center justify-center gap-3 px-8 py-4 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 transition-all w-full max-w-md mx-auto mb-6"
-                            >
-                                <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center group-hover:bg-emerald-500/10 transition-colors">
-                                    <Plus className="w-5 h-5" />
-                                </div>
-                                <span className="text-sm font-black uppercase tracking-widest">Add Another Ingredient</span>
-                            </button>
-                        </div>
                     </div>
                 )
             }
