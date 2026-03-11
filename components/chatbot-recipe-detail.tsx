@@ -643,30 +643,31 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-2">
                                         {relatedRecipes.map((meal) => (
                                             <a
                                                 key={meal.id}
                                                 href={`/dashboard/library/meals/${meal.id}`}
-                                                className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 transition-all hover:-translate-y-0.5"
+                                                className="group flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all"
                                             >
-                                                <div className="w-full aspect-square rounded-md overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-300 relative">
+                                                <div className="w-16 h-16 rounded-md overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex-shrink-0">
                                                     {meal.image ? (
                                                         <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
-                                                            <Layers size={16} className="opacity-20" />
+                                                            <Layers size={14} className="opacity-20" />
                                                         </div>
                                                     )}
+                                                </div>
 
-                                                    <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-emerald-600 text-white rounded text-[7px] font-bold uppercase tracking-wider z-10">
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2">
+                                                        {meal.title}
+                                                    </h4>
+                                                    <div className="mt-1 inline-block px-2 py-0.5 bg-emerald-600 text-white rounded text-[8px] font-bold uppercase tracking-wider">
                                                         {(meal as any).overlapMatch} Shared
                                                     </div>
                                                 </div>
-
-                                                <h4 className="font-bold text-[10px] uppercase text-slate-900 dark:text-white line-clamp-2 px-1">
-                                                    {meal.title}
-                                                </h4>
                                             </a>
                                         ))}
                                     </div>
