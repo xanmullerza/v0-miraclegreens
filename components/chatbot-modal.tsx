@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -143,6 +143,8 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [recipeLoading, setRecipeLoading] = useState(false);
     const [detectedURL, setDetectedURL] = useState<string | null>(null);
     const [successRecipe, setSuccessRecipe] = useState<ParsedRecipe | null>(null);
+    const [showQuickActions, setShowQuickActions] = useState(false);
+    const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -482,6 +484,24 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         }
     };
 
+    const handleViewAllRecipes = () => {
+        router.push('/dashboard/library/meals');
+        setShowQuickActions(false);
+        setExpandedRecipeMenu(false);
+    };
+
+    const handleViewMyRecipes = () => {
+        router.push('/dashboard/library/my-recipes');
+        setShowQuickActions(false);
+        setExpandedRecipeMenu(false);
+    };
+
+    const handleCreateNewRecipe = () => {
+        router.push('/dashboard/library/meals?create=true');
+        setShowQuickActions(false);
+        setExpandedRecipeMenu(false);
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex pointer-events-none">
             {/* Backdrop - only on mobile */}
@@ -558,39 +578,98 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 </div>
 
                 {/* Input */}
-                <div className="flex gap-2 p-4 pb-6 border-t border-slate-200 dark:border-slate-800 shrink-0">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                        placeholder="Ask a question or paste a recipe URL..."
-                        className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        disabled={isLoading || recipeLoading}
-                    />
-                    <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isLoading || recipeLoading}
-                        className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                        title="Upload image"
-                    >
-                        <Upload size={16} />
-                    </button>
-                    <button
-                        onClick={handleSend}
-                        disabled={!input.trim() || isLoading || recipeLoading}
-                        className="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                        title="Send"
-                    >
-                        {isLoading || recipeLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                    </button>
+                <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
+                    {/* Quick Actions Drawer */}
+                    {showQuickActions && (
+                        <div className="absolute bottom-full left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 space-y-2 animate-in slide-in-from-bottom-3">
+                            {/* Recipe Button */}
+                            <div>
+                                <button
+                                    onClick={() => setExpandedRecipeMenu(!expandedRecipeMenu)}
+                                    className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Salad size={18} className="text-emerald-500" />
+                                        <span className="font-medium text-sm">Recipes</span>
+                                    </div>
+                                    <ChevronRight 
+                                        size={16} 
+                                        className={cn(
+                                            "transition-transform",
+                                            expandedRecipeMenu ? "rotate-90" : ""
+                                        )}
+                                    />
+                                </button>
+
+                                {/* Recipe Sub-menu */}
+                                {expandedRecipeMenu && (
+                                    <div className="mt-2 ml-4 space-y-2 pl-4 border-l-2 border-emerald-500">
+                                        <button
+                                            onClick={handleViewAllRecipes}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors"
+                                        >
+                                            📚 View All Recipes
+                                        </button>
+                                        <button
+                                            onClick={handleViewMyRecipes}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors"
+                                        >
+                                            ❤️ View My Recipes
+                                        </button>
+                                        <button
+                                            onClick={handleCreateNewRecipe}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors"
+                                        >
+                                            ➕ Create New Recipe
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Input Bar */}
+                    <div className="flex gap-2 p-4 pb-6">
+                        <button
+                            onClick={() => setShowQuickActions(!showQuickActions)}
+                            className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors active:scale-95"
+                            title="Quick actions menu"
+                        >
+                            <Menu size={16} />
+                        </button>
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                            placeholder="Ask a question or paste a recipe URL..."
+                            className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                            disabled={isLoading || recipeLoading}
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isLoading || recipeLoading}
+                            className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                            title="Upload image"
+                        >
+                            <Upload size={16} />
+                        </button>
+                        <button
+                            onClick={handleSend}
+                            disabled={!input.trim() || isLoading || recipeLoading}
+                            className="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                            title="Send"
+                        >
+                            {isLoading || recipeLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
