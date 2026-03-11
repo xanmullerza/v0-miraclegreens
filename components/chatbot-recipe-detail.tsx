@@ -201,25 +201,27 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                     </div>
                 </div>
 
-                {/* Quick Stats */}
-                <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Prep Time</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.prep_time} min</p>
+                {/* Quick Stats - Only show when recipe section is active */}
+                {activeSection === 'recipe' && (
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Prep Time</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.prep_time} min</p>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Servings</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.servings} servings</p>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Weight</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(totalWeight)} g</p>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Type</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">{recipe.type}</p>
+                        </div>
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Servings</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.servings} servings</p>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Weight</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(totalWeight)} g</p>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Type</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">{recipe.type}</p>
-                    </div>
-                </div>
+                )}
 
                 {/* Content Sections */}
                 {activeSection === 'recipe' && (
