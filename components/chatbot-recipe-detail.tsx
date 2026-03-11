@@ -648,7 +648,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             <a
                                                 key={meal.id}
                                                 href={`/dashboard/library/meals/${meal.id}`}
-                                                className="group relative flex flex-col items-center text-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 transition-all hover:-translate-y-0.5"
+                                                className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 transition-all hover:-translate-y-0.5"
                                             >
                                                 <div className="w-full aspect-square rounded-md overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-300 relative">
                                                     {meal.image ? (
@@ -664,7 +664,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     </div>
                                                 </div>
 
-                                                <h4 className="font-bold text-[8px] uppercase text-slate-900 dark:text-white line-clamp-1 px-1">
+                                                <h4 className="font-bold text-[10px] uppercase text-slate-900 dark:text-white line-clamp-2 px-1">
                                                     {meal.title}
                                                 </h4>
                                             </a>
