@@ -145,8 +145,11 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [successRecipe, setSuccessRecipe] = useState<ParsedRecipe | null>(null);
     const [showQuickActions, setShowQuickActions] = useState(false);
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
+    const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
+    const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const recipeContentRef = useRef<HTMLTextAreaElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -497,9 +500,149 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     };
 
     const handleCreateNewRecipe = () => {
-        router.push('/dashboard/library/meals?create=true');
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
+        setIsCreatingRecipe(true);
+        
+        // Show greeting message
+        setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'bot',
+            content: "🎉 Let's get you started with adding more recipes to your growing library! Here are a few ways you can do it:",
+            timestamp: new Date(),
+        }]);
+    };
+
+    const handleManualRecipeCreation = () => {
+        router.push('/dashboard/library/meals?create=true');
+        setIsCreatingRecipe(false);
+    };
+
+    const handlePasteRecipeContent = async () => {
+        if (!pastedRecipeContent.trim()) return;
+
+        setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'user',
+            content: `📝 Pasted recipe content`,
+            timestamp: new Date(),
+        }]);
+
+        setIsLoading(true);
+
+        try {
+            // Get current user
+            const { data: { user } } = await supabase.auth.getUser();
+            const userId = user?.id || 'anonymous';
+
+            // Show parsing message
+            setMessages(prev => [...prev, {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: `🔍 Parsing your recipe...`,
+                timestamp: new Date(),
+            }]);
+
+            // Call n8n webhook to parse the recipe content
+            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: pastedRecipeContent,
+                    userId: userId,
+                    contentType: 'recipe-content'
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status} ${response.statusText}`);
+            }
+
+            const responseText = await response.text();
+            if (!responseText) {
+                throw new Error('Empty response from recipe parser');
+            }
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('JSON parse error. Response was:', responseText);
+                throw new Error('Invalid response format from recipe parser');
+            }
+
+            let recipeData: ParsedRecipe | null = null;
+
+            if (data.error) {
+                throw new Error(`Recipe parsing failed: ${data.error}`);
+            }
+
+            if (data.recipe || data.data) {
+                const recipe = data.recipe || data.data;
+                
+                if (!recipe.title) {
+                    throw new Error('Recipe parsing returned incomplete data (missing title)');
+                }
+                
+                recipeData = {
+                    title: recipe.title || 'Untitled Recipe',
+                    ingredients_text: recipe.ingredients_text || recipe.ingredients || '',
+                    instructions_text: recipe.instructions_text || recipe.instructions || '',
+                    servings: recipe.servings || 4,
+                    prep_time: recipe.prep_time || recipe.prepTime || 30,
+                    source_url: 'pasted-content',
+                    image_url: recipe.image_url || recipe.image || undefined,
+                };
+            } else if (!data.recipe && !data.data) {
+                throw new Error('Unexpected response format from recipe parser');
+            }
+
+            if (recipeData) {
+                // Remove the "Parsing..." message and show success
+                setMessages(prev => [
+                    ...prev.slice(0, -1),
+                    {
+                        id: (Date.now() + 1).toString(),
+                        type: 'bot',
+                        content: `✅ Perfect! I found "${recipeData.title}". Review it below and click "Save Recipe" to add it to your library!`,
+                        timestamp: new Date(),
+                    }
+                ]);
+
+                setSuccessRecipe(recipeData);
+                setPastedRecipeContent('');
+                setIsCreatingRecipe(false);
+                if (recipeContentRef.current) {
+                    recipeContentRef.current.value = '';
+                }
+            } else {
+                setMessages(prev => [
+                    ...prev.slice(0, -1),
+                    {
+                        id: (Date.now() + 1).toString(),
+                        type: 'bot',
+                        content: '⚠️ I couldn\'t parse that recipe. Make sure you paste the recipe content clearly with ingredients and instructions.',
+                        timestamp: new Date(),
+                    }
+                ]);
+            }
+        } catch (error) {
+            console.error('Error parsing recipe content:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            setMessages(prev => [
+                ...prev.slice(0, -1),
+                {
+                    id: (Date.now() + 1).toString(),
+                    type: 'bot',
+                    content: `❌ Sorry, I encountered an error parsing that recipe: ${errorMessage}`,
+                    timestamp: new Date(),
+                }
+            ]);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -571,6 +714,57 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             >
                                 <span>✓ View Recipe</span>
                             </button>
+                        </div>
+                    )}
+
+                    {/* Create Recipe Options */}
+                    {isCreatingRecipe && !successRecipe && (
+                        <div className="space-y-3 my-4 px-2">
+                            {/* Option 1: Manual Creation */}
+                            <div className="bg-gradient-to-r from-emerald-50 to-emerald-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-500/30">
+                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">✏️ Option 1: Manually Create</h4>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+                                    Step-by-step form to add all the details yourself.
+                                </p>
+                                <button
+                                    onClick={handleManualRecipeCreation}
+                                    disabled={isLoading}
+                                    className="w-full px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                >
+                                    Create Recipe Manually
+                                </button>
+                            </div>
+
+                            {/* Option 2: Paste Content */}
+                            <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-500/30">
+                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">📋 Option 2: Paste Recipe Content</h4>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+                                    Paste the full recipe text and we'll parse it for you.
+                                </p>
+                                <textarea
+                                    ref={recipeContentRef}
+                                    value={pastedRecipeContent}
+                                    onChange={(e) => setPastedRecipeContent(e.target.value)}
+                                    placeholder="Paste recipe content here..."
+                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                    rows={4}
+                                />
+                                <button
+                                    onClick={handlePasteRecipeContent}
+                                    disabled={!pastedRecipeContent.trim() || isLoading}
+                                    className="w-full mt-3 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                >
+                                    {isLoading ? '🔍 Parsing...' : '✓ Parse & Review'}
+                                </button>
+                            </div>
+
+                            {/* Option 3: URL (existing) */}
+                            <div className="bg-gradient-to-r from-purple-50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-purple-200 dark:border-purple-500/30">
+                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">🔗 Option 3: Paste Recipe URL</h4>
+                                <p className="text-xs text-slate-600 dark:text-slate-400">
+                                    Paste a recipe link and we'll automatically extract all the details.
+                                </p>
+                            </div>
                         </div>
                     )}
                     
