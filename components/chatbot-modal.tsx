@@ -561,8 +561,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             }
 
             const responseText = await response.text();
+            console.log('Recipe content response:', responseText);
+            
             if (!responseText) {
-                throw new Error('Empty response from recipe parser');
+                throw new Error('The recipe parser service is not responding. This feature may not be configured yet. Please try pasting a recipe URL instead, or contact support.');
             }
 
             let data;
@@ -570,7 +572,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 data = JSON.parse(responseText);
             } catch (parseError) {
                 console.error('JSON parse error. Response was:', responseText);
-                throw new Error('Invalid response format from recipe parser');
+                throw new Error('Invalid response format from recipe parser. Please ensure the recipe content is properly formatted with ingredients and instructions.');
             }
 
             let recipeData: ParsedRecipe | null = null;
@@ -638,7 +640,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 {
                     id: (Date.now() + 1).toString(),
                     type: 'bot',
-                    content: `❌ Sorry, I encountered an error parsing that recipe: ${errorMessage}\n\nPlease try again or paste the recipe text directly.`,
+                    content: `❌ Sorry, I encountered an error: ${errorMessage}\n\nPlease try pasting a recipe URL instead, or use the manual recipe creation option.`,
                     timestamp: new Date(),
                 }
             ]);
