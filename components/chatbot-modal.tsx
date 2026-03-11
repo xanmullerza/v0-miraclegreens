@@ -145,6 +145,12 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             type: 'bot',
             content: 'Hello! I\'m Zum, your child-friendly AI assistant. I can help with nutrition questions, recipes, meal planning, and more. I can also add recipes from URLs! Just share a recipe link.',
             timestamp: new Date(),
+        },
+        {
+            id: '2',
+            type: 'bot',
+            content: "🎉 Let's get you started with adding more recipes to your growing library! Here are a few ways you can do it:",
+            timestamp: new Date(),
         }
     ]);
     const [input, setInput] = useState('');
@@ -543,14 +549,6 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
         setIsCreatingRecipe(true);
-        
-        // Show greeting message
-        setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            type: 'bot',
-            content: "🎉 Let's get you started with adding more recipes to your growing library! Here are a few ways you can do it:",
-            timestamp: new Date(),
-        }]);
     };
 
     const handleManualRecipeCreation = () => {
@@ -1094,8 +1092,8 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     </div>
                 )}
 
-                {/* Messages View - Full Screen, Only in chat mode (hidden after success) */}
-                {!showRecipeBuilder && chatbotView === 'messages' && !isCreatingRecipe && !successRecipe && (
+                {/* Messages View - Full Screen, Only in chat mode */}
+                {!showRecipeBuilder && chatbotView === 'messages' && !isCreatingRecipe && (
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
                         <div
@@ -1213,24 +1211,8 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
 
 
-                {/* Success Message Only - Show only the success message after recipe saved */}
-                {!showRecipeBuilder && chatbotView === 'messages' && successRecipe && (
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col justify-end">
-                        {messages.length > 0 && (
-                            <div className="flex gap-3 justify-start">
-                                <div className={cn(
-                                    'px-4 py-2.5 rounded-xl text-sm leading-relaxed',
-                                    'max-w-sm bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-none'
-                                )}>
-                                    <FormattedText content={messages[messages.length - 1].content} />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Input Area - Only shown in chat messages view (hidden after success) */}
-                {chatbotView === 'messages' && !showRecipeBuilder && !isCreatingRecipe && !successRecipe && (
+                {/* Input Area - Only shown in chat messages view */}
+                {chatbotView === 'messages' && !showRecipeBuilder && !isCreatingRecipe && (
                     <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
                     {/* Quick Actions Drawer */}
                     {showQuickActions && (
