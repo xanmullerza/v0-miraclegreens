@@ -600,30 +600,32 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             }
 
             if (recipeData) {
-                // Remove the "Parsing..." message and show success
+                // Remove the "Parsing..." message and show success - matching URL flow
                 setMessages(prev => [
                     ...prev.slice(0, -1),
                     {
                         id: (Date.now() + 1).toString(),
                         type: 'bot',
-                        content: `✅ Perfect! I found "${recipeData.title}". Review it below and click "Save Recipe" to add it to your library!`,
+                        content: `✅ Great! "${recipeData.title}" has been saved to your library! You can now view it in your My Recipes section, edit it, adjust servings, and add more ingredients whenever you'd like.`,
                         timestamp: new Date(),
                     }
                 ]);
 
+                // Store the recipe and navigate/show modal - matching URL flow
                 setSuccessRecipe(recipeData);
-                setPastedRecipeContent('');
                 setIsCreatingRecipe(false);
+                setPastedRecipeContent('');
                 if (recipeContentRef.current) {
                     recipeContentRef.current.value = '';
                 }
+                handleViewSavedRecipe(recipeData);
             } else {
                 setMessages(prev => [
                     ...prev.slice(0, -1),
                     {
                         id: (Date.now() + 1).toString(),
                         type: 'bot',
-                        content: '⚠️ I couldn\'t parse that recipe. Make sure you paste the recipe content clearly with ingredients and instructions.',
+                        content: '⚠️ Could not parse recipe from that content. Try copying and pasting the recipe text more clearly with ingredients and instructions, or use one of the other methods.',
                         timestamp: new Date(),
                     }
                 ]);
@@ -636,7 +638,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 {
                     id: (Date.now() + 1).toString(),
                     type: 'bot',
-                    content: `❌ Sorry, I encountered an error parsing that recipe: ${errorMessage}`,
+                    content: `❌ Sorry, I encountered an error parsing that recipe: ${errorMessage}\n\nPlease try again or paste the recipe text directly.`,
                     timestamp: new Date(),
                 }
             ]);
