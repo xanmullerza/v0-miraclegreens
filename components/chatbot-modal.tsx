@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -198,6 +198,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [successRecipe, setSuccessRecipe] = useState<ParsedRecipe | null>(null);
     const [showQuickActions, setShowQuickActions] = useState(false);
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
+    const [expandedAppsMenu, setExpandedAppsMenu] = useState(false);
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(storedState?.isCreatingRecipe || false);
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
@@ -1494,6 +1495,53 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors"
                                         >
                                             ➕ Create New Recipe
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Apps Button */}
+                            <div>
+                                <button
+                                    onClick={() => setExpandedAppsMenu(!expandedAppsMenu)}
+                                    className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Package size={18} className="text-purple-500" />
+                                        <span className="font-medium text-sm">Apps</span>
+                                    </div>
+                                    <ChevronRight 
+                                        size={16} 
+                                        className={cn(
+                                            "transition-transform",
+                                            expandedAppsMenu ? "rotate-90" : ""
+                                        )}
+                                    />
+                                </button>
+
+                                {/* Apps Sub-menu */}
+                                {expandedAppsMenu && (
+                                    <div className="mt-2 ml-4 space-y-2 pl-4 border-l-2 border-purple-500">
+                                        <button
+                                            onClick={() => router.push('/dashboard/meal-o-matic/shopping')}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
+                                        >
+                                            <ShoppingBag size={14} className="text-blue-500" />
+                                            Shopping
+                                        </button>
+                                        <button
+                                            onClick={() => router.push('/dashboard/meal-o-matic/pantry')}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
+                                        >
+                                            <Package size={14} className="text-orange-500" />
+                                            Pantry
+                                        </button>
+                                        <button
+                                            onClick={() => router.push('/dashboard/meal-o-matic/planner')}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
+                                        >
+                                            <Calendar size={14} className="text-pink-500" />
+                                            Planner
                                         </button>
                                     </div>
                                 )}
