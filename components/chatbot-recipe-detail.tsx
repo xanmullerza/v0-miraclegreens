@@ -67,17 +67,35 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 .single();
 
             if (recipeError) throw recipeError;
-            setRecipe(recipeData);
 
-            // Fetch ingredients
+            // Fetch ingredients with full food item data
             const { data: ingredientsData, error: ingredientsError } = await supabase
                 .from('ingredients')
-                .select('*')
+                .select('*, food_items(*)')
                 .eq('recipe_id', recipeId)
                 .order('id', { ascending: true });
 
             if (ingredientsError) throw ingredientsError;
             setIngredients(ingredientsData || []);
+
+            // Calculate phytonutrients from ingredients
+            let aggregatedPhytos: Record<string, string> = {};
+            if (ingredientsData && ingredientsData.length > 0) {
+                ingredientsData.forEach((ing) => {
+                    const foodPhytos = ing.food_items?.phytonutrients;
+                    if (foodPhytos && typeof foodPhytos === 'object') {
+                        aggregatedPhytos = { ...aggregatedPhytos, ...foodPhytos };
+                    }
+                });
+            }
+
+            // Set recipe with aggregated phytonutrients
+            if (recipeData) {
+                setRecipe({
+                    ...recipeData,
+                    phytonutrients: aggregatedPhytos
+                });
+            }
 
             // Fetch instructions
             const { data: instructionsData, error: instructionsError } = await supabase
