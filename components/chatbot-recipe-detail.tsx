@@ -204,10 +204,6 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 gap-2">
                     <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Calories</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(recipe.calories)} kcal</p>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
                         <p className="text-xs text-slate-500 dark:text-slate-400">Prep Time</p>
                         <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.prep_time} min</p>
                     </div>
@@ -219,22 +215,25 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                         <p className="text-xs text-slate-500 dark:text-slate-400">Weight</p>
                         <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(totalWeight)} g</p>
                     </div>
+                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Type</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">{recipe.type}</p>
+                    </div>
                 </div>
 
                 {/* Content Sections */}
                 {activeSection === 'recipe' && (
                     <>
-                        {/* Type */}
-                        <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-semibold capitalize">
-                            {recipe.type}
-                        </div>
-
-                        {/* Macros */}
+                        {/* Nutritional Info */}
                         <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/30 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                             <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">
                                 Nutritional Info (per serving)
                             </p>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-4 gap-3">
+                                <div>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Calories</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(recipe.calories)} kcal</p>
+                                </div>
                                 <div>
                                     <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Protein</p>
                                     <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(recipe.protein * 10) / 10}g</p>
