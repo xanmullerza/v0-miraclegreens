@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
+import { RecipesView } from '@/components/ingredients/recipes-view';
+import { MyRecipesView } from '@/components/ingredients/my-recipes-view';
 import { toast } from 'sonner';
 
 interface Message {
@@ -153,6 +155,9 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
+    
+    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes)
+    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes'>('messages');
     
     // Recipe builder state
     const [showRecipeBuilder, setShowRecipeBuilder] = useState(false);
@@ -509,13 +514,13 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     };
 
     const handleViewAllRecipes = () => {
-        router.push('/dashboard/library/meals');
+        setChatbotView('all-recipes');
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };
 
     const handleViewMyRecipes = () => {
-        router.push('/dashboard/library/my-recipes');
+        setChatbotView('my-recipes');
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };
@@ -809,9 +814,15 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
                     <div className="flex items-center gap-2">
-                        {showRecipeBuilder && (
+                        {(showRecipeBuilder || chatbotView !== 'messages') && (
                             <button
-                                onClick={handleCloseRecipeBuilder}
+                                onClick={() => {
+                                    if (showRecipeBuilder) {
+                                        handleCloseRecipeBuilder();
+                                    } else {
+                                        setChatbotView('messages');
+                                    }
+                                }}
                                 className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
                                 title="Back to chat"
                             >
@@ -820,10 +831,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         )}
                         <div>
                             <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
-                                {showRecipeBuilder ? 'Create Recipe' : 'Q&A Assistant'}
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : 'Q&A Assistant'}
                             </h3>
                             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">
-                                {showRecipeBuilder ? 'Step-by-step recipe creation' : 'Ask me anything'}
+                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : 'Ask me anything'}
                             </p>
                         </div>
                     </div>
@@ -836,9 +847,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     </button>
                 </div>
 
-                {/* Messages or Recipe Builder */}
+                {/* Messages or Recipe Builder or Recipes Views */}
                 {showRecipeBuilder ? (
                     // RECIPE BUILDER FORM
+
                     <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
                         {recipeStep === 1 && (
                             <>
@@ -1173,6 +1185,20 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     
                     <div ref={messagesEndRef} />
                 </div>
+                )}
+
+                {/* All Recipes View */}
+                {!showRecipeBuilder && chatbotView === 'all-recipes' && (
+                    <div className="flex-1 overflow-hidden">
+                        <RecipesView />
+                    </div>
+                )}
+
+                {/* My Recipes View */}
+                {!showRecipeBuilder && chatbotView === 'my-recipes' && (
+                    <div className="flex-1 overflow-hidden">
+                        <MyRecipesView />
+                    </div>
                 )}
 
 
