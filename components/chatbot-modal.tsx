@@ -9,6 +9,7 @@ import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { RecipesView } from '@/components/ingredients/recipes-view';
 import { MyRecipesView } from '@/components/ingredients/my-recipes-view';
+import { ChatbotRecipeDetail } from '@/components/chatbot-recipe-detail';
 import { toast } from 'sonner';
 
 interface Message {
@@ -156,8 +157,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     
-    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes)
-    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes'>('messages');
+    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail)
+    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail'>('messages');
+    const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
+    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes'>('all-recipes');
     
     // Recipe builder state
     const [showRecipeBuilder, setShowRecipeBuilder] = useState(false);
@@ -525,6 +528,17 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setExpandedRecipeMenu(false);
     };
 
+    const handleRecipeClick = (recipeId: string, fromView: 'all-recipes' | 'my-recipes') => {
+        setSelectedRecipeId(recipeId);
+        setPreviousView(fromView);
+        setChatbotView('recipe-detail');
+    };
+
+    const handleBackFromRecipeDetail = () => {
+        setChatbotView(previousView);
+        setSelectedRecipeId(null);
+    };
+
     const handleCreateNewRecipe = () => {
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
@@ -819,19 +833,21 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                 onClick={() => {
                                     if (showRecipeBuilder) {
                                         handleCloseRecipeBuilder();
+                                    } else if (chatbotView === 'recipe-detail') {
+                                        handleBackFromRecipeDetail();
                                     } else {
                                         setChatbotView('messages');
                                     }
                                 }}
                                 className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
-                                title="Back to chat"
+                                title="Back"
                             >
                                 <ArrowLeft size={16} />
                             </button>
                         )}
                         <div>
                             <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
-                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : 'Q&A Assistant'}
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : 'Q&A Assistant'}
                             </h3>
                             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">
                                 {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : 'Ask me anything'}
@@ -1191,15 +1207,20 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 {/* All Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'all-recipes' && (
                     <div className="flex-1 overflow-y-auto">
-                        <RecipesView />
+                        <RecipesView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'all-recipes')} />
                     </div>
                 )}
 
                 {/* My Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'my-recipes' && (
                     <div className="flex-1 overflow-y-auto">
-                        <MyRecipesView />
+                        <MyRecipesView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'my-recipes')} />
                     </div>
+                )}
+
+                {/* Recipe Detail View */}
+                {!showRecipeBuilder && chatbotView === 'recipe-detail' && selectedRecipeId && (
+                    <ChatbotRecipeDetail recipeId={selectedRecipeId} onBack={handleBackFromRecipeDetail} />
                 )}
 
 

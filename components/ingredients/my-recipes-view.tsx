@@ -40,7 +40,11 @@ const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
 
 export const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 
-export function MyRecipesView() {
+interface MyRecipesViewProps {
+    onRecipeClick?: (recipeId: string) => void;
+}
+
+export function MyRecipesView({ onRecipeClick }: MyRecipesViewProps = {}) {
     const router = useRouter();
     const PAGE_SIZE = 20;
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -372,7 +376,13 @@ export function MyRecipesView() {
                                 {recipes.map((recipe) => (
                                     <div
                                         key={recipe.id}
-                                        onClick={() => router.push(`/dashboard/library/my-recipes/${recipe.id}`)}
+                                        onClick={() => {
+                                            if (onRecipeClick) {
+                                                onRecipeClick(recipe.id);
+                                            } else {
+                                                router.push(`/dashboard/library/my-recipes/${recipe.id}`);
+                                            }
+                                        }}
                                         className="group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-500 cursor-pointer overflow-hidden hover:border-emerald-400/50 hover:shadow-lg"
                                     >
                                         <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto_auto] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">

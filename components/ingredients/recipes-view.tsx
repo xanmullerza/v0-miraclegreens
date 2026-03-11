@@ -53,6 +53,7 @@ interface RecipesViewProps {
     isMix?: boolean;
     showAddRecipe?: boolean;
     setShowAddRecipe?: React.Dispatch<React.SetStateAction<boolean>>;
+    onRecipeClick?: (recipeId: string) => void;
 }
 
 export function RecipesView({
@@ -65,7 +66,8 @@ export function RecipesView({
     setIsFilterOpen: externalSetIsFilterOpen,
     isMix = false,
     showAddRecipe = false,
-    setShowAddRecipe
+    setShowAddRecipe,
+    onRecipeClick
 }: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
@@ -401,7 +403,13 @@ export function RecipesView({
                         {recipes.map((recipe) => (
                             <div
                                 key={recipe.id}
-                                onClick={() => router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/${recipe.id}`)}
+                                onClick={() => {
+                                    if (onRecipeClick) {
+                                        onRecipeClick(recipe.id);
+                                    } else {
+                                        router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/${recipe.id}`);
+                                    }
+                                }}
                                 className={cn(
                                     "group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-500 cursor-pointer overflow-hidden",
                                     isMix ? "hover:border-indigo-400/50 hover:shadow-lg" : "hover:border-blue-400/50 hover:shadow-lg"
