@@ -22,6 +22,7 @@ interface Recipe {
     is_favorite: boolean;
     source?: string;
     micronutrients?: Record<string, number>;
+    phytonutrients?: Record<string, string>;
 }
 
 interface Ingredient {
@@ -116,7 +117,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const totalWeight = ingredients.reduce((sum, ing) => sum + (ing.weight_g || 0), 0);
 
     // Simplified NutrientGrid for chatbot
-    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string }) => {
+    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, isRatios = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, isRatios?: boolean }) => {
         const themes = {
             indigo: { text: "text-indigo-400" },
             rose: { text: "text-rose-400" },
@@ -151,16 +152,26 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 {subtitle && <p className="text-[9px] text-slate-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">{subtitle}</p>}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {Object.entries(items).map(([label, keys]) => {
-                        const val = getNutrientValue(keys as string[]);
-                        const unitStr = (label === 'Energy') ? 'kcal' :
-                            (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars') ? 'g' :
-                                (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K') ? 'µg' : 'mg';
+                        let val = 0;
+                        let unitStr = '';
+
+                        if (isRatios && (keys as string[]).length === 2) {
+                            const v1 = getNutrientValue([(keys as string[])[0]]);
+                            const v2 = getNutrientValue([(keys as string[])[1]]);
+                            val = v2 > 0 ? v1 / v2 : 0;
+                            unitStr = ' to 1';
+                        } else {
+                            val = getNutrientValue(keys as string[]);
+                            unitStr = (label === 'Energy') ? 'kcal' :
+                                (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars') ? 'g' :
+                                    (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K') ? 'µg' : 'mg';
+                        }
 
                         return (
                             <div key={label} className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                                 <p className="text-[9px] font-semibold text-slate-600 dark:text-slate-400 mb-1 truncate">{label}</p>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{val.toFixed(1)}</span>
+                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{val.toFixed(isRatios ? 2 : 1)}</span>
                                     <span className="text-[9px] font-semibold text-slate-400">{unitStr}</span>
                                 </div>
                             </div>
@@ -475,6 +486,37 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         'Cholesterol': ['Cholesterol', 'cholesterol_mg']
                                     }} 
                                 />
+
+                                <NutrientGrid 
+                                    title="Biological Ratios" 
+                                    icon={Dna} 
+                                    theme="amber" 
+                                    subtitle="Key nutrient balances for a healthy body" 
+                                    isRatios={true}
+                                    items={{
+                                        'Sodium & Potassium': ['Sodium', 'Potassium'],
+                                        'Zinc & Copper': ['Zinc', 'Copper'],
+                                        'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
+                                        'Calcium & Magnesium': ['Calcium', 'Magnesium'],
+                                        'Calcium & Phosphorus': ['Calcium', 'Phosphorus']
+                                    }} 
+                                />
+
+                                {/* Phytonutrients */}
+                                {recipe?.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 && (
+                                    <div className="p-4 pt-3 rounded-2xl border bg-gradient-to-br mb-4 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                                        <h4 className="font-bold flex items-center gap-2 mb-1 uppercase tracking-wider text-xs text-green-500"><Dna className="h-4 w-4" /> Phytonutrients</h4>
+                                        <p className="text-[9px] text-slate-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">Plant compounds for enhanced nutrition</p>
+                                        <div className="space-y-2">
+                                            {Object.entries(recipe.phytonutrients).map(([name, description]) => (
+                                                <div key={name} className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                                                    <p className="text-[9px] font-semibold text-green-600 dark:text-green-400 mb-1">{name}</p>
+                                                    <p className="text-[8px] text-slate-600 dark:text-slate-400 leading-snug line-clamp-3">{description}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
