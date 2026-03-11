@@ -523,13 +523,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 {/* Phytonutrients */}
                                 {recipe?.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 && (
                                     <div className="p-4 pt-3 rounded-2xl border bg-gradient-to-br mb-4 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
-                                        <h4 className="font-bold flex items-center gap-2 mb-1 uppercase tracking-wider text-xs text-green-500"><Dna className="h-4 w-4" /> Phytonutrients</h4>
-                                        <p className="text-[9px] text-slate-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">Plant compounds for enhanced nutrition</p>
+                                        <h4 className="font-bold flex items-center gap-2 mb-2 uppercase tracking-wider text-sm text-green-500"><Dna className="h-4 w-4" /> Phytonutrients</h4>
+                                        <p className="text-[10px] text-slate-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">Plant compounds for enhanced nutrition</p>
                                         <div className="space-y-2">
                                             {Object.entries(recipe.phytonutrients).map(([name, description]) => (
                                                 <div key={name} className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                                                    <p className="text-[9px] font-semibold text-green-600 dark:text-green-400 mb-1">{name}</p>
-                                                    <p className="text-[8px] text-slate-600 dark:text-slate-400 leading-snug line-clamp-3">{description}</p>
+                                                    <p className="text-[11px] font-semibold text-green-600 dark:text-green-400 mb-1">{name}</p>
+                                                    <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed">{description}</p>
                                                 </div>
                                             ))}
                                         </div>
