@@ -1158,52 +1158,6 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
 
     return (
         <div className="space-y-4">
-            {/* Header / Controls Row */}
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                        <button
-                            type="button"
-                            onClick={() => setEnergyUnit('kcal')}
-                            className={cn(
-                                "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                                energyUnit === 'kcal' ? "bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400" : "text-slate-400 hover:text-slate-200"
-                            )}
-                        >
-                            kcal
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setEnergyUnit('kJ')}
-                            className={cn(
-                                "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                                energyUnit === 'kJ' ? "bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400" : "text-slate-400 hover:text-slate-200"
-                            )}
-                        >
-                            kJ
-                        </button>
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onClick={() => setShowMagicPaste(!showMagicPaste)}
-                        className="bg-amber-100/50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-amber-700 dark:text-amber-400 transition-all px-4 h-11 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest border border-amber-200/50 dark:border-amber-900/50"
-                    >
-                        <Wand2 className="w-3.5 h-3.5" />
-                        Magic Paste
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setShowPicker(true)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/10 transition-all px-5 h-11 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
-                    >
-                        <Plus className="w-3.5 h-3.5" />
-                        Add Item
-                    </button>
-                </div>
-            </div>
-
             {showMagicPaste && (
                 <div className="p-6 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/40 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="flex items-center justify-between">
