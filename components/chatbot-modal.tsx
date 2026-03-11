@@ -847,10 +847,9 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     </button>
                 </div>
 
-                {/* Messages or Recipe Builder or Recipes Views */}
-                {showRecipeBuilder ? (
-                    // RECIPE BUILDER FORM
-
+                {/* Content Area - Messages, Recipe Builder, or Recipe Views */}
+                {/* Recipe Builder - Full Screen */}
+                {showRecipeBuilder && (
                     <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
                         {recipeStep === 1 && (
                             <>
@@ -1077,8 +1076,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             </>
                         )}
                     </div>
-                ) : (
-                    // MESSAGES VIEW
+                )}
+
+                {/* Messages View - Full Screen, Only in chat mode */}
+                {!showRecipeBuilder && chatbotView === 'messages' && (
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
                         <div
@@ -1203,9 +1204,9 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
 
 
-
-                {/* Input */}
-                <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
+                {/* Input Area - Only shown in chat messages view */}
+                {chatbotView === 'messages' && !showRecipeBuilder && (
+                    <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
                     {/* Quick Actions Drawer */}
                     {showQuickActions && (
                         <div className="absolute bottom-full left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 space-y-2 animate-in slide-in-from-bottom-3">
@@ -1298,6 +1299,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         </button>
                     </div>
                 </div>
+                )}
             </div>
         </div>
     );
