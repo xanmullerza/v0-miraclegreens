@@ -1095,7 +1095,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 )}
 
                 {/* Messages View - Full Screen, Only in chat mode */}
-                {!showRecipeBuilder && chatbotView === 'messages' && (
+                {!showRecipeBuilder && chatbotView === 'messages' && !isCreatingRecipe && (
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
                         <div
@@ -1129,79 +1129,67 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         </div>
                     )}
                     
-                    {/* Recipe Success Button */}
-                    {successRecipe && (
-                        <div className="flex gap-2 justify-center my-2">
-                            <button
-                                onClick={() => handleViewSavedRecipe()}
-                                className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors active:scale-95"
-                            >
-                                <span>✓ View Recipe</span>
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Create Recipe Options */}
-                    {isCreatingRecipe && !successRecipe && (
-                        <div className="space-y-3 my-4 px-2">
-                            {/* Option 1: Manual Creation */}
-                            <div className="bg-gradient-to-r from-emerald-50 to-emerald-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-500/30">
-                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">✏️ Option 1: Manually Create</h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
-                                    Step-by-step form to add all the details yourself.
-                                </p>
-                                <button
-                                    onClick={handleManualRecipeCreation}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors active:scale-95"
-                                >
-                                    Let&apos;s Go <ChevronRight size={12} />
-                                </button>
-                            </div>
-
-                            {/* Option 2: Paste Content */}
-                            <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-500/30">
-                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">📋 Option 2: Paste Recipe Text</h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
-                                    Copy-paste recipe instructions and we&apos;ll parse the ingredients automatically.
-                                </p>
-                                <textarea
-                                    ref={recipeContentRef}
-                                    value={pastedRecipeContent}
-                                    onChange={(e) => setPastedRecipeContent(e.target.value)}
-                                    placeholder="Paste recipe content here..."
-                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-3"
-                                    rows={4}
-                                />
-                                <button
-                                    onClick={handlePasteRecipeContent}
-                                    disabled={!pastedRecipeContent.trim() || isLoading}
-                                    className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
-                                >
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 size={14} className="animate-spin" />
-                                            Parsing...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span>✓ Parse & Review</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-
-                            {/* Option 3: URL (existing) */}
-                            <div className="bg-gradient-to-r from-purple-50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-purple-200 dark:border-purple-500/30">
-                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">🔗 Option 3: Paste Recipe URL</h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400">
-                                    Paste a recipe link and we'll automatically extract all the details.
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                    
                     <div ref={messagesEndRef} />
                 </div>
+                )}
+
+                {/* Create Recipe Options - Shown when creating recipe */}
+                {!showRecipeBuilder && chatbotView === 'messages' && isCreatingRecipe && !successRecipe && (
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                        {/* Option 1: Manual Creation */}
+                        <div className="bg-gradient-to-r from-emerald-50 to-emerald-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-500/30">
+                            <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">✏️ Option 1: Manually Create</h4>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+                                Step-by-step form to add all the details yourself.
+                            </p>
+                            <button
+                                onClick={handleManualRecipeCreation}
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors active:scale-95"
+                            >
+                                Let&apos;s Go <ChevronRight size={12} />
+                            </button>
+                        </div>
+
+                        {/* Option 2: Paste Content */}
+                        <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-500/30">
+                            <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">📋 Option 2: Paste Recipe Text</h4>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+                                Copy-paste recipe instructions and we&apos;ll parse the ingredients automatically.
+                            </p>
+                            <textarea
+                                ref={recipeContentRef}
+                                value={pastedRecipeContent}
+                                onChange={(e) => setPastedRecipeContent(e.target.value)}
+                                placeholder="Paste recipe content here..."
+                                className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-3"
+                                rows={4}
+                            />
+                            <button
+                                onClick={handlePasteRecipeContent}
+                                disabled={!pastedRecipeContent.trim() || isLoading}
+                                className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 size={14} className="animate-spin" />
+                                        Parsing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>✓ Parse & Review</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Option 3: URL (existing) */}
+                        <div className="bg-gradient-to-r from-purple-50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-purple-200 dark:border-purple-500/30">
+                            <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">🔗 Option 3: Paste Recipe URL</h4>
+                            <p className="text-xs text-slate-600 dark:text-slate-400">
+                                Paste a recipe link and we'll automatically extract all the details.
+                            </p>
+                        </div>
+                    </div>
                 )}
 
                 {/* All Recipes View */}
@@ -1226,7 +1214,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
 
                 {/* Input Area - Only shown in chat messages view */}
-                {chatbotView === 'messages' && !showRecipeBuilder && (
+                {chatbotView === 'messages' && !showRecipeBuilder && !isCreatingRecipe && (
                     <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
                     {/* Quick Actions Drawer */}
                     {showQuickActions && (
