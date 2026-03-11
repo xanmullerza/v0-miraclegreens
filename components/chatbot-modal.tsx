@@ -13,6 +13,9 @@ import { ChatbotRecipeDetail } from '@/components/chatbot-recipe-detail';
 import { ChatbotShopping } from '@/components/chatbot-shopping';
 import { ChatbotPantry } from '@/components/chatbot-pantry';
 import { ChatbotPlanner } from '@/components/chatbot-planner';
+import { ChatbotNutridex } from '@/components/chatbot-nutridex';
+import { ChatbotComparator } from '@/components/chatbot-comparator';
+import { ChatbotLifeguard } from '@/components/chatbot-lifeguard';
 import { toast } from 'sonner';
 
 interface Message {
@@ -202,14 +205,15 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [showQuickActions, setShowQuickActions] = useState(false);
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
     const [expandedAppsMenu, setExpandedAppsMenu] = useState(false);
+    const [expandedWidgetsMenu, setExpandedWidgetsMenu] = useState(false);
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(storedState?.isCreatingRecipe || false);
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
-    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail, shopping, pantry, planner)
-    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner'>(storedState?.chatbotView || 'messages');
+    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail, shopping, pantry, planner, nutridex, comparator, lifeguard)
+    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard'>(storedState?.chatbotView || 'messages');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(storedState?.selectedRecipeId || null);
-    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner'>(storedState?.previousView || 'all-recipes');
+    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard'>(storedState?.previousView || 'all-recipes');
     
     // Recipe builder state
     const [showRecipeBuilder, setShowRecipeBuilder] = useState(storedState?.showRecipeBuilder || false);
@@ -609,6 +613,8 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setSuccessRecipe(null);
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
+        setExpandedAppsMenu(false);
+        setExpandedWidgetsMenu(false);
         setIsCreatingRecipe(false);
         setPastedRecipeContent('');
         setpastedRecipeURL('');
@@ -1053,10 +1059,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         )}
                         <div>
                             <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
-                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : 'Q&A Assistant'}
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : 'Q&A Assistant'}
                             </h3>
                             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">
-                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : 'Ask me anything'}
+                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : chatbotView === 'nutridex' ? 'Explore nutrients' : chatbotView === 'comparator' ? 'Compare nutrition' : chatbotView === 'lifeguard' ? 'Find substitutes' : 'Ask me anything'}
                             </p>
                         </div>
                     </div>
@@ -1466,6 +1472,21 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     <ChatbotPlanner />
                 )}
 
+                {/* Nutridex View */}
+                {!showRecipeBuilder && chatbotView === 'nutridex' && (
+                    <ChatbotNutridex />
+                )}
+
+                {/* Comparator View */}
+                {!showRecipeBuilder && chatbotView === 'comparator' && (
+                    <ChatbotComparator />
+                )}
+
+                {/* Lifeguard View */}
+                {!showRecipeBuilder && chatbotView === 'lifeguard' && (
+                    <ChatbotLifeguard />
+                )}
+
                 {/* Input Area - Only shown in chat messages view */}
                 {chatbotView === 'messages' && !showRecipeBuilder && !isCreatingRecipe && (
                     <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
@@ -1570,6 +1591,65 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                         >
                                             <Calendar size={14} className="text-pink-500" />
                                             Planner
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Widgets Button */}
+                            <div>
+                                <button
+                                    onClick={() => setExpandedWidgetsMenu(!expandedWidgetsMenu)}
+                                    className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Salad size={18} className="text-cyan-500" />
+                                        <span className="font-medium text-sm">Widgets</span>
+                                    </div>
+                                    <ChevronRight 
+                                        size={16} 
+                                        className={cn(
+                                            "transition-transform",
+                                            expandedWidgetsMenu ? "rotate-90" : ""
+                                        )}
+                                    />
+                                </button>
+
+                                {/* Widgets Sub-menu */}
+                                {expandedWidgetsMenu && (
+                                    <div className="mt-2 ml-4 space-y-2 pl-4 border-l-2 border-cyan-500">
+                                        <button
+                                            onClick={() => {
+                                                setPreviousView(previousView);
+                                                setChatbotView('nutridex');
+                                                setShowQuickActions(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
+                                        >
+                                            <span className="text-lg">📊</span>
+                                            Nutridex
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setPreviousView(previousView);
+                                                setChatbotView('comparator');
+                                                setShowQuickActions(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
+                                        >
+                                            <span className="text-lg">⚡</span>
+                                            Comparator
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setPreviousView(previousView);
+                                                setChatbotView('lifeguard');
+                                                setShowQuickActions(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
+                                        >
+                                            <span className="text-lg">🛡️</span>
+                                            Lifeguard
                                         </button>
                                     </div>
                                 )}
