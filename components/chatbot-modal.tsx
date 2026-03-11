@@ -200,6 +200,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(storedState?.isCreatingRecipe || false);
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
+    const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
     // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail)
     const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail'>(storedState?.chatbotView || 'messages');
@@ -862,6 +863,134 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         }
     };
 
+    const handlePasteRecipeURL = async () => {
+        if (!pastedRecipeURL.trim()) return;
+
+        setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            type: 'user',
+            content: `🔗 Pasted recipe URL`,
+            timestamp: new Date(),
+        }]);
+
+        setIsLoading(true);
+
+        try {
+            // Get current user
+            const { data: { user } } = await supabase.auth.getUser();
+            const userId = user?.id || 'anonymous';
+
+            // Show parsing message
+            setMessages(prev => [...prev, {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: `🔍 Extracting recipe from URL...`,
+                timestamp: new Date(),
+            }]);
+
+            // Call n8n webhook to parse the recipe URL
+            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: pastedRecipeURL,
+                    userId: userId,
+                    contentType: 'recipe-url'
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status} ${response.statusText}`);
+            }
+
+            const responseText = await response.text();
+            console.log('Recipe URL response:', responseText);
+            
+            if (!responseText) {
+                throw new Error('The recipe parser service is not responding. Please try again later.');
+            }
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('JSON parse error. Response was:', responseText);
+                throw new Error('Invalid response format from recipe parser.');
+            }
+
+            let recipeData: ParsedRecipe | null = null;
+
+            if (data.error) {
+                throw new Error(`Recipe parsing failed: ${data.error}`);
+            }
+
+            if (data.recipe || data.data) {
+                const recipe = data.recipe || data.data;
+                
+                if (!recipe.title) {
+                    throw new Error('Recipe parsing returned incomplete data (missing title)');
+                }
+                
+                recipeData = {
+                    title: recipe.title || 'Untitled Recipe',
+                    ingredients_text: recipe.ingredients_text || recipe.ingredients || '',
+                    instructions_text: recipe.instructions_text || recipe.instructions || '',
+                    servings: recipe.servings || 4,
+                    prep_time: recipe.prep_time || recipe.prepTime || 30,
+                    source_url: pastedRecipeURL,
+                    image_url: recipe.image_url || recipe.image || undefined,
+                };
+            } else if (!data.recipe && !data.data) {
+                throw new Error('Unexpected response format from recipe parser');
+            }
+
+            if (recipeData) {
+                // Remove the "Extracting..." message and show success
+                setMessages(prev => [
+                    ...prev.slice(0, -1),
+                    {
+                        id: (Date.now() + 1).toString(),
+                        type: 'bot',
+                        content: `✅ Perfect! "${recipeData.title}" has been imported and saved to your library! You can now view it in your My Recipes section, edit it, adjust servings, and add more ingredients.`,
+                        timestamp: new Date(),
+                    }
+                ]);
+
+                // Store the recipe
+                setSuccessRecipe(recipeData);
+                setIsCreatingRecipe(false);
+                setpastedRecipeURL('');
+                handleViewSavedRecipe(recipeData);
+            } else {
+                setMessages(prev => [
+                    ...prev.slice(0, -1),
+                    {
+                        id: (Date.now() + 1).toString(),
+                        type: 'bot',
+                        content: '⚠️ Could not extract recipe from that URL. Please make sure the URL is a valid recipe website and try again.',
+                        timestamp: new Date(),
+                    }
+                ]);
+            }
+        } catch (error) {
+            console.error('Error parsing recipe URL:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            setMessages(prev => [
+                ...prev.slice(0, -1),
+                {
+                    id: (Date.now() + 1).toString(),
+                    type: 'bot',
+                    content: `❌ Sorry, I encountered an error: ${errorMessage}\n\nPlease try a different recipe URL or use one of the other methods.`,
+                    timestamp: new Date(),
+                }
+            ]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex pointer-events-none">
             {/* Backdrop - only on mobile */}
@@ -1233,9 +1362,37 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         {/* Option 3: URL (existing) */}
                         <div className="bg-gradient-to-r from-purple-50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-purple-200 dark:border-purple-500/30">
                             <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">🔗 Option 3: Paste Recipe URL</h4>
-                            <p className="text-xs text-slate-600 dark:text-slate-400">
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                                 Paste a recipe link and we'll automatically extract all the details.
                             </p>
+                            <input
+                                type="text"
+                                value={pastedRecipeURL}
+                                onChange={(e) => setpastedRecipeURL(e.target.value)}
+                                placeholder="Paste recipe URL here (e.g., https://www.example.com/recipe)"
+                                className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter' && pastedRecipeURL.trim() && !isLoading) {
+                                        handlePasteRecipeURL();
+                                    }
+                                }}
+                            />
+                            <button
+                                onClick={handlePasteRecipeURL}
+                                disabled={!pastedRecipeURL.trim() || isLoading}
+                                className="w-full px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 size={14} className="animate-spin" />
+                                        Extracting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>✓ Import Recipe</span>
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
                 )}
