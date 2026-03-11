@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
+import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
+import { toast } from 'sonner';
 
 interface Message {
     id: string;
@@ -130,6 +133,9 @@ function getDomainFromURL(url: string): string {
 
 export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const router = useRouter();
+    const { user, saveRecipe } = useDataPersistence();
+    const builderRef = useRef<IngredientBuilderHandle>(null);
+    
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -147,9 +153,24 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
+    
+    // Recipe builder state
+    const [showRecipeBuilder, setShowRecipeBuilder] = useState(false);
+    const [recipeTitle, setRecipeTitle] = useState('');
+    const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
+    const [recipePrepTime, setRecipePrepTime] = useState(30);
+    const [recipeServings, setRecipeServings] = useState(4);
+    const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredient[]>([]);
+    const [recipeInstructions, setRecipeInstructions] = useState<string[]>(['']);
+    const [recipeImage, setRecipeImage] = useState('');
+    const [recipeSaving, setRecipeSaving] = useState(false);
+    const [recipeUploading, setRecipeUploading] = useState(false);
+    const [recipeStep, setRecipeStep] = useState(1);
+    
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const recipeContentRef = useRef<HTMLTextAreaElement>(null);
+    const recipeImageInputRef = useRef<HTMLInputElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -514,8 +535,133 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     };
 
     const handleManualRecipeCreation = () => {
-        router.push('/dashboard/library/meals/new');
-        setIsCreatingRecipe(false);
+        setShowRecipeBuilder(true);
+        setRecipeStep(1);
+        setRecipeTitle('');
+        setRecipeType('dinner');
+        setRecipePrepTime(30);
+        setRecipeServings(4);
+        setRecipeIngredients([]);
+        setRecipeInstructions(['']);
+        setRecipeImage('');
+    };
+
+    // Recipe builder helper functions
+    const handleAddInstruction = () => {
+        setRecipeInstructions([...recipeInstructions, '']);
+    };
+
+    const handleUpdateInstruction = (index: number, value: string) => {
+        const updated = [...recipeInstructions];
+        updated[index] = value;
+        setRecipeInstructions(updated);
+    };
+
+    const handleRemoveInstruction = (index: number) => {
+        setRecipeInstructions(recipeInstructions.filter((_, i) => i !== index));
+    };
+
+    const handleRecipeImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setRecipeUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+            const filePath = fileName;
+
+            const { data, error: uploadError } = await supabase.storage
+                .from('recipes')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (uploadError) {
+                // Fallback to data URL
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setRecipeImage(reader.result as string);
+                    setRecipeUploading(false);
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('recipes')
+                .getPublicUrl(filePath);
+
+            setRecipeImage(publicUrl);
+            setRecipeUploading(false);
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setRecipeImage(reader.result as string);
+                setRecipeUploading(false);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSaveRecipe = async () => {
+        if (!recipeTitle || recipeIngredients.length === 0 || recipeInstructions.filter(i => i.trim()).length === 0) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
+
+        setRecipeSaving(true);
+        try {
+            const totals = recipeIngredients.reduce((acc, ing) => ({
+                calories: acc.calories + ing.calories,
+                protein: acc.protein + ing.protein,
+                fat: acc.fat + ing.fat,
+                carbs: acc.carbs + ing.carbs,
+            }), { calories: 0, protein: 0, fat: 0, carbs: 0 });
+
+            const recipeData = {
+                title: recipeTitle,
+                type: recipeType,
+                calories: Math.round(totals.calories / (recipeServings || 1)),
+                protein: Math.round((totals.protein / (recipeServings || 1)) * 10) / 10,
+                carbs: Math.round((totals.carbs / (recipeServings || 1)) * 10) / 10,
+                fat: Math.round((totals.fat / (recipeServings || 1)) * 10) / 10,
+                prep_time: recipePrepTime,
+                servings: recipeServings,
+                image: recipeImage,
+                source: 'manual',
+                is_favorite: true,
+            };
+
+            await saveRecipe(recipeData, recipeIngredients, recipeInstructions);
+            
+            toast.success('Recipe saved successfully!');
+            
+            // Reset form and return to chat
+            setShowRecipeBuilder(false);
+            setIsCreatingRecipe(false);
+            setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                type: 'bot',
+                content: `✅ Perfect! I've saved "${recipeTitle}" to your recipe library. You can view it anytime in your My Recipes section!`,
+                timestamp: new Date(),
+            }]);
+        } catch (error: any) {
+            toast.error(`Failed to save: ${error.message}`);
+        } finally {
+            setRecipeSaving(false);
+        }
+    };
+
+    const handleCloseRecipeBuilder = () => {
+        setShowRecipeBuilder(false);
+        setRecipeTitle('');
+        setRecipeIngredients([]);
+        setRecipeInstructions(['']);
+        setRecipeImage('');
+        setRecipeStep(1);
     };
 
     const handlePasteRecipeContent = async () => {
@@ -662,9 +808,24 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
-                    <div>
-                        <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">Q&A Assistant</h3>
-                        <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">Ask me anything</p>
+                    <div className="flex items-center gap-2">
+                        {showRecipeBuilder && (
+                            <button
+                                onClick={handleCloseRecipeBuilder}
+                                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                                title="Back to chat"
+                            >
+                                <ArrowLeft size={16} />
+                            </button>
+                        )}
+                        <div>
+                            <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
+                                {showRecipeBuilder ? 'Create Recipe' : 'Q&A Assistant'}
+                            </h3>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">
+                                {showRecipeBuilder ? 'Step-by-step recipe creation' : 'Ask me anything'}
+                            </p>
+                        </div>
                     </div>
                     <button
                         onClick={onClose}
@@ -675,8 +836,238 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     </button>
                 </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {/* Messages or Recipe Builder */}
+                {showRecipeBuilder ? (
+                    // RECIPE BUILDER FORM
+                    <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
+                        {recipeStep === 1 && (
+                            <>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                        Recipe Title *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={recipeTitle}
+                                        onChange={(e) => setRecipeTitle(e.target.value)}
+                                        placeholder="e.g., Chicken Stir Fry"
+                                        className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                        Meal Type
+                                    </label>
+                                    <select
+                                        value={recipeType}
+                                        onChange={(e) => setRecipeType(e.target.value as any)}
+                                        className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    >
+                                        <option value="breakfast">Breakfast</option>
+                                        <option value="lunch">Lunch</option>
+                                        <option value="dinner">Dinner</option>
+                                        <option value="snack">Snack</option>
+                                    </select>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                            Servings
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={recipeServings}
+                                            onChange={(e) => setRecipeServings(Number(e.target.value))}
+                                            className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            min="1"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                            Prep Time (min)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={recipePrepTime}
+                                            onChange={(e) => setRecipePrepTime(Number(e.target.value))}
+                                            className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => setRecipeStep(2)}
+                                    disabled={!recipeTitle.trim()}
+                                    className="w-full px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                                >
+                                    Next: Add Ingredients →
+                                </button>
+                            </>
+                        )}
+
+                        {recipeStep === 2 && (
+                            <>
+                                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                    Ingredients *
+                                </div>
+                                <IngredientBuilder
+                                    ref={builderRef}
+                                    ingredients={recipeIngredients}
+                                    onChange={setRecipeIngredients}
+                                    initialShowPicker={true}
+                                />
+
+                                <div className="flex gap-2 mt-4">
+                                    <button
+                                        onClick={() => setRecipeStep(1)}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-sm transition-colors"
+                                    >
+                                        ← Back
+                                    </button>
+                                    <button
+                                        onClick={() => setRecipeStep(3)}
+                                        disabled={recipeIngredients.length === 0}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Next: Instructions →
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {recipeStep === 3 && (
+                            <>
+                                <div className="flex items-center justify-between">
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
+                                        Cooking Steps *
+                                    </label>
+                                    <button
+                                        onClick={handleAddInstruction}
+                                        className="text-xs font-bold uppercase tracking-widest text-emerald-500 hover:text-emerald-600 flex items-center gap-1"
+                                    >
+                                        <Plus size={12} /> Add
+                                    </button>
+                                </div>
+                                <div className="space-y-2">
+                                    {recipeInstructions.map((step, idx) => (
+                                        <div key={idx} className="flex gap-2 group">
+                                            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-400 shrink-0">
+                                                {idx + 1}
+                                            </div>
+                                            <textarea
+                                                value={step}
+                                                onChange={(e) => handleUpdateInstruction(idx, e.target.value)}
+                                                placeholder={`Step ${idx + 1}...`}
+                                                className="flex-1 px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[50px] resize-none"
+                                            />
+                                            {recipeInstructions.length > 1 && (
+                                                <button
+                                                    onClick={() => handleRemoveInstruction(idx)}
+                                                    className="p-1 text-slate-400 hover:text-rose-500 transition-colors shrink-0 mt-1"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="flex gap-2 mt-4">
+                                    <button
+                                        onClick={() => setRecipeStep(2)}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-sm transition-colors"
+                                    >
+                                        ← Back
+                                    </button>
+                                    <button
+                                        onClick={() => setRecipeStep(4)}
+                                        disabled={recipeInstructions.filter(i => i.trim()).length === 0}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Next: Save →
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {recipeStep === 4 && (
+                            <>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                        Recipe Photo (Optional)
+                                    </label>
+                                    <div className="relative aspect-video rounded-lg bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden group hover:border-emerald-500/50 transition-all">
+                                        {recipeImage ? (
+                                            <div className="w-full h-full relative">
+                                                <img src={recipeImage} alt="Recipe" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <button
+                                                        className="gap-2 px-3 py-1 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-lg text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center"
+                                                        onClick={() => setRecipeImage('')}
+                                                    >
+                                                        <Trash2 size={12} /> Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer p-3">
+                                                <div className="text-center">
+                                                    {recipeUploading ? (
+                                                        <Loader2 className="h-5 w-5 animate-spin text-emerald-500 mx-auto" />
+                                                    ) : (
+                                                        <>
+                                                            <Camera size={18} className="text-slate-400 mx-auto mb-2" />
+                                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                {!recipeUploading && (
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={handleRecipeImageUpload}
+                                                    />
+                                                )}
+                                            </label>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2 mt-4">
+                                    <button
+                                        onClick={() => setRecipeStep(3)}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-sm transition-colors"
+                                    >
+                                        ← Back
+                                    </button>
+                                    <button
+                                        onClick={handleSaveRecipe}
+                                        disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {recipeSaving ? (
+                                            <>
+                                                <Loader2 size={14} className="animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Save size={14} />
+                                                Save Recipe
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                ) : (
+                    // MESSAGES VIEW
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
                         <div
                             key={message.id}
@@ -732,34 +1123,18 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                 </p>
                                 <button
                                     onClick={handleManualRecipeCreation}
-                                    disabled={isLoading}
-                                    className="w-full px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors active:scale-95"
                                 >
-                                    Create Recipe Manually
+                                    Let&apos;s Go <ChevronRight size={12} />
                                 </button>
                             </div>
 
                             {/* Option 2: Paste Content */}
                             <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-500/30">
-                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">📋 Option 2: Paste Recipe Content</h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
-                                    Paste the full recipe text and we'll parse it for you.
+                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">📋 Option 2: Paste Recipe Text</h4>
+                                <p className="text-xs text-slate-600 dark:text-slate-400">
+                                    Copy-paste recipe instructions and we&apos;ll parse the ingredients automatically.
                                 </p>
-                                <textarea
-                                    ref={recipeContentRef}
-                                    value={pastedRecipeContent}
-                                    onChange={(e) => setPastedRecipeContent(e.target.value)}
-                                    placeholder="Paste recipe content here..."
-                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                    rows={4}
-                                />
-                                <button
-                                    onClick={handlePasteRecipeContent}
-                                    disabled={!pastedRecipeContent.trim() || isLoading}
-                                    className="w-full mt-3 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                                >
-                                    {isLoading ? '🔍 Parsing...' : '✓ Parse & Review'}
-                                </button>
                             </div>
 
                             {/* Option 3: URL (existing) */}
@@ -774,6 +1149,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     
                     <div ref={messagesEndRef} />
                 </div>
+                )}
+
+
+
 
                 {/* Input */}
                 <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
