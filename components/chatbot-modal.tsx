@@ -134,12 +134,43 @@ function getDomainFromURL(url: string): string {
     }
 }
 
+const CHATBOT_STORAGE_KEY = 'chatbot_state_v1';
+
+function loadChatbotState() {
+    if (typeof window === 'undefined') return null;
+    try {
+        const stored = localStorage.getItem(CHATBOT_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+        console.error('Failed to load chatbot state:', error);
+        return null;
+    }
+}
+
+function saveChatbotState(state: any) {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.setItem(CHATBOT_STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+        console.error('Failed to save chatbot state:', error);
+    }
+}
+
+function clearChatbotState() {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.removeItem(CHATBOT_STORAGE_KEY);
+    } catch (error) {
+        console.error('Failed to clear chatbot state:', error);
+    }
+}
+
 export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const router = useRouter();
     const { user, saveRecipe } = useDataPersistence();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
-    const [messages, setMessages] = useState<Message[]>([
+    const INITIAL_MESSAGES: Message[] = [
         {
             id: '1',
             type: 'bot',
@@ -152,7 +183,14 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             content: "🎉 Let's get you started with adding more recipes to your growing library! Here are a few ways you can do it:",
             timestamp: new Date(),
         }
-    ]);
+    ];
+    
+    const storedState = loadChatbotState();
+    const [messages, setMessages] = useState<Message[]>(
+        storedState?.messages ? 
+            (storedState.messages as any[]).map(m => ({ ...m, timestamp: new Date(m.timestamp) })) : 
+            INITIAL_MESSAGES
+    );
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [recipeLoading, setRecipeLoading] = useState(false);
@@ -160,16 +198,16 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [successRecipe, setSuccessRecipe] = useState<ParsedRecipe | null>(null);
     const [showQuickActions, setShowQuickActions] = useState(false);
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
-    const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
+    const [isCreatingRecipe, setIsCreatingRecipe] = useState(storedState?.isCreatingRecipe || false);
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     
     // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail)
-    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail'>('messages');
-    const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
-    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes'>('all-recipes');
+    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail'>(storedState?.chatbotView || 'messages');
+    const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(storedState?.selectedRecipeId || null);
+    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes'>(storedState?.previousView || 'all-recipes');
     
     // Recipe builder state
-    const [showRecipeBuilder, setShowRecipeBuilder] = useState(false);
+    const [showRecipeBuilder, setShowRecipeBuilder] = useState(storedState?.showRecipeBuilder || false);
     const [recipeTitle, setRecipeTitle] = useState('');
     const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
     const [recipePrepTime, setRecipePrepTime] = useState(30);
@@ -193,6 +231,18 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Persist chatbot state to localStorage whenever it changes
+    useEffect(() => {
+        saveChatbotState({
+            messages,
+            chatbotView,
+            isCreatingRecipe,
+            showRecipeBuilder,
+            selectedRecipeId,
+            previousView,
+        });
+    }, [messages, chatbotView, isCreatingRecipe, showRecipeBuilder, selectedRecipeId, previousView]);
 
     const handleViewSavedRecipe = async (recipe?: ParsedRecipe) => {
         const recipeToView = recipe || successRecipe;
@@ -855,7 +905,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     <button
                         onClick={onClose}
                         className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
-                        title="Close"
+                        title="Minimize (all history and state are preserved across sessions)"
                     >
                         <X size={16} />
                     </button>
