@@ -514,7 +514,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     };
 
     const handleManualRecipeCreation = () => {
-        router.push('/dashboard/library/meals?create=true');
+        router.push('/dashboard/library/meals/new');
         setIsCreatingRecipe(false);
     };
 
