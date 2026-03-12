@@ -140,34 +140,76 @@ function getDomainFromURL(url: string): string {
     }
 }
 
-const CHATBOT_STORAGE_KEY = 'chatbot_state_v1';
+const CHATBOT_MESSAGES_KEY = 'chatbot_messages_v1';
 
-function loadChatbotState() {
+function loadChatbotMessages() {
     if (typeof window === 'undefined') return null;
     try {
-        const stored = localStorage.getItem(CHATBOT_STORAGE_KEY);
+        const stored = localStorage.getItem(CHATBOT_MESSAGES_KEY);
         return stored ? JSON.parse(stored) : null;
     } catch (error) {
-        console.error('Failed to load chatbot state:', error);
+        console.error('Failed to load chatbot messages:', error);
         return null;
     }
 }
 
-function saveChatbotState(state: any) {
+function saveChatbotMessages(messages: Message[]) {
     if (typeof window === 'undefined') return;
     try {
-        localStorage.setItem(CHATBOT_STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem(CHATBOT_MESSAGES_KEY, JSON.stringify(messages));
     } catch (error) {
-        console.error('Failed to save chatbot state:', error);
+        console.error('Failed to save chatbot messages:', error);
     }
 }
 
-function clearChatbotState() {
+function clearChatbotMessages() {
     if (typeof window === 'undefined') return;
     try {
-        localStorage.removeItem(CHATBOT_STORAGE_KEY);
+        localStorage.removeItem(CHATBOT_MESSAGES_KEY);
     } catch (error) {
-        console.error('Failed to clear chatbot state:', error);
+        console.error('Failed to clear chatbot messages:', error);
+    }
+}
+
+// Save conversation to database
+async function saveConversationToDatabase(userId: string, messages: Message[]) {
+    try {
+        const conversationContent = messages.map(m => ({
+            type: m.type,
+            content: m.content,
+            timestamp: m.timestamp
+        }));
+        
+        const { error } = await supabase
+            .from('chatbot_conversations')
+            .insert({
+                user_id: userId,
+                title: `Conversation - ${new Date().toLocaleDateString()}`,
+                messages: conversationContent,
+                created_at: new Date().toISOString(),
+            });
+        
+        if (error) throw error;
+    } catch (error) {
+        console.error('Failed to save conversation to database:', error);
+    }
+}
+
+// Load conversation history from database
+async function loadConversationHistory(userId: string) {
+    try {
+        const { data, error } = await supabase
+            .from('chatbot_conversations')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(50);
+        
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('Failed to load conversation history:', error);
+        return [];
     }
 }
 
@@ -191,10 +233,11 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         }
     ];
     
-    const storedState = loadChatbotState();
+    // Load messages from localStorage (conversation is persisted across refreshes)
+    const storedMessages = loadChatbotMessages();
     const [messages, setMessages] = useState<Message[]>(
-        storedState?.messages ? 
-            (storedState.messages as any[]).map(m => ({ ...m, timestamp: new Date(m.timestamp) })) : 
+        storedMessages ? 
+            (storedMessages as any[]).map(m => ({ ...m, timestamp: new Date(m.timestamp) })) : 
             INITIAL_MESSAGES
     );
     const [input, setInput] = useState('');
@@ -206,17 +249,21 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
     const [expandedAppsMenu, setExpandedAppsMenu] = useState(false);
     const [expandedWidgetsMenu, setExpandedWidgetsMenu] = useState(false);
-    const [isCreatingRecipe, setIsCreatingRecipe] = useState(storedState?.isCreatingRecipe || false);
+    const [isCreatingRecipe, setIsCreatingRecipe] = useState(false); // Always reset on refresh
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
-    // Chatbot view state - controls which content is displayed (messages, recipe builder, all recipes, my recipes, recipe detail, shopping, pantry, planner, nutridex, comparator, lifeguard)
-    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard'>(storedState?.chatbotView || 'messages');
-    const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(storedState?.selectedRecipeId || null);
-    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard'>(storedState?.previousView || 'all-recipes');
+    // Chatbot view state - ALWAYS reset to 'messages' on refresh (new session)
+    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('messages');
+    const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
+    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('all-recipes'); // Always reset on refresh
+    
+    // Conversation history state
+    const [conversationHistory, setConversationHistory] = useState<any[]>([]);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     
     // Recipe builder state
-    const [showRecipeBuilder, setShowRecipeBuilder] = useState(storedState?.showRecipeBuilder || false);
+    const [showRecipeBuilder, setShowRecipeBuilder] = useState(false); // Always reset on refresh
     const [recipeTitle, setRecipeTitle] = useState('');
     const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
     const [recipePrepTime, setRecipePrepTime] = useState(30);
@@ -250,17 +297,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         scrollToBottom();
     }, [messages]);
 
-    // Persist chatbot state to localStorage whenever it changes
+    // Persist messages to localStorage whenever they change (conversation is saved locally)
     useEffect(() => {
-        saveChatbotState({
-            messages,
-            chatbotView,
-            isCreatingRecipe,
-            showRecipeBuilder,
-            selectedRecipeId,
-            previousView,
-        });
-    }, [messages, chatbotView, isCreatingRecipe, showRecipeBuilder, selectedRecipeId, previousView]);
+        saveChatbotMessages(messages);
+    }, [messages]);
 
     // Handle browser history for OS back button
     useEffect(() => {
@@ -781,8 +821,40 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setSelectedRecipeId(null);
     };
 
-    const resetChatbotState = () => {
-        // Reset all state to initial values
+    const loadConversationFromHistory = (conversation: any) => {
+        // Load a conversation from history
+        const messages = conversation.messages.map((m: any) => ({
+            ...m,
+            timestamp: new Date(m.timestamp)
+        }));
+        setMessages(messages);
+        setChatbotView('messages');
+        saveChatbotMessages(messages);
+    };
+
+    const handleLoadConversationHistory = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user?.id) return;
+        
+        setIsLoadingHistory(true);
+        try {
+            const history = await loadConversationHistory(user.id);
+            setConversationHistory(history);
+            setChatbotView('conversation-history');
+        } finally {
+            setIsLoadingHistory(false);
+        }
+    };
+
+    const startNewConversation = async () => {
+        // Save current conversation to database before starting new one
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.id && messages.length > 2) { // Only save if there's actual conversation
+            await saveConversationToDatabase(user.id, messages);
+        }
+        
+        // Reset to initial state
+        clearChatbotMessages();
         setMessages(INITIAL_MESSAGES);
         setInput('');
         setIsLoading(false);
@@ -799,13 +871,35 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setSelectedRecipeId(null);
         setPreviousView('all-recipes');
         setShowRecipeBuilder(false);
-        
-        // Clear localStorage
-        clearChatbotState();
+    };
+
+    const resetChatbotState = () => {
+        // Reset all state to initial values (same as start new conversation, but without saving)
+        clearChatbotMessages();
+        setMessages(INITIAL_MESSAGES);
+        setInput('');
+        setIsLoading(false);
+        setDetectedURL(null);
+        setSuccessRecipe(null);
+        setShowQuickActions(false);
+        setExpandedRecipeMenu(false);
+        setExpandedAppsMenu(false);
+        setExpandedWidgetsMenu(false);
+        setIsCreatingRecipe(false);
+        setPastedRecipeContent('');
+        setpastedRecipeURL('');
+        setChatbotView('messages');
+        setSelectedRecipeId(null);
+        setPreviousView('all-recipes');
+        setShowRecipeBuilder(false);
     };
 
     const handleBackToMessages = () => {
-        resetChatbotState();
+        if (chatbotView === 'conversation-history') {
+            setChatbotView('messages');
+        } else {
+            resetChatbotState();
+        }
     };
 
     const handleCreateNewRecipe = () => {
@@ -1236,10 +1330,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         )}
                         <div>
                             <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
-                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : 'Q&A Assistant'}
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : chatbotView === 'conversation-history' ? 'Conversation History' : 'Q&A Assistant'}
                             </h3>
                             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">
-                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : chatbotView === 'nutridex' ? 'Explore nutrients' : chatbotView === 'comparator' ? 'Compare nutrition' : chatbotView === 'lifeguard' ? 'Find substitutes' : 'Ask me anything'}
+                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : chatbotView === 'nutridex' ? 'Explore nutrients' : chatbotView === 'comparator' ? 'Compare nutrition' : chatbotView === 'lifeguard' ? 'Find substitutes' : chatbotView === 'conversation-history' ? 'View past conversations' : 'Ask me anything'}
                             </p>
                         </div>
                     </div>
@@ -1664,6 +1758,40 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     <ChatbotLifeguardFull />
                 )}
 
+                {/* Conversation History View */}
+                {!showRecipeBuilder && chatbotView === 'conversation-history' && (
+                    <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                        {isLoadingHistory ? (
+                            <div className="flex items-center justify-center py-12">
+                                <Loader2 size={24} className="animate-spin text-emerald-500" />
+                            </div>
+                        ) : conversationHistory.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <p className="text-slate-400 text-sm mb-2">No conversations yet</p>
+                                <p className="text-slate-500 text-xs">Your conversations will appear here</p>
+                            </div>
+                        ) : (
+                            conversationHistory.map((conversation, idx) => (
+                                <button
+                                    key={conversation.id}
+                                    onClick={() => loadConversationFromHistory(conversation)}
+                                    className="w-full text-left p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700"
+                                >
+                                    <p className="font-medium text-sm text-slate-900 dark:text-white mb-1">
+                                        {conversation.title}
+                                    </p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {conversation.messages?.length || 0} messages
+                                    </p>
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                                        {new Date(conversation.created_at).toLocaleDateString()} {new Date(conversation.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </p>
+                                </button>
+                            ))
+                        )}
+                    </div>
+                )}
+
                 {/* Input Area - Only shown in chat messages view */}
                 {chatbotView === 'messages' && !showRecipeBuilder && !isCreatingRecipe && (
                     <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
@@ -1926,6 +2054,26 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             title="Send"
                         >
                             {isLoading || recipeLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                        </button>
+                    </div>
+
+                    {/* History and New Conversation Buttons */}
+                    <div className="flex gap-2 px-4 pt-2">
+                        <button
+                            onClick={handleLoadConversationHistory}
+                            disabled={isLoadingHistory}
+                            className="flex-1 px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-xs uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            title="View conversation history"
+                        >
+                            {isLoadingHistory ? <Loader2 size={12} className="animate-spin" /> : <span>📋 History</span>}
+                        </button>
+                        <button
+                            onClick={startNewConversation}
+                            disabled={isLoading || recipeLoading}
+                            className="flex-1 px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-xs uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                            title="Start a new conversation"
+                        >
+                            ➕ New
                         </button>
                     </div>
                 </div>
