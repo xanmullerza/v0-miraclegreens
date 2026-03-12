@@ -640,15 +640,15 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     };
 
     const handleAudioUpload = async (audioBlob: Blob) => {
-        // Add user message showing audio was uploaded
-        const userMessage: Message = {
+        // Add loading indicator
+        const loadingMessage: Message = {
             id: Date.now().toString(),
             type: 'user',
             content: `🎤 Sent audio message (${recordingTime}s)`,
             timestamp: new Date(),
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        setMessages(prev => [...prev, loadingMessage]);
         setIsLoading(true);
         setRecordingTime(0);
 
@@ -663,7 +663,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             formData.append('userId', userId);
             formData.append('contentType', 'audio');
 
-            // Call n8n webhook
+            // Call n8n webhook to transcribe audio
             const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 body: formData
@@ -675,40 +675,99 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
 
             const data = await response.json();
             
-            // Extract bot response - audio transcription should come back as text
-            let botResponse = '';
+            // Extract transcribed text - this is the user's actual message
+            let transcribedText = '';
             if (typeof data === 'string') {
-                botResponse = data;
+                transcribedText = data;
             } else if (data.responseText) {
-                botResponse = data.responseText;
+                transcribedText = data.responseText;
             } else if (data.output) {
-                botResponse = data.output;
+                transcribedText = data.output;
             } else if (data.response) {
-                botResponse = data.response;
+                transcribedText = data.response;
             } else if (data.content) {
-                botResponse = data.content;
+                transcribedText = data.content;
             } else if (data.message) {
-                botResponse = data.message;
-            } else {
-                botResponse = JSON.stringify(data);
+                transcribedText = data.message;
             }
 
-            const botMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                type: 'bot',
-                content: botResponse || 'I heard your audio message. How can I help?',
-                timestamp: new Date(),
-            };
-            setMessages(prev => [...prev, botMessage]);
+            if (!transcribedText) {
+                throw new Error('No transcription received');
+            }
+
+            // Replace the loading message with the actual transcribed text as user message
+            setMessages(prev => [
+                ...prev.slice(0, -1),
+                {
+                    id: Date.now().toString(),
+                    type: 'user',
+                    content: transcribedText,
+                    timestamp: new Date(),
+                }
+            ]);
+
+            // Now send the transcribed text to get a bot response
+            try {
+                const chatResponse = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: transcribedText,
+                        userId: userId,
+                        contentType: 'text'
+                    })
+                });
+
+                if (!chatResponse.ok) {
+                    throw new Error(`API error: ${chatResponse.status}`);
+                }
+
+                const chatData = await chatResponse.json();
+                
+                // Extract bot response
+                let botResponse = '';
+                if (typeof chatData === 'string') {
+                    botResponse = chatData;
+                } else if (chatData.output) {
+                    botResponse = chatData.output;
+                } else if (chatData.response) {
+                    botResponse = chatData.response;
+                } else if (chatData.content) {
+                    botResponse = chatData.content;
+                } else if (chatData.message) {
+                    botResponse = chatData.message;
+                } else {
+                    botResponse = JSON.stringify(chatData);
+                }
+
+                const botMessage: Message = {
+                    id: (Date.now() + 1).toString(),
+                    type: 'bot',
+                    content: botResponse,
+                    timestamp: new Date(),
+                };
+                setMessages(prev => [...prev, botMessage]);
+            } catch (chatError) {
+                console.error('Error getting chat response:', chatError);
+                const errorMessage: Message = {
+                    id: (Date.now() + 1).toString(),
+                    type: 'bot',
+                    content: 'Sorry, I encountered an error responding to your message. Please try again.',
+                    timestamp: new Date(),
+                };
+                setMessages(prev => [...prev, errorMessage]);
+            }
         } catch (error) {
-            console.error('Error uploading audio:', error);
-            const errorMessage: Message = {
+            console.error('Error processing audio:', error);
+            // Remove loading message and show error
+            setMessages(prev => [...prev.slice(0, -1), {
                 id: (Date.now() + 1).toString(),
                 type: 'bot',
-                content: 'Sorry, I encountered an error processing your audio. Please try again.',
+                content: 'Sorry, I encountered an error transcribing your audio. Please try again.',
                 timestamp: new Date(),
-            };
-            setMessages(prev => [...prev, errorMessage]);
+            }]);
         } finally {
             setIsLoading(false);
             // Reset audio input
