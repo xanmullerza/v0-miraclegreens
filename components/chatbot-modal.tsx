@@ -908,7 +908,8 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const startNewConversation = async () => {
         // Save current conversation to database before starting new one
         const { data: { user } } = await supabase.auth.getUser();
-        if (user?.id && messages.length > 2) { // Only save if there's actual conversation
+        // Only save if there are messages beyond the initial ones
+        if (user?.id && messages.length > INITIAL_MESSAGES.length) {
             await saveConversationToDatabase(user.id, messages);
         }
         
@@ -930,6 +931,23 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setSelectedRecipeId(null);
         setPreviousView('all-recipes');
         setShowRecipeBuilder(false);
+    };
+
+    const handleCloseModal = async () => {
+        // Save conversation to database before closing
+        try {
+            if (messages.length > INITIAL_MESSAGES.length) {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user?.id) {
+                    await saveConversationToDatabase(user.id, messages);
+                }
+            }
+        } catch (error) {
+            console.error('Error saving conversation:', error);
+        } finally {
+            // Call original onClose callback
+            onClose();
+        }
     };
 
     const resetChatbotState = () => {
@@ -1360,7 +1378,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         <div className="fixed inset-0 z-50 flex pointer-events-none">
             {/* Backdrop - only on mobile */}
             <div
-                onClick={onClose}
+                onClick={handleCloseModal}
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm md:hidden pointer-events-auto"
             />
             
@@ -1397,7 +1415,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         </div>
                     </div>
                     <button
-                        onClick={onClose}
+                        onClick={handleCloseModal}
                         className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
                         title="Minimize (all history and state are preserved across sessions)"
                     >
