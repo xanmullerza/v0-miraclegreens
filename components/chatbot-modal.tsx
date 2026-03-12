@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -228,8 +228,16 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [recipeUploading, setRecipeUploading] = useState(false);
     const [recipeStep, setRecipeStep] = useState(1);
     
+    // Audio recording state
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingTime, setRecordingTime] = useState(0);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const audioInputRef = useRef<HTMLInputElement>(null);
     const recipeContentRef = useRef<HTMLTextAreaElement>(null);
     const recipeImageInputRef = useRef<HTMLInputElement>(null);
     const isInitialMount = useRef(true);
@@ -532,6 +540,141 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const startAudioRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            
+            audioChunksRef.current = [];
+            
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunksRef.current.push(event.data);
+            };
+            
+            mediaRecorder.onstop = () => {
+                // Audio will be sent when user stops recording
+                stream.getTracks().forEach(track => track.stop());
+            };
+            
+            mediaRecorderRef.current = mediaRecorder;
+            mediaRecorder.start();
+            setIsRecording(true);
+            setRecordingTime(0);
+            
+            // Track recording time
+            recordingIntervalRef.current = setInterval(() => {
+                setRecordingTime(prev => prev + 1);
+            }, 1000);
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: 'Sorry, I cannot access your microphone. Please check your browser permissions and try again.',
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        }
+    };
+
+    const stopAudioRecording = async () => {
+        if (!mediaRecorderRef.current) return;
+        
+        setIsRecording(false);
+        if (recordingIntervalRef.current) {
+            clearInterval(recordingIntervalRef.current);
+        }
+        
+        mediaRecorderRef.current.stop();
+        
+        // Wait a moment for the onstop event to fire and chunks to be collected
+        setTimeout(() => {
+            if (audioChunksRef.current.length > 0) {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                handleAudioUpload(audioBlob);
+            }
+        }, 100);
+    };
+
+    const handleAudioUpload = async (audioBlob: Blob) => {
+        // Add user message showing audio was uploaded
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            type: 'user',
+            content: `🎤 Sent audio message (${recordingTime}s)`,
+            timestamp: new Date(),
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setIsLoading(true);
+        setRecordingTime(0);
+
+        try {
+            // Get current user
+            const { data: { user } } = await supabase.auth.getUser();
+            const userId = user?.id || 'anonymous';
+
+            // Create FormData with file
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'audio.webm');
+            formData.append('userId', userId);
+            formData.append('contentType', 'audio');
+
+            // Call n8n webhook
+            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // Extract bot response - audio transcription should come back as text
+            let botResponse = '';
+            if (typeof data === 'string') {
+                botResponse = data;
+            } else if (data.responseText) {
+                botResponse = data.responseText;
+            } else if (data.output) {
+                botResponse = data.output;
+            } else if (data.response) {
+                botResponse = data.response;
+            } else if (data.content) {
+                botResponse = data.content;
+            } else if (data.message) {
+                botResponse = data.message;
+            } else {
+                botResponse = JSON.stringify(data);
+            }
+
+            const botMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: botResponse || 'I heard your audio message. How can I help?',
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, botMessage]);
+        } catch (error) {
+            console.error('Error uploading audio:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: 'Sorry, I encountered an error processing your audio. Please try again.',
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
+            // Reset audio input
+            if (audioInputRef.current) {
+                audioInputRef.current.value = '';
+            }
         }
     };
 
@@ -1743,6 +1886,31 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             className="hidden"
                             disabled={isLoading || recipeLoading}
                         />
+                        <input
+                            ref={audioInputRef}
+                            type="file"
+                            accept="audio/*"
+                            className="hidden"
+                        />
+                        <button
+                            onClick={() => {
+                                if (isRecording) {
+                                    stopAudioRecording();
+                                } else {
+                                    startAudioRecording();
+                                }
+                            }}
+                            disabled={isLoading || recipeLoading}
+                            className={cn(
+                                "w-10 h-10 rounded-lg flex items-center justify-center transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",
+                                isRecording
+                                    ? "bg-red-500 text-white hover:bg-red-600"
+                                    : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600"
+                            )}
+                            title={isRecording ? `Recording... (${recordingTime}s)` : "Record audio"}
+                        >
+                            {isRecording ? <Square size={16} /> : <Mic size={16} />}
+                        </button>
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isLoading || recipeLoading}
