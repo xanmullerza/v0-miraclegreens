@@ -77,6 +77,21 @@ export default function DashboardFoodPage() {
 }
 
 function FoodItemCreatorContent() {
+            // Helper: auto-categorize based on name/notes
+            function autoCategorize(name: string, text: string) {
+                const animalKeywords = [
+                    'beef', 'pork', 'chicken', 'turkey', 'duck', 'lamb', 'goat', 'veal', 'bacon', 'ham', 'sausage',
+                    'egg', 'eggs', 'fish', 'salmon', 'tuna', 'trout', 'cod', 'sardine', 'anchovy', 'mackerel', 'herring',
+                    'shellfish', 'shrimp', 'prawn', 'crab', 'lobster', 'clam', 'oyster', 'mussel', 'scallop',
+                    'animal', 'meat', 'liver', 'kidney', 'heart', 'gizzard', 'duck', 'goose', 'quail', 'rabbit', 'venison',
+                    'cheese', 'milk', 'yogurt', 'butter', 'cream', 'whey', 'casein', 'curd', 'cottage cheese', 'dairy'
+                ];
+                const lower = (name + ' ' + text).toLowerCase();
+                for (const kw of animalKeywords) {
+                    if (lower.includes(kw)) return 'Proteins';
+                }
+                return '';
+            }
         // Combined paste state
         const [combinedPaste, setCombinedPaste] = useState('');
 
@@ -105,6 +120,9 @@ function FoodItemCreatorContent() {
                 foundName = lines.find(l => /^[A-Za-z].{3,}/.test(l.trim())) || '';
             }
             setName(foundName);
+            // Auto-categorize
+            const suggestedCat = autoCategorize(foundName, text);
+            if (suggestedCat) setCategory(suggestedCat);
 
             // Extract serving sizes
             let servingsBlock = '';
