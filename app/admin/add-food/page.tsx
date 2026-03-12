@@ -98,6 +98,25 @@ function FoodItemCreatorContent() {
     // State for the food item
     const [name, setName] = useState('');
     const [commonName, setCommonName] = useState('');
+    const [duplicateName, setDuplicateName] = useState(false);
+    const [duplicateCommonName, setDuplicateCommonName] = useState(false);
+        // Check for duplicate name/common name
+        useEffect(() => {
+            async function checkDuplicates() {
+                setDuplicateName(false);
+                setDuplicateCommonName(false);
+                if (!name && !commonName) return;
+                let query = supabase.from('food_items').select('name,common_name');
+                if (name) query = query.ilike('name', name);
+                if (commonName) query = query.ilike('common_name', commonName);
+                const { data, error } = await query;
+                if (!error && data) {
+                    if (name && data.some((item: any) => item.name?.toLowerCase() === name.toLowerCase())) setDuplicateName(true);
+                    if (commonName && data.some((item: any) => item.common_name?.toLowerCase() === commonName.toLowerCase())) setDuplicateCommonName(true);
+                }
+            }
+            checkDuplicates();
+        }, [name, commonName]);
     const [energyKcal, setEnergyKcal] = useState<string>('');
     const [energyKj, setEnergyKj] = useState<string>('');
     const [protein, setProtein] = useState<string>('');
@@ -186,8 +205,17 @@ function FoodItemCreatorContent() {
     };
 
     const handleSave = async () => {
+
         if (!name) {
             toast.error('Please enter a name for the food item');
+            return;
+        }
+        if (duplicateName) {
+            toast.error('A food with this official name already exists.');
+            return;
+        }
+        if (duplicateCommonName) {
+            toast.error('A food with this common name already exists.');
             return;
         }
 
@@ -458,22 +486,38 @@ Fat: ${item.fat_g || 0}g
                         </div>
                         <div className="space-y-4">
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Official Name</Label>
+                                <Label className="text-[10px] uppercase font-black text-slate-400">
+                                    Official Name <span className="text-rose-500">*</span>
+                                </Label>
                                 <Input
                                     placeholder="e.g. Potatoes, raw, white"
-                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl font-bold"
+                                    className={cn(
+                                        "h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl font-bold",
+                                        duplicateName && "border-rose-500"
+                                    )}
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                 />
+                                {duplicateName && (
+                                    <div className="text-xs text-rose-500 font-bold mt-1">A food with this official name already exists.</div>
+                                )}
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Common Name / Nickname</Label>
+                                <Label className="text-[10px] uppercase font-black text-slate-400">
+                                    Common Name / Nickname
+                                </Label>
                                 <Input
                                     placeholder="e.g. White Potato"
-                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl"
+                                    className={cn(
+                                        "h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl",
+                                        duplicateCommonName && "border-rose-500"
+                                    )}
                                     value={commonName}
                                     onChange={(e) => setCommonName(e.target.value)}
                                 />
+                                {duplicateCommonName && (
+                                    <div className="text-xs text-rose-500 font-bold mt-1">A food with this common name already exists.</div>
+                                )}
                             </div>
                             <div className="space-y-1.5">
                                 <Label className="text-[10px] uppercase font-black text-slate-400">Category</Label>
