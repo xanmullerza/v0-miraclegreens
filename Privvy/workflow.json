@@ -12,16 +12,40 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        32,
-        496
+        304,
+        640
       ],
-      "id": "e6b65279-7cf0-43d4-ab66-7caa3a5531b2",
+      "id": "935d2be6-05f2-4b69-bc5d-de4f33ba7461",
       "name": "AI Agent"
     },
     {
       "parameters": {
         "rules": {
           "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "recipe-url",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c8f9e7d1-a9b2-4c3d-b5e6-f7g8h9i0j1k2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "recipe-url"
+            },
             {
               "conditions": {
                 "options": {
@@ -80,8 +104,32 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{$json.headers['content-type']}}",
-                    "rightValue": "application/json",
+                    "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "recipe-content",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d4f7g8h9i0j1k2l3m4n5o6p7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "recipe-content"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "text",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -104,10 +152,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -864,
-        176
+        -320,
+        208
       ],
-      "id": "423dd6d5-d420-4a0c-a4cd-383753efdfe2",
+      "id": "61a55459-a8d9-4b6a-92a1-00b582d49b76",
       "name": "Content Type Router"
     },
     {
@@ -118,10 +166,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -192,
-        496
+        128,
+        640
       ],
-      "id": "b99fada0-685a-4410-b964-156716d49862"
+      "id": "c827634d-f625-4625-bf33-712e5bf2462e"
     },
     {
       "parameters": {
@@ -132,10 +180,10 @@
       },
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        -416,
-        192
+        128,
+        448
       ],
-      "id": "5b32597c-d528-48b0-99b5-d6600b19dd85",
+      "id": "e5a8722a-3188-487c-896a-0f9e9bcfae18",
       "name": "Image to Base64",
       "typeVersion": 1
     },
@@ -148,10 +196,10 @@
       },
       "type": "n8n-nodes-base.webhook",
       "position": [
-        -1072,
-        192
+        -544,
+        256
       ],
-      "id": "f672ce4a-7005-4252-ab93-232457dbddf5",
+      "id": "72c66d8c-7a48-45e4-a6df-23c0753148a5",
       "name": "Webhook",
       "typeVersion": 2,
       "webhookId": "06779100-8d0e-4ed7-9916-14a9ece2b41f"
@@ -162,65 +210,26 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "position": [
-        384,
-        192
+        720,
+        400
       ],
-      "id": "31898178-3cc6-4d77-ab08-bbc7b31210e9",
+      "id": "9b625e57-9fce-4322-9e04-9a4b15ae6dac",
       "name": "Respond",
       "typeVersion": 1.1
     },
     {
       "parameters": {
-        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        32,
-        672
+        368,
+        768
       ],
-      "id": "962adcc8-710f-4934-91af-8cec754c10a1",
+      "id": "52843d78-5f3f-4387-80d6-b6eab0e18f13",
       "name": "Groq Chat Model",
-      "credentials": {
-        "groqApi": {
-          "id": "tPNA8xQI2Nvaa6PH",
-          "name": "Groq account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.groq.com/openai/v1/chat/completions",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "groqApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer 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"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Webhook').item.json.body.message || 'What is in this image?' }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:image/jpeg;base64,{{ $json.file }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"model\": \"llama-3.2-90b-vision-preview\"\n}",
-        "options": {}
-      },
-      "id": "9513582a-10fe-48c1-9f85-01fc9046c992",
-      "name": "HTTP Request GROQ LLAVA1",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [
-        -192,
-        192
-      ],
-      "typeVersion": 4.2,
       "credentials": {
         "groqApi": {
           "id": "tPNA8xQI2Nvaa6PH",
@@ -236,10 +245,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        96,
-        192
+        448,
+        448
       ],
-      "id": "efbbb639-6579-4073-a533-0d4a8af89f54"
+      "id": "86835688-88cb-4c1f-8bb3-7e717857470d"
     },
     {
       "parameters": {
@@ -249,10 +258,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        144,
-        672
+        496,
+        768
       ],
-      "id": "ca2f7988-40be-4047-add2-d51691431ac3",
+      "id": "157bc18c-b51c-4542-b919-1618ce7a25bf",
       "name": "Simple Memory"
     },
     {
@@ -262,10 +271,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -416,
-        0
+        -96,
+        256
       ],
-      "id": "6aca38d6-cac5-4e3e-b4b0-b61a32ac4cb1",
+      "id": "4c59117b-be8b-4850-8d54-9fd38ec960c8",
       "name": "Process Audio",
       "continueOnFail": true
     },
@@ -276,10 +285,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        96,
-        0
+        416,
+        256
       ],
-      "id": "181c065f-1bb6-4bf4-80ec-7b3946b0762a",
+      "id": "440986d9-9c08-4f7c-bf82-9ff120d74a83",
       "name": "Format Response1",
       "continueOnFail": true
     },
@@ -291,12 +300,7 @@
         "nodeCredentialType": "groqApi",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer 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"
-            }
-          ]
+          "parameters": []
         },
         "sendBody": true,
         "contentType": "multipart-form-data",
@@ -326,10 +330,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -192,
-        0
+        128,
+        256
       ],
-      "id": "f8b87b29-2fd4-457a-b177-f9bccf2a9547",
+      "id": "53a13e55-3b6b-4b55-99b0-65a2c8ae73b5",
       "name": "Audio Transcription",
       "credentials": {
         "groqApi": {
@@ -345,12 +349,136 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -640,
-        192
+        -96,
+        448
       ],
-      "id": "132a6f19-e1fd-4544-9c71-b06a70533b73",
+      "id": "2ccb7987-96c1-4ff8-8a17-32b20c66de98",
       "name": "Process Image",
       "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.message }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br"
+            },
+            {
+              "name": "DNT",
+              "value": "1"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Upgrade-Insecure-Requests",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -96,
+        -128
+      ],
+      "id": "3fe81057-e4c1-496b-a768-6a02916ee93e",
+      "name": "Fetch Recipe Page",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = items[0].json;\nconsole.log('Response keys:', Object.keys(response || {}));\nconsole.log('Response type:', typeof response);\n\n// HTTP request response can be in different formats\nlet html = response?.data || response?.body || response;\n\n// If it's still an object, try stringifying it\nif (typeof html === 'object' && html !== null) {\n  console.log('Response is object, checking for text property...');\n  html = html?.text || JSON.stringify(html);\n}\n\nif (!html || typeof html !== 'string') {\n  console.error('Invalid response format:', typeof response, 'Keys:', Object.keys(response || {}));\n  return [{ json: { error: 'No HTML content from page' } }];\n}\n\nif (html.length === 0) {\n  return [{ json: { error: 'Empty HTML response' } }];\n}\n\nconsole.log('✓ HTML fetched, length:', html.length);\n\n// Try to extract JSON-LD recipe data from ALL script tags (not just first)\nconst jsonLdRegex = /<script[^>]*type=\"application\\/ld\\+json\"[^>]*>([\\s\\S]*?)<\\/script>/gi;\nlet jsonLdMatches = [];\nlet match;\nwhile ((match = jsonLdRegex.exec(html)) !== null) {\n  jsonLdMatches.push(match[1]);\n}\n\nlet recipeData = null;\n\n// Try to find Recipe in all JSON-LD blocks\nfor (const jsonLdText of jsonLdMatches) {\n  try {\n    const jsonLd = JSON.parse(jsonLdText.trim());\n    let recipe = null;\n    \n    // Check if it's directly a Recipe or inside an array\n    if (Array.isArray(jsonLd)) {\n      recipe = jsonLd.find(item => item['@type'] === 'Recipe');\n    } else if (jsonLd['@type'] === 'Recipe') {\n      recipe = jsonLd;\n    } else if (jsonLd['@graph'] && Array.isArray(jsonLd['@graph'])) {\n      recipe = jsonLd['@graph'].find(item => item['@type'] === 'Recipe');\n    }\n    \n    if (recipe) {\n      // Better handling of recipeInstructions - could be various formats\n      let instructions = '';\n      if (recipe.recipeInstructions) {\n        if (typeof recipe.recipeInstructions === 'string') {\n          instructions = recipe.recipeInstructions;\n        } else if (Array.isArray(recipe.recipeInstructions)) {\n          instructions = recipe.recipeInstructions\n            .map(item => typeof item === 'string' ? item : item.text || item.description || '')\n            .filter(text => text.length > 0)\n            .join('\\n');\n        }\n      }\n      \n      recipeData = {\n        title: recipe.name || 'Untitled Recipe',\n        ingredients_text: recipe.recipeIngredient?.join('\\n') || '',\n        instructions_text: instructions,\n        servings: recipe.recipeYield ? recipe.recipeYield.toString().replace(/\\D/g, '') : '4',\n        prep_time: recipe.prepTime?.match(/\\d+/)?.[0] || recipe.cookTime?.match(/\\d+/)?.[0] || '30',\n        image_url: recipe.image?.url || recipe.image?.[0]?.url || recipe.image || undefined,\n        source_url: $('Webhook').item.json.body.message\n      };\n      console.log('✓ Successfully extracted JSON-LD recipe data');\n      break;\n    }\n  } catch (error) {\n    console.error('JSON-LD parsing error for block:', error.message);\n  }\n}\n\n// Fallback: Improved regex parsing if JSON-LD not found\nif (!recipeData) {\n  console.log('JSON-LD not found, trying regex fallback...');\n  try {\n    // Extract title from various possible HTML tags\n    const titleMatch = html.match(/<h1[^>]*>([^<]*)<\\/h1>/i) || \n                       html.match(/<meta\\s+property=[\"']og:title[\"']\\s+content=[\"']([^\"']*)[\"']/i);\n    \n    // More flexible ingredient and instruction extraction\n    // Look for lists or divs that might contain them\n    const ingredientPatterns = [\n      /<(ul|ol)[^>]*(?:class|id)[^>]*ingredient[^>]*>([\\s\\S]*?)<\\/(ul|ol)>/i,\n      /<div[^>]*(?:class|id)[^>]*ingredient[^>]*>([\\s\\S]*?)<\\/div>/i,\n      /<(li|p)[^>]*>\\s*([\\d\\s\\w]*(?:cup|tbsp|tsp|g|kg|ml|l|oz)[\\s\\w]*[^<]*?)<\\/(li|p)>/gi\n    ];\n    \n    const instructionPatterns = [\n      /<(ul|ol)[^>]*(?:class|id)[^>]*instruction[^>]*>([\\s\\S]*?)<\\/(ul|ol)>/i,\n      /<div[^>]*(?:class|id)[^>]*instruction[^>]*>([\\s\\S]*?)<\\/div>/i,\n      /<(ol|ul)[^>]*>([\\s\\S]*?)<\\/(ol|ul)>/i\n    ];\n    \n    let ingredientsText = '';\n    for (const pattern of ingredientPatterns) {\n      const match = html.match(pattern);\n      if (match) {\n        ingredientsText = (match[2] || match[0])\n          .replace(/<[^>]*>/g, '')\n          .split('\\n')\n          .map(line => line.trim())\n          .filter(line => line.length > 0)\n          .join('\\n');\n        if (ingredientsText.length > 20) break;\n      }\n    }\n    \n    let instructionsText = '';\n    for (const pattern of instructionPatterns) {\n      const match = html.match(pattern);\n      if (match) {\n        instructionsText = (match[2] || match[0])\n          .replace(/<[^>]*>/g, '')\n          .split('\\n')\n          .map(line => line.trim())\n          .filter(line => line.length > 0)\n          .join('\\n');\n        if (instructionsText.length > 20) break;\n      }\n    }\n    \n    // Extract servings and prep time from common patterns\n    const servingsMatch = html.match(/(?:serves|servings?)[:\\s]+([\\d]+)/i);\n    const prepTimeMatch = html.match(/prep\\s+time[:\\s]+(?:PT)?(\\d+)(?:M|m)/i) ||\n                         html.match(/prep[:\\s]+([\\d]+)\\s*(?:mins?|minutes?)/i);\n    const cookTimeMatch = html.match(/cook\\s+time[:\\s]+(?:PT)?(\\d+)(?:M|m)/i) ||\n                         html.match(/cooking?[:\\s]+([\\d]+)\\s*(?:mins?|minutes?)/i);\n    \n    recipeData = {\n      title: titleMatch?.[1]?.trim() || 'Recipe from URL',\n      ingredients_text: ingredientsText,\n      instructions_text: instructionsText,\n      servings: servingsMatch?.[1] || '4',\n      prep_time: prepTimeMatch?.[1] || cookTimeMatch?.[1] || '30',\n      image_url: html.match(/<meta\\s+property=[\"']og:image[\"']\\s+content=[\"']([^\"']*)[\"']/i)?.[1],\n      source_url: $('Webhook').item.json.body.message\n    };\n    console.log('✓ Used fallback regex parsing');\n  } catch (error) {\n    console.error('Regex parsing error:', error.message);\n    return [{ json: { error: 'Could not parse recipe from URL' } }];\n  }\n}\n\nreturn [{\n  json: recipeData || { error: 'Could not extract recipe data' }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        -128
+      ],
+      "id": "9071a39b-1b7c-49ec-a8b2-3335e029950f",
+      "name": "Extract Recipe Metadata"
+    },
+    {
+      "parameters": {
+        "jsCode": "const recipe = items[0].json;\n\n// Check if there was an error in the previous steps\nif (recipe.error) {\n  console.error('Recipe extraction error:', recipe.error);\n  return [{ json: { error: recipe.error } }];\n}\n\n// Check if we have any recipe data at all\nif (!recipe || !recipe.title) {\n  console.error('No valid recipe data to format');\n  return [{ json: { error: 'No recipe data available to format' } }];\n}\n\n// Clean and normalize the recipe data\nreturn [{\n  json: {\n    message: `Great! \"${recipe.title?.trim()}\" has been saved to your library! You can now view it in your My Recipes section, edit it, adjust servings, and add more ingredients whenever you'd like.`,\n    recipe: {\n      title: recipe.title?.trim() || 'Untitled Recipe',\n      ingredients_text: recipe.ingredients_text?.trim() || '',\n      instructions_text: recipe.instructions_text?.trim() || '',\n      servings: parseInt(recipe.servings) || 4,\n      prep_time: parseInt(recipe.prep_time) || 30,\n      image_url: recipe.image_url,\n      source_url: recipe.source_url\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        -64
+      ],
+      "id": "f3068d16-4d3e-4c14-8581-5366985a25c7",
+      "name": "Format Recipe"
+    },
+    {
+      "parameters": {
+        "jsCode": "const recipeText = items[0].json.body.message;\nconsole.log('Parsing recipe content...');\n\n// Split by common separators and normalize\nconst lines = recipeText.split(/\\n|\\r\\n/).map(line => line.trim()).filter(line => line.length > 0);\n\nlet title = '';\nlet ingredientsText = '';\nlet instructionsText = '';\nlet servings = '4';\nlet prepTime = '30';\n\n// Try to find title from first few non-empty lines or common patterns\nconst titlePatterns = [\n  /^(?:title|recipe|name)[:\\s]+(.+)$/i,\n  /^#{1,3}\\s+(.+)$/,  // Markdown headers\n  /^(?:my\\s+)?([a-z][^0-9]*?)(?:\\s+recipe|\\s+-|$)/i  // General title\n];\n\nlet ingredientsSectionStart = -1;\nlet instructionsSectionStart = -1;\n\n// Find section boundaries\nconst ingredientKeywords = /^(?:ingredients|components|what you need|you will need|supplies)[:\\s]*$/i;\nconst instructionKeywords = /^(?:instructions|directions|method|how to|steps|procedure|cooking|cook)[:\\s]*$/i;\nconst servingsKeywords = /(?:yield|serve|servings?|makes)\\s*:?\\s*([\\d]+)/i;\nconst prepTimeKeywords = /prep\\s+time\\s*:?\\s*([\\d]+)\\s*(?:mins?|m|minutes?)|prep\\s*:?\\s*([\\d]+)\\s*(?:mins?|m|minutes?)/i;\nconst cookTimeKeywords = /cook\\s+time\\s*:?\\s*([\\d]+)\\s*(?:mins?|m|minutes?)|cooking\\s*:?\\s*([\\d]+)\\s*(?:mins?|m|minutes?)/i;\n\n// Extract title\nif (!title && lines.length > 0) {\n  for (const pattern of titlePatterns) {\n    const match = lines[0].match(pattern);\n    if (match) {\n      title = match[1]?.trim() || lines[0];\n      break;\n    }\n  }\n  if (!title && !lines[0].match(/^(?:ingredients|instructions|steps|method)/i)) {\n    title = lines[0];\n  }\n}\n\n// Find sections and extract content\nconst ingredients = [];\nconst instructions = [];\n\nfor (let i = 0; i < lines.length; i++) {\n  const line = lines[i];\n  \n  // Check for section headers\n  if (ingredientKeywords.test(line)) {\n    ingredientsSectionStart = i + 1;\n    instructionsSectionStart = -1;\n    continue;\n  }\n  if (instructionKeywords.test(line)) {\n    instructionsSectionStart = i + 1;\n    ingredientsSectionStart = -1;\n    continue;\n  }\n  \n  // Extract servings\n  const servingsMatch = line.match(servingsKeywords);\n  if (servingsMatch) {\n    servings = servingsMatch[1];\n  }\n  \n  // Extract prep time\n  const prepMatch = line.match(prepTimeKeywords);\n  if (prepMatch) {\n    prepTime = prepMatch[1] || prepMatch[2];\n  }\n  \n  // Extract cook time if prep time not found\n  if (prepTime === '30') {\n    const cookMatch = line.match(cookTimeKeywords);\n    if (cookMatch) {\n      prepTime = cookMatch[1] || cookMatch[2];\n    }\n  }\n  \n  // Categorize line content\n  if (ingredientsSectionStart > 0 && i >= ingredientsSectionStart) {\n    // Stop at next section or empty line before next section\n    if (instructionKeywords.test(line) || (line.length === 0 && i + 2 < lines.length && instructionKeywords.test(lines[i + 2]))) {\n      ingredientsSectionStart = -1;\n    } else if (line.length > 0 && !instructionKeywords.test(line)) {\n      ingredients.push(line);\n    }\n  } else if (instructionsSectionStart > 0 && i >= instructionsSectionStart) {\n    // Collect instructions\n    if (line.length > 0) {\n      instructions.push(line);\n    }\n  } else if (ingredientsSectionStart === -1 && instructionsSectionStart === -1) {\n    // Before any section is identified, try to guess based on line content\n    // Lines with measurements are likely ingredients\n    if (/\\d+\\s*(?:cup|tbsp|tsp|g|kg|ml|oz|lb|lbs|dash|pinch)/i.test(line)) {\n      ingredients.push(line);\n    } else if (/^(?:\\d+\\.|-)\\s+/i.test(line) && ingredients.length > 0 && instructions.length === 0) {\n      // Numbered or bullet points after ingredients are likely instructions\n      instructions.push(line.replace(/^(?:\\d+\\.|-)\\s+/, ''));\n    } else if (ingredients.length > 0 && line.length > 20 && !line.match(/^(?:ingredients|instructions)/i)) {\n      // Longer lines after ingredients are likely instructions\n      instructions.push(line);\n    }\n  }\n}\n\n// Format the extracted data\ningredientsText = ingredients.join('\\n').trim();\ninstructionsText = instructions.join('\\n').trim();\n\n// Ensure we have required data\nif (!title) {\n  title = 'Recipe from pasted content';\n}\n\nif (!ingredientsText && !instructionsText) {\n  console.error('Could not parse recipe content');\n  return [{ json: { error: 'Could not parse recipe from pasted content. Please ensure the recipe includes ingredients and instructions.' } }];\n}\n\nconsole.log('✓ Successfully parsed recipe content');\n\nreturn [{\n  json: {\n    title: title,\n    ingredients_text: ingredientsText,\n    instructions_text: instructionsText,\n    servings: servings,\n    prep_time: prepTime,\n    image_url: undefined,\n    source_url: 'pasted-content'\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        64
+      ],
+      "id": "32eee00e-5992-4a06-ad73-1f96ccdbaa9a",
+      "name": "Parse Recipe Content"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Webhook').item.json.body.message || 'What is in this image?' }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:image/jpeg;base64,{{ $json.file }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"model\": \"meta-llama/llama-4-scout-17b-16e-instruct\"\n}",
+        "options": {}
+      },
+      "id": "f9c998c6-31a5-4c15-9281-9eae80e7d63a",
+      "name": "HTTP Request GROQ Scout",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        288,
+        448
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "groqApi": {
+          "id": "tPNA8xQI2Nvaa6PH",
+          "name": "Groq account 2"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -370,6 +498,13 @@
       "main": [
         [
           {
+            "node": "Fetch Recipe Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Process Audio",
             "type": "main",
             "index": 0
@@ -378,6 +513,13 @@
         [
           {
             "node": "Process Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Recipe Content",
             "type": "main",
             "index": 0
           }
@@ -396,17 +538,6 @@
         [
           {
             "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Image to Base64": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request GROQ LLAVA1",
             "type": "main",
             "index": 0
           }
@@ -441,17 +572,6 @@
           {
             "node": "AI Agent",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request GROQ LLAVA1": {
-      "main": [
-        [
-          {
-            "node": "Format Text1",
-            "type": "main",
             "index": 0
           }
         ]
@@ -511,19 +631,86 @@
           }
         ]
       ]
+    },
+    "Fetch Recipe Page": {
+      "main": [
+        [
+          {
+            "node": "Extract Recipe Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Recipe Metadata": {
+      "main": [
+        [
+          {
+            "node": "Format Recipe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Recipe Content": {
+      "main": [
+        [
+          {
+            "node": "Format Recipe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Recipe": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image to Base64": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request GROQ Scout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request GROQ Scout": {
+      "main": [
+        [
+          {
+            "node": "Format Text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "d6eb2d8a-0789-4c7c-9713-d59ec59f8882",
+  "versionId": "da53368d-2b20-4aff-80ad-ecf95f6ce8d0",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "3a03056b3ae25ed7627ebd0b40dc7c7af839a6375f05a7e809eefe543dd430d8"
   },
-  "id": "p0mBlT9M8Ud71a32",
+  "id": "261hIu5MuOzab2gF",
   "tags": []
 }
