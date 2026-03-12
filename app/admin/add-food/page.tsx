@@ -77,20 +77,38 @@ export default function DashboardFoodPage() {
 }
 
 function FoodItemCreatorContent() {
-            // Helper: auto-categorize based on name/notes
-            function autoCategorize(name: string, text: string) {
-                const animalKeywords = [
-                    'beef', 'pork', 'chicken', 'turkey', 'duck', 'lamb', 'goat', 'veal', 'bacon', 'ham', 'sausage',
-                    'egg', 'eggs', 'fish', 'salmon', 'tuna', 'trout', 'cod', 'sardine', 'anchovy', 'mackerel', 'herring',
-                    'shellfish', 'shrimp', 'prawn', 'crab', 'lobster', 'clam', 'oyster', 'mussel', 'scallop',
-                    'animal', 'meat', 'liver', 'kidney', 'heart', 'gizzard', 'duck', 'goose', 'quail', 'rabbit', 'venison',
-                    'cheese', 'milk', 'yogurt', 'butter', 'cream', 'whey', 'casein', 'curd', 'cottage cheese', 'dairy'
+            // Helper: auto-categorize based on name/notes for all categories
+            function autoCategorize(foodName: string, text: string) {
+                const lower = (foodName + ' ' + text).toLowerCase();
+                // Priority order: Proteins, Nuts, Seeds, Fruit, Vegetables, Grains, Legumes, Oils, Flavour, Supplements
+                const categories = [
+                    { cat: 'Proteins', kws: [
+                        'beef','pork','chicken','turkey','duck','lamb','goat','veal','bacon','ham','sausage','egg','eggs','fish','salmon','tuna','trout','cod','sardine','anchovy','mackerel','herring','shellfish','shrimp','prawn','crab','lobster','clam','oyster','mussel','scallop','animal','meat','liver','kidney','heart','gizzard','duck','goose','quail','rabbit','venison','cheese','milk','yogurt','butter','cream','whey','casein','curd','cottage cheese','dairy'] },
+                    { cat: 'Nuts', kws: [
+                        'nut','almond','cashew','walnut','pecan','pistachio','hazelnut','macadamia','brazil nut','pine nut','chestnut'] },
+                    { cat: 'Seeds', kws: [
+                        'seed','chia','flax','sunflower','pumpkin','sesame','hemp','poppy','watermelon seed'] },
+                    { cat: 'Fruit', kws: [
+                        'fruit','apple','banana','orange','mango','grape','berry','cherry','peach','pear','plum','apricot','melon','watermelon','pineapple','kiwi','papaya','fig','date','raisin','currant','lemon','lime','grapefruit','tangerine','avocado','coconut','pomegranate','guava','lychee','passionfruit','persimmon','starfruit','dragonfruit','jackfruit','rambutan','mangosteen','durian'] },
+                    { cat: 'Vegetables', kws: [
+                        'vegetable','carrot','potato','tomato','cucumber','lettuce','spinach','kale','broccoli','cauliflower','cabbage','onion','garlic','leek','shallot','radish','beet','turnip','parsnip','celery','pepper','chili','eggplant','zucchini','squash','pumpkin','okra','artichoke','asparagus','mushroom','pea','bean','lentil','chickpea','corn','yam','sweet potato','taro','cassava','jicama','sunchoke','rutabaga','fennel','endive','arugula','chard','collard','dandelion','purslane','sorrel','watercress','cress','bok choy','napa','daikon','kohlrabi','horseradish','ginger','turmeric','galangal','lotus','bamboo','seaweed','algae','nori','wakame','kombu','hijiki','spirulina','chlorella','agar','kelp','laver','samphire','salicornia','glasswort','pickleweed','sea bean','sea asparagus','sea pickle','sea fennel','sea grape','sea lettuce','sea moss','sea purslane','sea spinach','sea kale','sea beet'] },
+                    { cat: 'Grains', kws: [
+                        'grain','rice','wheat','oat','barley','millet','sorghum','quinoa','amaranth','spelt','teff','triticale','farro','bulgur','freekeh','buckwheat','rye','cornmeal','semolina','couscous','polenta','bran','germ','groat','muesli','granola','cereal','pasta','noodle','cracker','bread','tortilla','bagel','bun','roll','biscuit','pretzel','pita','naan','chapati','roti','matzo','lavash','injera','idli','dosa','upma','poha','sattu','paratha','bhakri','appam','puttu','sevai','sheermal','khakhra','thepla','handvo','dhokla','khaman','fafda','chakli','murukku','papad','papadam','vadam','vadi','kurkure','chevdo','chiwda','namkeen','sev','bhujia','gathiya','chakli','murukku','papad','papadam','vadam','vadi','kurkure','chevdo','chiwda','namkeen','sev','bhujia','gathiya'] },
+                    { cat: 'Legumes', kws: [
+                        'legume','bean','lentil','chickpea','pea','soy','soybean','mung','black-eyed','pigeon pea','split pea','navy bean','kidney bean','pinto bean','lima bean','fava bean','broad bean','adzuki','urad','dal','toor','moong','masoor','chana','rajma','lobia','haricot','canellini','flageolet','garbanzo','bambara','yardlong','winged bean','guar','carob','mesquite','lupin','peanut'] },
+                    { cat: 'Oils', kws: [
+                        'oil','olive','canola','sunflower oil','safflower','corn oil','soy oil','peanut oil','sesame oil','coconut oil','palm oil','avocado oil','grapeseed oil','hemp oil','flaxseed oil','walnut oil','almond oil','hazelnut oil','macadamia oil','pumpkin seed oil','rice bran oil','mustard oil','ghee','shortening','lard','margarine','spread'] },
+                    { cat: 'Flavour', kws: [
+                        'spice','herb','seasoning','flavour','flavor','vanilla','cinnamon','clove','nutmeg','mace','allspice','ginger','cardamom','coriander','cumin','fennel','fenugreek','mustard','oregano','parsley','rosemary','sage','thyme','basil','dill','tarragon','chive','bay','marjoram','savory','saffron','anise','caraway','celery seed','chervil','cress','curry','garlic','horseradish','juniper','lavender','lemon balm','lemongrass','lovage','mint','paprika','pepper','poppy','sesame','sumac','wasabi','zaatar','zest','ajwain','asafoetida','amchur','anardana','black salt','chili','chipotle','curry leaf','galangal','kaffir','kokum','methi','nigella','panch phoron','peri peri','sichuan','star anise','tamarind','tejpat','turmeric','urfa','white pepper','yellow mustard'] },
+                    { cat: 'Supplements', kws: [
+                        'supplement','vitamin','mineral','probiotic','enzyme','collagen','creatine','protein powder','whey protein','casein protein','pea protein','soy protein','hemp protein','multivitamin','omega-3','fish oil','cod liver oil','krill oil','dha','epa','b12','d3','c','zinc','magnesium','calcium','iron','potassium','electrolyte','amino acid','bcaa','glutamine','lysine','methionine','threonine','tryptophan','valine','leucine','isoleucine','histidine','phenylalanine','tyrosine','serine','proline','glycine','alanine','arginine','aspartic acid','cysteine','glutamic acid','ornithine','taurine','carnitine','beta-alanine','betaine','inositol','choline','coq10','astaxanthin','lutein','zeaxanthin','resveratrol','curcumin','quercetin','berberine','ashwagandha','rhodiola','ginseng','maca','spirulina','chlorella','greens powder','fiber supplement','psyllium','inulin','prebiotic','digestive enzyme','lactase','bromelain','papain','lipase','amylase','protease','cellulase','hemicellulase','pectinase','xylanase','glucoamylase','alpha-galactosidase','beta-galactosidase','alpha-amylase','beta-amylase','alpha-lipoic acid','beta-glucan','hyaluronic acid','msm','glucosamine','chondroitin','boswellia','cat\'s claw','devil\'s claw','elderberry','echinacea','garlic extract','ginger extract','ginkgo','ginseng extract','goldenseal','grape seed','green tea extract','hawthorn','holy basil','licorice root','milk thistle','olive leaf','pine bark','red yeast rice','saw palmetto','schisandra','st. john\'s wort','turmeric extract','valerian','yohimbe'] }
                 ];
-                const lower = (name + ' ' + text).toLowerCase();
-                for (const kw of animalKeywords) {
-                    if (lower.includes(kw)) return 'Proteins';
+                for (const { cat, kws } of categories) {
+                    for (const kw of kws) {
+                        if (lower.includes(kw)) return cat;
+                    }
                 }
-                return '';
+                return 'General';
             }
         // Combined paste state
         const [combinedPaste, setCombinedPaste] = useState('');
@@ -102,26 +120,26 @@ function FoodItemCreatorContent() {
             const lines = text.split(/\r?\n/);
 
             // Extract food name
-            let foundName = '';
+            let foundFoodName = '';
             for (let i = 0; i < lines.length; i++) {
                 if (/Food Name/i.test(lines[i])) {
                     // Next non-empty line is the name
                     for (let j = i + 1; j < lines.length; j++) {
                         if (lines[j].trim().length > 0) {
-                            foundName = lines[j].trim();
+                            foundFoodName = lines[j].trim();
                             break;
                         }
                     }
                     break;
                 }
             }
-            if (!foundName) {
+            if (!foundFoodName) {
                 // Fallback: look for first line with 'Oyster Mushrooms' or similar
-                foundName = lines.find(l => /^[A-Za-z].{3,}/.test(l.trim())) || '';
+                foundFoodName = lines.find(l => /^[A-Za-z].{3,}/.test(l.trim())) || '';
             }
-            setName(foundName);
+            setName(foundFoodName);
             // Auto-categorize
-            const suggestedCat = autoCategorize(foundName, text);
+            const suggestedCat = autoCategorize(foundFoodName, text);
             if (suggestedCat) setCategory(suggestedCat);
 
             // Extract serving sizes
