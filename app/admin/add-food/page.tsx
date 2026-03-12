@@ -110,12 +110,17 @@ function FoodItemCreatorContent() {
             let servingsBlock = '';
             const servingStart = lines.findIndex(l => /Serving Sizes/i.test(l));
             if (servingStart !== -1) {
+                let servingLines = [];
                 for (let i = servingStart + 1; i < lines.length; i++) {
                     if (/Notes|Advanced Info|Nutrition Label|Nutrition Facts/i.test(lines[i])) break;
-                    // Look for lines like '1 cup, sliced 86.0'
-                    if (/\d+\s+\w+.*\d+/.test(lines[i])) {
-                        servingsBlock += lines[i].trim() + '\n';
-                    }
+                    if (lines[i].trim().length > 0) servingLines.push(lines[i].trim());
+                }
+                // Group every 3 lines as a serving
+                for (let i = 0; i + 2 < servingLines.length; i += 3) {
+                    const amount = servingLines[i];
+                    const label = servingLines[i + 1];
+                    const grams = servingLines[i + 2];
+                    servingsBlock += `${amount} ${label} = ${grams}g\n`;
                 }
             }
             setServingText(servingsBlock.trim());
