@@ -232,6 +232,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const recipeContentRef = useRef<HTMLTextAreaElement>(null);
     const recipeImageInputRef = useRef<HTMLInputElement>(null);
+    const isInitialMount = useRef(true);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -252,6 +253,39 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             previousView,
         });
     }, [messages, chatbotView, isCreatingRecipe, showRecipeBuilder, selectedRecipeId, previousView]);
+
+    // Handle browser history for OS back button
+    useEffect(() => {
+        // Push state to history when view changes (skip on initial mount)
+        if (typeof window !== 'undefined') {
+            if (!isInitialMount.current) {
+                window.history.pushState(
+                    { chatbotView, previousView },
+                    '',
+                    window.location.href
+                );
+            }
+            isInitialMount.current = false;
+        }
+    }, [chatbotView]);
+
+    // Handle popstate event (OS back button)
+    useEffect(() => {
+        const handlePopState = (e: PopStateEvent) => {
+            if (e.state?.chatbotView) {
+                setChatbotView(e.state.chatbotView);
+                if (e.state.previousView) {
+                    setPreviousView(e.state.previousView);
+                }
+            } else if (chatbotView !== 'messages') {
+                // If there's a popstate but no state data, go back to messages
+                setChatbotView('messages');
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [chatbotView]);
 
     const handleViewSavedRecipe = async (recipe?: ParsedRecipe) => {
         const recipeToView = recipe || successRecipe;
