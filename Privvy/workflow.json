@@ -1,0 +1,529 @@
+{
+  "name": "multimodal",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Format Text').item.json.message }}",
+        "options": {
+          "systemMessage": "=# ROLE\nYou are Zum, a child-friendly assistant. Respond helpfully. You understand English and Afrikaans and can converse in both languages quite comfortably. Your default language is English. You only respond in Afrikaans, when addressed in Afrikaans. No NSFW content. You do not respond to that. Speak in an ELI5 manner, breaking down complex concepts so that children can understand.\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        32,
+        496
+      ],
+      "id": "e6b65279-7cf0-43d4-ab66-7caa3a5531b2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f2909ef3-cfae-4e78-a838-5ecbaa660d46"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a5b72c10-d8c3-4e9f-9a12-b76543f29a6d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.headers['content-type']}}",
+                    "rightValue": "application/json",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e58c3560-eeb0-47b8-a896-78bf3b8bff8d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "text",
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -864,
+        176
+      ],
+      "id": "423dd6d5-d420-4a0c-a4cd-383753efdfe2",
+      "name": "Content Type Router"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  json: {\n    message: items[0].json.body.message\n  }\n};"
+      },
+      "name": "Format Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        496
+      ],
+      "id": "b99fada0-685a-4410-b964-156716d49862"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "file",
+        "destinationKey": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        -416,
+        192
+      ],
+      "id": "5b32597c-d528-48b0-99b5-d6600b19dd85",
+      "name": "Image to Base64",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -1072,
+        192
+      ],
+      "id": "f672ce4a-7005-4252-ab93-232457dbddf5",
+      "name": "Webhook",
+      "typeVersion": 2,
+      "webhookId": "06779100-8d0e-4ed7-9916-14a9ece2b41f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        384,
+        192
+      ],
+      "id": "31898178-3cc6-4d77-ab08-bbc7b31210e9",
+      "name": "Respond",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        32,
+        672
+      ],
+      "id": "962adcc8-710f-4934-91af-8cec754c10a1",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "tPNA8xQI2Nvaa6PH",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $('Webhook').item.json.body.message || 'What is in this image?' }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:image/jpeg;base64,{{ $json.file }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"model\": \"llama-3.2-90b-vision-preview\"\n}",
+        "options": {}
+      },
+      "id": "9513582a-10fe-48c1-9f85-01fc9046c992",
+      "name": "HTTP Request GROQ LLAVA1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -192,
+        192
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "groqApi": {
+          "id": "tPNA8xQI2Nvaa6PH",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all();\nreturn input.map(item => {\n  if (item.json && item.json.choices && item.json.choices[0] && item.json.choices[0].message) {\n    return { json: { content: item.json.choices[0].message.content } };\n  } else {\n    return { json: { content: 'Content not available' } };\n  }\n});"
+      },
+      "name": "Format Text1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        192
+      ],
+      "id": "efbbb639-6579-4073-a533-0d4a8af89f54"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        672
+      ],
+      "id": "ca2f7988-40be-4047-add2-d51691431ac3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Enhanced audio processing with better error handling\n\n// Log the entire input for debugging\nconsole.log(\"Audio Processing Input:\", JSON.stringify(items[0].json));\n\n// First, try to find the file in the multipart form data\nlet audioFile;\nlet foundFile = false;\n\n// Check if file exists in binary data\nif (items[0].binary) {\n  const binaryKeys = Object.keys(items[0].binary);\n  if (binaryKeys.length > 0) {\n    audioFile = items[0].binary[binaryKeys[0]];\n    foundFile = true;\n    console.log(\"Found audio in binary data:\", audioFile.fileName, audioFile.mimeType);\n  }\n}\n\n// If not found in binary, try to extract from form data\nif (!foundFile && items[0].json && items[0].json.body) {\n  const formData = items[0].json.body;\n  console.log(\"Form data keys:\", Object.keys(formData));\n  \n  if (formData.file) {\n    try {\n      // Extract file from form data\n      audioFile = formData.file;\n      foundFile = true;\n      console.log(\"Found audio in form data:\", audioFile);\n    } catch (error) {\n      console.error(\"Error extracting file from form data:\", error);\n    }\n  }\n}\n\n// If still no file found, throw detailed error\nif (!foundFile) {\n  console.error(\"No audio file found in request\");\n  throw new Error(\"No audio file found in request\");\n}\n\n// Ensure proper file format\nlet fileName = \"audio_\" + Date.now() + \".webm\";\nlet mimeType = \"audio/webm\";\n\n// Return properly formatted binary data\nreturn {\n  json: {\n    contentType: \"audio\",\n    route: \"audio\"\n  },\n  binary: {\n    file: {\n      ...audioFile,\n      fileName: fileName,\n      mimeType: mimeType\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        0
+      ],
+      "id": "6aca38d6-cac5-4e3e-b4b0-b61a32ac4cb1",
+      "name": "Process Audio",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n    const response = items[0].json;\n    console.log(\"Transcription response:\", JSON.stringify(response));\n    \n    // Fix: Look for text in the body object instead\n    if (!response || !response.body || !response.body.text) {\n        throw new Error('Invalid transcription response: ' + JSON.stringify(response));\n    }\n    \n    return [{\n        json: {\n            responseText: response.body.text.trim()\n        }\n    }];\n} catch (error) {\n    console.error('Transcription formatting error:', error);\n    throw new Error('Failed to process transcription');\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        0
+      ],
+      "id": "181c065f-1bb6-4bf4-80ec-7b3946b0762a",
+      "name": "Format Response1",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=file"
+            },
+            {
+              "name": "model",
+              "value": "whisper-large-v3-turbo"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "f8b87b29-2fd4-457a-b177-f9bccf2a9547",
+      "name": "Audio Transcription",
+      "credentials": {
+        "groqApi": {
+          "id": "tPNA8xQI2Nvaa6PH",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process the image data from form data\nconsole.log('Image processing started');\n\n// Log to help with debugging\nconsole.log('Content type received:', items[0].json.body?.contentType);\n\n// Find the file in binary data or form data\nlet imageFile;\nlet foundFile = false;\n\n// Check binary data first\nif (items[0].binary) {\n    const binaryKeys = Object.keys(items[0].binary);\n    if (binaryKeys.length > 0) {\n        imageFile = items[0].binary[binaryKeys[0]];\n        foundFile = true;\n        console.log('Found image in binary data:', imageFile.fileName, imageFile.mimeType);\n    }\n}\n\n// If not found in binary, try to extract from form data\nif (!foundFile && items[0].json && items[0].json.body) {\n    const formData = items[0].json.body;\n    console.log('Form data keys:', Object.keys(formData));\n    \n    if (formData.file) {\n        imageFile = formData.file;\n        foundFile = true;\n        console.log('Found image in form data');\n    }\n}\n\n// If still no file found, throw error\nif (!foundFile) {\n    console.error('No image file found in request');\n    throw new Error('No image file found in request');\n}\n\n// Pass through the image file data\nreturn {\n    json: {\n        message: items[0].json.body?.message || 'What is in this image?',\n        userId: items[0].json.body?.userId || 'unknown-user'\n    },\n    binary: {\n        file: imageFile\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        192
+      ],
+      "id": "132a6f19-e1fd-4544-9c71-b06a70533b73",
+      "name": "Process Image",
+      "continueOnFail": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Content Type Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Type Router": {
+      "main": [
+        [
+          {
+            "node": "Process Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image to Base64": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request GROQ LLAVA1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Image": {
+      "main": [
+        [
+          {
+            "node": "Image to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request GROQ LLAVA1": {
+      "main": [
+        [
+          {
+            "node": "Format Text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Text1": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Audio": {
+      "main": [
+        [
+          {
+            "node": "Audio Transcription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response1": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Transcription": {
+      "main": [
+        [
+          {
+            "node": "Format Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d6eb2d8a-0789-4c7c-9713-d59ec59f8882",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3a03056b3ae25ed7627ebd0b40dc7c7af839a6375f05a7e809eefe543dd430d8"
+  },
+  "id": "p0mBlT9M8Ud71a32",
+  "tags": []
+}
