@@ -77,6 +77,34 @@ export default function DashboardFoodPage() {
 }
 
 function FoodItemCreatorContent() {
+        // Combined paste state
+        const [combinedPaste, setCombinedPaste] = useState('');
+
+        // Handler for combined paste
+        const handleCombinedPaste = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const text = e.target.value;
+            setCombinedPaste(text);
+            // Use the existing parser to extract nutrition and measures
+            const parsed = parseNutritionText(text);
+            // Try to extract servings/measures
+            const servingsMatch = text.match(/(\d+\s*\w+\s*=\s*\d+g)/gi);
+            setServingText(servingsMatch ? servingsMatch.join('\n') : '');
+            setNutrientText(text); // fallback to all text if not parsed
+            // Try to extract name from first line or a line starting with 'name:'
+            const lines = text.split(/\r?\n/);
+            let foundName = '';
+            for (let line of lines) {
+                if (/^name:/i.test(line)) {
+                    foundName = line.replace(/^name:/i, '').trim();
+                    break;
+                }
+            }
+            if (!foundName && lines.length > 0) {
+                // Use first non-empty line as name
+                foundName = lines.find(l => l.trim().length > 0) || '';
+            }
+            setName(foundName);
+        };
     const router = useRouter();
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -424,6 +452,18 @@ Fat: ${item.fat_g || 0}g
                             <div className="flex items-center gap-3 mb-6">
                                 <Sparkles size={20} className="text-sky-500" />
                                 <h3 className="font-black text-sm uppercase tracking-widest">Nutrients & Servings</h3>
+                            </div>
+
+                            {/* Combined Paste Area */}
+                            <div className="mb-6">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-sky-700 ml-1">Combined Paste (Name, Servings, Nutrients)</Label>
+                                <Textarea
+                                    placeholder="Paste all details here (name, servings, nutrients)..."
+                                    className="min-h-[100px] bg-white dark:bg-slate-950 border-sky-500/10 text-xs focus:ring-sky-500/20 rounded-2xl font-mono p-4 mb-2"
+                                    value={combinedPaste}
+                                    onChange={handleCombinedPaste}
+                                />
+                                <div className="text-xs text-slate-400 mb-2">Pasting here will auto-fill the fields below. You can still edit them after.</div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
