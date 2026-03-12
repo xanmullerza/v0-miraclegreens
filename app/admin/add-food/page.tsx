@@ -84,26 +84,53 @@ function FoodItemCreatorContent() {
         const handleCombinedPaste = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const text = e.target.value;
             setCombinedPaste(text);
-            // Use the existing parser to extract nutrition and measures
-            const parsed = parseNutritionText(text);
-            // Try to extract servings/measures
-            const servingsMatch = text.match(/(\d+\s*\w+\s*=\s*\d+g)/gi);
-            setServingText(servingsMatch ? servingsMatch.join('\n') : '');
-            setNutrientText(text); // fallback to all text if not parsed
-            // Try to extract name from first line or a line starting with 'name:'
             const lines = text.split(/\r?\n/);
+
+            // Extract food name
             let foundName = '';
-            for (let line of lines) {
-                if (/^name:/i.test(line)) {
-                    foundName = line.replace(/^name:/i, '').trim();
+            for (let i = 0; i < lines.length; i++) {
+                if (/Food Name/i.test(lines[i])) {
+                    // Next non-empty line is the name
+                    for (let j = i + 1; j < lines.length; j++) {
+                        if (lines[j].trim().length > 0) {
+                            foundName = lines[j].trim();
+                            break;
+                        }
+                    }
                     break;
                 }
             }
-            if (!foundName && lines.length > 0) {
-                // Use first non-empty line as name
-                foundName = lines.find(l => l.trim().length > 0) || '';
+            if (!foundName) {
+                // Fallback: look for first line with 'Oyster Mushrooms' or similar
+                foundName = lines.find(l => /^[A-Za-z].{3,}/.test(l.trim())) || '';
             }
             setName(foundName);
+
+            // Extract serving sizes
+            let servingsBlock = '';
+            const servingStart = lines.findIndex(l => /Serving Sizes/i.test(l));
+            if (servingStart !== -1) {
+                for (let i = servingStart + 1; i < lines.length; i++) {
+                    if (/Notes|Advanced Info|Nutrition Label|Nutrition Facts/i.test(lines[i])) break;
+                    // Look for lines like '1 cup, sliced 86.0'
+                    if (/\d+\s+\w+.*\d+/.test(lines[i])) {
+                        servingsBlock += lines[i].trim() + '\n';
+                    }
+                }
+            }
+            setServingText(servingsBlock.trim());
+
+            // Extract nutrients
+            let nutrientsBlock = '';
+            const nutritionStart = lines.findIndex(l => /Nutrition Facts|Nutrition Overview|Macronutrients|General|Carbohydrates|Lipids|Protein|Vitamins|Minerals/i.test(l));
+            if (nutritionStart !== -1) {
+                for (let i = nutritionStart; i < lines.length; i++) {
+                    // Stop at empty line or unrelated section
+                    if (/^\s*$/.test(lines[i]) || /Notes|Serving Sizes|Food Name|Add to Diary|Advanced Info/i.test(lines[i])) break;
+                    nutrientsBlock += lines[i].trim() + '\n';
+                }
+            }
+            setNutrientText(nutrientsBlock.trim() || text);
         };
     const router = useRouter();
     const [currentUser, setCurrentUser] = useState<any>(null);
