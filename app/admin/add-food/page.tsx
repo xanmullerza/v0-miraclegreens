@@ -105,7 +105,9 @@ function FoodItemCreatorContent() {
                 ];
                 for (const { cat, kws } of categories) {
                     for (const kw of kws) {
-                        if (lower.includes(kw)) return cat;
+                        // Match whole word or plural (e.g. 'mushroom' matches 'mushrooms')
+                        const pattern = new RegExp(`\\b${kw}s?\\b`, 'i');
+                        if (pattern.test(lower)) return cat;
                     }
                 }
                 return 'General';
