@@ -180,10 +180,11 @@ async function saveConversationToDatabase(userId: string, messages: Message[]) {
             timestamp: m.timestamp
         }));
         
+        // Note: DO NOT explicitly pass user_id with RLS enabled
+        // The column has a DEFAULT value of auth.uid() which Supabase will use
         const { error } = await supabase
             .from('chatbot_conversations')
             .insert({
-                user_id: userId,
                 title: `Conversation - ${new Date().toLocaleDateString()}`,
                 messages: conversationContent,
                 created_at: new Date().toISOString(),
