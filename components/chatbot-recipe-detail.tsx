@@ -143,48 +143,77 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
             setLoadingRelated(true);
             try {
+                // 1. Collect both Food IDs and Ingredient Names for matching
                 const foodIds = ingredients
                     .map(ing => ing.food_item_id)
-                    .filter((id): id is string => !!id);
+                    .filter((id): id is string => !!id && !id.startsWith('raw-'));
 
-                if (foodIds.length === 0) {
+                const ingredientNames = ingredients
+                    .map(ing => (ing.base_ingredient || ing.item || '').toLowerCase().trim())
+                    .filter(name => name.length > 3); // Avoid very short words like "oil", "salt"
+
+                if (foodIds.length === 0 && ingredientNames.length === 0) {
                     setRelatedRecipes([]);
                     return;
                 }
 
-                // Query ingredients table for other recipes using these food items
-                const { data: ingData, error: ingError } = await supabase
-                    .from('ingredients')
-                    .select('recipe_id, food_item_id')
-                    .in('food_item_id', foodIds)
-                    .neq('recipe_id', recipeId)
-                    .limit(50);
+                // 2. Query for matches
+                let overlapDetails: any[] = [];
 
-                if (ingError) throw ingError;
+                // Try ID matching (reliable)
+                if (foodIds.length > 0) {
+                    const { data: idMatches } = await supabase
+                        .from('ingredients')
+                        .select('recipe_id, food_item_id, item, base_ingredient')
+                        .in('food_item_id', foodIds)
+                        .neq('recipe_id', recipeId)
+                        .limit(100);
+                    
+                    if (idMatches) overlapDetails = [...idMatches];
+                }
 
-                // Create a mapping of food_item_id to its names for the current recipe
-                const sharedFoodNames: Record<string, string> = {};
-                ingredients.forEach(ing => {
-                    if (ing.food_item_id) {
-                        sharedFoodNames[ing.food_item_id] = ing.item || ing.base_ingredient || 'Unknown';
+                // Try Name matching (fallback for imported/unknown items)
+                if (ingredientNames.length > 0) {
+                    // Only use top ingredients to avoid too many generic matches (like salt/pepper)
+                    const filteredNames = ingredientNames
+                        .filter(n => !['salt', 'pepper', 'water', 'oil', 'sugar'].includes(n))
+                        .slice(0, 10);
+
+                    if (filteredNames.length > 0) {
+                        const { data: nameMatches } = await supabase
+                            .from('ingredients')
+                            .select('recipe_id, food_item_id, item, base_ingredient')
+                            .in('base_ingredient', filteredNames)
+                            .neq('recipe_id', recipeId)
+                            .limit(100);
+                        
+                        if (nameMatches) {
+                            nameMatches.forEach(nm => {
+                                // Add if not already found via food_item_id
+                                if (!overlapDetails.some(od => od.recipe_id === nm.recipe_id && (od.food_item_id === nm.food_item_id || od.base_ingredient === nm.base_ingredient))) {
+                                    overlapDetails.push(nm);
+                                }
+                            });
+                        }
                     }
-                });
+                }
 
-                // Count overlaps and track which ingredients are shared
+                // 3. Process counts and find recipes
                 const overlapCounts: Record<string, number> = {};
                 const sharedItemsMap: Record<string, string[]> = {};
 
-                ingData.forEach(i => {
+                overlapDetails.forEach(i => {
                     overlapCounts[i.recipe_id] = (overlapCounts[i.recipe_id] || 0) + 1;
-                    if (i.food_item_id && sharedFoodNames[i.food_item_id]) {
-                        if (!sharedItemsMap[i.recipe_id]) sharedItemsMap[i.recipe_id] = [];
-                        if (!sharedItemsMap[i.recipe_id].includes(sharedFoodNames[i.food_item_id])) {
-                            sharedItemsMap[i.recipe_id].push(sharedFoodNames[i.food_item_id]);
-                        }
+                    const itemName = i.base_ingredient || i.item || 'Unknown';
+                    if (!sharedItemsMap[i.recipe_id]) sharedItemsMap[i.recipe_id] = [];
+                    if (!sharedItemsMap[i.recipe_id].includes(itemName)) {
+                        sharedItemsMap[i.recipe_id].push(itemName);
                     }
                 });
 
-                const recipeIds = Object.keys(overlapCounts);
+                // Filter by minimum threshold (requested 1 for testing, ultimately 3)
+                const minThreshold = 1;
+                const recipeIds = Object.keys(overlapCounts).filter(id => overlapCounts[id] >= minThreshold);
 
                 if (recipeIds.length === 0) {
                     setRelatedRecipes([]);
@@ -194,11 +223,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 const { data: recipeData, error: recipeError } = await supabase
                     .from('recipes')
                     .select('id, title, image, type, diet, prep_time, calories')
-                    .in('id', recipeIds);
+                    .in('id', recipeIds)
+                    .limit(12);
 
                 if (recipeError) throw recipeError;
 
-                // Sort by overlap count (descending)
+                // 4. Sort by overlap count (descending)
                 const sortedRecipes = (recipeData || [])
                     .map(r => ({
                         ...r,
