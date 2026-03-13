@@ -17,6 +17,7 @@ interface Recipe {
     fat: number;
     carbs: number;
     prep_time: number;
+    cook_time: number;
     servings: number;
     diet: string[];
     is_favorite: boolean;
@@ -378,19 +379,23 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                     <div className="grid grid-cols-2 gap-2">
                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
                             <p className="text-xs text-slate-500 dark:text-slate-400">Prep Time</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.prep_time} min</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">
+                                {recipe.prep_time > 0 ? `${recipe.prep_time} min` : '-'}
+                            </p>
                         </div>
                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
                             <p className="text-xs text-slate-500 dark:text-slate-400">Servings</p>
                             <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.servings} servings</p>
                         </div>
                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Weight</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(totalWeight)} g</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Cook Time</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">
+                                {recipe.cook_time > 0 ? `${recipe.cook_time} min` : '-'}
+                            </p>
                         </div>
                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Type</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">{recipe.type}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Weight</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(totalWeight)} g</p>
                         </div>
                     </div>
                 )}
