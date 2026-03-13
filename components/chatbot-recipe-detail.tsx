@@ -268,8 +268,21 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             // Helper to clean and extract the core ingredient name
             const extractCoreName = (name: string) => {
                 return name.toLowerCase()
-                    .replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated)\s+/g, '')
-                    .replace(/\s+\(.*\)/g, '')
+                    // Remove leading quantities like "2", "4-6", "250ml", "300g", "1/2"
+                    .replace(/^[\d\/\.\-]+\s*/g, '')
+                    // Remove units like tbsp, tsp, cups, ml, g, kg, oz, lb, liter, bunch, handful, can, cans, small, large, medium
+                    .replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?|x)\s+/gi, '')
+                    // Remove leading "of"
+                    .replace(/^of\s+/gi, '')
+                    // Remove size descriptors
+                    .replace(/^(small|large|medium|big|thin|thick)\s+/gi, '')
+                    // Remove prep words
+                    .replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated)\s+/gi, '')
+                    // Remove trailing prep descriptions
+                    .replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste).*$/gi, '')
+                    // Remove anything in parentheses
+                    .replace(/\s*\(.*\)/g, '')
+                    // Take text before comma
                     .split(',')[0]
                     .trim();
             };
@@ -279,12 +292,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 const searchTermRaw = ing.base_ingredient || ing.item;
                 const searchTerm = extractCoreName(searchTermRaw);
                 
-                if (!searchTerm) continue;
+                if (!searchTerm || searchTerm.length < 2) continue;
 
                 // Query local food_items table
                 const { data, error } = await supabase
                     .from('food_items')
-                    .select('id, name, format, base_weight_g, energy_kcal, protein_g, carbs_g, fat_g')
+                    .select('id, name, base_weight_g, energy_kcal, protein_g, carbs_g, fat_g')
                     .ilike('name', `%${searchTerm}%`)
                     .limit(1);
 
