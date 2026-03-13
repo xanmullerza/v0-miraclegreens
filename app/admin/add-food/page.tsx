@@ -199,32 +199,29 @@ function FoodItemCreatorContent() {
     // Track if user has manually edited common name
     const [commonNameManuallyEdited, setCommonNameManuallyEdited] = useState(false);
 
-    // Helper: auto-generate common name from official name
+    // Helper: auto-generate common name from official name (scientific name)
     function autoCommonName(officialName: string): string {
         if (!officialName) return '';
-        const cookingWords = [
-            'cooked', 'boiled', 'fried', 'blanched', 'steamed', 'roasted', 'baked', 'grilled', 'poached', 'sauteed', 'stewed', 'broiled', 'microwaved', 'toasted', 'smoked', 'braised', 'pickled', 'fermented', 'dehydrated', 'dried', 'candied', 'caramelized', 'parboiled', 'scalded', 'scorched', 'charred', 'barbecued', 'air-fried', 'pressure-cooked', 'slow-cooked', 'sous-vide', 'confit', 'en papillote', 'glazed', 'marinated', 'preserved', 'jerked', 'curried', 'stuffed', 'tempura', 'deep-fried', 'pan-fried', 'oven-baked', 'oven-roasted', 'oven-grilled', 'oven-fried', 'oven-steamed', 'oven-broiled', 'oven-toasted', 'oven-smoked', 'oven-braised', 'oven-pickled', 'oven-fermented', 'oven-dehydrated', 'oven-dried', 'oven-candied', 'oven-caramelized', 'oven-parboiled', 'oven-scalded', 'oven-scorched', 'oven-charred', 'oven-barbecued', 'oven-air-fried', 'oven-pressure-cooked', 'oven-slow-cooked', 'oven-sous-vide', 'oven-confit', 'oven-en papillote', 'oven-glazed', 'oven-marinated', 'oven-preserved', 'oven-jerked', 'oven-curried', 'oven-stuffed', 'oven-tempura', 'oven-deep-fried', 'oven-pan-fried'
-        ];
         let n = officialName.trim();
-        // Remove trailing commas and spaces
-        n = n.replace(/,+\s*$/, '');
-        // If contains 'raw', remove 'raw' and everything after
-        if (/raw/i.test(n)) {
-            return n.split(/,\s*raw/i)[0].trim();
+        n = n.replace(/,+\s*$/, ''); // Remove trailing commas and spaces
+        // If contains 'raw' or 'fresh', use part before comma
+        if (/,(\s*)?(raw|fresh)/i.test(n)) {
+            return n.split(/,\s*(raw|fresh)/i)[0].trim();
         }
-        // If contains any cooking word, use part before first comma, add (cooked)
-        for (const word of cookingWords) {
-            const regex = new RegExp(`,?\\s*${word}[,\s]*`, 'i');
-            if (regex.test(n)) {
-                // Use part before first comma or before cooking word
-                let base = n.split(',')[0].trim();
-                if (!base) base = n.replace(regex, '').trim();
-                return base + ' (cooked)';
-            }
+        // If contains any other word after comma, treat as cooked
+        if (/,\s*([a-zA-Z]+)/.test(n)) {
+            return n.split(',')[0].trim() + ' (cooked)';
         }
-        // Default: use part before first comma
-        return n.split(',')[0].trim();
+        // Default: use as is
+        return n;
     }
+
+    // Auto-populate common name from name unless manually edited
+    useEffect(() => {
+        if (!commonNameManuallyEdited) {
+            setCommonName(autoCommonName(name));
+        }
+    }, [name, commonNameManuallyEdited]);
     const [duplicateName, setDuplicateName] = useState(false);
     const [duplicateCommonName, setDuplicateCommonName] = useState(false);
         // Check for duplicate name/common name
@@ -637,10 +634,7 @@ Fat: ${item.fat_g || 0}g
                                     value={name}
                                     onChange={(e) => {
                                         setName(e.target.value);
-                                        // Only auto-fill if user hasn't manually edited common name
-                                        if (!commonNameManuallyEdited) {
-                                            setCommonName(autoCommonName(e.target.value));
-                                        }
+                                        // No longer needed: auto-fill now handled by useEffect
                                     }}
                                 />
                                 {duplicateName && (
