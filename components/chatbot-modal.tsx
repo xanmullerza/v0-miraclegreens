@@ -23,6 +23,7 @@ interface Message {
     type: 'user' | 'bot';
     content: string;
     timestamp: Date;
+    recipeData?: ParsedRecipe;
 }
 
 interface ParsedRecipe {
@@ -336,6 +337,63 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         return () => window.removeEventListener('popstate', handlePopState);
     }, [chatbotView]);
 
+    const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
+        setRecipeSaving(true);
+        try {
+            // Parse ingredients into array
+            const ingredientsList = recipe.ingredients_text
+                .split('\n')
+                .filter(line => line.trim())
+                .map((line, idx) => ({
+                    food_item_name: line.trim(),
+                    food_item_id: `raw-${idx}`,
+                    quantity: 1,
+                    measure_label: 'item',
+                    weight_g: 0,
+                    calories: 0,
+                    protein: 0,
+                    fat: 0,
+                    carbs: 0,
+                }));
+
+            // Parse instructions into array
+            const instructionsList = recipe.instructions_text
+                .split('\n')
+                .filter(line => line.trim());
+
+            // Create recipe data object for saving
+            const recipeDataToSave = {
+                title: recipe.title,
+                type: 'dinner',
+                servings: recipe.servings || 4,
+                prep_time: recipe.prep_time || 30,
+                image: recipe.image_url,
+                is_favorite: true,
+                is_mix: false,
+                diet: [],
+                calories: 0,
+                protein: 0,
+                fat: 0,
+                carbs: 0,
+                source: recipe.source_url
+            };
+
+            // Save the recipe
+            const result = await saveRecipe(recipeDataToSave, ingredientsList, instructionsList);
+            const recipeId = result?.id || `recipe-${Date.now()}`;
+            
+            toast.success('Successfully saved to your library!');
+            
+            // Navigate to the recipe
+            router.push(`/dashboard/library/my-recipes/${recipeId}`);
+        } catch (error: any) {
+            console.error('Error saving recipe:', error);
+            toast.error('Failed to save recipe. Please try again.');
+        } finally {
+            setRecipeSaving(false);
+        }
+    };
+
     const handleViewSavedRecipe = async (recipe?: ParsedRecipe) => {
         const recipeToView = recipe || successRecipe;
         if (!recipeToView) return;
@@ -436,7 +494,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     throw new Error('Invalid response format from recipe parser');
                 }
 
-                // Parse response - expect { recipe: { title, ingredients_text, instructions_text, servings, prep_time, source_url, image_url } }
+                // Parse response - expect { recipe: { title, ... } }
                 let recipeData: ParsedRecipe | null = null;
 
                 // Check if n8n returned an error
@@ -466,20 +524,19 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 }
 
                 if (recipeData) {
-                    // Remove the "Parsing..." message and show success
+                    // Store the recipe data and show the success message with a button
+                    setSuccessRecipe(recipeData);
                     setMessages(prev => [
                         ...prev.slice(0, -1),
                         {
                             id: (Date.now() + 1).toString(),
                             type: 'bot',
-                            content: `✅ Great! "${recipeData.title}" has been saved to your library! You can now view it in your My Recipes section, edit it, adjust servings, and add more ingredients whenever you'd like.`,
+                            content: `✅ Great! I've parsed "${recipeData.title}"! Would you like to save it to your library and view it?`,
                             timestamp: new Date(),
+                            recipeData: recipeData
                         }
                     ]);
-
-                    // Store the recipe as fallback and navigate directly to the saved recipe
-                    setSuccessRecipe(recipeData);
-                    handleViewSavedRecipe(recipeData);
+                    // Don't auto-redirect, let user click the button they remember
                 } else {
                     setMessages(prev => [
                         ...prev.slice(0, -1),
@@ -1200,25 +1257,22 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             }
 
             if (recipeData) {
-                // Remove the "Parsing..." message and show success - matching URL flow
+                setSuccessRecipe(recipeData);
                 setMessages(prev => [
                     ...prev.slice(0, -1),
                     {
                         id: (Date.now() + 1).toString(),
                         type: 'bot',
-                        content: `✅ Great! "${recipeData.title}" has been saved to your library! You can now view it in your My Recipes section, edit it, adjust servings, and add more ingredients whenever you'd like.`,
+                        content: `✅ Successfully parsed "${recipeData.title}"! You can now save it to your library.`,
                         timestamp: new Date(),
+                        recipeData: recipeData
                     }
                 ]);
-
-                // Store the recipe and navigate/show modal - matching URL flow
-                setSuccessRecipe(recipeData);
                 setIsCreatingRecipe(false);
                 setPastedRecipeContent('');
                 if (recipeContentRef.current) {
                     recipeContentRef.current.value = '';
                 }
-                handleViewSavedRecipe(recipeData);
             } else {
                 setMessages(prev => [
                     ...prev.slice(0, -1),
@@ -1331,22 +1385,19 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             }
 
             if (recipeData) {
-                // Remove the "Extracting..." message and show success
+                setSuccessRecipe(recipeData);
                 setMessages(prev => [
                     ...prev.slice(0, -1),
                     {
                         id: (Date.now() + 1).toString(),
                         type: 'bot',
-                        content: `✅ Perfect! "${recipeData.title}" has been imported and saved to your library! You can now view it in your My Recipes section, edit it, adjust servings, and add more ingredients.`,
+                        content: `✅ Perfect! I've imported "${recipeData.title}"! Use the button below to save it.`,
                         timestamp: new Date(),
+                        recipeData: recipeData
                     }
                 ]);
-
-                // Store the recipe
-                setSuccessRecipe(recipeData);
                 setIsCreatingRecipe(false);
                 setpastedRecipeURL('');
-                handleViewSavedRecipe(recipeData);
             } else {
                 setMessages(prev => [
                     ...prev.slice(0, -1),
@@ -1675,7 +1726,23 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                 )}
                             >
                                 {message.type === 'bot' ? (
-                                    <FormattedText content={message.content} />
+                                    <div className="space-y-3">
+                                        <FormattedText content={message.content} />
+                                        {message.recipeData && (
+                                            <button
+                                                onClick={() => handleSaveAndViewRecipe(message.recipeData!)}
+                                                disabled={recipeSaving}
+                                                className="w-full mt-2 px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/20 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {recipeSaving ? (
+                                                    <Loader2 size={12} className="animate-spin" />
+                                                ) : (
+                                                    <Save size={12} />
+                                                )}
+                                                SAVE AND VIEW RECIPE
+                                            </button>
+                                        )}
+                                    </div>
                                 ) : (
                                     message.content
                                 )}

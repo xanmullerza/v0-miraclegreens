@@ -63,9 +63,9 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
     const [sortField, setSortField] = useState<string>('title');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-    // Fetch user's personal recipes only (where user_id matches)
+    // Fetch user's personal recipes (cloud if logged in, local if not)
     useEffect(() => {
-        if (!authLoading && user) {
+        if (!authLoading) {
             fetchMyRecipes(0, true);
         }
     }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, user]);
@@ -75,20 +75,28 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
         else setLoadingMore(true);
 
         try {
-            // Fetch all recipes and then filter to user's own
-            const { recipes: allRecipes, count } = await fetchRecipesBridge({
+            // Fetch all recipes
+            const { recipes: allRecipes } = await fetchRecipesBridge({
                 searchQuery,
                 selectedTypes,
                 showFavoritesOnly,
-                page: 0, // Get all pages initially to filter locally
-                pageSize: 1000, // Large number to get user's recipes
+                page: 0,
+                pageSize: 1000,
                 sortField,
                 sortDirection,
                 isMix: false
             });
 
-            // Filter to only user's own recipes (not curated)
-            const userRecipes = allRecipes.filter(r => r.user_id === user?.id && !r.is_curated);
+            // Filter logic:
+            // 1. If logged in: show recipes belonging to the user
+            // 2. If logged out: show recipes from local storage (which have local- prefix or no user_id)
+            const userRecipes = allRecipes.filter(r => {
+                if (user) {
+                    return r.user_id === user.id && !r.is_curated;
+                } else {
+                    return r.id.toString().startsWith('local-') || !r.user_id;
+                }
+            });
 
             if (isNewSearch) {
                 setRecipes(userRecipes);
