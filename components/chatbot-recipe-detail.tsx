@@ -267,24 +267,33 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
             // Helper to clean and extract the core ingredient name
             const extractCoreName = (name: string) => {
-                return name.toLowerCase()
+                let cleaned = name.toLowerCase()
                     // Remove leading quantities like "2", "4-6", "250ml", "300g", "1/2"
                     .replace(/^[\d\/\.\-]+\s*/g, '')
-                    // Remove units like tbsp, tsp, cups, ml, g, kg, oz, lb, liter, bunch, handful, can, cans, small, large, medium
+                    // Remove leading units/measures
                     .replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?|x)\s+/gi, '')
                     // Remove leading "of"
                     .replace(/^of\s+/gi, '')
                     // Remove size descriptors
                     .replace(/^(small|large|medium|big|thin|thick)\s+/gi, '')
-                    // Remove prep words
+                    // Remove leading prep words
                     .replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated)\s+/gi, '')
+                    // Remove trailing form/measure descriptors (sprigs, stalks, leaves, cloves, etc.)
+                    .replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches|florets?|pieces?|fillets?|breasts?|thighs?|drumsticks?|heads?|ears?|kernels?|zest|juice|seeds?|pods?|strips?|wedges?|rounds?|halves|quarters?)\s*$/gi, '')
                     // Remove trailing prep descriptions
-                    .replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste).*$/gi, '')
+                    .replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste|and leaves|stalks and leaves).*$/gi, '')
                     // Remove anything in parentheses
                     .replace(/\s*\(.*\)/g, '')
                     // Take text before comma
                     .split(',')[0]
                     .trim();
+                
+                // Second pass: re-strip any remaining trailing descriptors after comma split
+                cleaned = cleaned
+                    .replace(/\s+(sprigs?|stalks?|leaves?|cloves?)\s*$/gi, '')
+                    .trim();
+                
+                return cleaned;
             };
 
             for (const ing of ingredients) {
