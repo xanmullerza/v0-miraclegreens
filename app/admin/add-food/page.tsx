@@ -196,6 +196,35 @@ function FoodItemCreatorContent() {
     // State for the food item
     const [name, setName] = useState('');
     const [commonName, setCommonName] = useState('');
+    // Track if user has manually edited common name
+    const [commonNameManuallyEdited, setCommonNameManuallyEdited] = useState(false);
+
+    // Helper: auto-generate common name from official name
+    function autoCommonName(officialName: string): string {
+        if (!officialName) return '';
+        const cookingWords = [
+            'cooked', 'boiled', 'fried', 'blanched', 'steamed', 'roasted', 'baked', 'grilled', 'poached', 'sauteed', 'stewed', 'broiled', 'microwaved', 'toasted', 'smoked', 'braised', 'pickled', 'fermented', 'dehydrated', 'dried', 'candied', 'caramelized', 'parboiled', 'scalded', 'scorched', 'charred', 'barbecued', 'air-fried', 'pressure-cooked', 'slow-cooked', 'sous-vide', 'confit', 'en papillote', 'glazed', 'marinated', 'preserved', 'jerked', 'curried', 'stuffed', 'tempura', 'deep-fried', 'pan-fried', 'oven-baked', 'oven-roasted', 'oven-grilled', 'oven-fried', 'oven-steamed', 'oven-broiled', 'oven-toasted', 'oven-smoked', 'oven-braised', 'oven-pickled', 'oven-fermented', 'oven-dehydrated', 'oven-dried', 'oven-candied', 'oven-caramelized', 'oven-parboiled', 'oven-scalded', 'oven-scorched', 'oven-charred', 'oven-barbecued', 'oven-air-fried', 'oven-pressure-cooked', 'oven-slow-cooked', 'oven-sous-vide', 'oven-confit', 'oven-en papillote', 'oven-glazed', 'oven-marinated', 'oven-preserved', 'oven-jerked', 'oven-curried', 'oven-stuffed', 'oven-tempura', 'oven-deep-fried', 'oven-pan-fried'
+        ];
+        let n = officialName.trim();
+        // Remove trailing commas and spaces
+        n = n.replace(/,+\s*$/, '');
+        // If contains 'raw', remove 'raw' and everything after
+        if (/raw/i.test(n)) {
+            return n.split(/,\s*raw/i)[0].trim();
+        }
+        // If contains any cooking word, use part before first comma, add (cooked)
+        for (const word of cookingWords) {
+            const regex = new RegExp(`,?\\s*${word}[,\s]*`, 'i');
+            if (regex.test(n)) {
+                // Use part before first comma or before cooking word
+                let base = n.split(',')[0].trim();
+                if (!base) base = n.replace(regex, '').trim();
+                return base + ' (cooked)';
+            }
+        }
+        // Default: use part before first comma
+        return n.split(',')[0].trim();
+    }
     const [duplicateName, setDuplicateName] = useState(false);
     const [duplicateCommonName, setDuplicateCommonName] = useState(false);
         // Check for duplicate name/common name
@@ -606,7 +635,13 @@ Fat: ${item.fat_g || 0}g
                                         duplicateName && "border-rose-500"
                                     )}
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => {
+                                        setName(e.target.value);
+                                        // Only auto-fill if user hasn't manually edited common name
+                                        if (!commonNameManuallyEdited) {
+                                            setCommonName(autoCommonName(e.target.value));
+                                        }
+                                    }}
                                 />
                                 {duplicateName && (
                                     <div className="text-xs text-rose-500 font-bold mt-1">A food with this official name already exists.</div>
@@ -623,7 +658,10 @@ Fat: ${item.fat_g || 0}g
                                         duplicateCommonName && "border-rose-500"
                                     )}
                                     value={commonName}
-                                    onChange={(e) => setCommonName(e.target.value)}
+                                    onChange={(e) => {
+                                        setCommonName(e.target.value);
+                                        setCommonNameManuallyEdited(true);
+                                    }}
                                 />
                                 {duplicateCommonName && (
                                     <div className="text-xs text-rose-500 font-bold mt-1">A food with this common name already exists.</div>
