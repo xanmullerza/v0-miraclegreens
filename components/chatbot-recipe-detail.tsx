@@ -267,28 +267,43 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
             // Helper to clean and extract the core ingredient name
             const extractCoreName = (name: string) => {
-                let cleaned = name.toLowerCase()
-                    // Remove leading quantities like "2", "4-6", "250ml", "300g", "1/2"
-                    .replace(/^[\d\/\.\-]+\s*/g, '')
-                    // Remove leading units/measures
-                    .replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?|x)\s+/gi, '')
-                    // Remove leading "of"
-                    .replace(/^of\s+/gi, '')
-                    // Remove size descriptors
-                    .replace(/^(small|large|medium|big|thin|thick)\s+/gi, '')
-                    // Remove leading prep words
-                    .replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated)\s+/gi, '')
-                    // Remove trailing form/measure descriptors (sprigs, stalks, leaves, cloves, etc.)
-                    .replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches|florets?|pieces?|fillets?|breasts?|thighs?|drumsticks?|heads?|ears?|kernels?|zest|juice|seeds?|pods?|strips?|wedges?|rounds?|halves|quarters?)\s*$/gi, '')
-                    // Remove trailing prep descriptions
-                    .replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste|and leaves|stalks and leaves).*$/gi, '')
-                    // Remove anything in parentheses
-                    .replace(/\s*\(.*\)/g, '')
-                    // Take text before comma
-                    .split(',')[0]
-                    .trim();
+                let cleaned = name.toLowerCase().trim();
                 
-                // Second pass: re-strip any remaining trailing descriptors after comma split
+                // Remove anything in parentheses first
+                cleaned = cleaned.replace(/\s*\(.*?\)/g, '').trim();
+                
+                // Multi-pass leading cleanup (run twice so e.g. "small bunch of" all gets stripped)
+                for (let i = 0; i < 2; i++) {
+                    // Remove leading quantities like "2", "4-6", "250ml", "300g", "1/2", "2 x"
+                    cleaned = cleaned.replace(/^[\d\/\.\-]+\s*(x\s+)?/g, '').trim();
+                    // Remove leading units/measures
+                    cleaned = cleaned.replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?)\s+/gi, '').trim();
+                    // Remove leading "of"
+                    cleaned = cleaned.replace(/^of\s+/gi, '').trim();
+                    // Remove size descriptors
+                    cleaned = cleaned.replace(/^(small|large|medium|big|thin|thick)\s+/gi, '').trim();
+                    // Remove leading prep words
+                    cleaned = cleaned.replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated|skin-on|bone-in|boneless|skinless)\s*,?\s*/gi, '').trim();
+                }
+                
+                // Remove trailing form/measure descriptors
+                cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches|florets?|pieces?|fillets?|breasts?|thighs?|drumsticks?|heads?|ears?|kernels?|zest|juice|seeds?|pods?|strips?|wedges?|rounds?|halves|quarters?)\s*$/gi, '').trim();
+                
+                // Remove trailing prep descriptions
+                cleaned = cleaned.replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste|and leaves|stalks and leaves).*$/gi, '').trim();
+                
+                // Handle commas: try to find the most food-like segment
+                if (cleaned.includes(',')) {
+                    const parts = cleaned.split(',').map(p => p.trim()).filter(p => p.length > 1);
+                    // Descriptors that indicate a part is NOT the core food name
+                    const descriptorPattern = /^(skin-on|bone-in|boneless|skinless|dried|fresh|raw|cooked|chopped|diced|sliced|minced|grated|peeled|whole|ground|crushed|smoked|roasted|canned|frozen|organic|rinsed|pitted|grade|unprepared)/i;
+                    // Find the first part that doesn't look like a descriptor
+                    const foodPart = parts.find(p => !descriptorPattern.test(p));
+                    cleaned = foodPart || parts[parts.length - 1] || cleaned;
+                    cleaned = cleaned.trim();
+                }
+                
+                // Final cleanup pass for any remaining trailing descriptors
                 cleaned = cleaned
                     .replace(/\s+(sprigs?|stalks?|leaves?|cloves?)\s*$/gi, '')
                     .trim();
