@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, Info } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -923,22 +923,48 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-1">
+                                                    <div className="flex items-center gap-2">
                                                         <button 
                                                             onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: false })); }}
-                                                            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-                                                            title="Go Back"
+                                                            className="w-8 h-8 flex items-center justify-center rounded-full border border-slate-300 dark:border-slate-600 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+                                                            title="Review original"
                                                         >
-                                                            <ArrowLeft size={14} />
+                                                            <RefreshCw size={14} />
                                                         </button>
                                                         <button 
                                                             onClick={() => { 
                                                                 setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
                                                                 setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
                                                             }}
-                                                            className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                                                            className="w-8 h-8 flex items-center justify-center rounded-full border border-emerald-300 dark:border-emerald-700 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all"
+                                                            title="Accept match"
                                                         >
-                                                            Accept
+                                                            <Check size={14} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={(e) => { 
+                                                                e.stopPropagation();
+                                                                setMatchedIngredients(prev => {
+                                                                    const updated = { ...prev };
+                                                                    delete updated[ing.id];
+                                                                    return updated;
+                                                                });
+                                                                setFlippedCards(prev => {
+                                                                    const updated = { ...prev };
+                                                                    delete updated[ing.id];
+                                                                    return updated;
+                                                                });
+                                                                setAcceptedMatches(prev => {
+                                                                    const updated = { ...prev };
+                                                                    delete updated[ing.id];
+                                                                    return updated;
+                                                                });
+                                                                toast.success('Match rejected');
+                                                            }}
+                                                            className="w-8 h-8 flex items-center justify-center rounded-full border border-rose-300 dark:border-rose-700 text-rose-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all"
+                                                            title="Reject match"
+                                                        >
+                                                            <X size={14} />
                                                         </button>
                                                     </div>
                                                 </div>
