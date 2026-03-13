@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, Info } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -52,6 +52,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
     const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
+
+    // Smart Match State
+    const [smartMatchRunning, setSmartMatchRunning] = useState(false);
+    const [matchedIngredients, setMatchedIngredients] = useState<Record<string, any>>({});
+    const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+    const [acceptedMatches, setAcceptedMatches] = useState<Record<string, boolean>>({});
+
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
 
@@ -247,6 +254,68 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         };
         fetchRelated();
     }, [ingredients, recipeId]);
+
+    // --- Smart Match Logic ---
+    const runSmartMatch = async () => {
+        if (smartMatchRunning || ingredients.length === 0) return;
+        setSmartMatchRunning(true);
+        toast.loading("Analyzing ingredients with Smart Match...", { id: 'smart-match' });
+
+        try {
+            const newMatches: Record<string, any> = {};
+            const newFlipped: Record<string, boolean> = {};
+
+            // Helper to clean and extract the core ingredient name
+            const extractCoreName = (name: string) => {
+                return name.toLowerCase()
+                    .replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated)\s+/g, '')
+                    .replace(/\s+\(.*\)/g, '')
+                    .split(',')[0]
+                    .trim();
+            };
+
+            for (const ing of ingredients) {
+                // Determine search term, prioritizing base_ingredient
+                const searchTermRaw = ing.base_ingredient || ing.item;
+                const searchTerm = extractCoreName(searchTermRaw);
+                
+                if (!searchTerm) continue;
+
+                // Query local food_items table
+                const { data, error } = await supabase
+                    .from('food_items')
+                    .select('id, name, format, base_weight_g, energy_kcal, protein_g, carbs_g, fat_g')
+                    .ilike('name', `%${searchTerm}%`)
+                    .limit(1);
+
+                if (error) {
+                    console.error('Error fetching food item for match:', error);
+                    continue;
+                }
+
+                if (data && data.length > 0) {
+                    const match = data[0];
+                    newMatches[ing.id] = match;
+                    newFlipped[ing.id] = true; // Auto-flip to show the match
+                }
+            }
+
+            const matchCount = Object.keys(newMatches).length;
+            if (matchCount > 0) {
+                setMatchedIngredients(newMatches);
+                setFlippedCards(newFlipped);
+                toast.success(`Smart Match found ${matchCount} corresponding food items!`, { id: 'smart-match' });
+            } else {
+                toast.error("Smart Match couldn't find any direct mappings. You may need to add these items to your database.", { id: 'smart-match' });
+            }
+
+        } catch (error) {
+            console.error('Error during Smart Match:', error);
+            toast.error("An error occurred while running Smart Match.", { id: 'smart-match' });
+        } finally {
+            setSmartMatchRunning(false);
+        }
+    };
 
     const totalWeight = ingredients.reduce((sum, ing) => sum + (ing.weight_g || 0), 0);
 
@@ -518,7 +587,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                     </>
                 )}
 
-                {activeSection === 'nutrition' && (
+                {activeSection === 'nutrition' && (recipe.calories > 0 ? (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="pb-3">
                             <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
@@ -658,7 +727,159 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                             </div>
                         )}
                     </div>
-                )}
+                ) : (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {/* No Data Explainer */}
+                        <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100 dark:border-indigo-800/50 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                                <Sparkles size={64} className="text-indigo-500" />
+                            </div>
+                            <div className="relative z-10">
+                                <h3 className="text-lg font-black text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
+                                    <Sparkles size={18} className="text-indigo-500 animate-pulse" />
+                                    Smart Match
+                                </h3>
+                                <p className="text-sm text-indigo-700/80 dark:text-indigo-400/80 mb-4 leading-relaxed">
+                                    This recipe hasn't been analyzed yet. We can use our Smart Match technology to map these ingredients to our nutrition database and calculate the exact macro and micro nutrients tailored to your body.
+                                </p>
+                                <button
+                                    onClick={runSmartMatch}
+                                    disabled={smartMatchRunning}
+                                    className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100"
+                                >
+                                    {smartMatchRunning ? (
+                                        <><Loader2 size={16} className="animate-spin" /> Analyzing Ingredients...</>
+                                    ) : (
+                                        <><Zap size={16} className="fill-current" /> Run Smart Match</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Ingredients to Match */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                                    <Layers size={14} /> Ingredient Mapping
+                                </h4>
+                                {Object.keys(matchedIngredients).length > 0 && (
+                                    <button 
+                                        onClick={() => {
+                                            const newAccepted = { ...acceptedMatches };
+                                            const newFlipped = { ...flippedCards };
+                                            Object.keys(matchedIngredients).forEach(id => {
+                                                newAccepted[id] = true;
+                                                newFlipped[id] = false;
+                                            });
+                                            setAcceptedMatches(newAccepted);
+                                            setFlippedCards(newFlipped);
+                                            toast.success(`Accepted ${Object.keys(matchedIngredients).length} ingredient matches`);
+                                        }}
+                                        className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                                    >
+                                        Accept All
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="grid gap-3">
+                                {ingredients.map((ing) => {
+                                    const isMatched = !!matchedIngredients[ing.id];
+                                    const isFlipped = !!flippedCards[ing.id];
+                                    const isAccepted = !!acceptedMatches[ing.id];
+                                    
+                                    return (
+                                        <div key={ing.id} className="relative h-[80px] w-full [perspective:1000px] group">
+                                            <div 
+                                                className={cn(
+                                                    "w-full h-full transition-all duration-500 [transform-style:preserve-3d]",
+                                                    isFlipped ? "[transform:rotateY(180deg)]" : ""
+                                                )}
+                                            >
+                                                {/* Front (Original Ingredient) */}
+                                                <div className={cn(
+                                                    "absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl p-3 flex items-center justify-between border transition-colors",
+                                                    isMatched && !isAccepted ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" :
+                                                    isAccepted ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800" :
+                                                    "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                                                )}>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={cn(
+                                                            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm",
+                                                            isAccepted ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600" :
+                                                            "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                                                        )}>
+                                                            {isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-bold text-slate-900 dark:text-white capitalize truncate max-w-[180px]">
+                                                                {ing.base_ingredient || ing.item}
+                                                            </p>
+                                                            <p className="text-xs text-slate-500 font-medium">
+                                                                {ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {isMatched && !isAccepted && (
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: true })); }}
+                                                            className="p-2 text-indigo-500 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-full transition-colors"
+                                                            title="Review Match"
+                                                        >
+                                                            <RefreshCw size={16} />
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* Back (Matched Food Item) */}
+                                                <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl p-3 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-900/30 dark:to-slate-900 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between shadow-sm shadow-indigo-100 dark:shadow-none">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
+                                                            <Activity size={18} className="text-indigo-500" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <p className="text-sm font-bold text-indigo-900 dark:text-indigo-300 truncate max-w-[150px]">
+                                                                    {matchedIngredients[ing.id]?.name || 'Match'}
+                                                                </p>
+                                                                <span className="text-[8px] h-4 px-1 py-0 rounded border bg-indigo-100 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400">
+                                                                    LOCAL DB
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-[10px] text-indigo-600/80 dark:text-indigo-400/80 font-medium mt-0.5 max-w-[180px] truncate">
+                                                                Match for: "{ing.base_ingredient || ing.item}"
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-1">
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: false })); }}
+                                                            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                                                            title="Go Back"
+                                                        >
+                                                            <ArrowLeft size={14} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => { 
+                                                                setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+                                                                setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
+                                                            }}
+                                                            className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                                                        >
+                                                            Accept
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                ))}
 
                 {activeSection === 'related' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
