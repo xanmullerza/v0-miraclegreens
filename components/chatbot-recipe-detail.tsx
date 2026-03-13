@@ -265,7 +265,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             const newMatches: Record<string, any> = {};
             const newFlipped: Record<string, boolean> = {};
 
-            // Helper to clean and extract the core ingredient name
+            // Helper to clean ingredient name - keeps food-form words (thighs, breasts, etc.)
             const extractCoreName = (name: string) => {
                 let cleaned = name.toLowerCase().trim();
                 
@@ -274,20 +274,15 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 
                 // Multi-pass leading cleanup (run twice so e.g. "small bunch of" all gets stripped)
                 for (let i = 0; i < 2; i++) {
-                    // Remove leading quantities like "2", "4-6", "250ml", "300g", "1/2", "2 x"
                     cleaned = cleaned.replace(/^[\d\/\.\-]+\s*(x\s+)?/g, '').trim();
-                    // Remove leading units/measures
                     cleaned = cleaned.replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?)\s+/gi, '').trim();
-                    // Remove leading "of"
                     cleaned = cleaned.replace(/^of\s+/gi, '').trim();
-                    // Remove size descriptors
                     cleaned = cleaned.replace(/^(small|large|medium|big|thin|thick)\s+/gi, '').trim();
-                    // Remove leading prep words
                     cleaned = cleaned.replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated|skin-on|bone-in|boneless|skinless)\s*,?\s*/gi, '').trim();
                 }
                 
-                // Remove trailing form/measure descriptors
-                cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches|florets?|pieces?|fillets?|breasts?|thighs?|drumsticks?|heads?|ears?|kernels?|zest|juice|seeds?|pods?|strips?|wedges?|rounds?|halves|quarters?)\s*$/gi, '').trim();
+                // Remove trailing non-food descriptors (sprigs, stalks, leaves, cloves only)
+                cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches)\s*$/gi, '').trim();
                 
                 // Remove trailing prep descriptions
                 cleaned = cleaned.replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste|and leaves|stalks and leaves).*$/gi, '').trim();
@@ -295,51 +290,76 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 // Handle commas: try to find the most food-like segment
                 if (cleaned.includes(',')) {
                     const parts = cleaned.split(',').map(p => p.trim()).filter(p => p.length > 1);
-                    // Descriptors that indicate a part is NOT the core food name
                     const descriptorPattern = /^(skin-on|bone-in|boneless|skinless|dried|fresh|raw|cooked|chopped|diced|sliced|minced|grated|peeled|whole|ground|crushed|smoked|roasted|canned|frozen|organic|rinsed|pitted|grade|unprepared)/i;
-                    // Find the first part that doesn't look like a descriptor
                     const foodPart = parts.find(p => !descriptorPattern.test(p));
                     cleaned = foodPart || parts[parts.length - 1] || cleaned;
                     cleaned = cleaned.trim();
                 }
                 
-                // Final cleanup pass for any remaining trailing descriptors
-                cleaned = cleaned
-                    .replace(/\s+(sprigs?|stalks?|leaves?|cloves?)\s*$/gi, '')
-                    .trim();
+                // Final cleanup
+                cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?)\s*$/gi, '').trim();
                 
                 return cleaned;
             };
+            
+            // De-pluralize: simple trailing 's' removal for search fallback
+            const dePluralize = (term: string) => {
+                if (term.endsWith('ies')) return term.slice(0, -3) + 'y'; // berries -> berry
+                if (term.endsWith('ves')) return term.slice(0, -3) + 'f'; // leaves -> leaf
+                if (term.endsWith('es') && !term.endsWith('ses')) return term.slice(0, -2); // tomatoes -> tomato
+                if (term.endsWith('s') && !term.endsWith('ss')) return term.slice(0, -1); // thighs -> thigh
+                return term;
+            };
+            
+            // Search helper: tries name then common_name
+            const searchFood = async (term: string) => {
+                const { data: nameData, error: nameError } = await supabase
+                    .from('food_items')
+                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
+                    .ilike('name', `%${term}%`)
+                    .limit(3);
+                
+                if (!nameError && nameData && nameData.length > 0) return nameData;
+                
+                const { data: commonData, error: commonError } = await supabase
+                    .from('food_items')
+                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
+                    .ilike('common_name', `%${term}%`)
+                    .limit(3);
+                
+                if (!commonError && commonData && commonData.length > 0) return commonData;
+                return null;
+            };
 
             for (const ing of ingredients) {
-                // Determine search term, prioritizing base_ingredient
                 const searchTermRaw = ing.base_ingredient || ing.item;
                 const searchTerm = extractCoreName(searchTermRaw);
                 
                 if (!searchTerm || searchTerm.length < 2) continue;
 
-                // Query local food_items table - try name first, then common_name
-                let matchData: any[] | null = null;
+                // Tiered search: try specific term first, then de-pluralized, then single-word fallback
+                let matchData = await searchFood(searchTerm);
                 
-                // Try searching by name
-                const { data: nameData, error: nameError } = await supabase
-                    .from('food_items')
-                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
-                    .ilike('name', `%${searchTerm}%`)
-                    .limit(3);
+                // If no match, try de-pluralized version (e.g. "chicken thighs" -> "chicken thigh")
+                if (!matchData) {
+                    const singular = dePluralize(searchTerm);
+                    if (singular !== searchTerm) {
+                        matchData = await searchFood(singular);
+                    }
+                }
                 
-                if (!nameError && nameData && nameData.length > 0) {
-                    matchData = nameData;
-                } else {
-                    // Fallback: search by common_name  
-                    const { data: commonData, error: commonError } = await supabase
-                        .from('food_items')
-                        .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
-                        .ilike('common_name', `%${searchTerm}%`)
-                        .limit(3);
-                    
-                    if (!commonError && commonData && commonData.length > 0) {
-                        matchData = commonData;
+                // If still no match, try just the last word (e.g. "cherry tomatoes" -> "tomatoes" -> "tomato")
+                if (!matchData && searchTerm.includes(' ')) {
+                    const words = searchTerm.split(' ');
+                    // Try each word from longest combo to shortest
+                    for (let w = words.length - 1; w >= 0; w--) {
+                        const subTerm = words.slice(w).join(' ');
+                        matchData = await searchFood(subTerm);
+                        if (!matchData) {
+                            const subSingular = dePluralize(subTerm);
+                            if (subSingular !== subTerm) matchData = await searchFood(subSingular);
+                        }
+                        if (matchData) break;
                     }
                 }
 
