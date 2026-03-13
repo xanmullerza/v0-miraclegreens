@@ -141,6 +141,30 @@
               },
               "renameOutput": true,
               "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body?.contentType}}",
+                    "rightValue": "cronometer-food",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a1b2c3d4-e5f6-47db-a8b9-c0d1e2f3g4h5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cronometer-food"
             }
           ]
         },
@@ -173,20 +197,89 @@
     },
     {
       "parameters": {
-        "operation": "binaryToPropery",
-        "binaryPropertyName": "file",
-        "destinationKey": "file",
-        "options": {}
+        "jsCode": "// Convert form data body to proper JSON if needed\nlet bodyData = items[0].json.body;\n\nif (typeof bodyData === 'string') {\n  try {\n    bodyData = JSON.parse(bodyData);\n  } catch(e) {\n    // If not valid JSON, keep as string\n  }\n}\n\nreturn [{\n  json: bodyData\n}];"
       },
-      "type": "n8n-nodes-base.extractFromFile",
+      "name": "Prepare Cronometer Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        640
+      ],
+      "id": "f4e5d6c7-d8e9-4a5b-b6c7-d8e9f0a1b2c3"
+    },
+    {
+      "parameters": {
+        "url": "={{$json.url || 'https://cronometer.com/food.html?food=' + ($json.foodId || $json.id) + '&amount=100&measure=0'}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate"
+            },
+            {
+              "name": "DNT",
+              "value": "1"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         128,
-        448
+        640
       ],
-      "id": "e5a8722a-3188-487c-896a-0f9e9bcfae18",
-      "name": "Image to Base64",
-      "typeVersion": 1
+      "id": "c9d8e7f6-a5b4-41c3-b2a1-90f8e7d6c5b4",
+      "name": "Fetch Cronometer Food"
     },
+    {
+      "parameters": {
+        "jsCode": "const html = items[0].json.body || items[0].json;\n\nif (!html || typeof html !== 'string') {\n  return [{ json: { error: 'No HTML content from Cronometer page' } }];\n}\n\nconsole.log('Parsing Cronometer HTML, length:', html.length);\n\nlet foodData = {\n  name: '',\n  servings: [],\n  macros: {\n    energy_kcal: 0,\n    energy_kj: 0,\n    protein_g: 0,\n    carbs_g: 0,\n    fat_g: 0\n  },\n  micros: {}\n};\n\ntry {\n  // Extract food name - usually in h1 or page title\n  const nameMatch = html.match(/<h1[^>]*>([^<]+)<\\/h1>/i);\n  if (nameMatch) {\n    foodData.name = nameMatch[1].trim();\n  }\n  \n  // If no h1, try meta title\n  if (!foodData.name) {\n    const titleMatch = html.match(/<meta[^>]+property=[\"']og:title[\"'][^>]+content=[\"']([^\"']+)[\"']/i);\n    if (titleMatch) {\n      foodData.name = titleMatch[1].split(' - ')[0].trim();\n    }\n  }\n  \n  // Extract macronutrients from tables or divs\n  // Calories\n  const caloriesMatch = html.match(/(?:calories?|energy)[^0-9]*([0-9]+(?:\\.[0-9]+)?)[^<]*(?:kcal|cal)/i);\n  if (caloriesMatch) {\n    foodData.macros.energy_kcal = parseFloat(caloriesMatch[1]);\n  }\n  \n  // kJ\n  const kjMatch = html.match(/([0-9]+(?:\\.[0-9]+)?)[^<]*kJ/i);\n  if (kjMatch) {\n    foodData.macros.energy_kj = parseFloat(kjMatch[1]);\n  }\n  \n  // Protein\n  const proteinMatch = html.match(/(?:protein)[^0-9]*([0-9]+(?:\\.[0-9]+)?)[^<]*g/i);\n  if (proteinMatch) {\n    foodData.macros.protein_g = parseFloat(proteinMatch[1]);\n  }\n  \n  // Carbs\n  const carbMatch = html.match(/(?:carb|carbohydrate)[^0-9]*([0-9]+(?:\\.[0-9]+)?)[^<]*g/i);\n  if (carbMatch) {\n    foodData.macros.carbs_g = parseFloat(carbMatch[1]);\n  }\n  \n  // Fat\n  const fatMatch = html.match(/(?:fat)[^0-9]*([0-9]+(?:\\.[0-9]+)?)[^<]*g/i);\n  if (fatMatch) {\n    foodData.macros.fat_g = parseFloat(fatMatch[1]);\n  }\n  \n  // Extract serving sizes from table rows or list\n  const servingMatches = html.match(/<tr[^>]*>\\s*<td[^>]*>([^<]+)<\\/td>\\s*<td[^>]*>([0-9]+(?:\\.[0-9]+)?)[^<]*<\\/td>/gi);\n  if (servingMatches) {\n    servingMatches.forEach(match => {\n      const parsed = match.match(/<td[^>]*>([^<]+)<\\/td>\\s*<td[^>]*>([0-9]+(?:\\.[0-9]+)?)/i);\n      if (parsed) {\n        foodData.servings.push({\n          measure: parsed[1].trim(),\n          grams: parseFloat(parsed[2])\n        });\n      }\n    });\n  }\n  \n  // Extract micronutrients from tables\n  const microMatches = html.match(/<tr[^>]*>\\s*<td[^>]*>([^<]+)<\\/td>\\s*<td[^>]*>([0-9]+(?:\\.[0-9]+)?)[^<]*(?:%|[a-z]{2,4})?/gi);\n  if (microMatches) {\n    microMatches.forEach(match => {\n      const parsed = match.match(/<td[^>]*>([^<]+)<\\/td>\\s*<td[^>]*>([0-9]+(?:\\.[0-9]+)?)/i);\n      if (parsed && parsed[1].toLowerCase().includes(parsed[1])) {\n        const nutrientName = parsed[1].trim().toLowerCase().replace(/\\s+/g, '_');\n        foodData.micros[nutrientName] = parseFloat(parsed[2]);\n      }\n    });\n  }\n  \n  console.log('✓ Successfully parsed Cronometer HTML:', foodData.name);\n  \n} catch (error) {\n  console.error('Error parsing Cronometer HTML:', error.message);\n  return [{ json: { error: 'Failed to parse Cronometer HTML: ' + error.message } }];\n}\n\nreturn [{ json: foodData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        640
+      ],
+      "id": "e8f7a6b5-c4d3-42b2-a1c0-8f7e6d5c4b3a",
+      "name": "Parse Cronometer HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cronData = items[0].json;\n\nif (cronData.error) {\n  return [{ json: { error: cronData.error } }];\n}\n\n// Transform extracted data to ParsedNutrition format\nconst ParsedNutrition = {\n  name: cronData.name || 'Cronometer Food',\n  energy_kcal: cronData.macros?.energy_kcal || 0,\n  energy_kj: cronData.macros?.energy_kj || 0,\n  protein_g: cronData.macros?.protein_g || 0,\n  carbs_g: cronData.macros?.carbs_g || 0,\n  fat_g: cronData.macros?.fat_g || 0,\n  fiber_g: 0,\n  sugar_g: 0,\n  sodium_mg: 0,\n  potassium_mg: 0,\n  calcium_mg: 0,\n  iron_mg: 0,\n  magnesium_mg: 0,\n  phosphorus_mg: 0,\n  zinc_mg: 0,\n  copper_mg: 0,\n  manganese_mg: 0,\n  selenium_mcg: 0,\n  iodine_mcg: 0,\n  vitamin_a_mcg: 0,\n  vitamin_b6_mg: 0,\n  vitamin_b12_mcg: 0,\n  vitamin_c_mg: 0,\n  vitamin_d_mcg: 0,\n  vitamin_e_mg: 0,\n  vitamin_k_mcg: 0,\n  folate_mcg_dfe: 0,\n  niacin_mg_nę: 0,\n  riboflavin_b2_mg: 0,\n  thiamine_b1_mg: 0,\n  pantothenic_acid_mg: 0,\n  choline_mg: 0,\n  // Amino acids\n  alanine_g: 0,\n  arginine_g: 0,\n  aspartic_acid_g: 0,\n  cysteine_g: 0,\n  glutamic_acid_g: 0,\n  glycine_g: 0,\n  histidine_g: 0,\n  isoleucine_g: 0,\n  leucine_g: 0,\n  lysine_g: 0,\n  methionine_g: 0,\n  phenylalanine_g: 0,\n  proline_g: 0,\n  serine_g: 0,\n  threonine_g: 0,\n  tryptophan_g: 0,\n  tyrosine_g: 0,\n  valine_g: 0,\n  // Additional nutrients\n  cholesterol_mg: 0,\n  saturated_fat_g: 0,\n  monounsaturated_fat_g: 0,\n  polyunsaturated_fat_g: 0,\n  trans_fat_g: 0,\n  servings: cronData.servings || []\n};\n\n// Map micronutrients from cronData.micros\nif (cronData.micros && typeof cronData.micros === 'object') {\n  for (const [key, value] of Object.entries(cronData.micros)) {\n    if (ParsedNutrition.hasOwnProperty(key)) {\n      ParsedNutrition[key] = value;\n    }\n  }\n}\n\nconsole.log('✓ Formatted to ParsedNutrition:', ParsedNutrition.name);\n\nreturn [{ json: ParsedNutrition }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        640
+      ],
+      "id": "d7c6b5a4-93e2-41d0-90c1-7f6e5d4c3b2a",
+      "name": "Format Cronometer Data"
+    },
+    
     {
       "parameters": {
         "httpMethod": "POST",
@@ -530,6 +623,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Prepare Cronometer Request",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -692,6 +792,50 @@
         [
           {
             "node": "Format Text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Cronometer Request": {
+      "main": [
+        [
+          {
+            "node": "Fetch Cronometer Food",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Cronometer Food": {
+      "main": [
+        [
+          {
+            "node": "Parse Cronometer HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Cronometer HTML": {
+      "main": [
+        [
+          {
+            "node": "Format Cronometer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Cronometer Data": {
+      "main": [
+        [
+          {
+            "node": "Respond",
             "type": "main",
             "index": 0
           }
