@@ -294,20 +294,33 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 
                 if (!searchTerm || searchTerm.length < 2) continue;
 
-                // Query local food_items table
-                const { data, error } = await supabase
+                // Query local food_items table - try name first, then common_name
+                let matchData: any[] | null = null;
+                
+                // Try searching by name
+                const { data: nameData, error: nameError } = await supabase
                     .from('food_items')
-                    .select('id, name, base_weight_g, energy_kcal, protein_g, carbs_g, fat_g')
+                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
                     .ilike('name', `%${searchTerm}%`)
-                    .limit(1);
-
-                if (error) {
-                    console.error('Error fetching food item for match:', error);
-                    continue;
+                    .limit(3);
+                
+                if (!nameError && nameData && nameData.length > 0) {
+                    matchData = nameData;
+                } else {
+                    // Fallback: search by common_name  
+                    const { data: commonData, error: commonError } = await supabase
+                        .from('food_items')
+                        .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
+                        .ilike('common_name', `%${searchTerm}%`)
+                        .limit(3);
+                    
+                    if (!commonError && commonData && commonData.length > 0) {
+                        matchData = commonData;
+                    }
                 }
 
-                if (data && data.length > 0) {
-                    const match = data[0];
+                if (matchData && matchData.length > 0) {
+                    const match = matchData[0];
                     newMatches[ing.id] = match;
                     newFlipped[ing.id] = true; // Auto-flip to show the match
                 }
