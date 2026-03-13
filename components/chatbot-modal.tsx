@@ -384,8 +384,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             
             toast.success('Successfully saved to your library!');
             
-            // Navigate to the recipe
-            router.push(`/dashboard/library/my-recipes/${recipeId}`);
+            // Navigate to the recipe within the modal
+            setSelectedRecipeId(recipeId);
+            setPreviousView('my-recipes');
+            setChatbotView('recipe-detail');
         } catch (error: any) {
             console.error('Error saving recipe:', error);
             toast.error('Failed to save recipe. Please try again.');
@@ -421,8 +423,10 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 return;
             }
 
-            // Navigate directly to recipe detail page
-            router.push(`/dashboard/library/my-recipes/${savedRecipe.id}`);
+            // Navigate directly to recipe detail page within the modal
+            setSelectedRecipeId(savedRecipe.id);
+            setPreviousView('my-recipes');
+            setChatbotView('recipe-detail');
         } catch (error) {
             console.error('Error navigating to recipe:', error);
             // Fallback to modal on error
