@@ -1028,9 +1028,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     </div>
                                                     <div className="flex items-center justify-between">
                                                         {displayWeight > 0 && <p className="text-xs text-slate-500 dark:text-slate-400">{displayWeight}g</p>}
-                                                        <p className="text-xs px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold">
-                                                            Flip for macros
-                                                        </p>
+                                                        <button className="text-xs px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors">
+                                                            Macros
+                                                        </button>
                                                     </div>
                                                 </div>
 
