@@ -97,7 +97,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const [vitaminThreshold, setVitaminThreshold] = useState<50 | 75 | 100>(75);
 
     // User preferences and RDA
-    const { profile } = useUserPreferences();
+    const { profile, nutrientDisplayMode } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
 
     useEffect(() => {
@@ -1304,7 +1304,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     val *= scaleFactor;
                                     const rda = userRDAs?.[label] || 0;
                                     const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                    return { label, pct };
+                                    return { label, val, pct };
                                 });
 
                                 const total = electrolyteData.length;
@@ -1354,7 +1354,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
                                         {/* Electrolyte pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
-                                            {electrolyteData.map(({ label, pct }) => {
+                                            {electrolyteData.map(({ label, val, pct }) => {
                                                 const hit = pct >= mineralThreshold;
                                                 return (
                                                     <div key={label} className={cn(
@@ -1364,7 +1364,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
                                                     )}>
                                                         <span>{label}</span>
-                                                        <span className={hit ? 'font-black' : ''}>{pct}%</span>
+                                                        <span className={hit ? 'font-black' : ''}>
+                                                            {nutrientDisplayMode === 'value' && `${val.toFixed(0)}mg`}
+                                                            {nutrientDisplayMode === 'percentage' && `${pct}%`}
+                                                            {nutrientDisplayMode === 'both' && `${val.toFixed(0)}mg (${pct}%)`}
+                                                        </span>
                                                     </div>
                                                 );
                                             })}
@@ -1381,7 +1385,6 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 const OVERLOOKED = [
                                     { label: 'Water', keys: ['Water'], unit: 'g', color: '#06b6d4' },
                                     { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g', color: '#22c55e' },
-                                    { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu'], unit: 'IU', color: '#f59e0b' },
                                     { label: 'Choline', keys: ['Choline', 'choline_mg'], unit: 'mg', color: '#a855f7' },
                                 ];
                                 const micro = calculatedNutrition.micronutrients || {};
@@ -1442,7 +1445,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     val *= scaleFactor;
                                     const rda = userRDAs?.[label] || 0;
                                     const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                    return { label, pct };
+                                    return { label, val, pct };
                                 });
 
                                 const total = traceData.length;
@@ -1492,7 +1495,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
                                         {/* Trace pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
-                                            {traceData.map(({ label, pct }) => {
+                                            {traceData.map(({ label, val, pct }) => {
                                                 const hit = pct >= mineralThreshold;
                                                 return (
                                                     <div key={label} className={cn(
@@ -1502,7 +1505,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
                                                     )}>
                                                         <span>{label}</span>
-                                                        <span className={hit ? 'font-black' : ''}>{pct}%</span>
+                                                        <span className={hit ? 'font-black' : ''}>
+                                                            {nutrientDisplayMode === 'value' && `${val.toFixed(1)}μg`}
+                                                            {nutrientDisplayMode === 'percentage' && `${pct}%`}
+                                                            {nutrientDisplayMode === 'both' && `${val.toFixed(1)}μg (${pct}%)`}
+                                                        </span>
                                                     </div>
                                                 );
                                             })}
@@ -1535,7 +1542,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     }
                                     const rda = userRDAs?.[label] || 0;
                                     const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                    return { label, fullName, subtitle, pct };
+                                    return { label, fullName, subtitle, val, pct };
                                 });
 
                                 const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
@@ -1585,7 +1592,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
                                         {/* Water-Soluble Vitamin pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
-                                            {vitaminData.map(({ label, fullName, subtitle, pct }) => {
+                                            {vitaminData.map(({ label, fullName, subtitle, val, pct }) => {
                                                 const hit = pct >= vitaminThreshold;
                                                 return (
                                                     <div key={label} className={cn(
@@ -1598,7 +1605,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             <div className="text-[10px] font-black">{fullName}</div>
                                                             <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
                                                         </div>
-                                                        <span className={cn('text-[10px] self-end mt-1', hit ? 'font-black' : '')}>{pct}%</span>
+                                                        <span className={cn('text-[10px] self-end mt-1', hit ? 'font-black' : '')}>
+                                                            {nutrientDisplayMode === 'value' && `${val.toFixed(1)}`}
+                                                            {nutrientDisplayMode === 'percentage' && `${pct}%`}
+                                                            {nutrientDisplayMode === 'both' && `${val.toFixed(1)} (${pct}%)`}
+                                                        </span>
                                                     </div>
                                                 );
                                             })}
@@ -1627,7 +1638,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     }
                                     const rda = userRDAs?.[label] || 0;
                                     const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                    return { label, fullName, subtitle, pct };
+                                    return { label, fullName, subtitle, val, pct };
                                 });
 
                                 const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
@@ -1677,7 +1688,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
                                         {/* Stored Vitamin pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
-                                            {vitaminData.map(({ label, fullName, subtitle, pct }) => {
+                                            {vitaminData.map(({ label, fullName, subtitle, val, pct }) => {
                                                 const hit = pct >= vitaminThreshold;
                                                 return (
                                                     <div key={label} className={cn(
@@ -1690,7 +1701,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             <div className="text-[10px] font-black">{fullName}</div>
                                                             <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
                                                         </div>
-                                                        <span className={cn('text-[10px] self-end mt-1', hit ? 'font-black' : '')}>{pct}%</span>
+                                                        <span className={cn('text-[10px] self-end mt-1', hit ? 'font-black' : '')}>
+                                                            {nutrientDisplayMode === 'value' && `${val.toFixed(1)}`}
+                                                            {nutrientDisplayMode === 'percentage' && `${pct}%`}
+                                                            {nutrientDisplayMode === 'both' && `${val.toFixed(1)} (${pct}%)`}
+                                                        </span>
                                                     </div>
                                                 );
                                             })}
