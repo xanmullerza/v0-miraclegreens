@@ -310,6 +310,23 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     };
 
     // --- Phase 3: Quantity Parsing & Accept Handling ---
+    const formatFraction = (num: number) => {
+        const whole = Math.floor(num);
+        const frac = num - whole;
+        let fracStr = '';
+        if (Math.abs(frac - 0.25) < 0.01) fracStr = '1/4';
+        else if (Math.abs(frac - 0.33) < 0.02) fracStr = '1/3';
+        else if (Math.abs(frac - 0.5) < 0.01) fracStr = '1/2';
+        else if (Math.abs(frac - 0.66) < 0.02) fracStr = '2/3';
+        else if (Math.abs(frac - 0.75) < 0.01) fracStr = '3/4';
+        else if (frac > 0) fracStr = frac.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+
+        if (whole > 0 && fracStr) return `${whole} ${fracStr}`;
+        if (whole > 0) return `${whole}`;
+        if (fracStr) return fracStr;
+        return '0';
+    };
+
     const parseRecipeAmount = (amountStr: string) => {
         let quantity = 1;
         let measure = '';
@@ -959,9 +976,21 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         setPortionConflicts(prev => ({ ...prev, [ing.id]: { ...prev[ing.id], isSaving: true } }));
                                         
                                         try {
-                                            const finalWeight = Number(customPortionGram);
-                                            const newPortion = { label: conflict!.measure_label, weight_g: finalWeight };
-                                            const updatedPortions = [...(conflict!.itemToAccept.portions || []), newPortion];
+                                            const totalWeight = Number(customPortionGram);
+                                            // The database stores the unit weight (e.g., 1 slice, 1 tbsp)
+                                            // We divide the total recipe weight by the recipe quantity
+                                            const unitWeight = Math.round((totalWeight / conflict!.quantity) * 10) / 10;
+                                            
+                                            const newPortion = { label: conflict!.measure_label, weight_g: unitWeight };
+                                            const updatedPortions = [...(conflict!.itemToAccept.portions || [])];
+                                            
+                                            // Ensure no duplicates for the same label
+                                            const existingIdx = updatedPortions.findIndex(p => p.label.toLowerCase() === conflict!.measure_label.toLowerCase());
+                                            if (existingIdx >= 0) {
+                                                updatedPortions[existingIdx].weight_g = unitWeight;
+                                            } else {
+                                                updatedPortions.push(newPortion);
+                                            }
 
                                             const { error } = await supabase
                                                 .from('food_items')
@@ -1143,8 +1172,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                                 <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 mb-1 leading-tight flex items-center gap-1">
                                                                     <AlertCircle size={12} /> Portion Missing!
                                                                 </p>
-                                                                <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-tight mb-2">
-                                                                    1 <strong>{conflict.measure_label}</strong> = ? grams
+                                                                <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-tight mb-2 truncate" title={`Recipe needs: ${formatFraction(conflict.quantity)} ${conflict.measure_label}`}>
+                                                                    Recipe needs: <strong>{formatFraction(conflict.quantity)} {conflict.measure_label}</strong>
                                                                 </p>
                                                                 <div className="flex flex-col gap-1.5">
                                                                     <div className="flex items-center gap-2">
@@ -1153,8 +1182,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                                                 type="number" 
                                                                                 value={customPortionGram}
                                                                                 onChange={e => setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }))}
-                                                                                placeholder="e.g. 120"
-                                                                                className="w-full h-7 bg-white dark:bg-slate-950 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-bold text-amber-700 dark:text-amber-500 focus:outline-none focus:ring-1 ring-amber-500"
+                                                                                placeholder="Total grams"
+                                                                                className="w-full h-8 bg-white dark:bg-slate-950 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-bold text-amber-700 dark:text-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
                                                                             />
                                                                             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">g</span>
                                                                         </div>
@@ -1164,15 +1193,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                                             className="w-full h-8 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-medium text-amber-700 dark:text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500 hover:bg-amber-100 dark:hover:bg-slate-800 transition-colors appearance-none cursor-pointer"
                                                                             onChange={(e) => {
                                                                                 if (e.target.value) {
-                                                                                    setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }));
+                                                                                    const unitWt = Number(e.target.value);
+                                                                                    const totalWt = Math.round(unitWt * conflict.quantity * 10) / 10;
+                                                                                    setCustomPortions(prev => ({ ...prev, [ing.id]: String(totalWt) }));
                                                                                 }
                                                                             }}
                                                                             value=""
                                                                         >
-                                                                            <option value="" disabled className="text-slate-500 dark:text-slate-400">Or pick existing DB portion...</option>
+                                                                            <option value="" disabled className="text-slate-500 dark:text-slate-400">Or pick existing DB option (auto-multiplies)...</option>
                                                                             {conflict.itemToAccept.portions.map((p: any, idx: number) => (
                                                                                 <option key={idx} value={p.weight_g} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 py-1">
-                                                                                    {p.label} ({p.weight_g}g)
+                                                                                    {p.label} ({p.weight_g}g unit)
                                                                                 </option>
                                                                             ))}
                                                                         </select>
