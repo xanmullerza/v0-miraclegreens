@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { searchUSDAFood } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -58,6 +59,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const [matchedIngredients, setMatchedIngredients] = useState<Record<string, any>>({});
     const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
     const [acceptedMatches, setAcceptedMatches] = useState<Record<string, boolean>>({});
+    // USDA Phase 2 State
+    const [usdaResults, setUsdaResults] = useState<Record<string, any[]>>({});
+    const [usdaLoading, setUsdaLoading] = useState<Record<string, boolean>>({});
+    const [usdaExpanded, setUsdaExpanded] = useState<Record<string, boolean>>({});
 
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
@@ -255,6 +260,51 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         fetchRelated();
     }, [ingredients, recipeId]);
 
+    // --- Ingredient Name Extraction Helpers ---
+    const extractCoreName = (name: string) => {
+        let cleaned = name.toLowerCase().trim();
+        
+        // Remove anything in parentheses first
+        cleaned = cleaned.replace(/\s*\(.*?\)/g, '').trim();
+        
+        // Multi-pass leading cleanup (run twice so e.g. "small bunch of" all gets stripped)
+        for (let i = 0; i < 2; i++) {
+            cleaned = cleaned.replace(/^[\d\/\.\-]+\s*(x\s+)?/g, '').trim();
+            cleaned = cleaned.replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?)\s+/gi, '').trim();
+            cleaned = cleaned.replace(/^of\s+/gi, '').trim();
+            cleaned = cleaned.replace(/^(small|large|medium|big|thin|thick)\s+/gi, '').trim();
+            cleaned = cleaned.replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated|skin-on|bone-in|boneless|skinless)\s*,?\s*/gi, '').trim();
+        }
+        
+        // Remove trailing non-food descriptors (sprigs, stalks, leaves, cloves only)
+        cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches)\s*$/gi, '').trim();
+        
+        // Remove trailing prep descriptions
+        cleaned = cleaned.replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste|and leaves|stalks and leaves).*$/gi, '').trim();
+        
+        // Handle commas: try to find the most food-like segment
+        if (cleaned.includes(',')) {
+            const parts = cleaned.split(',').map(p => p.trim()).filter(p => p.length > 1);
+            const descriptorPattern = /^(skin-on|bone-in|boneless|skinless|dried|fresh|raw|cooked|chopped|diced|sliced|minced|grated|peeled|whole|ground|crushed|smoked|roasted|canned|frozen|organic|rinsed|pitted|grade|unprepared)/i;
+            const foodPart = parts.find(p => !descriptorPattern.test(p));
+            cleaned = foodPart || parts[parts.length - 1] || cleaned;
+            cleaned = cleaned.trim();
+        }
+        
+        // Final cleanup
+        cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?)\s*$/gi, '').trim();
+        
+        return cleaned;
+    };
+
+    const dePluralize = (term: string) => {
+        if (term.endsWith('ies')) return term.slice(0, -3) + 'y';
+        if (term.endsWith('ves')) return term.slice(0, -3) + 'f';
+        if (term.endsWith('es') && !term.endsWith('ses')) return term.slice(0, -2);
+        if (term.endsWith('s') && !term.endsWith('ss')) return term.slice(0, -1);
+        return term;
+    };
+
     // --- Smart Match Logic ---
     const runSmartMatch = async () => {
         if (smartMatchRunning || ingredients.length === 0) return;
@@ -265,52 +315,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             const newMatches: Record<string, any> = {};
             const newFlipped: Record<string, boolean> = {};
 
-            // Helper to clean ingredient name - keeps food-form words (thighs, breasts, etc.)
-            const extractCoreName = (name: string) => {
-                let cleaned = name.toLowerCase().trim();
-                
-                // Remove anything in parentheses first
-                cleaned = cleaned.replace(/\s*\(.*?\)/g, '').trim();
-                
-                // Multi-pass leading cleanup (run twice so e.g. "small bunch of" all gets stripped)
-                for (let i = 0; i < 2; i++) {
-                    cleaned = cleaned.replace(/^[\d\/\.\-]+\s*(x\s+)?/g, '').trim();
-                    cleaned = cleaned.replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?)\s+/gi, '').trim();
-                    cleaned = cleaned.replace(/^of\s+/gi, '').trim();
-                    cleaned = cleaned.replace(/^(small|large|medium|big|thin|thick)\s+/gi, '').trim();
-                    cleaned = cleaned.replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated|skin-on|bone-in|boneless|skinless)\s*,?\s*/gi, '').trim();
-                }
-                
-                // Remove trailing non-food descriptors (sprigs, stalks, leaves, cloves only)
-                cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches)\s*$/gi, '').trim();
-                
-                // Remove trailing prep descriptions
-                cleaned = cleaned.replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste|and leaves|stalks and leaves).*$/gi, '').trim();
-                
-                // Handle commas: try to find the most food-like segment
-                if (cleaned.includes(',')) {
-                    const parts = cleaned.split(',').map(p => p.trim()).filter(p => p.length > 1);
-                    const descriptorPattern = /^(skin-on|bone-in|boneless|skinless|dried|fresh|raw|cooked|chopped|diced|sliced|minced|grated|peeled|whole|ground|crushed|smoked|roasted|canned|frozen|organic|rinsed|pitted|grade|unprepared)/i;
-                    const foodPart = parts.find(p => !descriptorPattern.test(p));
-                    cleaned = foodPart || parts[parts.length - 1] || cleaned;
-                    cleaned = cleaned.trim();
-                }
-                
-                // Final cleanup
-                cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?)\s*$/gi, '').trim();
-                
-                return cleaned;
-            };
-            
-            // De-pluralize: simple trailing 's' removal for search fallback
-            const dePluralize = (term: string) => {
-                if (term.endsWith('ies')) return term.slice(0, -3) + 'y'; // berries -> berry
-                if (term.endsWith('ves')) return term.slice(0, -3) + 'f'; // leaves -> leaf
-                if (term.endsWith('es') && !term.endsWith('ses')) return term.slice(0, -2); // tomatoes -> tomato
-                if (term.endsWith('s') && !term.endsWith('ss')) return term.slice(0, -1); // thighs -> thigh
-                return term;
-            };
-            
+
             // Search helper: tries name then common_name
             const searchFood = async (term: string) => {
                 const { data: nameData, error: nameError } = await supabase
@@ -857,118 +862,231 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     const isMatched = !!matchedIngredients[ing.id];
                                     const isFlipped = !!flippedCards[ing.id];
                                     const isAccepted = !!acceptedMatches[ing.id];
+                                    const isUsdaExpanded = !!usdaExpanded[ing.id];
+                                    const isUsdaLoading = !!usdaLoading[ing.id];
+                                    const ingUsdaResults = usdaResults[ing.id] || [];
+                                    
+                                    // Handler: search USDA for this ingredient
+                                    const handleUsdaSearch = async () => {
+                                        const searchTermRaw = ing.base_ingredient || ing.item;
+                                        const searchTerm = extractCoreName(searchTermRaw);
+                                        if (!searchTerm || searchTerm.length < 2) {
+                                            toast.error('Search term is too short');
+                                            return;
+                                        }
+                                        setUsdaLoading(prev => ({ ...prev, [ing.id]: true }));
+                                        setUsdaExpanded(prev => ({ ...prev, [ing.id]: true }));
+                                        try {
+                                            const results = await searchUSDAFood(searchTerm);
+                                            setUsdaResults(prev => ({ ...prev, [ing.id]: results.slice(0, 5) }));
+                                        } catch (err) {
+                                            console.error('USDA search error:', err);
+                                            toast.error('USDA search failed');
+                                        } finally {
+                                            setUsdaLoading(prev => ({ ...prev, [ing.id]: false }));
+                                        }
+                                    };
+
+                                    // Handler: accept a USDA result for this ingredient
+                                    const handleAcceptUsda = (result: any) => {
+                                        setMatchedIngredients(prev => ({ ...prev, [ing.id]: { ...result, source: 'usda' } }));
+                                        setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+                                        setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
+                                        setUsdaExpanded(prev => ({ ...prev, [ing.id]: false }));
+                                        toast.success(`Matched: ${result.name}`);
+                                    };
+
+                                    // Handler: dismiss USDA results
+                                    const handleDismissUsda = () => {
+                                        setUsdaExpanded(prev => ({ ...prev, [ing.id]: false }));
+                                        setUsdaResults(prev => { const u = { ...prev }; delete u[ing.id]; return u; });
+                                    };
                                     
                                     return (
-                                        <div key={ing.id} className="relative h-[80px] w-full [perspective:1000px] group">
-                                            <div 
-                                                className={cn(
-                                                    "w-full h-full transition-all duration-500 [transform-style:preserve-3d]",
-                                                    isFlipped ? "[transform:rotateY(180deg)]" : ""
-                                                )}
-                                            >
-                                                {/* Front (Original Ingredient) */}
-                                                <div className={cn(
-                                                    "absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl p-3 flex items-center justify-between border transition-colors",
-                                                    isMatched && !isAccepted ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" :
-                                                    isAccepted ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800" :
-                                                    "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-                                                )}>
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={cn(
-                                                            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm",
-                                                            isAccepted ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600" :
-                                                            "bg-slate-100 dark:bg-slate-800 text-slate-400"
-                                                        )}>
-                                                            {isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-bold text-slate-900 dark:text-white capitalize truncate max-w-[180px]">
-                                                                {ing.base_ingredient || ing.item}
-                                                            </p>
-                                                            <p className="text-xs text-slate-500 font-medium">
-                                                                {ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-
-                                                    {isMatched && !isAccepted && (
-                                                        <button 
-                                                            onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: true })); }}
-                                                            className="p-2 text-indigo-500 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-full transition-colors"
-                                                            title="Review Match"
-                                                        >
-                                                            <RefreshCw size={16} />
-                                                        </button>
+                                        <div key={ing.id} className="w-full">
+                                            {/* Card with flip animation */}
+                                            <div className="relative h-[80px] w-full [perspective:1000px] group">
+                                                <div 
+                                                    className={cn(
+                                                        "w-full h-full transition-all duration-500 [transform-style:preserve-3d]",
+                                                        isFlipped ? "[transform:rotateY(180deg)]" : ""
                                                     )}
-                                                </div>
-
-                                                {/* Back (Matched Food Item) */}
-                                                <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl p-3 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-900/30 dark:to-slate-900 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between shadow-sm shadow-indigo-100 dark:shadow-none">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
-                                                            <Activity size={18} className="text-indigo-500" />
-                                                        </div>
-                                                        <div>
-                                                            <div className="flex items-center gap-1.5">
-                                                                <p className="text-sm font-bold text-indigo-900 dark:text-indigo-300 truncate max-w-[150px]">
-                                                                    {matchedIngredients[ing.id]?.name || 'Match'}
-                                                                </p>
-                                                                <span className="text-[8px] h-4 px-1 py-0 rounded border bg-indigo-100 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400">
-                                                                    LOCAL DB
-                                                                </span>
+                                                >
+                                                    {/* Front (Original Ingredient) */}
+                                                    <div className={cn(
+                                                        "absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl p-3 flex items-center justify-between border transition-colors",
+                                                        isMatched && !isAccepted ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" :
+                                                        isAccepted ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800" :
+                                                        "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                                                    )}>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={cn(
+                                                                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm",
+                                                                isAccepted ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600" :
+                                                                "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                                                            )}>
+                                                                {isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
                                                             </div>
-                                                            <p className="text-[10px] text-indigo-600/80 dark:text-indigo-400/80 font-medium mt-0.5 max-w-[180px] truncate">
-                                                                Match for: "{ing.base_ingredient || ing.item}"
-                                                            </p>
+                                                            <div>
+                                                                <p className="text-sm font-bold text-slate-900 dark:text-white capitalize truncate max-w-[180px]">
+                                                                    {ing.base_ingredient || ing.item}
+                                                                </p>
+                                                                <p className="text-xs text-slate-500 font-medium">
+                                                                    {ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2">
+                                                            {isMatched && !isAccepted && (
+                                                                <button 
+                                                                    onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: true })); }}
+                                                                    className="p-2 text-indigo-500 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-full transition-colors"
+                                                                    title="Review Match"
+                                                                >
+                                                                    <RefreshCw size={16} />
+                                                                </button>
+                                                            )}
+                                                            {/* USDA Search button - show on unmatched, non-accepted ingredients */}
+                                                            {!isMatched && !isAccepted && (
+                                                                <button
+                                                                    onClick={handleUsdaSearch}
+                                                                    disabled={isUsdaLoading}
+                                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full border border-amber-400/50 text-amber-500 hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all disabled:opacity-50"
+                                                                    title="Search USDA Database"
+                                                                >
+                                                                    {isUsdaLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+                                                                    USDA
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-2">
-                                                        <button 
-                                                            onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: false })); }}
-                                                            className="w-8 h-8 flex items-center justify-center rounded-full border border-slate-300 dark:border-slate-600 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
-                                                            title="Review original"
-                                                        >
-                                                            <RefreshCw size={14} />
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => { 
-                                                                setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
-                                                                setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
-                                                            }}
-                                                            className="w-8 h-8 flex items-center justify-center rounded-full border border-emerald-300 dark:border-emerald-700 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all"
-                                                            title="Accept match"
-                                                        >
-                                                            <Check size={14} />
-                                                        </button>
-                                                        <button 
-                                                            onClick={(e) => { 
-                                                                e.stopPropagation();
-                                                                setMatchedIngredients(prev => {
-                                                                    const updated = { ...prev };
-                                                                    delete updated[ing.id];
-                                                                    return updated;
-                                                                });
-                                                                setFlippedCards(prev => {
-                                                                    const updated = { ...prev };
-                                                                    delete updated[ing.id];
-                                                                    return updated;
-                                                                });
-                                                                setAcceptedMatches(prev => {
-                                                                    const updated = { ...prev };
-                                                                    delete updated[ing.id];
-                                                                    return updated;
-                                                                });
-                                                                toast.success('Match rejected');
-                                                            }}
-                                                            className="w-8 h-8 flex items-center justify-center rounded-full border border-rose-300 dark:border-rose-700 text-rose-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all"
-                                                            title="Reject match"
-                                                        >
-                                                            <X size={14} />
-                                                        </button>
+                                                    {/* Back (Matched Food Item) */}
+                                                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl p-3 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-900/30 dark:to-slate-900 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between shadow-sm shadow-indigo-100 dark:shadow-none">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
+                                                                <Activity size={18} className="text-indigo-500" />
+                                                            </div>
+                                                            <div>
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <p className="text-sm font-bold text-indigo-900 dark:text-indigo-300 truncate max-w-[150px]">
+                                                                        {matchedIngredients[ing.id]?.name || 'Match'}
+                                                                    </p>
+                                                                    <span className={cn(
+                                                                        "text-[8px] h-4 px-1 py-0 rounded border",
+                                                                        matchedIngredients[ing.id]?.source === 'usda'
+                                                                            ? "bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400"
+                                                                            : "bg-indigo-100 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400"
+                                                                    )}>
+                                                                        {matchedIngredients[ing.id]?.source === 'usda' ? 'USDA' : 'LOCAL DB'}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-[10px] text-indigo-600/80 dark:text-indigo-400/80 font-medium mt-0.5 max-w-[180px] truncate">
+                                                                    Match for: "{ing.base_ingredient || ing.item}"
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2">
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: false })); }}
+                                                                className="w-8 h-8 flex items-center justify-center rounded-full border border-slate-300 dark:border-slate-600 text-slate-400 hover:text-indigo-500 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+                                                                title="Review original"
+                                                            >
+                                                                <RefreshCw size={14} />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => { 
+                                                                    setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+                                                                    setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
+                                                                }}
+                                                                className="w-8 h-8 flex items-center justify-center rounded-full border border-emerald-300 dark:border-emerald-700 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all"
+                                                                title="Accept match"
+                                                            >
+                                                                <Check size={14} />
+                                                            </button>
+                                                            <button 
+                                                                onClick={(e) => { 
+                                                                    e.stopPropagation();
+                                                                    setMatchedIngredients(prev => {
+                                                                        const updated = { ...prev };
+                                                                        delete updated[ing.id];
+                                                                        return updated;
+                                                                    });
+                                                                    setFlippedCards(prev => {
+                                                                        const updated = { ...prev };
+                                                                        delete updated[ing.id];
+                                                                        return updated;
+                                                                    });
+                                                                    setAcceptedMatches(prev => {
+                                                                        const updated = { ...prev };
+                                                                        delete updated[ing.id];
+                                                                        return updated;
+                                                                    });
+                                                                    toast.success('Match rejected');
+                                                                }}
+                                                                className="w-8 h-8 flex items-center justify-center rounded-full border border-rose-300 dark:border-rose-700 text-rose-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all"
+                                                                title="Reject match"
+                                                            >
+                                                                <X size={14} />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {/* USDA Search Results - slide out below */}
+                                            {isUsdaExpanded && (
+                                                <div className="mt-1 ml-4 space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                    {/* Header with reject all */}
+                                                    <div className="flex items-center justify-between px-2 py-1">
+                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-amber-500 flex items-center gap-1.5">
+                                                            <Search size={10} />
+                                                            USDA Results
+                                                        </p>
+                                                        <button
+                                                            onClick={handleDismissUsda}
+                                                            className="w-6 h-6 flex items-center justify-center rounded-full border border-rose-300 dark:border-rose-700 text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
+                                                            title="Dismiss all results"
+                                                        >
+                                                            <X size={11} />
+                                                        </button>
+                                                    </div>
+
+                                                    {isUsdaLoading ? (
+                                                        <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                                            <Loader2 size={14} className="animate-spin text-amber-500" />
+                                                            <span className="text-xs text-slate-500">Searching USDA database...</span>
+                                                        </div>
+                                                    ) : ingUsdaResults.length === 0 ? (
+                                                        <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                                            <p className="text-xs text-slate-500">No results found in USDA database.</p>
+                                                        </div>
+                                                    ) : (
+                                                        ingUsdaResults.map((result, idx) => (
+                                                            <div
+                                                                key={result.fdcId || idx}
+                                                                className="flex items-center justify-between p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-700 transition-all group/result"
+                                                            >
+                                                                <div className="flex-1 min-w-0 mr-2">
+                                                                    <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{result.name}</p>
+                                                                    <p className="text-[9px] text-slate-400 font-medium">
+                                                                        {result.energy_kcal}kcal · P:{result.protein_g}g · C:{result.carbs_g}g · F:{result.fat_g}g
+                                                                    </p>
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => handleAcceptUsda(result)}
+                                                                    className="w-7 h-7 flex items-center justify-center rounded-full border border-slate-300 dark:border-slate-600 text-slate-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shrink-0"
+                                                                    title="Accept this match"
+                                                                >
+                                                                    <Check size={13} />
+                                                                </button>
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}
