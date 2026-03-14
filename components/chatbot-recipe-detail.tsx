@@ -1490,7 +1490,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             </div>
                                             <div>
                                                 <div className="text-lg font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
-                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">trace<br />≥ {mineralThreshold}% RDA</div>
+                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">trace<br />minerals<br />≥ {mineralThreshold}% RDA</div>
                                             </div>
                                         </div>
 
