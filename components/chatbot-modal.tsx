@@ -32,7 +32,6 @@ interface ParsedRecipe {
     instructions_text: string;
     servings?: number;
     prep_time?: number;
-    cook_time?: number;
     source_url: string;
     image_url?: string;
 }
@@ -270,7 +269,6 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [recipeTitle, setRecipeTitle] = useState('');
     const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
     const [recipePrepTime, setRecipePrepTime] = useState(30);
-    const [recipeCookTime, setRecipeCookTime] = useState(0);
     const [recipeServings, setRecipeServings] = useState(4);
     const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredient[]>([]);
     const [recipeInstructions, setRecipeInstructions] = useState<string[]>(['']);
@@ -369,7 +367,6 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 type: 'dinner',
                 servings: recipe.servings || 4,
                 prep_time: recipe.prep_time || 30,
-                cook_time: recipe.cook_time || 0,
                 image: recipe.image_url,
                 is_favorite: true,
                 is_mix: false,
@@ -1148,7 +1145,6 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 carbs: Math.round((totals.carbs / (recipeServings || 1)) * 10) / 10,
                 fat: Math.round((totals.fat / (recipeServings || 1)) * 10) / 10,
                 prep_time: recipePrepTime,
-                cook_time: recipeCookTime,
                 servings: recipeServings,
                 image: recipeImage,
                 source: 'manual',
