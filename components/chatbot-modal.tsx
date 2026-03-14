@@ -32,6 +32,7 @@ interface ParsedRecipe {
     instructions_text: string;
     servings?: number;
     prep_time?: number;
+    cook_time?: number;
     source_url: string;
     image_url?: string;
 }
@@ -269,6 +270,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const [recipeTitle, setRecipeTitle] = useState('');
     const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
     const [recipePrepTime, setRecipePrepTime] = useState(30);
+    const [recipeCookTime, setRecipeCookTime] = useState(0);
     const [recipeServings, setRecipeServings] = useState(4);
     const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredient[]>([]);
     const [recipeInstructions, setRecipeInstructions] = useState<string[]>(['']);
@@ -367,6 +369,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 type: 'dinner',
                 servings: recipe.servings || 4,
                 prep_time: recipe.prep_time || 30,
+                cook_time: recipe.cook_time || 0,
                 image: recipe.image_url,
                 is_favorite: true,
                 is_mix: false,
@@ -520,6 +523,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                         instructions_text: recipe.instructions_text || recipe.instructions || '',
                         servings: recipe.servings || 4,
                         prep_time: recipe.prep_time || recipe.prepTime || 30,
+                        cook_time: recipe.cook_time || recipe.cookTime || 0,
                         source_url: detectedUrl,
                         image_url: recipe.image_url || recipe.image || undefined,
                     };
@@ -1031,6 +1035,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setSelectedRecipeId(null);
         setPreviousView('all-recipes');
         setShowRecipeBuilder(false);
+        setRecipeCookTime(0);
     };
 
     const handleBackToMessages = () => {
@@ -1053,6 +1058,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setRecipeTitle('');
         setRecipeType('dinner');
         setRecipePrepTime(30);
+        setRecipeCookTime(0);
         setRecipeServings(4);
         setRecipeIngredients([]);
         setRecipeInstructions(['']);
@@ -1142,6 +1148,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 carbs: Math.round((totals.carbs / (recipeServings || 1)) * 10) / 10,
                 fat: Math.round((totals.fat / (recipeServings || 1)) * 10) / 10,
                 prep_time: recipePrepTime,
+                cook_time: recipeCookTime,
                 servings: recipeServings,
                 image: recipeImage,
                 source: 'manual',
@@ -1175,6 +1182,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
         setRecipeInstructions(['']);
         setRecipeImage('');
         setRecipeStep(1);
+        setRecipeCookTime(0);
     };
 
     const handlePasteRecipeContent = async () => {
@@ -1253,6 +1261,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     instructions_text: recipe.instructions_text || recipe.instructions || '',
                     servings: recipe.servings || 4,
                     prep_time: recipe.prep_time || recipe.prepTime || 30,
+                    cook_time: recipe.cook_time || recipe.cookTime || 0,
                     source_url: 'pasted-content',
                     image_url: recipe.image_url || recipe.image || undefined,
                 };
@@ -1381,6 +1390,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                     instructions_text: recipe.instructions_text || recipe.instructions || '',
                     servings: recipe.servings || 4,
                     prep_time: recipe.prep_time || recipe.prepTime || 30,
+                    cook_time: recipe.cook_time || recipe.cookTime || 0,
                     source_url: pastedRecipeURL,
                     image_url: recipe.image_url || recipe.image || undefined,
                 };
@@ -1512,7 +1522,7 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
-                                    <div className="col-span-2">
+                                    <div>
                                         <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                             Prep Time (min)
                                         </label>
@@ -1520,6 +1530,18 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                                             type="number"
                                             value={recipePrepTime}
                                             onChange={(e) => setRecipePrepTime(Number(e.target.value))}
+                                            className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                            Cook Time (min)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={recipeCookTime}
+                                            onChange={(e) => setRecipeCookTime(Number(e.target.value))}
                                             className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                             min="0"
                                         />

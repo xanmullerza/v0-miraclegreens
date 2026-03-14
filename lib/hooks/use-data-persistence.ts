@@ -11,6 +11,7 @@ export interface Recipe {
     fat: number;
     carbs: number;
     prep_time: number;
+    cook_time: number;
     servings: number;
     image: string | null;
     is_favorite: boolean;
