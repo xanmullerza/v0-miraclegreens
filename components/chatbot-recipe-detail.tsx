@@ -410,10 +410,18 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         if (['g', 'gram', 'grams'].includes(measure)) measure = 'g';
         if (['c', 'cup', 'cups'].includes(measure)) measure = 'cup';
         if (['ml', 'milliliter', 'milliliters'].includes(measure)) measure = 'ml';
+        
+        // Small kitchen units
+        if (['sprig', 'sprigs'].includes(measure)) measure = 'sprig';
+        if (['clove', 'cloves'].includes(measure)) measure = 'clove';
+        if (['bunch', 'bunches'].includes(measure)) measure = 'bunch';
+        if (['cube', 'cubes'].includes(measure)) measure = 'cube';
+        if (['stalk', 'stalks'].includes(measure)) measure = 'stalk';
+
         if (measure.endsWith('s') && !['oz', 'lbs', 'g', 'ml'].includes(measure)) {
              measure = measure.slice(0, -1);
         }
-        return { quantity: quantity || 1, measure_label: measure || 'serving' };
+        return { quantity: quantity || 1, measure_label: measure || 'item' };
     };
 
     const processAcceptIngredient = (ing: Ingredient, matchedItem: any) => {
@@ -527,6 +535,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             let totalCarbs = 0;
             let totalFat = 0;
             let aggregatedMicros: Record<string, number> = {};
+            
+            // Outlier detection
+            const outliers: Array<{ item: string, nutrient: string, value: number }> = [];
 
             // We use the already matched food data and the saved weight_g
             // We need to re-fetch ingredients to make sure we have the latest weight_g from DB
@@ -544,10 +555,18 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 if (food && weight > 0) {
                     const ratio = weight / 100; // Database values are typically per 100g
                     
-                    totalCalories += (food.energy_kcal || 0) * ratio;
-                    totalProtein += (food.protein_g || 0) * ratio;
-                    totalCarbs += (food.carbs_g || 0) * ratio;
-                    totalFat += (food.fat_g || 0) * ratio;
+                    const contribCal = (food.energy_kcal || 0) * ratio;
+                    const contribProt = (food.protein_g || 0) * ratio;
+                    const contribCarb = (food.carbs_g || 0) * ratio;
+                    const contribFat = (food.fat_g || 0) * ratio;
+
+                    totalCalories += contribCal;
+                    totalProtein += contribProt;
+                    totalCarbs += contribCarb;
+                    totalFat += contribFat;
+
+                    // Outlier checks for macros
+                    if (contribCal > 2000) outliers.push({ item: ing.item, nutrient: 'Calories', value: Math.round(contribCal) });
 
                     // Aggregate micronutrients and extra macros (fiber, sugar, etc)
                     const foodMicros = food.micronutrients || {};
@@ -555,7 +574,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                     // Sum up all available micronutrients in JSON
                     Object.entries(foodMicros).forEach(([key, val]) => {
                         if (typeof val === 'number') {
-                            aggregatedMicros[key] = (aggregatedMicros[key] || 0) + (val * ratio);
+                            const contrib = val * ratio;
+                            aggregatedMicros[key] = (aggregatedMicros[key] || 0) + contrib;
+
+                            // Micro outlier thresholds
+                            if (key.toLowerCase().includes('iron') && contrib > 50) outliers.push({ item: ing.item, nutrient: 'Iron', value: Math.round(contrib) });
+                            if (key.toLowerCase().includes('calcium') && contrib > 1000) outliers.push({ item: ing.item, nutrient: 'Calcium', value: Math.round(contrib) });
+                            if (key.toLowerCase().includes('sodium') && contrib > 5000) outliers.push({ item: ing.item, nutrient: 'Sodium', value: Math.round(contrib) });
                         }
                     });
 
@@ -564,6 +589,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                     if (food.sugars_g) aggregatedMicros['Sugars'] = (aggregatedMicros['Sugars'] || 0) + (food.sugars_g * ratio);
                 }
             });
+
+            // If we found significant outliers, warn the user but allow proceed (they might be cooking for 100 people)
+            if (outliers.length > 0) {
+                const outlierMsg = outliers.map(o => `${o.item}: ${o.value}${o.nutrient === 'Calories' ? 'kcal' : 'mg'} ${o.nutrient}`).join(', ');
+                toast.warning(`Nutritional outliers detected! ${outlierMsg}. Please verify weights.`, { duration: 6000 });
+            }
 
             // Round macros to 1 decimal
             totalCalories = Math.round(totalCalories);
@@ -1552,6 +1583,22 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     }
                                 };
                                 
+                                // Live Weight Calculation for Preview
+                                let liveUnitWeight = 0;
+                                if (!isNaN(Number(inputs.measure))) {
+                                    liveUnitWeight = Number(inputs.measure);
+                                } else if (['g', 'gram', 'grams', '1'].includes(inputs.measure)) liveUnitWeight = 1;
+                                else if (['oz', 'ounce', 'ounces', '28.35'].includes(inputs.measure)) liveUnitWeight = 28.3495;
+                                else if (['lb', 'lbs', 'pound', 'pounds', '453.59'].includes(inputs.measure)) liveUnitWeight = 453.592;
+                                else if (['ml', 'milliliters'].includes(inputs.measure)) liveUnitWeight = 1;
+
+                                const liveTotalWeight = Math.round(Number(inputs.multiplier) * liveUnitWeight * 10) / 10;
+                                
+                                // Live Outlier Check (UI Hint)
+                                const isOutlier = (dbItem?.micronutrients?.Iron || dbItem?.micronutrients?.['Iron, Fe'] || 0) * (liveTotalWeight / 100) > 50 || 
+                                                 (dbItem?.micronutrients?.Calcium || 0) * (liveTotalWeight / 100) > 1000 ||
+                                                 (dbItem?.energy_kcal || 0) * (liveTotalWeight / 100) > 2000;
+
                                 return (
                                     <div key={ing.id} className={cn(
                                         "relative rounded-lg border p-[10px] shadow-sm flex flex-col gap-2 transition-all",
@@ -1610,7 +1657,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     <option value="1">milliliter (1g approx)</option>
                                                 </select>
                                             </div>
-                                            <div className="pl-2 border-l border-slate-100 dark:border-slate-800 flex flex-col justify-end">
+                                            <div className="pl-2 border-l border-slate-100 dark:border-slate-800 flex flex-col justify-end items-center">
                                                 <button 
                                                     onClick={isAccepted ? () => setStepTwoSaved(prev => ({ ...prev, [ing.id]: false })) : handleSaveStepTwo}
                                                     disabled={inputs.isSaving}
@@ -1626,14 +1673,27 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     ) : isAccepted ? (
                                                         <>
                                                             <Check size={12} className="group-hover:hidden" />
-                                                            <span className="group-hover:hidden">Verified</span>
+                                                            <span className="group-hover:hidden whitespace-nowrap text-[8px]">Verified</span>
                                                             <RefreshCw size={12} className="hidden group-hover:block" />
-                                                            <span className="hidden group-hover:block">Edit</span>
+                                                            <span className="hidden group-hover:block whitespace-nowrap text-[8px]">Edit</span>
                                                         </>
                                                     ) : (
                                                         "Accept"
                                                     )}
                                                 </button>
+
+                                                {/* Calculated Weight Helper */}
+                                                {!isAccepted && liveTotalWeight > 0 && (
+                                                   <div className={cn(
+                                                       "mt-1.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-200",
+                                                       isOutlier ? "text-rose-500 font-bold" : "text-slate-400 font-medium"
+                                                   )}>
+                                                       {isOutlier && <AlertTriangle size={10} />}
+                                                       <span className="text-[8px] uppercase tracking-tighter whitespace-nowrap">
+                                                           Est. {liveTotalWeight}g
+                                                       </span>
+                                                   </div>
+                                               )}
                                             </div>
                                         </div>
                                     </div>
