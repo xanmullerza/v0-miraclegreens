@@ -402,7 +402,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             const searchFood = async (term: string) => {
                 const { data: nameData, error: nameError } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
+                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g, portions')
                     .ilike('name', `%${term}%`)
                     .limit(3);
                 
@@ -410,7 +410,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 
                 const { data: commonData, error: commonError } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g')
+                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g, portions')
                     .ilike('common_name', `%${term}%`)
                     .limit(3);
                 
