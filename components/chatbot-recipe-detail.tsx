@@ -984,28 +984,87 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 <h3 className="text-sm font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 mb-3">
                                     Ingredients ({ingredients.length})
                                 </h3>
-                                <ul className="space-y-2">
+                                <div className="grid gap-2">
                                     {ingredients.map((ing, idx) => {
                                         const servings = recipe.servings || 1;
                                         const weightScale = nutritionViewMode === 'total' ? 1 : (1 / servings);
                                         const displayWeight = Math.round((ing.weight_g || 0) * weightScale * 10) / 10;
                                         
-                                        // Hide generic "X item" labels if we have a valid weight to show instead
+                                        // Calculate macros for this ingredient
+                                        const food = ing.food_items;
+                                        const weight = ing.weight_g || 0;
+                                        let ingCalories = 0, ingProtein = 0, ingCarbs = 0, ingFat = 0;
+                                        
+                                        if (food && weight > 0) {
+                                            const ratio = weight / 100;
+                                            ingCalories = Math.round((food.energy_kcal || 0) * ratio);
+                                            ingProtein = Math.round((food.protein_g || 0) * ratio * 10) / 10;
+                                            ingCarbs = Math.round((food.carbs_g || 0) * ratio * 10) / 10;
+                                            ingFat = Math.round((food.fat_g || 0) * ratio * 10) / 10;
+                                        }
+
+                                        const isFlipped = flippedCards[ing.id];
                                         const isGenericItem = ing.amount?.toLowerCase().includes('item') || ing.amount?.toLowerCase().includes('unit');
                                         const cleanAmount = isGenericItem && displayWeight > 0 ? '' : ing.amount;
 
                                         return (
-                                            <li key={ing.id || idx} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300">
-                                                <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">•</span>
-                                                <span>
-                                                    <span className="font-medium text-slate-900 dark:text-slate-100">{ing.base_ingredient || ing.item}</span>
-                                                    {cleanAmount && <span className="text-slate-500 dark:text-slate-400"> - {cleanAmount}</span>}
-                                                    {displayWeight > 0 && <span className="text-slate-500 dark:text-slate-400 ml-1">({displayWeight}g)</span>}
-                                                </span>
-                                            </li>
+                                            <div
+                                                key={ing.id || idx}
+                                                className="relative h-32 cursor-pointer group"
+                                                onClick={() => setFlippedCards(prev => ({ ...prev, [ing.id]: !isFlipped }))}
+                                            >
+                                                {/* Front of card */}
+                                                <div
+                                                    className={cn(
+                                                        "absolute inset-0 p-3 rounded-lg border transition-all duration-300 flex flex-col justify-between",
+                                                        "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700",
+                                                        isFlipped ? "opacity-0 pointer-events-none" : "opacity-100",
+                                                        "group-hover:border-emerald-400 dark:group-hover:border-emerald-600"
+                                                    )}
+                                                >
+                                                    <div>
+                                                        <p className="font-medium text-slate-900 dark:text-slate-100 text-sm">{ing.base_ingredient || ing.item}</p>
+                                                        {cleanAmount && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{cleanAmount}</p>}
+                                                    </div>
+                                                    <div className="flex items-center justify-between">
+                                                        {displayWeight > 0 && <p className="text-xs text-slate-500 dark:text-slate-400">{displayWeight}g</p>}
+                                                        <p className="text-xs px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold">
+                                                            Flip for macros
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Back of card */}
+                                                <div
+                                                    className={cn(
+                                                        "absolute inset-0 p-3 rounded-lg border transition-all duration-300 flex flex-col justify-center gap-2",
+                                                        "bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-700",
+                                                        isFlipped ? "opacity-100" : "opacity-0 pointer-events-none"
+                                                    )}
+                                                >
+                                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                                        <div>
+                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCalories}</p>
+                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">kcal</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingProtein}g</p>
+                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">protein</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingFat}g</p>
+                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">fat</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCarbs}g</p>
+                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">carbs</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         );
                                     })}
-                                </ul>
+                                </div>
                             </div>
                         )}
 
