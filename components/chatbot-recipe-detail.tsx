@@ -1280,20 +1280,19 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 );
                             })()}
 
-                            {/* Right: Minerals */}
+                            {/* Right: Electrolytes */}
                             {(() => {
-                                const MINERALS = [
+                                const ELECTROLYTES = [
                                     { label: 'Sodium', keys: ['Sodium', 'sodium_mg'] },
                                     { label: 'Potassium', keys: ['Potassium', 'potassium_mg'] },
                                     { label: 'Magnesium', keys: ['Magnesium', 'magnesium_mg'] },
                                     { label: 'Calcium', keys: ['Calcium', 'calcium_mg'] },
                                     { label: 'Phosphorus', keys: ['Phosphorus', 'phosphorus_mg'] },
-                                    { label: 'Iron', keys: ['Iron', 'iron_mg'] },
                                 ];
                                 const micro = calculatedNutrition.micronutrients || {};
                                 const scaleFactor = nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
 
-                                const mineralData = MINERALS.map(({ label, keys }) => {
+                                const electrolyteData = ELECTROLYTES.map(({ label, keys }) => {
                                     let val = 0;
                                     for (const k of keys) {
                                         const match = findNutrientMatch(micro, k);
@@ -1308,8 +1307,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     return { label, pct };
                                 });
 
-                                const total = mineralData.length;
-                                const count = mineralData.filter(m => m.pct >= mineralThreshold).length;
+                                const total = electrolyteData.length;
+                                const count = electrolyteData.filter(m => m.pct >= mineralThreshold).length;
                                 const arcPct = total > 0 ? count / total : 0;
                                 const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
                                 const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
@@ -1339,7 +1338,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
                                                 <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
                                                     <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
-                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#10b981" strokeWidth={S2} strokeLinecap="butt"
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#f97316" strokeWidth={S2} strokeLinecap="butt"
                                                         style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
                                                 </svg>
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -1349,19 +1348,19 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             </div>
                                             <div>
                                                 <div className="text-lg font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
-                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">minerals<br />≥ {mineralThreshold}% RDA</div>
+                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">electrolytes<br />≥ {mineralThreshold}% RDA</div>
                                             </div>
                                         </div>
 
-                                        {/* Mineral pills */}
+                                        {/* Electrolyte pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
-                                            {mineralData.map(({ label, pct }) => {
+                                            {electrolyteData.map(({ label, pct }) => {
                                                 const hit = pct >= mineralThreshold;
                                                 return (
                                                     <div key={label} className={cn(
                                                         'flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border',
                                                         hit
-                                                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                                                            ? 'bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400'
                                                             : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
                                                     )}>
                                                         <span>{label}</span>
@@ -1375,7 +1374,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                             })()}
                         </div>
 
-                        {/* Often Overlooked + Vitamins Row */}
+                        {/* Often Overlooked + Trace Minerals Row */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {/* Left: Often Overlooked */}
                             {(() => {
@@ -1419,26 +1418,116 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 );
                             })()}
 
-                            {/* Right: Vitamins */}
+                            {/* Right: Trace Minerals */}
                             {(() => {
-                                const ALL_VITAMINS = [
+                                const TRACE = [
+                                    { label: 'Iron', keys: ['Iron', 'iron_mg'] },
+                                    { label: 'Zinc', keys: ['Zinc', 'zinc_mg'] },
+                                    { label: 'Copper', keys: ['Copper', 'copper_mg'] },
+                                    { label: 'Manganese', keys: ['Manganese', 'manganese_mg'] },
+                                    { label: 'Selenium', keys: ['Selenium', 'selenium_ug'] },
+                                ];
+                                const micro = calculatedNutrition.micronutrients || {};
+                                const scaleFactor = nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
+
+                                const traceData = TRACE.map(({ label, keys }) => {
+                                    let val = 0;
+                                    for (const k of keys) {
+                                        const match = findNutrientMatch(micro, k);
+                                        if (match !== null && match !== undefined && micro[match] !== undefined) {
+                                            val = micro[match];
+                                            break;
+                                        }
+                                    }
+                                    val *= scaleFactor;
+                                    const rda = userRDAs?.[label] || 0;
+                                    const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
+                                    return { label, pct };
+                                });
+
+                                const total = traceData.length;
+                                const count = traceData.filter(m => m.pct >= mineralThreshold).length;
+                                const arcPct = total > 0 ? count / total : 0;
+                                const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
+                                const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
+
+                                return (
+                                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                                        {/* Threshold toggle */}
+                                        <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                                            {thresholds.map(t => (
+                                                <button
+                                                    key={t}
+                                                    onClick={() => setMineralThreshold(t)}
+                                                    className={cn(
+                                                        'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
+                                                        mineralThreshold === t
+                                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                    )}
+                                                >
+                                                    {t}%
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Donut + big number */}
+                                        <div className="flex items-center justify-center gap-3">
+                                            <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
+                                                <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#ec4899" strokeWidth={S2} strokeLinecap="butt"
+                                                        style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">{count}</span>
+                                                    <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-lg font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
+                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">trace<br />≥ {mineralThreshold}% RDA</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Trace pills */}
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            {traceData.map(({ label, pct }) => {
+                                                const hit = pct >= mineralThreshold;
+                                                return (
+                                                    <div key={label} className={cn(
+                                                        'flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border',
+                                                        hit
+                                                            ? 'bg-pink-500/10 border-pink-500/30 text-pink-600 dark:text-pink-400'
+                                                            : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
+                                                    )}>
+                                                        <span>{label}</span>
+                                                        <span className={hit ? 'font-black' : ''}>{pct}%</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+
+                        {/* Water-Soluble + Stored Vitamins Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {/* Left: Water-Soluble Vitamins */}
+                            {(() => {
+                                const WATER_SOLUBLE = [
                                     { label: 'B1 (Thiamine)', fullName: 'Vitamin B1', subtitle: 'Thiamine' },
                                     { label: 'B2 (Riboflavin)', fullName: 'Vitamin B2', subtitle: 'Riboflavin' },
                                     { label: 'B3 (Niacin)', fullName: 'Vitamin B3', subtitle: 'Niacin' },
                                     { label: 'B5 (Pantothenic Acid)', fullName: 'Vitamin B5', subtitle: 'Pantothenic Acid' },
                                     { label: 'B6 (Pyridoxine)', fullName: 'Vitamin B6', subtitle: 'Pyridoxine' },
-                                    { label: 'B7 (Biotin)', fullName: 'Vitamin B7', subtitle: 'Biotin', excludeFromCount: true },
                                     { label: 'B9 (Folate)', fullName: 'Vitamin B9', subtitle: 'Folate' },
-                                    { label: 'B12 (Cobalamin)', fullName: 'Vitamin B12', subtitle: 'Cobalamin' },
-                                    { label: 'Vitamin A', fullName: 'Vitamin A', subtitle: 'Retinol' },
-                                    { label: 'Vitamin C', fullName: 'Vitamin C', subtitle: 'Ascorbic Acid' },
-                                    { label: 'Vitamin E', fullName: 'Vitamin E', subtitle: 'Tocopherol' },
-                                    { label: 'Vitamin K', fullName: 'Vitamin K', subtitle: 'Phylloquinone' },
                                 ];
                                 const micro = calculatedNutrition.micronutrients || {};
                                 const scaleFactor = nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
 
-                                const vitaminData = ALL_VITAMINS.map(({ label, fullName, subtitle, excludeFromCount }) => {
+                                const vitaminData = WATER_SOLUBLE.map(({ label, fullName, subtitle }) => {
                                     let val = 0;
                                     const match = findNutrientMatch(micro, label);
                                     if (match !== null && match !== undefined && micro[match] !== undefined) {
@@ -1446,12 +1535,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     }
                                     const rda = userRDAs?.[label] || 0;
                                     const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                    return { label, fullName, subtitle, pct, excludeFromCount: !!excludeFromCount };
+                                    return { label, fullName, subtitle, pct };
                                 });
 
-                                const counted = vitaminData.filter(v => !v.excludeFromCount);
-                                const count = counted.filter(v => v.pct >= vitaminThreshold).length;
-                                const total = counted.length;
+                                const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
+                                const total = vitaminData.length;
                                 const arcPct = total > 0 ? count / total : 0;
                                 const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
                                 const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
@@ -1481,7 +1569,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
                                                 <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
                                                     <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
-                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#8b5cf6" strokeWidth={S2} strokeLinecap="butt"
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#06b6d4" strokeWidth={S2} strokeLinecap="butt"
                                                         style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
                                                 </svg>
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -1491,32 +1579,111 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             </div>
                                             <div>
                                                 <div className="text-lg font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
-                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">vitamins<br />≥ {vitaminThreshold}% RDA</div>
+                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">daily<br />vitamins</div>
                                             </div>
                                         </div>
 
-                                        {/* Vitamin pills */}
+                                        {/* Water-Soluble Vitamin pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
-                                            {vitaminData.map(({ label, fullName, subtitle, pct, excludeFromCount }) => {
-                                                if (excludeFromCount) {
-                                                    return (
-                                                        <button
-                                                            key={label}
-                                                            className="flex items-center justify-between rounded-lg px-2 py-1.5 font-bold border bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400 hover:border-amber-400/40 hover:text-amber-500 dark:hover:text-amber-400 transition-colors text-left"
-                                                        >
-                                                            <div>
-                                                                <div className="text-[10px] font-black">{fullName}</div>
-                                                                <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
-                                                            </div>
-                                                        </button>
-                                                    );
-                                                }
+                                            {vitaminData.map(({ label, fullName, subtitle, pct }) => {
                                                 const hit = pct >= vitaminThreshold;
                                                 return (
                                                     <div key={label} className={cn(
                                                         'flex flex-col items-start justify-between rounded-lg px-2 py-1.5 font-bold border',
                                                         hit
-                                                            ? 'bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400'
+                                                            ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400'
+                                                            : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
+                                                    )}>
+                                                        <div className="text-left w-full">
+                                                            <div className="text-[10px] font-black">{fullName}</div>
+                                                            <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
+                                                        </div>
+                                                        <span className={cn('text-[10px] self-end mt-1', hit ? 'font-black' : '')}>{pct}%</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Right: Stored Vitamins */}
+                            {(() => {
+                                const STORED = [
+                                    { label: 'Vitamin A', fullName: 'Vitamin A', subtitle: 'Retinol' },
+                                    { label: 'Vitamin D', fullName: 'Vitamin D', subtitle: 'Calciferol' },
+                                    { label: 'Vitamin E', fullName: 'Vitamin E', subtitle: 'Tocopherol' },
+                                    { label: 'Vitamin K', fullName: 'Vitamin K', subtitle: 'Phylloquinone' },
+                                    { label: 'B12 (Cobalamin)', fullName: 'Vitamin B12', subtitle: 'Cobalamin' },
+                                ];
+                                const micro = calculatedNutrition.micronutrients || {};
+                                const scaleFactor = nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
+
+                                const vitaminData = STORED.map(({ label, fullName, subtitle }) => {
+                                    let val = 0;
+                                    const match = findNutrientMatch(micro, label);
+                                    if (match !== null && match !== undefined && micro[match] !== undefined) {
+                                        val = micro[match] * scaleFactor;
+                                    }
+                                    const rda = userRDAs?.[label] || 0;
+                                    const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
+                                    return { label, fullName, subtitle, pct };
+                                });
+
+                                const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
+                                const total = vitaminData.length;
+                                const arcPct = total > 0 ? count / total : 0;
+                                const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
+                                const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
+
+                                return (
+                                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                                        {/* Threshold toggle */}
+                                        <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                                            {thresholds.map(t => (
+                                                <button
+                                                    key={t}
+                                                    onClick={() => setVitaminThreshold(t)}
+                                                    className={cn(
+                                                        'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
+                                                        vitaminThreshold === t
+                                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                    )}
+                                                >
+                                                    {t}%
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Donut + big number */}
+                                        <div className="flex items-center justify-center gap-3">
+                                            <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
+                                                <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#eab308" strokeWidth={S2} strokeLinecap="butt"
+                                                        style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">{count}</span>
+                                                    <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-lg font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
+                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">stored<br />vitamins</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Stored Vitamin pills */}
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            {vitaminData.map(({ label, fullName, subtitle, pct }) => {
+                                                const hit = pct >= vitaminThreshold;
+                                                return (
+                                                    <div key={label} className={cn(
+                                                        'flex flex-col items-start justify-between rounded-lg px-2 py-1.5 font-bold border',
+                                                        hit
+                                                            ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400'
                                                             : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
                                                     )}>
                                                         <div className="text-left w-full">
