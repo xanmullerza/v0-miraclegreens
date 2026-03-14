@@ -576,8 +576,9 @@ function parseIngredientLine(line: string): ParsedIngredient {
 /**
  * Domain-specific parser for yourtestsite.xyz recipe pages
  * Fetches and parses recipe data from the yourtestsite.xyz domain
+ * Returns data in chatbot-modal format (text-based ingredients/instructions)
  */
-export async function parseYourTestSiteRecipe(url: string): Promise<ParsedRecipe> {
+export async function parseYourTestSiteRecipe(url: string): Promise<any> {
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -591,36 +592,36 @@ export async function parseYourTestSiteRecipe(url: string): Promise<ParsedRecipe
         const titleMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
         const title = titleMatch ? titleMatch[1].trim() : 'Recipe';
 
-        // Extract ingredients section content
-        const ingredients: ParsedIngredient[] = [];
-        const ingredientsMatch = html.match(/<h2[^>]*>Ingredients<\/h2>([\s\S]*?)(?=<\/div>|\r?\n\s*<\/div>|\r?\n\s*{\/\*)/i);
+        // Extract ingredients as text
+        let ingredientsText = '';
+        const ingredientsMatch = html.match(/<h2[^>]*>Ingredients<\/h2>([\s\S]*?)(?=<\/div>|<h2|\r?\n\s*<\/div>|\r?\n\s*{\/\*)/i);
         
         if (ingredientsMatch) {
             const ingredientsHTML = ingredientsMatch[1];
             // Extract all div contents within ingredients
             const ingredientDivs = ingredientsHTML.match(/<div[^>]*>([^<]+)<\/div>/gi) || [];
+            const ingredientLines: string[] = [];
             ingredientDivs.forEach(divHTML => {
                 const textMatch = divHTML.match(/<div[^>]*>([^<]+)<\/div>/i);
                 if (textMatch) {
                     const text = textMatch[1].trim();
                     if (text.length > 0) {
-                        const parsed = parseIngredientLine(text);
-                        if (parsed.item) {
-                            ingredients.push(parsed);
-                        }
+                        ingredientLines.push(text);
                     }
                 }
             });
+            ingredientsText = ingredientLines.join('\n');
         }
 
-        // Extract directions/instructions section
-        const instructions: string[] = [];
-        const directionsMatch = html.match(/<h2[^>]*>Directions<\/h2>([\s\S]*?)(?=<\/div>|\r?\n\s*<\/div>)/i);
+        // Extract directions/instructions as text
+        let instructionsText = '';
+        const directionsMatch = html.match(/<h2[^>]*>Directions<\/h2>([\s\S]*?)(?=<\/div>|<h2|\r?\n\s*<\/div>)/i);
         
         if (directionsMatch) {
             const directionsHTML = directionsMatch[1];
             // Extract all div contents within directions
             const directionDivs = directionsHTML.match(/<div[^>]*>([^<]+)<\/div>/gi) || [];
+            const instructionLines: string[] = [];
             directionDivs.forEach((divHTML, index) => {
                 const textMatch = divHTML.match(/<div[^>]*>([^<]+)<\/div>/i);
                 if (textMatch) {
@@ -628,36 +629,44 @@ export async function parseYourTestSiteRecipe(url: string): Promise<ParsedRecipe
                     // Remove step numbers if present
                     text = text.replace(/^Step \d+[:\s]+/, '').replace(/^\d+[.\s]+/, '');
                     if (text.length > 0) {
-                        instructions.push(text);
+                        instructionLines.push(text);
                     }
                 }
             });
+            instructionsText = instructionLines.join('\n');
         }
 
         return {
-            title,
+            title: title || 'Recipe',
+            ingredients_text: ingredientsText.length > 0 ? ingredientsText : '100g Raw Kale',
+            instructions_text: instructionsText.length > 0 ? instructionsText : 'Wash it\nChop it\nCook it\nEat it',
             servings: 1,
-            prepTime: 5,
-            ingredients: ingredients.length > 0 ? ingredients : [{ item: 'Raw Kale', amount: '100g', weightG: 100 }],
-            instructions: instructions.length > 0 ? instructions : ['Wash it', 'Chop it', 'Cook it', 'Eat it']
+            prep_time: 5,
+            cook_time: 0,
+            source_url: url,
+            image_url: undefined
         };
     } catch (error) {
         console.error('Error parsing yourtestsite.xyz recipe:', error);
         // Return a fallback recipe for yourtestsite.xyz
         return {
             title: 'Recipe from yourtestsite.xyz',
+            ingredients_text: '100g Raw Kale',
+            instructions_text: 'Wash it\nChop it\nCook it\nEat it',
             servings: 1,
-            prepTime: 5,
-            ingredients: [{ item: 'Raw Kale', amount: '100g', weightG: 100 }],
-            instructions: ['Wash it', 'Chop it', 'Cook it', 'Eat it']
+            prep_time: 5,
+            cook_time: 0,
+            source_url: url,
+            image_url: undefined
         };
     }
 }
 
 /**
  * Router function to determine which parser to use based on URL domain
+ * Returns recipe in chatbot-modal format (text-based ingredients/instructions)
  */
-export async function parseRecipeFromURL(url: string): Promise<ParsedRecipe> {
+export async function parseRecipeFromURL(url: string): Promise<any> {
     const urlObj = new URL(url);
     const domain = urlObj.hostname.toLowerCase();
 
