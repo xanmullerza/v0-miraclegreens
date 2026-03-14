@@ -353,6 +353,18 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         return cleaned;
     };
 
+    // Helper to clean ingredient display names
+    const cleanIngredientDisplay = (name: string) => {
+        let cleaned = name.trim();
+        
+        // Remove trailing prep descriptions like "crushed or finely grated", "torn, to serve", etc.
+        cleaned = cleaned.replace(/\s+(crushed or finely grated|drained and roughly chopped|finely chopped|roughly chopped|torn to serve|torn, to serve|and leaves stalks and leaves|stalks and leaves).*$/i, '');
+        cleaned = cleaned.replace(/\s*,\s*(drained|roughly chopped|finely chopped|crushed|grated|torn|picked|separated|skinless|boneless|and.*).*$/i, '');
+        cleaned = cleaned.replace(/\s+(to taste|to serve|optional).*$/i, '');
+        
+        return cleaned.trim();
+    };
+
     const dePluralize = (term: string) => {
         if (term.endsWith('ies')) return term.slice(0, -3) + 'y';
         if (term.endsWith('ves')) return term.slice(0, -3) + 'f';
@@ -1923,7 +1935,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-bold text-slate-900 dark:text-white capitalize truncate max-w-[180px]">
-                                                                    {ing.base_ingredient || ing.item}
+                                                                    {cleanIngredientDisplay(ing.base_ingredient || ing.item)}
                                                                 </p>
                                                                 <p className="text-xs text-slate-500 font-medium">
                                                                     {(ing.amount?.includes('0.25') && (ing.base_ingredient || ing.item)?.match(/^\d/)) ? '' : ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
