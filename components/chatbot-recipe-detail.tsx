@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { searchUSDAFood } from '@/lib/services/nutrition';
+import { searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -103,6 +103,28 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
             if (ingredientsError) throw ingredientsError;
             setIngredients(ingredientsData || []);
+
+            // Pre-populate mapping states if data exists
+            if (ingredientsData && ingredientsData.length > 0) {
+                const initialMatches: Record<string, any> = {};
+                const initialAccepted: Record<string, boolean> = {};
+                const initialStepTwoSaved: Record<string, boolean> = {};
+                
+                ingredientsData.forEach((ing) => {
+                    if (ing.food_items) {
+                        initialMatches[ing.id] = ing.food_items;
+                        initialAccepted[ing.id] = true;
+                        // If weight_g is explicitly set, it's accepted in Step 2 too
+                        if (ing.weight_g && ing.weight_g > 0) {
+                            initialStepTwoSaved[ing.id] = true;
+                        }
+                    }
+                });
+                
+                setMatchedIngredients(initialMatches);
+                setAcceptedMatches(initialAccepted);
+                setStepTwoSaved(initialStepTwoSaved);
+            }
 
             // Calculate phytonutrients from ingredients
             let aggregatedPhytos: Record<string, string> = {};
@@ -333,11 +355,22 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         return '0';
     };
 
-    const parseRecipeAmount = (amountStr: string) => {
+    const parseRecipeAmount = (amountStr: string, itemStr?: string) => {
         let quantity = 1;
         let measure = '';
 
-        const str = (amountStr || '').trim().toLowerCase();
+        let str = (amountStr || '').trim().toLowerCase();
+        
+        // If amountStr is a generic fraction + "item", and we have itemStr,
+        // it's likely the original text ("2 tbsp ...") got moved to itemStr.
+        if ((str.includes('item') || str === '') && itemStr) {
+            const itemLower = itemStr.trim().toLowerCase();
+            // Check if itemStr starts with a measurement pattern
+            if (itemLower.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*([a-z]+)/)) {
+                str = itemLower;
+            }
+        }
+
         const match = str.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*(.*)/);
         if (match) {
             let numStr = match[1];
@@ -982,6 +1015,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             const { data: { session } } = await supabase.auth.getSession();
                                             const userId = session?.user?.id || null;
                                             
+                                            // 1. Fetch full details (including portions and full micronutrients)
+                                            const details = await getUSDAFoodDetails(result.fdcId);
+                                            
                                             const foodData = {
                                                 name: result.name,
                                                 common_name: result.common_name || null,
@@ -992,8 +1028,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                 protein_g: result.protein_g || 0,
                                                 carbs_g: result.carbs_g || 0,
                                                 fat_g: result.fat_g || 0,
-                                                micronutrients: result.micronutrients || {},
-                                                portions: result.portions || [],
+                                                micronutrients: details.micronutrients || result.micronutrients || {},
+                                                portions: details.portions || [],
                                                 user_id: userId,
                                                 is_curated: false
                                             };
@@ -1075,7 +1111,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                                     {ing.base_ingredient || ing.item}
                                                                 </p>
                                                                 <p className="text-xs text-slate-500 font-medium">
-                                                                    {ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
+                                                                    {(ing.amount?.includes('0.25') && (ing.base_ingredient || ing.item)?.match(/^\d/)) ? '' : ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -1269,7 +1305,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                         
                         <div className="grid gap-4">
                             {ingredients.map((ing) => {
-                                const originalDetails = parseRecipeAmount(ing.amount);
+                                const originalDetails = parseRecipeAmount(ing.amount, ing.item);
                                 const dbItem = matchedIngredients[ing.id];
                                 
                                 const isAccepted = !!stepTwoSaved[ing.id];
@@ -1397,6 +1433,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     {dbItem?.portions?.map((p: any, idx: number) => (
                                                         <option key={idx} value={p.weight_g}>{p.label} ({p.weight_g}g unit)</option>
                                                     ))}
+                                                    <option disabled>--- Standard Units ---</option>
+                                                    <option value="1">gram (1g)</option>
+                                                    <option value="1000">kilogram (1000g)</option>
+                                                    <option value="28.35">ounce (28.35g)</option>
+                                                    <option value="453.59">pound (453.59g)</option>
+                                                    <option value="1">milliliter (1g approx)</option>
                                                 </select>
                                             </div>
                                             <div className="pl-2 border-l border-slate-100 dark:border-slate-800 flex flex-col justify-end">
