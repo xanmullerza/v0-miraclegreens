@@ -1557,7 +1557,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         }
 
                                         const totalWeight = Math.round(Number(inputs.multiplier) * unitWeight * 10) / 10;
-                                        const perServingWeight = Math.round((totalWeight / servings) * 10) / 10;
+                                        const perServingWeight = Math.round((totalWeight / (recipe?.servings || 1)) * 10) / 10;
                                         
                                         const originalMeasureLabel = isNaN(Number(inputs.measure)) ? inputs.measure : 
                                             (dbItem?.portions?.find((p: any) => p.weight_g === Number(inputs.measure))?.label || originalDetails.measure_label);
