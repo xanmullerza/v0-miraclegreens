@@ -499,9 +499,100 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 toast.error("Smart Match couldn't find any direct mappings. You may need to add these items to your database.", { id: 'smart-match' });
             }
 
-        } catch (error) {
-            console.error('Error during Smart Match:', error);
-            toast.error("An error occurred while running Smart Match.", { id: 'smart-match' });
+        } finally {
+            setSmartMatchRunning(false);
+        }
+    };
+
+    const finalizeRecipeNutrition = async () => {
+        if (!recipe) return;
+        
+        // 1. Check if all ingredients are saved in step 2
+        const allSaved = ingredients.every(ing => stepTwoSaved[ing.id]);
+        if (!allSaved) {
+            toast.error("Please accept/save all ingredient portions before finalizing.");
+            return;
+        }
+
+        setSmartMatchRunning(true);
+        const loadingToastId = toast.loading("Calculating total recipe nutrition...", { id: 'finalize-nutrition' });
+
+        try {
+            // Initialize totals
+            let totalCalories = 0;
+            let totalProtein = 0;
+            let totalCarbs = 0;
+            let totalFat = 0;
+            let aggregatedMicros: Record<string, number> = {};
+
+            // We use the already matched food data and the saved weight_g
+            // We need to re-fetch ingredients to make sure we have the latest weight_g from DB
+            const { data: updatedIngs, error: fetchErr } = await supabase
+                .from('ingredients')
+                .select('*, food_items(*)')
+                .eq('recipe_id', recipeId);
+
+            if (fetchErr) throw fetchErr;
+
+            updatedIngs?.forEach(ing => {
+                const food = ing.food_items;
+                const weight = ing.weight_g || 0;
+                
+                if (food && weight > 0) {
+                    const ratio = weight / 100; // Database values are typically per 100g
+                    
+                    totalCalories += (food.energy_kcal || 0) * ratio;
+                    totalProtein += (food.protein_g || 0) * ratio;
+                    totalCarbs += (food.carbs_g || 0) * ratio;
+                    totalFat += (food.fat_g || 0) * ratio;
+
+                    // Aggregate micronutrients and extra macros (fiber, sugar)
+                    const foodMicros = food.micronutrients || {};
+                    // Add extra macros to micros if they exist as top level but we need them aggregated
+                    const combinedSource = { 
+                        ...foodMicros,
+                        fiber_g: food.fiber_g || foodMicros.fiber_g || 0,
+                        sugars_g: food.sugars_g || foodMicros.sugars_g || 0
+                    };
+
+                    Object.entries(combinedSource).forEach(([key, val]) => {
+                        if (typeof val === 'number') {
+                            aggregatedMicros[key] = (aggregatedMicros[key] || 0) + (val * ratio);
+                        }
+                    });
+                }
+            });
+
+            // Round values
+            totalCalories = Math.round(totalCalories);
+            totalProtein = Math.round(totalProtein * 10) / 10;
+            totalCarbs = Math.round(totalCarbs * 10) / 10;
+            totalFat = Math.round(totalFat * 10) / 10;
+
+            // 2. Update the recipe in database
+            const { error: updateErr } = await supabase
+                .from('recipes')
+                .update({
+                    calories: totalCalories,
+                    protein: totalProtein,
+                    carbs: totalCarbs,
+                    fat: totalFat,
+                    micronutrients: aggregatedMicros
+                })
+                .eq('id', recipeId);
+
+            if (updateErr) throw updateErr;
+
+            toast.success("Recipe nutrition analyzed and saved!", { id: 'finalize-nutrition' });
+            
+            // 3. Update local state and move to nutrition section
+            await fetchRecipeDetails(); // Re-fetch all to refresh the UI
+            setActiveSection('nutrition');
+            setMappingStep('FOOD_MATCH'); // Reset mapping UI step for next time
+            
+        } catch (err: any) {
+            console.error("Finalize error:", err);
+            toast.error(err.message || "Failed to finalize recipe nutrition", { id: 'finalize-nutrition' });
         } finally {
             setSmartMatchRunning(false);
         }
@@ -1446,13 +1537,24 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     onClick={isAccepted ? () => setStepTwoSaved(prev => ({ ...prev, [ing.id]: false })) : handleSaveStepTwo}
                                                     disabled={inputs.isSaving}
                                                     className={cn(
-                                                        "h-8 px-5 rounded text-[10px] font-bold transition-colors flex items-center justify-center min-w-[80px]",
+                                                        "h-8 px-5 rounded text-[10px] font-bold transition-colors flex items-center justify-center min-w-[80px] gap-1.5 group",
                                                         isAccepted
-                                                            ? "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent"
+                                                            ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
                                                             : "bg-white hover:bg-slate-50 border border-slate-200 dark:border-slate-800 text-indigo-600"
                                                     )}
                                                 >
-                                                    {inputs.isSaving ? <Loader2 size={12} className="animate-spin" /> : isAccepted ? "Saved" : "Accept"}
+                                                    {inputs.isSaving ? (
+                                                        <Loader2 size={12} className="animate-spin" />
+                                                    ) : isAccepted ? (
+                                                        <>
+                                                            <Check size={12} className="group-hover:hidden" />
+                                                            <span className="group-hover:hidden">Verified</span>
+                                                            <RefreshCw size={12} className="hidden group-hover:block" />
+                                                            <span className="hidden group-hover:block">Edit</span>
+                                                        </>
+                                                    ) : (
+                                                        "Accept"
+                                                    )}
                                                 </button>
                                             </div>
                                         </div>
@@ -1460,6 +1562,31 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 );
                             })}
                         </div>
+
+                        {/* Final Step Action */}
+                        {ingredients.every(ing => stepTwoSaved[ing.id]) && (
+                            <div className="mt-8 p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800/50 flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 shadow-sm">
+                                    <Sparkles size={24} className="fill-current" />
+                                </div>
+                                <div className="text-center">
+                                    <h4 className="font-bold text-slate-900 dark:text-white">Analysis Complete!</h4>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">All ingredients have been matched and verified. Ready to calculate final nutritional profile.</p>
+                                </div>
+                                <button
+                                    onClick={finalizeRecipeNutrition}
+                                    disabled={smartMatchRunning}
+                                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
+                                >
+                                    {smartMatchRunning ? (
+                                        <><Loader2 size={18} className="animate-spin" /> Finalizing Analysis...</>
+                                    ) : (
+                                        <><Sparkles size={18} /> Finish Analysis & Calculate Nutrition</>
+                                    )}
+                                </button>
+                                <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Saves to recipe and updates nutrition grid</p>
+                            </div>
+                        )}
                     </div>
                 )}
                     </div>
