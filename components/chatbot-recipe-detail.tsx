@@ -1146,17 +1146,35 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                                 <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-tight mb-2">
                                                                     1 <strong>{conflict.measure_label}</strong> = ? grams
                                                                 </p>
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="relative flex-1">
-                                                                        <input 
-                                                                            type="number" 
-                                                                            value={customPortionGram}
-                                                                            onChange={e => setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }))}
-                                                                            placeholder="e.g. 120"
-                                                                            className="w-full h-7 bg-white dark:bg-slate-950 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-bold text-amber-700 dark:text-amber-500 focus:outline-none focus:ring-1 ring-amber-500"
-                                                                        />
-                                                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">g</span>
+                                                                <div className="flex flex-col gap-1.5">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="relative flex-1">
+                                                                            <input 
+                                                                                type="number" 
+                                                                                value={customPortionGram}
+                                                                                onChange={e => setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }))}
+                                                                                placeholder="e.g. 120"
+                                                                                className="w-full h-7 bg-white dark:bg-slate-950 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-bold text-amber-700 dark:text-amber-500 focus:outline-none focus:ring-1 ring-amber-500"
+                                                                            />
+                                                                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">g</span>
+                                                                        </div>
                                                                     </div>
+                                                                    {conflict.itemToAccept.portions && conflict.itemToAccept.portions.length > 0 && (
+                                                                        <select 
+                                                                            className="w-full h-6 bg-amber-50/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded px-1 text-[9px] text-amber-700 dark:text-amber-400 focus:outline-none placeholder:text-amber-400"
+                                                                            onChange={(e) => {
+                                                                                if (e.target.value) {
+                                                                                    setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }));
+                                                                                }
+                                                                            }}
+                                                                            value=""
+                                                                        >
+                                                                            <option value="" disabled>Or pick existing DB portion...</option>
+                                                                            {conflict.itemToAccept.portions.map((p: any, idx: number) => (
+                                                                                <option key={idx} value={p.weight_g}>{p.label} ({p.weight_g}g)</option>
+                                                                            ))}
+                                                                        </select>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                             <div className="flex flex-col gap-1 w-16">
