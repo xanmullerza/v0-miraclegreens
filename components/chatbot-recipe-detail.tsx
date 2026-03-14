@@ -115,6 +115,30 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 .order('id', { ascending: true });
 
             if (ingredientsError) throw ingredientsError;
+            
+            // DEBUG: Log raw fetched ingredients to see what Supabase returns
+            console.log('🔍 RAW INGREDIENTS FROM SUPABASE:', ingredientsData);
+            if (ingredientsData && ingredientsData.length > 0) {
+                console.log('🔍 FIRST INGREDIENT DETAIL:', {
+                    id: ingredientsData[0].id,
+                    item: ingredientsData[0].item,
+                    weight_g: ingredientsData[0].weight_g,
+                    food_item_id: ingredientsData[0].food_item_id,
+                    food_items: ingredientsData[0].food_items,
+                    food_items_keys: ingredientsData[0].food_items ? Object.keys(ingredientsData[0].food_items) : 'NONE',
+                });
+                ingredientsData.forEach((ing, idx) => {
+                    console.log(`📦 Ingredient ${idx}:`, {
+                        item: ing.item,
+                        weight_g: ing.weight_g,
+                        has_food_items: !!ing.food_items,
+                        energy_kcal: ing.food_items?.energy_kcal,
+                        protein_g: ing.food_items?.protein_g,
+                        calculated_kcal: ing.food_items?.energy_kcal ? (ing.weight_g / 100) * ing.food_items.energy_kcal : 'N/A'
+                    });
+                });
+            }
+            
             setIngredients(ingredientsData || []);
 
             // Pre-populate mapping states if data exists
@@ -658,16 +682,34 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         let totalFat = 0;
         let aggregatedMicros: Record<string, number> = {};
 
-        ingredients.forEach(ing => {
+        console.log('🧮 CALCULATING NUTRITION START - Total ingredients:', ingredients.length);
+
+        ingredients.forEach((ing, idx) => {
             const food = ing.food_items;
             const weight = ing.weight_g || 0;
             
+            console.log(`  [${idx}] ${ing.item}:`, {
+                weight_g: weight,
+                has_food_items: !!food,
+                energy_kcal: food?.energy_kcal,
+                protein_g: food?.protein_g,
+                carbs_g: food?.carbs_g,
+                fat_g: food?.fat_g,
+            });
+            
             if (food && weight > 0) {
                 const ratio = weight / 100; // Database values are per 100g
-                totalCalories += (food.energy_kcal || 0) * ratio;
-                totalProtein += (food.protein_g || 0) * ratio;
-                totalCarbs += (food.carbs_g || 0) * ratio;
-                totalFat += (food.fat_g || 0) * ratio;
+                const calContribution = (food.energy_kcal || 0) * ratio;
+                const proteinContribution = (food.protein_g || 0) * ratio;
+                const carbsContribution = (food.carbs_g || 0) * ratio;
+                const fatContribution = (food.fat_g || 0) * ratio;
+                
+                console.log(`    → Per 100g: kcal=${food.energy_kcal} | ratio=${ratio} | contribution=${calContribution}kcal`);
+                
+                totalCalories += calContribution;
+                totalProtein += proteinContribution;
+                totalCarbs += carbsContribution;
+                totalFat += fatContribution;
 
                 // Aggregate micronutrients from food_items
                 const foodMicros = food.micronutrients || {};
@@ -679,7 +721,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             }
         });
 
-        return {
+        const result = {
             calories: Math.round(totalCalories),
             protein: Math.round(totalProtein * 10) / 10,
             carbs: Math.round(totalCarbs * 10) / 10,
@@ -688,6 +730,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 Object.entries(aggregatedMicros).map(([key, val]) => [key, Math.round(val * 10) / 10])
             )
         };
+        
+        console.log('🧮 CALCULATING NUTRITION RESULT:', result);
+        return result;
     };
 
     const calculatedNutrition = calculateNutritionFromIngredients();
@@ -715,6 +760,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 // 1. Direct handle for top-level macros - use calculated values from ingredients
                 if (key === 'Energy' || key === 'energy_kcal' || key === 'Calories' || key === 'calories') {
                     value = calculatedNutrition.calories;
+                    console.log(`    📊 getNutrientValue('${key}') → ${value} kcal (from calculatedNutrition)`);
                     break;
                 }
                 if (key === 'Protein' || key === 'protein_g' || key === 'protein') {
