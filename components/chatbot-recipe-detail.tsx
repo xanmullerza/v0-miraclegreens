@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
