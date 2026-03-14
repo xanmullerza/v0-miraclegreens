@@ -94,7 +94,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     
     // Threshold state for minerals/vitamins
     const [mineralThreshold, setMineralThreshold] = useState<50 | 75 | 100>(75);
-    const [vitaminThreshold, setVitaminThreshold] = useState<50 | 75 | 100>(75);
+    const [waterSolubleThreshold, setWaterSolubleThreshold] = useState<50 | 75 | 100>(75);
+    const [storedVitaminThreshold, setStoredVitaminThreshold] = useState<50 | 75 | 100>(75);
 
     // User preferences and RDA
     const { profile, nutrientDisplayMode } = useUserPreferences();
@@ -1545,7 +1546,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     return { label, fullName, subtitle, val, pct };
                                 });
 
-                                const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
+                                const count = vitaminData.filter(v => v.pct >= waterSolubleThreshold).length;
                                 const total = vitaminData.length;
                                 const arcPct = total > 0 ? count / total : 0;
                                 const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
@@ -1558,10 +1559,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             {thresholds.map(t => (
                                                 <button
                                                     key={t}
-                                                    onClick={() => setVitaminThreshold(t)}
+                                                    onClick={() => setWaterSolubleThreshold(t)}
                                                     className={cn(
                                                         'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
-                                                        vitaminThreshold === t
+                                                        waterSolubleThreshold === t
                                                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                                                     )}
@@ -1593,7 +1594,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         {/* Water-Soluble Vitamin pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
                                             {vitaminData.map(({ label, fullName, subtitle, val, pct }) => {
-                                                const hit = pct >= vitaminThreshold;
+                                                const hit = pct >= waterSolubleThreshold;
                                                 return (
                                                     <div key={label} className={cn(
                                                         'flex flex-col items-start justify-between rounded-lg px-2 py-1.5 font-bold border',
@@ -1641,7 +1642,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     return { label, fullName, subtitle, val, pct };
                                 });
 
-                                const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
+                                const count = vitaminData.filter(v => v.pct >= storedVitaminThreshold).length;
                                 const total = vitaminData.length;
                                 const arcPct = total > 0 ? count / total : 0;
                                 const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
@@ -1654,10 +1655,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             {thresholds.map(t => (
                                                 <button
                                                     key={t}
-                                                    onClick={() => setVitaminThreshold(t)}
+                                                    onClick={() => setStoredVitaminThreshold(t)}
                                                     className={cn(
                                                         'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
-                                                        vitaminThreshold === t
+                                                        storedVitaminThreshold === t
                                                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                                                     )}
@@ -1689,7 +1690,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         {/* Stored Vitamin pills */}
                                         <div className="grid grid-cols-2 gap-1.5">
                                             {vitaminData.map(({ label, fullName, subtitle, val, pct }) => {
-                                                const hit = pct >= vitaminThreshold;
+                                                const hit = pct >= storedVitaminThreshold;
                                                 return (
                                                     <div key={label} className={cn(
                                                         'flex flex-col items-start justify-between rounded-lg px-2 py-1.5 font-bold border',
