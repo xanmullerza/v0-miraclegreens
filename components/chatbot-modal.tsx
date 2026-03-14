@@ -346,46 +346,14 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
             const parseIngredientAmount = (ingredientLine: string) => {
                 let line = ingredientLine.trim();
                 
-                // Step 1: Remove common trailing descriptors that shouldn't be in ingredient name
-                const trailingPhrases = [
-                    'to taste', 'to serve', 'optionally', 'optional', 
-                    '\\(optional\\)', '\\(to taste\\)', '\\(to serve\\)'
-                ];
-                trailingPhrases.forEach(phrase => {
-                    line = line.replace(new RegExp(`\\s*,?\\s*${phrase}\\s*$`, 'i'), '');
-                });
+                // Step 1: Remove common trailing descriptors that create separate entries
+                line = line.replace(/\s*\(to taste\)\s*$/i, '').trim();
+                line = line.replace(/\s*\(optional\)\s*$/i, '').trim();
+                line = line.replace(/\s+(to taste|optional)\s*$/i, '').trim();
                 
-                // Step 2: Remove trailing prep descriptions after comma or keyword
-                line = line.replace(/\s*,\s*(drained|roughly chopped|finely chopped|crushed|grated|torn|picked|separated|skinless|boneless|and.*)/i, '');
-                
-                // Step 3: Known units list (longer strings first to avoid partial matches)
-                const knownUnits = [
-                    'tablespoon', 'tablespoons', 'tbsp', 'tbs',
-                    'teaspoon', 'teaspoons', 'tsp',
-                    'milliliter', 'milliliters', 'ml',
-                    'liter', 'liters', 'l',
-                    'cup', 'cups', 'c',
-                    'ounce', 'ounces', 'oz',
-                    'pound', 'pounds', 'lb', 'lbs',
-                    'kilogram', 'kilograms', 'kg',
-                    'gram', 'grams', 'g',
-                    'clove', 'cloves',
-                    'sprig', 'sprigs',
-                    'leaf', 'leaves',
-                    'stem', 'stems',
-                    'stalk', 'stalks',
-                    'bunch', 'bunches',
-                    'wedge', 'wedges',
-                    'slice', 'slices',
-                    'piece', 'pieces',
-                    'fillet', 'fillets',
-                    'breast', 'breasts',
-                    'steak', 'steaks',
-                    'head', 'heads',
-                ];
-                
-                // Step 4: Match number/range at start: "30g", "2-3", "½ - 1 tsp", etc.
-                const amountRegex = /^([\d.\/\s\-¼½¾⅛⅜⅝⅞]+?)\s*([a-z]*)/i;
+                // Step 2: Extract amount at the START of the line
+                // Matches: "30g", "4", "½ - 1 tsp", "2-3 cups", etc.
+                const amountRegex = /^([\d¼½¾⅛⅜⅝⅞]+(?:\s*[-\/]\s*[\d¼½¾⅛⅜⅝⅞]+)?)\s*([a-z]*)/i;
                 const match = line.match(amountRegex);
                 
                 let quantity = 1;
@@ -394,55 +362,60 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                 
                 if (match) {
                     const amountStr = match[1].trim();
-                    const afterAmount = match[2].trim().toLowerCase();
+                    const possibleUnit = match[2].trim().toLowerCase();
                     
-                    // Step 5: Parse quantity (handle ranges like "2-3" or "½ - 1")
-                    let qtyToUse = amountStr;
-                    if (amountStr.includes('-')) {
-                        const parts = amountStr.split('-').map(p => p.trim());
-                        // Take the first number
-                        qtyToUse = parts[0];
-                    }
+                    // Defined units we recognize
+                    const unitMap: Record<string, string> = {
+                        'g': 'g', 'gram': 'g', 'grams': 'g', 'kg': 'g', 'kilogram': 'g', 'kilograms': 'g',
+                        'ml': 'ml', 'milliliter': 'ml', 'milliliters': 'ml', 'l': 'ml', 'liter': 'ml', 'liters': 'ml',
+                        'oz': 'oz', 'ounce': 'oz', 'ounces': 'oz',
+                        'lb': 'lb', 'lbs': 'lb', 'pound': 'lb', 'pounds': 'lb',
+                        'cup': 'cup', 'cups': 'cup', 'c': 'cup',
+                        'tbsp': 'tbsp', 'tbs': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp',
+                        'tsp': 'tsp', 'teaspoon': 'tsp', 'teaspoons': 'tsp',
+                        'clove': 'clove', 'cloves': 'clove',
+                        'sprig': 'sprig', 'sprigs': 'sprig',
+                        'leaf': 'leaf', 'leaves': 'leaf',
+                        'stalk': 'stalk', 'stalks': 'stalk',
+                        'breast': 'breast', 'breasts': 'breast',
+                    };
                     
-                    try {
-                        quantity = parseFloat(qtyToUse) || 1;
-                    } catch (e) {
-                        quantity = 1;
-                    }
-                    
-                    // Step 6: Find first known unit in the line
-                    const restOfLine = afterAmount + ' ' + line.substring(match[0].length);
-                    const restLower = restOfLine.toLowerCase();
-                    
-                    let foundUnit = false;
-                    for (const unit of knownUnits) {
-                        if (restLower.startsWith(unit)) {
-                            measure = unit;
-                            foundUnit = true;
-                            
-                            // Normalize to standard format
-                            if (['gram', 'grams', 'g', 'kg', 'kilogram', 'kilograms'].includes(unit)) measure = 'g';
-                            else if (['ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters'].includes(unit)) measure = 'ml';
-                            else if (['oz', 'ounce', 'ounces'].includes(unit)) measure = 'oz';
-                            else if (['lb', 'lbs', 'pound', 'pounds'].includes(unit)) measure = 'lb';
-                            else if (['c', 'cup', 'cups'].includes(unit)) measure = 'cup';
-                            else if (['tbsp', 'tablespoon', 'tablespoons', 'tbs'].includes(unit)) measure = 'tbsp';
-                            else if (['tsp', 'teaspoon', 'teaspoons'].includes(unit)) measure = 'tsp';
-                            
-                            // Extract food name (remove matched amount + unit)
-                            foodName = line.replace(new RegExp(`^[\\d.\/\\s\\-¼½¾⅛⅜⅝⅞]+\\s*${unit}\\s*`, 'i'), '').trim();
-                            break;
+                    // Check if possibleUnit is an actual unit
+                    if (possibleUnit && unitMap[possibleUnit]) {
+                        measure = unitMap[possibleUnit];
+                        
+                        // Parse quantity - take first number from range if present
+                        let qtyStr = amountStr;
+                        if (amountStr.includes('-') || amountStr.includes('/')) {
+                            qtyStr = amountStr.split(/[-\/]/)[0].trim();
                         }
-                    }
-                    
-                    // Step 7: If no unit found, just remove the leading amount
-                    if (!foundUnit) {
-                        foodName = line.replace(/^[\d.\/\s\-¼½¾⅛⅜⅝⅞]+\s*/, '').trim();
+                        
+                        try {
+                            quantity = parseFloat(qtyStr) || 1;
+                        } catch (e) {
+                            quantity = 1;
+                        }
+                        
+                        // Remove the matched amount + unit from the line for food name
+                        foodName = line.replace(new RegExp(`^${escapeRegex(amountStr)}\\s*${escapeRegex(possibleUnit)}\\s*`), '').trim();
+                    } else {
+                        // No recognized unit, just extract quantity and keep rest
+                        try {
+                            quantity = parseFloat(amountStr) || 1;
+                        } catch (e) {
+                            quantity = 1;
+                        }
+                        foodName = line.replace(new RegExp(`^${escapeRegex(amountStr)}\\s*`), '').trim();
                     }
                 }
                 
+                // Clean up food name - remove prep descriptions
+                foodName = foodName.replace(/\s+(crushed or finely grated|drained and roughly chopped|finely chopped|roughly chopped|torn to serve|torn, to serve).*$/i, '').trim();
+                
                 return { quantity, measure, foodName: foodName || line };
             };
+            
+            const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
             // Parse ingredients into array
             const ingredientsList = recipe.ingredients_text
