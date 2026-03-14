@@ -1557,20 +1557,25 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         }
 
                                         const totalWeight = Math.round(Number(inputs.multiplier) * unitWeight * 10) / 10;
+                                        const perServingWeight = Math.round((totalWeight / servings) * 10) / 10;
+                                        
                                         const originalMeasureLabel = isNaN(Number(inputs.measure)) ? inputs.measure : 
                                             (dbItem?.portions?.find((p: any) => p.weight_g === Number(inputs.measure))?.label || originalDetails.measure_label);
 
-                                        // 1. Update recipe ingredient with final mapped data
+                                        // 1. Update recipe ingredient in DB with final mapped data (stored as per-serving weight)
                                         const { error: ingError } = await supabase
                                             .from('ingredients')
                                             .update({ 
                                                 food_item_id: dbItem.id,
-                                                weight_g: totalWeight
+                                                weight_g: perServingWeight
                                                 // notice we DO NOT touch 'item' or 'amount' (preserving raw text)
                                             })
                                             .eq('id', ing.id);
 
                                         if (ingError) throw ingError;
+
+                                        // 2. Update local state immediately for instant feedback
+                                        setIngredients(prev => prev.map(p => p.id === ing.id ? { ...p, weight_g: perServingWeight, food_item_id: dbItem.id } : p));
 
                                         // 2. Optionally update food_items portions if we mapped an unknown string measure
                                         if (isNaN(Number(inputs.measure)) && !['g', 'gram', 'grams', 'oz', 'ounce', 'ounces', 'lb', 'lbs', 'pound', 'pounds', 'ml', 'milliliters'].includes(inputs.measure)) {
