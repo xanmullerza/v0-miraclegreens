@@ -1117,15 +1117,16 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
                 {activeSection === 'nutrition' && (
                     calculatedNutrition.calories > 0 ? (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="flex items-center justify-between pb-3">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {/* Header */}
+                        <div className="flex items-center justify-between">
                             <div>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-2">
                                     <Activity size={16} />
-                                    Nutritional Profile
+                                    Nutritional Breakdown
                                 </h3>
                                 <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
-                                    {nutritionViewMode === 'per-serving' ? `Average per serving (1 of ${recipe.servings})` : `Total recipe analysis (${recipe.servings} servings)`}
+                                    {nutritionViewMode === 'per-serving' ? `Per Serving (1 of ${recipe.servings})` : `Total (${recipe.servings} Servings)`}
                                 </p>
                             </div>
                             
@@ -1134,7 +1135,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 <button 
                                     onClick={() => setNutritionViewMode('per-serving')}
                                     className={cn(
-                                        "px-2 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
+                                        "px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
                                         nutritionViewMode === 'per-serving' 
                                             ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
                                             : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
@@ -1145,7 +1146,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 <button 
                                     onClick={() => setNutritionViewMode('total')}
                                     className={cn(
-                                        "px-2 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
+                                        "px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
                                         nutritionViewMode === 'total' 
                                             ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
                                             : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
@@ -1156,133 +1157,192 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                             </div>
                         </div>
 
-                        <NutrientGrid 
-                            title="Macronutrients" 
-                            icon={Zap} 
-                            theme="orange" 
-                            subtitle="Energy and macro breakdown" 
-                            items={{
-                                'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
-                                'Protein': ['Protein', 'protein_g', 'protein'],
-                                'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
-                                'Fat': ['Fat', 'fat_g', 'fat']
-                            }} 
-                        />
-
-                        <NutrientGrid 
-                            title="Electrolytes" 
-                            icon={Zap} 
-                            theme="indigo" 
-                            subtitle="Essential minerals for hydration" 
-                            items={{
-                                'Sodium': ['Sodium', 'sodium_mg'],
-                                'Potassium': ['Potassium', 'potassium_mg'],
-                                'Magnesium': ['Magnesium', 'magnesium_mg'],
-                                'Calcium': ['Calcium', 'calcium_mg'],
-                                'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-                            }} 
-                        />
-
-                        <NutrientGrid 
-                            title="Trace Minerals" 
-                            icon={Gem} 
-                            theme="rose" 
-                            subtitle="Essential minerals for energy support" 
-                            items={{
-                                'Iron': ['Iron', 'iron_mg'],
-                                'Zinc': ['Zinc', 'zinc_mg'],
-                                'Copper': ['Copper', 'copper_mg'],
-                                'Manganese': ['Manganese', 'manganese_mg'],
-                                'Selenium': ['Selenium', 'selenium_ug']
-                            }} 
-                        />
-
-                        <NutrientGrid 
-                            title="Water-Soluble Vitamins" 
-                            icon={Droplet} 
-                            theme="blue" 
-                            subtitle="Daily vitamins for health" 
-                            items={{
-                                'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                                'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                                'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                                'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                                'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                                'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                                'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                                'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                                'Choline': ['Choline', 'choline_mg']
-                            }} 
-                        />
-
-                        <NutrientGrid 
-                            title="Fat-Soluble Vitamins" 
-                            icon={Battery} 
-                            theme="emerald" 
-                            subtitle="Stored vitamins for long-term vitality" 
-                            items={{
-                                'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                                'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                                'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                                'Vitamin K': ['Vitamin K', 'vitamin_k_ug']
-                            }} 
-                        />
-
-                        {/* Advanced Nutrition Toggle */}
-                        <button
-                            onClick={() => setShowAdvancedNutrition(prev => !prev)}
-                            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-dashed border-amber-300 dark:border-amber-700/50 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all text-[9px] font-bold uppercase tracking-wider"
-                        >
-                            <Dna size={13} />
-                            {showAdvancedNutrition ? 'Hide' : 'Show'} Advanced Bio-Markers
-                            {showAdvancedNutrition ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                        </button>
-
-                        {showAdvancedNutrition && (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                <NutrientGrid 
-                                    title="Extra Markers" 
-                                    icon={Activity} 
-                                    theme="amber" 
-                                    subtitle="Additional health markers" 
-                                    items={{
-                                        'Fiber': ['Fiber', 'fiber_g'],
-                                        'Sugars': ['Sugars', 'sugars_g'],
-                                        'Oxalate': ['Oxalate', 'oxalate_mg'],
-                                        'Cholesterol': ['Cholesterol', 'cholesterol_mg']
-                                    }} 
-                                />
-
-                                <NutrientGrid 
-                                    title="Biological Ratios" 
-                                    icon={Dna} 
-                                    theme="amber" 
-                                    subtitle="Key nutrient balances for a healthy body" 
-                                    isRatios={true}
-                                    items={{
-                                        'Sodium & Potassium': ['Sodium', 'Potassium'],
-                                        'Zinc & Copper': ['Zinc', 'Copper'],
-                                        'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
-                                        'Calcium & Magnesium': ['Calcium', 'Magnesium'],
-                                        'Calcium & Phosphorus': ['Calcium', 'Phosphorus']
-                                    }} 
-                                />
-
-                                {/* Phytonutrients */}
-                                {recipe?.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 && (
-                                    <div className="p-4 pt-3 rounded-2xl border bg-gradient-to-br mb-4 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
-                                        <h4 className="font-bold flex items-center gap-2 mb-2 uppercase tracking-wider text-sm text-green-500"><Dna className="h-4 w-4" /> Phytonutrients</h4>
-                                        <p className="text-[10px] text-slate-400 mb-3 border-b border-slate-200 dark:border-slate-700 pb-2">Plant compounds for enhanced nutrition</p>
-                                        <div className="space-y-2">
-                                            {Object.entries(recipe.phytonutrients).map(([name, description]) => (
-                                                <div key={name} className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                                                    <p className="text-[11px] font-semibold text-green-600 dark:text-green-400 mb-1">{name}</p>
-                                                    <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed">{description}</p>
-                                                </div>
-                                            ))}
+                        {/* Macronutrients Section */}
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Left: Circular Macros + Energy */}
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4">
+                                <div className="flex flex-col items-center justify-center gap-4">
+                                    {/* Circular Progress for Macros */}
+                                    <div className="relative w-28 h-28 flex items-center justify-center">
+                                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                                            {/* Background circle */}
+                                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-200 dark:text-slate-700" />
+                                            {/* Carbs segment (blue) */}
+                                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${(calculatedNutrition.carbs / (calculatedNutrition.carbs + calculatedNutrition.protein + calculatedNutrition.fat)) * 282.7} 282.7`} className="text-blue-500" />
+                                        </svg>
+                                        <div className="absolute text-center">
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white">
+                                                {nutritionViewMode === 'per-serving' 
+                                                    ? (calculatedNutrition.calories / recipe.servings).toFixed(0)
+                                                    : calculatedNutrition.calories}
+                                            </p>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400">kcal</p>
                                         </div>
                                     </div>
-                                )}
+
+                                    {/* Macro Bars */}
+                                    <div className="w-full space-y-2">
+                                        {/* Carbs */}
+                                        <div>
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">CARBS</span>
+                                                <span className="text-[11px] font-bold text-blue-500">{nutritionViewMode === 'per-serving' ? (calculatedNutrition.carbs / recipe.servings).toFixed(0) : calculatedNutrition.carbs.toFixed(0)}g</span>
+                                            </div>
+                                            <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                <div className="h-full bg-blue-500 rounded-full" style={{width: '100%'}} />
+                                            </div>
+                                        </div>
+
+                                        {/* Fat */}
+                                        <div>
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">FAT</span>
+                                                <span className="text-[11px] font-bold text-orange-500">{nutritionViewMode === 'per-serving' ? (calculatedNutrition.fat / recipe.servings).toFixed(1) : calculatedNutrition.fat.toFixed(1)}g</span>
+                                            </div>
+                                            <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                <div className="h-full bg-orange-500 rounded-full" style={{width: '100%'}} />
+                                            </div>
+                                        </div>
+
+                                        {/* Protein */}
+                                        <div>
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">PROTEIN</span>
+                                                <span className="text-[11px] font-bold text-rose-500">{nutritionViewMode === 'per-serving' ? (calculatedNutrition.protein / recipe.servings).toFixed(1) : calculatedNutrition.protein.toFixed(1)}g</span>
+                                            </div>
+                                            <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                <div className="h-full bg-rose-500 rounded-full" style={{width: '100%'}} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Minerals Overview */}
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4">
+                                <div className="flex flex-col items-center justify-center gap-3">
+                                    {/* Circular Indicator */}
+                                    <div className="relative w-24 h-24 flex items-center justify-center">
+                                        <svg className="w-full h-full" viewBox="0 0 100 100">
+                                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-200 dark:text-emerald-700" />
+                                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="282.7 282.7" className="text-emerald-500" />
+                                        </svg>
+                                        <div className="absolute text-center">
+                                            <p className="text-base font-bold text-slate-900 dark:text-white">100%</p>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400">MINERALS</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Mineral Pills */}
+                                    <div className="w-full grid grid-cols-2 gap-2">
+                                        {[
+                                            { name: 'Sodium', key: 'Sodium', color: 'emerald' },
+                                            { name: 'Potassium', key: 'Potassium', color: 'emerald' },
+                                            { name: 'Magnesium', key: 'Magnesium', color: 'emerald' },
+                                            { name: 'Calcium', key: 'Calcium', color: 'emerald' },
+                                            { name: 'Phosphorus', key: 'Phosphorus', color: 'emerald' },
+                                            { name: 'Iron', key: 'Iron', color: 'emerald' }
+                                        ].map(mineral => {
+                                            const val = calculatedNutrition.micronutrients[mineral.key] || 0;
+                                            const displayVal = nutritionViewMode === 'per-serving' ? val / recipe.servings : val;
+                                            return (
+                                                <div key={mineral.name} className="px-2 py-1 rounded-full border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 text-center">
+                                                    <p className="text-[8px] font-semibold text-emerald-700 dark:text-emerald-300">{mineral.name}</p>
+                                                    <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{displayVal.toFixed(0)}%</p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Often Overlooked Section */}
+                        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4">
+                            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-3">Often Overlooked</h4>
+                            <div className="space-y-2">
+                                {[
+                                    { label: 'WATER', value: calculatedNutrition.micronutrients['Water'] || 0, unit: 'g' },
+                                    { label: 'FIBER', value: calculatedNutrition.micronutrients['Fiber'] || 0, unit: 'g' },
+                                    { label: 'VITAMIN D', value: calculatedNutrition.micronutrients['Vitamin D'] || 0, unit: 'IU' },
+                                    { label: 'CHOLINE', value: calculatedNutrition.micronutrients['Choline'] || 0, unit: 'mg' }
+                                ].map(item => (
+                                    <div key={item.label} className="flex items-center justify-between">
+                                        <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">{item.label}</span>
+                                        <span className="text-[11px] font-bold text-slate-900 dark:text-white">{
+                                            nutritionViewMode === 'per-serving' 
+                                                ? (item.value / recipe.servings).toFixed(1)
+                                                : item.value.toFixed(1)
+                                        } {item.unit}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Vitamins Section */}
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Vitamin Circular Indicator */}
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4 col-span-2">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h4 className="text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">Vitamins</h4>
+                                        <p className="text-[9px] text-slate-500 dark:text-slate-400">≥ 75% RDA</p>
+                                    </div>
+                                    <div className="relative w-20 h-20 flex items-center justify-center">
+                                        <svg className="w-full h-full" viewBox="0 0 100 100">
+                                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" className="text-purple-200 dark:text-purple-700" />
+                                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="213 282.7" className="text-purple-500" />
+                                        </svg>
+                                        <div className="absolute text-center">
+                                            <p className="text-base font-bold text-slate-900 dark:text-white">91%</p>
+                                            <p className="text-[9px] text-slate-500 dark:text-slate-400">VITAMINS</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Vitamin Pills Grid */}
+                                <div className="grid grid-cols-2 gap-2 mt-4">
+                                    {[
+                                        { label: 'Vitamin B1', key: 'B1 (Thiamine)' },
+                                        { label: 'Vitamin B2', key: 'B2 (Riboflavin)' },
+                                        { label: 'Vitamin B3', key: 'B3 (Niacin)' },
+                                        { label: 'Vitamin B5', key: 'B5 (Pantothenic Acid)' },
+                                        { label: 'Vitamin B6', key: 'B6 (Pyridoxine)' },
+                                        { label: 'Vitamin B7', key: 'B7 (Biotin)' },
+                                        { label: 'Vitamin B9', key: 'B9 (Folate)' },
+                                        { label: 'Vitamin B12', key: 'B12 (Cobalamin)' },
+                                        { label: 'Vitamin A', key: 'Vitamin A' },
+                                        { label: 'Vitamin C', key: 'Vitamin C' },
+                                        { label: 'Vitamin E', key: 'Vitamin E' },
+                                        { label: 'Vitamin K', key: 'Vitamin K' }
+                                    ].map(vit => {
+                                        const val = calculatedNutrition.micronutrients[vit.key] || 0;
+                                        const displayVal = nutritionViewMode === 'per-serving' ? val / recipe.servings : val;
+                                        return (
+                                            <div key={vit.label} className="px-3 py-2 rounded-lg border border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20 text-center">
+                                                <p className="text-[9px] font-semibold text-purple-700 dark:text-purple-300">{vit.label}</p>
+                                                <p className="text-[11px] font-bold text-purple-600 dark:text-purple-400">{displayVal.toFixed(0)}%</p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Phytonutrients */}
+                        {recipe?.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 && (
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4">
+                                <h4 className="font-bold flex items-center gap-2 mb-3 uppercase tracking-wider text-sm text-green-600 dark:text-green-400">
+                                    <Dna className="h-4 w-4" /> Phytonutrients
+                                </h4>
+                                <div className="space-y-2">
+                                    {Object.entries(recipe.phytonutrients).slice(0, 3).map(([name, description]) => (
+                                        <div key={name} className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-green-200 dark:border-green-700">
+                                            <p className="text-[10px] font-semibold text-green-700 dark:text-green-400">{name}</p>
+                                            <p className="text-[9px] text-slate-600 dark:text-slate-400 line-clamp-2">{description}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
