@@ -888,12 +888,69 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     };
 
                                     // Handler: accept a USDA result for this ingredient
-                                    const handleAcceptUsda = (result: any) => {
-                                        setMatchedIngredients(prev => ({ ...prev, [ing.id]: { ...result, source: 'usda' } }));
-                                        setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
-                                        setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
-                                        setUsdaExpanded(prev => ({ ...prev, [ing.id]: false }));
-                                        toast.success(`Matched: ${result.name}`);
+                                    const handleAcceptUsda = async (result: any) => {
+                                        toast.loading(`Importing ${result.name}...`, { id: `import-usda-${ing.id}` });
+                                        try {
+                                            const { data: { session } } = await supabase.auth.getSession();
+                                            const userId = session?.user?.id || null;
+                                            
+                                            const foodData = {
+                                                name: result.name,
+                                                common_name: result.common_name || null,
+                                                source: 'usda',
+                                                category: 'General',
+                                                energy_kcal: result.energy_kcal || 0,
+                                                energy_kj: result.energy_kj || Math.round((result.energy_kcal || 0) * 4.184),
+                                                protein_g: result.protein_g || 0,
+                                                carbs_g: result.carbs_g || 0,
+                                                fat_g: result.fat_g || 0,
+                                                micronutrients: result.micronutrients || {},
+                                                portions: result.portions || [],
+                                                user_id: userId,
+                                                is_curated: false
+                                            };
+
+                                            let finalFood;
+                                            // First check if it exists
+                                            const { data: existingFood } = await supabase
+                                                .from('food_items')
+                                                .select('*')
+                                                .eq('name', result.name)
+                                                .single();
+                                                
+                                            if (existingFood) {
+                                                finalFood = existingFood;
+                                            } else {
+                                                // Insert new uncurated record
+                                                const { data: insertedFood, error } = await supabase
+                                                    .from('food_items')
+                                                    .insert(foodData)
+                                                    .select()
+                                                    .single();
+                                                    
+                                                if (error) {
+                                                    // Fallback in case of race condition duplicate
+                                                    if (error.code === '23505') {
+                                                        const { data: fallbackFood } = await supabase.from('food_items').select('*').eq('name', result.name).single();
+                                                        if (fallbackFood) finalFood = fallbackFood;
+                                                        else throw error;
+                                                    } else {
+                                                        throw error;
+                                                    }
+                                                } else {
+                                                    finalFood = insertedFood;
+                                                }
+                                            }
+
+                                            setMatchedIngredients(prev => ({ ...prev, [ing.id]: { ...finalFood, source: 'usda' } }));
+                                            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+                                            setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
+                                            setUsdaExpanded(prev => ({ ...prev, [ing.id]: false }));
+                                            toast.success(`Imported & Matched: ${result.name}`, { id: `import-usda-${ing.id}` });
+                                        } catch (err: any) {
+                                            console.error('Error importing USDA item:', err);
+                                            toast.error(`Failed to import: ${err.message}`, { id: `import-usda-${ing.id}` });
+                                        }
                                     };
 
                                     // Handler: dismiss USDA results
