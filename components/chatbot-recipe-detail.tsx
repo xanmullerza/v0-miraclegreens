@@ -76,6 +76,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
+    
+    // Nutrition Display Mode
+    const [nutritionViewMode, setNutritionViewMode] = useState<'per-serving' | 'total'>('per-serving');
 
     useEffect(() => {
         fetchRecipeDetails();
@@ -619,30 +622,60 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         const micronutrients = recipe?.micronutrients || {};
 
         const getNutrientValue = (keys: string[]): number => {
+            let value = 0;
             // First pass: look for exact or very close matches to avoid fuzzy collisions (like 'Trans Fat' matching 'Fat')
             for (const key of keys) {
                 const lowerKey = key.toLowerCase();
                 
                 // 1. Direct handle for top-level macros
-                if (key === 'Energy' || key === 'energy_kcal' || key === 'Calories' || key === 'calories') return recipe?.calories || 0;
-                if (key === 'Protein' || key === 'protein_g' || key === 'protein') return recipe?.protein || 0;
-                if (key === 'Carbohydrates' || key === 'carbs_g' || key === 'carbs') return recipe?.carbs || 0;
-                if (key === 'Fat' || key === 'fat_g' || key === 'fat') return recipe?.fat || 0;
+                if (key === 'Energy' || key === 'energy_kcal' || key === 'Calories' || key === 'calories') {
+                    value = recipe?.calories || 0;
+                    break;
+                }
+                if (key === 'Protein' || key === 'protein_g' || key === 'protein') {
+                    value = recipe?.protein || 0;
+                    break;
+                }
+                if (key === 'Carbohydrates' || key === 'carbs_g' || key === 'carbs') {
+                    value = recipe?.carbs || 0;
+                    break;
+                }
+                if (key === 'Fat' || key === 'fat_g' || key === 'fat') {
+                    value = recipe?.fat || 0;
+                    break;
+                }
 
                 // 2. Check JSON micros with strict matching first
-                for (const [dbKey, value] of Object.entries(micronutrients)) {
-                    if (dbKey.toLowerCase() === lowerKey) return value as number;
+                for (const [dbKey, val] of Object.entries(micronutrients)) {
+                    if (dbKey.toLowerCase() === lowerKey) {
+                        value = val as number;
+                        break;
+                    }
                 }
+                if (value > 0) break;
             }
 
             // Second pass: Fuzzy matching (fallback)
-            for (const key of keys) {
-                const lowerKey = key.toLowerCase();
-                for (const [dbKey, value] of Object.entries(micronutrients)) {
-                    if (dbKey.toLowerCase().includes(lowerKey)) return value as number;
+            if (value === 0) {
+                for (const key of keys) {
+                    const lowerKey = key.toLowerCase();
+                    for (const [dbKey, val] of Object.entries(micronutrients)) {
+                        if (dbKey.toLowerCase().includes(lowerKey)) {
+                            value = val as number;
+                            break;
+                        }
+                    }
+                    if (value > 0) break;
                 }
             }
-            return 0;
+            
+            // Scaled nutrition logic
+            const currentServings = recipe?.servings || 1;
+            if (nutritionViewMode === 'per-serving' && currentServings > 1) {
+                return value / currentServings;
+            }
+
+            return value;
         };
 
         return (
@@ -886,12 +919,42 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 {activeSection === 'nutrition' && (
                     recipe.calories > 0 ? (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="pb-3">
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
-                                <Activity size={16} />
-                                Nutritional Profile
-                            </h3>
-                            <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Comprehensive analysis of nutrition</p>
+                        <div className="flex items-center justify-between pb-3">
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
+                                    <Activity size={16} />
+                                    Nutritional Profile
+                                </h3>
+                                <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
+                                    {nutritionViewMode === 'per-serving' ? `Average per serving (1 of ${recipe.servings})` : `Total recipe analysis (${recipe.servings} servings)`}
+                                </p>
+                            </div>
+                            
+                            {/* View Mode Toggle */}
+                            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
+                                <button 
+                                    onClick={() => setNutritionViewMode('per-serving')}
+                                    className={cn(
+                                        "px-2 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
+                                        nutritionViewMode === 'per-serving' 
+                                            ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                    )}
+                                >
+                                    Per Serving
+                                </button>
+                                <button 
+                                    onClick={() => setNutritionViewMode('total')}
+                                    className={cn(
+                                        "px-2 py-1 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
+                                        nutritionViewMode === 'total' 
+                                            ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                    )}
+                                >
+                                    Total
+                                </button>
+                            </div>
                         </div>
 
                         <NutrientGrid 
