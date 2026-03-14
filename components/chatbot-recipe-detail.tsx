@@ -735,7 +735,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         return result;
     };
 
-    const calculatedNutrition = calculateNutritionFromIngredients();
+    const calculatedNutrition = ingredients.length > 0 ? calculateNutritionFromIngredients() : { calories: 0, protein: 0, carbs: 0, fat: 0, micronutrients: {} };
 
     // Simplified NutrientGrid for chatbot
     const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, isRatios = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, isRatios?: boolean }) => {
