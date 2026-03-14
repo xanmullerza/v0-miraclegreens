@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { searchUSDAFood } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
@@ -63,6 +63,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const [usdaResults, setUsdaResults] = useState<Record<string, any[]>>({});
     const [usdaLoading, setUsdaLoading] = useState<Record<string, boolean>>({});
     const [usdaExpanded, setUsdaExpanded] = useState<Record<string, boolean>>({});
+
+    // Phase 3: Portion Matching States
+    const [portionConflicts, setPortionConflicts] = useState<Record<string, { quantity: number, measure_label: string, itemToAccept: any, isSaving?: boolean }>>({});
+    const [customPortions, setCustomPortions] = useState<Record<string, string>>({});
 
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
@@ -303,6 +307,84 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         if (term.endsWith('es') && !term.endsWith('ses')) return term.slice(0, -2);
         if (term.endsWith('s') && !term.endsWith('ss')) return term.slice(0, -1);
         return term;
+    };
+
+    // --- Phase 3: Quantity Parsing & Accept Handling ---
+    const parseRecipeAmount = (amountStr: string) => {
+        let quantity = 1;
+        let measure = '';
+
+        const str = (amountStr || '').trim().toLowerCase();
+        const match = str.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*(.*)/);
+        if (match) {
+            let numStr = match[1];
+            if (numStr.includes('/')) {
+                const parts = numStr.split(' ');
+                if (parts.length === 2) {
+                    const [whole, frac] = parts;
+                    const [n, d] = frac.split('/');
+                    quantity = parseInt(whole) + (parseInt(n) / parseInt(d));
+                } else {
+                    const [n, d] = numStr.split('/');
+                    quantity = parseInt(n) / parseInt(d);
+                }
+            } else {
+                quantity = parseFloat(numStr);
+            }
+            
+            let restStr = match[2].trim();
+            const firstWordMatch = restStr.match(/^([a-z]+)/);
+            if (firstWordMatch) {
+                measure = firstWordMatch[1];
+            }
+        } else {
+             const firstWordMatch = str.match(/^([a-z]+)/);
+             if (firstWordMatch) {
+                 measure = firstWordMatch[1];
+             }
+        }
+        
+        if (['tbs', 'tbsp', 'tablespoon', 'tablespoons'].includes(measure)) measure = 'tbsp';
+        if (['tsp', 'teaspoon', 'teaspoons'].includes(measure)) measure = 'tsp';
+        if (['oz', 'ounce', 'ounces'].includes(measure)) measure = 'oz';
+        if (['lb', 'lbs', 'pound', 'pounds'].includes(measure)) measure = 'lb';
+        if (['g', 'gram', 'grams'].includes(measure)) measure = 'g';
+        if (['c', 'cup', 'cups'].includes(measure)) measure = 'cup';
+        if (['ml', 'milliliter', 'milliliters'].includes(measure)) measure = 'ml';
+        if (measure.endsWith('s') && !['oz', 'lbs', 'g', 'ml'].includes(measure)) {
+             measure = measure.slice(0, -1);
+        }
+        return { quantity: quantity || 1, measure_label: measure || 'serving' };
+    };
+
+    const processAcceptIngredient = (ing: Ingredient, matchedItem: any) => {
+        const { quantity, measure_label } = parseRecipeAmount(ing.amount);
+        
+        // standard mass measures
+        if (['g', 'kg', 'oz', 'lb', 'ml', 'serving', 'servings'].includes(measure_label) || !measure_label) {
+            setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem }));
+            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+            setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
+            setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; });
+            return;
+        }
+
+        // Check if measure_label exists in portions
+        const portions = matchedItem.portions || [];
+        const measureExists = portions.some((p: any) => p.label.toLowerCase() === measure_label);
+
+        if (measureExists) {
+            setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem }));
+            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+            setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
+            setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; });
+        } else {
+            // Conflict State!
+            setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem })); 
+            setPortionConflicts(prev => ({ ...prev, [ing.id]: { quantity, measure_label, itemToAccept: matchedItem } }));
+            setFlippedCards(prev => ({ ...prev, [ing.id]: true })); 
+            toast.warning(`Missing portion data for ${measure_label}`);
+        }
     };
 
     // --- Smart Match Logic ---
@@ -840,15 +922,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 {Object.keys(matchedIngredients).length > 0 && (
                                     <button 
                                         onClick={() => {
-                                            const newAccepted = { ...acceptedMatches };
-                                            const newFlipped = { ...flippedCards };
+                                            let count = 0;
                                             Object.keys(matchedIngredients).forEach(id => {
-                                                newAccepted[id] = true;
-                                                newFlipped[id] = false;
+                                                if (!acceptedMatches[id]) {
+                                                    const ing = ingredients.find(i => i.id === id);
+                                                    if (ing) {
+                                                        processAcceptIngredient(ing, matchedIngredients[id]);
+                                                        count++;
+                                                    }
+                                                }
                                             });
-                                            setAcceptedMatches(newAccepted);
-                                            setFlippedCards(newFlipped);
-                                            toast.success(`Accepted ${Object.keys(matchedIngredients).length} ingredient matches`);
+                                            if (count > 0) toast.success(`Processed ${count} ingredient matches`);
                                         }}
                                         className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
                                     >
@@ -865,6 +949,41 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     const isUsdaExpanded = !!usdaExpanded[ing.id];
                                     const isUsdaLoading = !!usdaLoading[ing.id];
                                     const ingUsdaResults = usdaResults[ing.id] || [];
+                                    const conflict = portionConflicts[ing.id];
+                                    const customPortionGram = customPortions[ing.id] || '';
+
+                                    const handleSaveCustomPortion = async () => {
+                                        if (!customPortionGram || isNaN(Number(customPortionGram))) {
+                                            toast.error('Please enter a valid gram number'); return;
+                                        }
+                                        setPortionConflicts(prev => ({ ...prev, [ing.id]: { ...prev[ing.id], isSaving: true } }));
+                                        
+                                        try {
+                                            const finalWeight = Number(customPortionGram);
+                                            const newPortion = { label: conflict!.measure_label, weight_g: finalWeight };
+                                            const updatedPortions = [...(conflict!.itemToAccept.portions || []), newPortion];
+
+                                            const { error } = await supabase
+                                                .from('food_items')
+                                                .update({ portions: updatedPortions })
+                                                .eq('id', conflict!.itemToAccept.id);
+
+                                            if (error) throw error;
+                                            
+                                            const updatedItem = { ...conflict!.itemToAccept, portions: updatedPortions };
+                                            
+                                            setMatchedIngredients(prev => ({ ...prev, [ing.id]: updatedItem }));
+                                            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+                                            setFlippedCards(prev => ({ ...prev, [ing.id]: false })); 
+                                            setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; });
+                                            
+                                            toast.success('Portion saved to database!');
+                                        } catch (err: any) {
+                                            console.error('Save portion error:', err);
+                                            toast.error('Failed to save portion');
+                                            setPortionConflicts(prev => ({ ...prev, [ing.id]: { ...prev[ing.id], isSaving: false } }));
+                                        }
+                                    };
                                     
                                     // Handler: search USDA for this ingredient
                                     const handleUsdaSearch = async () => {
@@ -942,11 +1061,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                 }
                                             }
 
-                                            setMatchedIngredients(prev => ({ ...prev, [ing.id]: { ...finalFood, source: 'usda' } }));
-                                            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
-                                            setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
                                             setUsdaExpanded(prev => ({ ...prev, [ing.id]: false }));
                                             toast.success(`Imported & Matched: ${result.name}`, { id: `import-usda-${ing.id}` });
+                                            processAcceptIngredient(ing, { ...finalFood, source: 'usda' });
                                         } catch (err: any) {
                                             console.error('Error importing USDA item:', err);
                                             toast.error(`Failed to import: ${err.message}`, { id: `import-usda-${ing.id}` });
@@ -1019,7 +1136,50 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         </div>
                                                     </div>
 
-                                                    {/* Back (Matched Food Item) */}
+                                                    {/* Back (Matched Food Item or Conflict) */}
+                                                    {conflict ? (
+                                                        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl p-3 bg-gradient-to-r from-amber-50 to-white dark:from-amber-900/40 dark:to-slate-900 border border-amber-300 dark:border-amber-700 flex items-center justify-between shadow-sm">
+                                                            <div className="flex-1 mr-3 flex flex-col justify-center h-full">
+                                                                <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 mb-1 leading-tight flex items-center gap-1">
+                                                                    <AlertCircle size={12} /> Portion Missing!
+                                                                </p>
+                                                                <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-tight mb-2">
+                                                                    1 <strong>{conflict.measure_label}</strong> = ? grams
+                                                                </p>
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="relative flex-1">
+                                                                        <input 
+                                                                            type="number" 
+                                                                            value={customPortionGram}
+                                                                            onChange={e => setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }))}
+                                                                            placeholder="e.g. 120"
+                                                                            className="w-full h-7 bg-white dark:bg-slate-950 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-bold text-amber-700 dark:text-amber-500 focus:outline-none focus:ring-1 ring-amber-500"
+                                                                        />
+                                                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">g</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col gap-1 w-16">
+                                                                <button 
+                                                                    onClick={handleSaveCustomPortion}
+                                                                    disabled={conflict.isSaving || !customPortionGram}
+                                                                    className="w-full h-7 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded text-[10px] font-bold transition-colors flex items-center justify-center gap-1"
+                                                                >
+                                                                    {conflict.isSaving ? <Loader2 size={10} className="animate-spin" /> : "Save"}
+                                                                </button>
+                                                                <button 
+                                                                    onClick={(e) => { 
+                                                                        e.stopPropagation(); 
+                                                                        setFlippedCards(prev => ({ ...prev, [ing.id]: false })); 
+                                                                        setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; }); 
+                                                                    }}
+                                                                    className="w-full h-6 text-slate-400 hover:text-amber-600 text-[10px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded transition-colors"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
                                                     <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl p-3 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-900/30 dark:to-slate-900 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between shadow-sm shadow-indigo-100 dark:shadow-none">
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
@@ -1055,8 +1215,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             </button>
                                                             <button 
                                                                 onClick={() => { 
-                                                                    setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
-                                                                    setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
+                                                                    processAcceptIngredient(ing, matchedIngredients[ing.id]);
                                                                 }}
                                                                 className="w-8 h-8 flex items-center justify-center rounded-full border border-emerald-300 dark:border-emerald-700 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all"
                                                                 title="Accept match"
@@ -1090,6 +1249,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             </button>
                                                         </div>
                                                     </div>
+                                                    )}
                                                 </div>
                                             </div>
 
