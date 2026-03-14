@@ -905,14 +905,24 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     Ingredients ({ingredients.length})
                                 </h3>
                                 <ul className="space-y-2">
-                                    {ingredients.map((ing, idx) => (
-                                        <li key={ing.id || idx} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300">
-                                            <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">•</span>
-                                            <span>
-                                                <span className="font-medium">{ing.base_ingredient || ing.item}</span> - {ing.amount}
-                                            </span>
-                                        </li>
-                                    ))}
+                                    {ingredients.map((ing, idx) => {
+                                        const servings = recipe.servings || 1;
+                                        const weightScale = nutritionViewMode === 'total' ? servings : 1;
+                                        const displayWeight = Math.round((ing.weight_g || 0) * weightScale * 10) / 10;
+                                        
+                                        return (
+                                            <li key={ing.id || idx} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300">
+                                                <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">•</span>
+                                                <span>
+                                                    <span className="font-medium text-slate-900 dark:text-slate-100">{ing.base_ingredient || ing.item}</span>
+                                                    {' - '}
+                                                    <span className="text-slate-500 dark:text-slate-400">
+                                                        {ing.amount} {displayWeight > 0 && `(${displayWeight}g)`}
+                                                    </span>
+                                                </span>
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
                             </div>
                         )}
@@ -1657,7 +1667,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     <option value="1">milliliter (1g approx)</option>
                                                 </select>
                                             </div>
-                                            <div className="pl-2 border-l border-slate-100 dark:border-slate-800 flex flex-col justify-end items-center">
+                                            <div className="pl-2 border-l border-slate-100 dark:border-slate-800 flex flex-col justify-end items-center gap-1">
+                                                <div className={cn(
+                                                    "px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 animate-in fade-in zoom-in duration-300",
+                                                    isOutlier ? "bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                                )}>
+                                                    {isOutlier && <AlertTriangle size={10} />}
+                                                    {liveTotalWeight}g
+                                                </div>
+                                                {isOutlier && !isAccepted && (
+                                                    <div className="text-[8px] text-rose-500 font-bold uppercase tracking-tighter">High density!</div>
+                                                )}
                                                 <button 
                                                     onClick={isAccepted ? () => setStepTwoSaved(prev => ({ ...prev, [ing.id]: false })) : handleSaveStepTwo}
                                                     disabled={inputs.isSaving}

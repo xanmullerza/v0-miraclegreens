@@ -171,19 +171,32 @@ export function useDataPersistence() {
 
                     const servings = recipe.servings || 1;
                     const ingredientsData = ingredients.map(ing => {
-                        // Ensure we have a descriptive item name and amount for legacy support/fallback
+                        // Ensure we have a descriptive item name
                         const itemName = ing.food_item_name || ing.item || 'Ingredient';
-                        const amountStr = `${ing.quantity / servings} ${ing.measure_label || 'unit'}`;
+                        
+                        // Generate a smarter amount string
+                        let amountStr = '';
+                        const scaledQty = Math.round((ing.quantity / servings) * 100) / 100;
+                        const scaledWeight = Math.round((ing.weight_g / servings) * 10) / 10;
+                        const unit = ing.measure_label || '';
+
+                        if (unit && !['unit', 'item', 'whole', 'g', 'gram', 'grams', 'ml'].includes(unit.toLowerCase())) {
+                            amountStr = `${scaledQty} ${unit}`;
+                        } else if (scaledWeight > 0) {
+                            amountStr = `${scaledWeight}g`;
+                        } else {
+                            amountStr = `${scaledQty} ${unit || 'item'}`;
+                        }
 
                         return {
                             recipe_id: recipeId,
-                            food_item_id: ing.food_item_id && !ing.food_item_id.startsWith('raw-') ? ing.food_item_id : null, // Allow NULL for raw ingredients
+                            food_item_id: ing.food_item_id && !ing.food_item_id.startsWith('raw-') ? ing.food_item_id : null, 
                             item: itemName,
                             amount: amountStr,
                             weight_g: ing.weight_g / servings,
                             quantity: ing.quantity / servings,
-                            measure_label: ing.measure_label,
-                            base_ingredient: itemName, // Fallback
+                            measure_label: ing.measure_label || 'item',
+                            base_ingredient: itemName,
                             modifier: ing.modifier || null,
                         };
                     });
