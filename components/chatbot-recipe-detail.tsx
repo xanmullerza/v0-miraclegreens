@@ -34,6 +34,16 @@ interface Ingredient {
     base_ingredient: string;
     weight_g: number;
     food_item_id?: string;
+    food_items?: {
+        id: string;
+        energy_kcal?: number;
+        protein_g?: number;
+        carbs_g?: number;
+        fat_g?: number;
+        micronutrients?: Record<string, number>;
+        phytonutrients?: Record<string, string>;
+        [key: string]: any;
+    };
 }
 
 interface Instruction {
@@ -640,6 +650,48 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
     const totalWeight = ingredients.reduce((sum, ing) => sum + (ing.weight_g || 0), 0);
 
+    // Calculate nutrition from current ingredients
+    const calculateNutritionFromIngredients = (): { calories: number; protein: number; carbs: number; fat: number; micronutrients: Record<string, number> } => {
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        let totalFat = 0;
+        let aggregatedMicros: Record<string, number> = {};
+
+        ingredients.forEach(ing => {
+            const food = ing.food_items;
+            const weight = ing.weight_g || 0;
+            
+            if (food && weight > 0) {
+                const ratio = weight / 100; // Database values are per 100g
+                totalCalories += (food.energy_kcal || 0) * ratio;
+                totalProtein += (food.protein_g || 0) * ratio;
+                totalCarbs += (food.carbs_g || 0) * ratio;
+                totalFat += (food.fat_g || 0) * ratio;
+
+                // Aggregate micronutrients from food_items
+                const foodMicros = food.micronutrients || {};
+                Object.entries(foodMicros).forEach(([key, val]) => {
+                    if (typeof val === 'number') {
+                        aggregatedMicros[key] = (aggregatedMicros[key] || 0) + (val * ratio);
+                    }
+                });
+            }
+        });
+
+        return {
+            calories: Math.round(totalCalories),
+            protein: Math.round(totalProtein * 10) / 10,
+            carbs: Math.round(totalCarbs * 10) / 10,
+            fat: Math.round(totalFat * 10) / 10,
+            micronutrients: Object.fromEntries(
+                Object.entries(aggregatedMicros).map(([key, val]) => [key, Math.round(val * 10) / 10])
+            )
+        };
+    };
+
+    const calculatedNutrition = calculateNutritionFromIngredients();
+
     // Simplified NutrientGrid for chatbot
     const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, isRatios = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, isRatios?: boolean }) => {
         const themes = {
@@ -652,7 +704,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         };
         const t = (themes as any)[theme] || themes.indigo;
 
-        const micronutrients = recipe?.micronutrients || {};
+        const micronutrients = calculatedNutrition.micronutrients || {};
 
         const getNutrientValue = (keys: string[]): number => {
             let value = 0;
@@ -660,25 +712,25 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
             for (const key of keys) {
                 const lowerKey = key.toLowerCase();
                 
-                // 1. Direct handle for top-level macros
+                // 1. Direct handle for top-level macros - use calculated values from ingredients
                 if (key === 'Energy' || key === 'energy_kcal' || key === 'Calories' || key === 'calories') {
-                    value = recipe?.calories || 0;
+                    value = calculatedNutrition.calories;
                     break;
                 }
                 if (key === 'Protein' || key === 'protein_g' || key === 'protein') {
-                    value = recipe?.protein || 0;
+                    value = calculatedNutrition.protein;
                     break;
                 }
                 if (key === 'Carbohydrates' || key === 'carbs_g' || key === 'carbs') {
-                    value = recipe?.carbs || 0;
+                    value = calculatedNutrition.carbs;
                     break;
                 }
                 if (key === 'Fat' || key === 'fat_g' || key === 'fat') {
-                    value = recipe?.fat || 0;
+                    value = calculatedNutrition.fat;
                     break;
                 }
 
-                // 2. Check JSON micros with strict matching first
+                // 2. Check JSON micros with strict matching first (from calculated aggregated micros)
                 for (const [dbKey, val] of Object.entries(micronutrients)) {
                     if (dbKey.toLowerCase() === lowerKey) {
                         value = val as number;
@@ -702,10 +754,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 }
             }
             
-            // Scaled nutrition logic
+            // Scaled nutrition logic - values calculated are totals, so divide for per-serving
             const currentServings = recipe?.servings || 1;
-            if (nutritionViewMode === 'total') {
-                return value * currentServings;
+            if (nutritionViewMode === 'per-serving' && currentServings > 1) {
+                return value / currentServings;
             }
 
             return value;
@@ -898,19 +950,19 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                             <div className="grid grid-cols-4 gap-3">
                                 <div>
                                     <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Calories</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? recipe.calories : recipe.calories * recipe.servings))} kcal</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.calories / recipe.servings : calculatedNutrition.calories))} kcal</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Protein</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? recipe.protein : recipe.protein * recipe.servings) * 10) / 10}g</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.protein / recipe.servings : calculatedNutrition.protein) * 10) / 10}g</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Fat</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? recipe.fat : recipe.fat * recipe.servings) * 10) / 10}g</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.fat / recipe.servings : calculatedNutrition.fat) * 10) / 10}g</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Carbs</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? recipe.carbs : recipe.carbs * recipe.servings) * 10) / 10}g</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.carbs / recipe.servings : calculatedNutrition.carbs) * 10) / 10}g</p>
                                 </div>
                             </div>
                         </div>
@@ -988,7 +1040,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 )}
 
                 {activeSection === 'nutrition' && (
-                    recipe.calories > 0 ? (
+                    calculatedNutrition.calories > 0 ? (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="flex items-center justify-between pb-3">
                             <div>
