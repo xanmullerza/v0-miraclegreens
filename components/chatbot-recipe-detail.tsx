@@ -1037,29 +1037,46 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                 {/* Back of card */}
                                                 <div
                                                     className={cn(
-                                                        "absolute inset-0 p-3 rounded-lg border transition-all duration-300 flex flex-col justify-center gap-2",
+                                                        "absolute inset-0 p-3 rounded-lg border transition-all duration-300 flex flex-col justify-between text-[11px]",
                                                         "bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-700",
                                                         isFlipped ? "opacity-100" : "opacity-0 pointer-events-none"
                                                     )}
                                                 >
-                                                    <div className="grid grid-cols-2 gap-2 text-xs">
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCalories}</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">kcal</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingProtein}g</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">protein</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingFat}g</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">fat</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCarbs}g</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[10px]">carbs</p>
-                                                        </div>
+                                                    <div>
+                                                        {food ? (
+                                                            <>
+                                                                <p className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px] mb-2">
+                                                                    {food.name || food.common_name || 'Unknown'}
+                                                                </p>
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    <div>
+                                                                        <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCalories}</p>
+                                                                        <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">kcal</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingProtein}g</p>
+                                                                        <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">protein</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingFat}g</p>
+                                                                        <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">fat</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCarbs}g</p>
+                                                                        <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">carbs</p>
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <p className="text-amber-600 dark:text-amber-400 font-semibold">⚠ Not matched</p>
+                                                        )}
                                                     </div>
+                                                    {food && (
+                                                        <div className="text-[9px] text-emerald-600 dark:text-emerald-400 border-t border-emerald-200 dark:border-emerald-700 pt-1 mt-1">
+                                                            <p className="opacity-70">ID: {food.id}</p>
+                                                            <p className="opacity-70">Per 100g: {food.energy_kcal || '?'}kcal, {food.protein_g || '?'}g prot</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
