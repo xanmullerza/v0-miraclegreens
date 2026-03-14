@@ -546,28 +546,32 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                     totalCarbs += (food.carbs_g || 0) * ratio;
                     totalFat += (food.fat_g || 0) * ratio;
 
-                    // Aggregate micronutrients and extra macros (fiber, sugar)
+                    // Aggregate micronutrients and extra macros (fiber, sugar, etc)
                     const foodMicros = food.micronutrients || {};
-                    // Add extra macros to micros if they exist as top level but we need them aggregated
-                    const combinedSource = { 
-                        ...foodMicros,
-                        fiber_g: food.fiber_g || foodMicros.fiber_g || 0,
-                        sugars_g: food.sugars_g || foodMicros.sugars_g || 0
-                    };
-
-                    Object.entries(combinedSource).forEach(([key, val]) => {
+                    
+                    // Sum up all available micronutrients in JSON
+                    Object.entries(foodMicros).forEach(([key, val]) => {
                         if (typeof val === 'number') {
                             aggregatedMicros[key] = (aggregatedMicros[key] || 0) + (val * ratio);
                         }
                     });
+
+                    // Ensure specific top-level micros are accounted for if they're in columns
+                    if (food.fiber_g) aggregatedMicros['Fiber'] = (aggregatedMicros['Fiber'] || 0) + (food.fiber_g * ratio);
+                    if (food.sugars_g) aggregatedMicros['Sugars'] = (aggregatedMicros['Sugars'] || 0) + (food.sugars_g * ratio);
                 }
             });
 
-            // Round values
+            // Round macros to 1 decimal
             totalCalories = Math.round(totalCalories);
             totalProtein = Math.round(totalProtein * 10) / 10;
             totalCarbs = Math.round(totalCarbs * 10) / 10;
             totalFat = Math.round(totalFat * 10) / 10;
+
+            // Round all micros to 1 decimal to avoid float junk and clean up display
+            Object.keys(aggregatedMicros).forEach(key => {
+                aggregatedMicros[key] = Math.round(aggregatedMicros[key] * 10) / 10;
+            });
 
             // 2. Update the recipe in database
             const { error: updateErr } = await supabase
@@ -615,17 +619,28 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         const micronutrients = recipe?.micronutrients || {};
 
         const getNutrientValue = (keys: string[]): number => {
+            // First pass: look for exact or very close matches to avoid fuzzy collisions (like 'Trans Fat' matching 'Fat')
             for (const key of keys) {
                 const lowerKey = key.toLowerCase();
-                for (const [dbKey, value] of Object.entries(micronutrients)) {
-                    if (dbKey.toLowerCase().includes(lowerKey) || lowerKey.includes(dbKey.toLowerCase())) {
-                        return value as number;
-                    }
-                }
+                
+                // 1. Direct handle for top-level macros
                 if (key === 'Energy' || key === 'energy_kcal' || key === 'Calories' || key === 'calories') return recipe?.calories || 0;
                 if (key === 'Protein' || key === 'protein_g' || key === 'protein') return recipe?.protein || 0;
                 if (key === 'Carbohydrates' || key === 'carbs_g' || key === 'carbs') return recipe?.carbs || 0;
                 if (key === 'Fat' || key === 'fat_g' || key === 'fat') return recipe?.fat || 0;
+
+                // 2. Check JSON micros with strict matching first
+                for (const [dbKey, value] of Object.entries(micronutrients)) {
+                    if (dbKey.toLowerCase() === lowerKey) return value as number;
+                }
+            }
+
+            // Second pass: Fuzzy matching (fallback)
+            for (const key of keys) {
+                const lowerKey = key.toLowerCase();
+                for (const [dbKey, value] of Object.entries(micronutrients)) {
+                    if (dbKey.toLowerCase().includes(lowerKey)) return value as number;
+                }
             }
             return 0;
         };
