@@ -909,7 +909,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 <ul className="space-y-2">
                                     {ingredients.map((ing, idx) => {
                                         const servings = recipe.servings || 1;
-                                        const weightScale = nutritionViewMode === 'total' ? servings : 1;
+                                        const weightScale = nutritionViewMode === 'total' ? 1 : (1 / servings);
                                         const displayWeight = Math.round((ing.weight_g || 0) * weightScale * 10) / 10;
                                         
                                         // Hide generic "X item" labels if we have a valid weight to show instead
