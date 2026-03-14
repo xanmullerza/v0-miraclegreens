@@ -176,16 +176,23 @@ export function useDataPersistence() {
                         
                         // Generate a smarter amount string
                         let amountStr = '';
-                        const scaledQty = Math.round((ing.quantity / servings) * 100) / 100;
-                        const scaledWeight = Math.round((ing.weight_g / servings) * 10) / 10;
                         const unit = ing.measure_label || '';
+                        
+                        // Only scale down if we have actual weight data (raw imports won't have this)
+                        const hasWeightData = ing.weight_g > 0;
+                        const scaledQty = hasWeightData ? Math.round((ing.quantity / servings) * 100) / 100 : ing.quantity;
+                        const scaledWeight = hasWeightData ? Math.round((ing.weight_g / servings) * 10) / 10 : 0;
 
                         if (unit && !['unit', 'item', 'whole', 'g', 'gram', 'grams', 'ml'].includes(unit.toLowerCase())) {
                             amountStr = `${scaledQty} ${unit}`;
                         } else if (scaledWeight > 0) {
                             amountStr = `${scaledWeight}g`;
+                        } else if (scaledQty > 1 || unit !== 'item') {
+                            // Only include quantity if it's not just "1 item"
+                            amountStr = scaledQty !== 1 ? `${scaledQty} ${unit || 'item'}` : unit || 'item';
                         } else {
-                            amountStr = `${scaledQty} ${unit || 'item'}`;
+                            // For simple "1 item" without weight data, just show as needed
+                            amountStr = unit || 'item';
                         }
 
                         return {

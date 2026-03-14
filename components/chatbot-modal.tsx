@@ -342,21 +342,67 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
         setRecipeSaving(true);
         try {
+            // Helper function to parse ingredient amounts
+            const parseIngredientAmount = (ingredientLine: string) => {
+                const line = ingredientLine.trim();
+                // Match patterns like: "30g", "2 cups", "1/2 cup", "2 tbsp", "3-4", etc.
+                const amountMatch = line.match(/^([\d.\/\s\-¼½¾⅛⅜⅝⅞]+)\s*([a-z]*)/i);
+                
+                if (amountMatch) {
+                    const amountStr = amountMatch[1].trim();
+                    const measureStr = amountMatch[2].trim().toLowerCase();
+                    
+                    // Try to parse quantity from amount string
+                    let quantity = 1;
+                    try {
+                        const fractionMatch = amountStr.match(/^([\d.]+)/);
+                        if (fractionMatch) {
+                            quantity = parseFloat(fractionMatch[1]);
+                        }
+                    } catch (e) {
+                        quantity = 1;
+                    }
+                    
+                    // Normalize measure labels
+                    let measure = 'item';
+                    if (measureStr) {
+                        if (['g', 'gram', 'grams', 'kg'].includes(measureStr)) measure = 'g';
+                        else if (['ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters'].includes(measureStr)) measure = 'ml';
+                        else if (['oz', 'ounce', 'ounces'].includes(measureStr)) measure = 'oz';
+                        else if (['lb', 'lbs', 'pound', 'pounds'].includes(measureStr)) measure = 'lb';
+                        else if (['cup', 'cups', 'c'].includes(measureStr)) measure = 'cup';
+                        else if (['tbsp', 'tablespoon', 'tablespoons', 'tbs'].includes(measureStr)) measure = 'tbsp';
+                        else if (['tsp', 'teaspoon', 'teaspoons'].includes(measureStr)) measure = 'tsp';
+                        else if (['clove', 'cloves'].includes(measureStr)) measure = 'clove';
+                        else if (['sprig', 'sprigs'].includes(measureStr)) measure = 'sprig';
+                        else if (['bunch', 'bunches'].includes(measureStr)) measure = 'bunch';
+                        else if (measureStr) measure = measureStr;
+                    }
+                    
+                    return { quantity, measure, foodName: line.replace(/^[\d.\/\s\-¼½¾⅛⅜⅝⅞a-z]+/i, '').trim() };
+                }
+                
+                return { quantity: 1, measure: 'item', foodName: line };
+            };
+
             // Parse ingredients into array
             const ingredientsList = recipe.ingredients_text
                 .split('\n')
                 .filter(line => line.trim())
-                .map((line, idx) => ({
-                    food_item_name: line.trim(),
-                    food_item_id: `raw-${idx}`,
-                    quantity: 1,
-                    measure_label: 'item',
-                    weight_g: 0,
-                    calories: 0,
-                    protein: 0,
-                    fat: 0,
-                    carbs: 0,
-                }));
+                .map((line, idx) => {
+                    const { quantity, measure, foodName } = parseIngredientAmount(line);
+                    return {
+                        food_item_name: foodName || line.trim(),
+                        food_item_id: `raw-${idx}`,
+                        quantity: quantity,
+                        measure_label: measure,
+                        weight_g: 0,
+                        calories: 0,
+                        protein: 0,
+                        fat: 0,
+                        carbs: 0,
+                    };
+                });
 
             // Parse instructions into array
             const instructionsList = recipe.instructions_text
