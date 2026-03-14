@@ -364,11 +364,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
         let str = (amountStr || '').trim().toLowerCase();
         
-        // If amountStr is a generic fraction + "item", and we have itemStr,
-        // it's likely the original text ("2 tbsp ...") got moved to itemStr.
-        if ((str.includes('item') || str === '') && itemStr) {
+        // Match the number and the rest of the string
+        const mainMatch = str.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*(.*)/);
+        const hasNumber = !!mainMatch;
+
+        // Only fallback to itemStr if we REALLY don't have a number in amountStr
+        if (!hasNumber && itemStr) {
             const itemLower = itemStr.trim().toLowerCase();
-            // Check if itemStr starts with a measurement pattern
             if (itemLower.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*([a-z]+)/)) {
                 str = itemLower;
             }
@@ -1518,13 +1520,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                         <div className="grid gap-4">
                             {ingredients.map((ing) => {
                                 const originalDetails = parseRecipeAmount(ing.amount, ing.item);
+                                const servings = recipe?.servings || 1;
                                 const dbItem = matchedIngredients[ing.id];
-                                
                                 const isAccepted = !!stepTwoSaved[ing.id];
                                 
-                                // Default initialize state if missing
+                                // Default initialize state if missing with TOTAL quantity (scaled by servings)
                                 const inputs = stepTwoInputs[ing.id] || { 
-                                    multiplier: String(originalDetails.quantity), 
+                                    multiplier: String(Math.round(originalDetails.quantity * servings * 100) / 100), 
                                     measure: originalDetails.measure_label 
                                 };
 
