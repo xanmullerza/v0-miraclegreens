@@ -727,7 +727,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                             val = getNutrientValue(keys as string[]);
                             unitStr = (label === 'Energy') ? 'kcal' :
                                 (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars') ? 'g' :
-                                    (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K') ? 'µg' : 'mg';
+                                    (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label === 'Vitamin D') ? 'µg' : 'mg';
                         }
 
                         return (
@@ -910,15 +910,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         const weightScale = nutritionViewMode === 'total' ? servings : 1;
                                         const displayWeight = Math.round((ing.weight_g || 0) * weightScale * 10) / 10;
                                         
+                                        // Hide generic "X item" labels if we have a valid weight to show instead
+                                        const isGenericItem = ing.amount?.toLowerCase().includes('item') || ing.amount?.toLowerCase().includes('unit');
+                                        const cleanAmount = isGenericItem && displayWeight > 0 ? '' : ing.amount;
+
                                         return (
                                             <li key={ing.id || idx} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300">
                                                 <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">•</span>
                                                 <span>
                                                     <span className="font-medium text-slate-900 dark:text-slate-100">{ing.base_ingredient || ing.item}</span>
-                                                    {' - '}
-                                                    <span className="text-slate-500 dark:text-slate-400">
-                                                        {ing.amount} {displayWeight > 0 && `(${displayWeight}g)`}
-                                                    </span>
+                                                    {cleanAmount && <span className="text-slate-500 dark:text-slate-400"> - {cleanAmount}</span>}
+                                                    {displayWeight > 0 && <span className="text-slate-500 dark:text-slate-400 ml-1">({displayWeight}g)</span>}
                                                 </span>
                                             </li>
                                         );
