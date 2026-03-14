@@ -64,9 +64,15 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     const [usdaLoading, setUsdaLoading] = useState<Record<string, boolean>>({});
     const [usdaExpanded, setUsdaExpanded] = useState<Record<string, boolean>>({});
 
-    // Phase 3: Portion Matching States
     const [portionConflicts, setPortionConflicts] = useState<Record<string, { quantity: number, measure_label: string, itemToAccept: any, isSaving?: boolean }>>({});
     const [customPortions, setCustomPortions] = useState<Record<string, string>>({});
+    
+    // Phase 4: Two-Step Workflow
+    const [mappingStep, setMappingStep] = useState<'FOOD_MATCH' | 'PORTION_MATCH'>('FOOD_MATCH');
+    
+    // Step 2 State
+    const [stepTwoInputs, setStepTwoInputs] = useState<Record<string, { multiplier: string, measure: string, isSaving?: boolean }>>({});
+    const [stepTwoSaved, setStepTwoSaved] = useState<Record<string, boolean>>({});
 
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
@@ -375,33 +381,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
     };
 
     const processAcceptIngredient = (ing: Ingredient, matchedItem: any) => {
-        const { quantity, measure_label } = parseRecipeAmount(ing.amount);
-        
-        // standard mass measures
-        if (['g', 'kg', 'oz', 'lb', 'ml', 'serving', 'servings'].includes(measure_label) || !measure_label) {
-            setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem }));
-            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
-            setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
-            setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; });
-            return;
-        }
-
-        // Check if measure_label exists in portions
-        const portions = matchedItem.portions || [];
-        const measureExists = portions.some((p: any) => p.label.toLowerCase() === measure_label);
-
-        if (measureExists) {
-            setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem }));
-            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
-            setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
-            setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; });
-        } else {
-            // Conflict State!
-            setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem })); 
-            setPortionConflicts(prev => ({ ...prev, [ing.id]: { quantity, measure_label, itemToAccept: matchedItem } }));
-            setFlippedCards(prev => ({ ...prev, [ing.id]: true })); 
-            toast.warning(`Missing portion data for ${measure_label}`);
-        }
+        // In Step 1, we just securely accept the food match. Portion mapping happens in Step 2.
+        setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem }));
+        setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+        setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
     };
 
     // --- Smart Match Logic ---
@@ -761,7 +744,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                     </>
                 )}
 
-                {activeSection === 'nutrition' && (recipe.calories > 0 ? (
+                {activeSection === 'nutrition' && (
+                    recipe.calories > 0 ? (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="pb-3">
                             <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
@@ -930,13 +914,14 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                             </div>
                         </div>
 
-                        {/* Ingredients to Match */}
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
-                                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                                    <Layers size={14} /> Ingredient Mapping
-                                </h4>
-                                {Object.keys(matchedIngredients).length > 0 && (
+                        {/* Ingredients to Match (STEP 1) */}
+                        {mappingStep === 'FOOD_MATCH' && (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                                        <Layers size={14} /> Step 1: Ingredient Discovery
+                                    </h4>
+                                    {Object.keys(matchedIngredients).length > 0 && (
                                     <button 
                                         onClick={() => {
                                             let count = 0;
@@ -966,53 +951,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     const isUsdaExpanded = !!usdaExpanded[ing.id];
                                     const isUsdaLoading = !!usdaLoading[ing.id];
                                     const ingUsdaResults = usdaResults[ing.id] || [];
-                                    const conflict = portionConflicts[ing.id];
-                                    const customPortionGram = customPortions[ing.id] || '';
-
-                                    const handleSaveCustomPortion = async () => {
-                                        if (!customPortionGram || isNaN(Number(customPortionGram))) {
-                                            toast.error('Please enter a valid gram number'); return;
-                                        }
-                                        setPortionConflicts(prev => ({ ...prev, [ing.id]: { ...prev[ing.id], isSaving: true } }));
-                                        
-                                        try {
-                                            const totalWeight = Number(customPortionGram);
-                                            // The database stores the unit weight (e.g., 1 slice, 1 tbsp)
-                                            // We divide the total recipe weight by the recipe quantity
-                                            const unitWeight = Math.round((totalWeight / conflict!.quantity) * 10) / 10;
-                                            
-                                            const newPortion = { label: conflict!.measure_label, weight_g: unitWeight };
-                                            const updatedPortions = [...(conflict!.itemToAccept.portions || [])];
-                                            
-                                            // Ensure no duplicates for the same label
-                                            const existingIdx = updatedPortions.findIndex(p => p.label.toLowerCase() === conflict!.measure_label.toLowerCase());
-                                            if (existingIdx >= 0) {
-                                                updatedPortions[existingIdx].weight_g = unitWeight;
-                                            } else {
-                                                updatedPortions.push(newPortion);
-                                            }
-
-                                            const { error } = await supabase
-                                                .from('food_items')
-                                                .update({ portions: updatedPortions })
-                                                .eq('id', conflict!.itemToAccept.id);
-
-                                            if (error) throw error;
-                                            
-                                            const updatedItem = { ...conflict!.itemToAccept, portions: updatedPortions };
-                                            
-                                            setMatchedIngredients(prev => ({ ...prev, [ing.id]: updatedItem }));
-                                            setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
-                                            setFlippedCards(prev => ({ ...prev, [ing.id]: false })); 
-                                            setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; });
-                                            
-                                            toast.success('Portion saved to database!');
-                                        } catch (err: any) {
-                                            console.error('Save portion error:', err);
-                                            toast.error('Failed to save portion');
-                                            setPortionConflicts(prev => ({ ...prev, [ing.id]: { ...prev[ing.id], isSaving: false } }));
-                                        }
-                                    };
+                                    
+                                    // Removed Phase 3 yellow intercepts from Step 1.
                                     
                                     // Handler: search USDA for this ingredient
                                     const handleUsdaSearch = async () => {
@@ -1165,72 +1105,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         </div>
                                                     </div>
 
-                                                    {/* Back (Matched Food Item or Conflict) */}
-                                                    {conflict ? (
-                                                        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl p-3 bg-gradient-to-r from-amber-50 to-white dark:from-amber-900/40 dark:to-slate-900 border border-amber-300 dark:border-amber-700 flex items-center justify-between shadow-sm">
-                                                            <div className="flex-1 mr-3 flex flex-col justify-center h-full">
-                                                                <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 mb-1 leading-tight flex items-center gap-1">
-                                                                    <AlertCircle size={12} /> Portion Missing!
-                                                                </p>
-                                                                <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-tight mb-2 truncate" title={`Recipe needs: ${formatFraction(conflict.quantity)} ${conflict.measure_label}`}>
-                                                                    Recipe needs: <strong>{formatFraction(conflict.quantity)} {conflict.measure_label}</strong>
-                                                                </p>
-                                                                <div className="flex flex-col gap-1.5">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <div className="relative flex-1">
-                                                                            <input 
-                                                                                type="number" 
-                                                                                value={customPortionGram}
-                                                                                onChange={e => setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }))}
-                                                                                placeholder="Total grams"
-                                                                                className="w-full h-8 bg-white dark:bg-slate-950 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-bold text-amber-700 dark:text-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-                                                                            />
-                                                                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">g</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    {conflict.itemToAccept.portions && conflict.itemToAccept.portions.length > 0 && (
-                                                                        <select 
-                                                                            className="w-full h-8 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-medium text-amber-700 dark:text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500 hover:bg-amber-100 dark:hover:bg-slate-800 transition-colors appearance-none cursor-pointer"
-                                                                            onChange={(e) => {
-                                                                                if (e.target.value) {
-                                                                                    const unitWt = Number(e.target.value);
-                                                                                    const totalWt = Math.round(unitWt * conflict.quantity * 10) / 10;
-                                                                                    setCustomPortions(prev => ({ ...prev, [ing.id]: String(totalWt) }));
-                                                                                }
-                                                                            }}
-                                                                            value=""
-                                                                        >
-                                                                            <option value="" disabled className="text-slate-500 dark:text-slate-400">Or pick existing DB option (auto-multiplies)...</option>
-                                                                            {conflict.itemToAccept.portions.map((p: any, idx: number) => (
-                                                                                <option key={idx} value={p.weight_g} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 py-1">
-                                                                                    {p.label} ({p.weight_g}g unit)
-                                                                                </option>
-                                                                            ))}
-                                                                        </select>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex flex-col gap-1 w-16">
-                                                                <button 
-                                                                    onClick={handleSaveCustomPortion}
-                                                                    disabled={conflict.isSaving || !customPortionGram}
-                                                                    className="w-full h-7 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded text-[10px] font-bold transition-colors flex items-center justify-center gap-1"
-                                                                >
-                                                                    {conflict.isSaving ? <Loader2 size={10} className="animate-spin" /> : "Save"}
-                                                                </button>
-                                                                <button 
-                                                                    onClick={(e) => { 
-                                                                        e.stopPropagation(); 
-                                                                        setFlippedCards(prev => ({ ...prev, [ing.id]: false })); 
-                                                                        setPortionConflicts(prev => { const p = {...prev}; delete p[ing.id]; return p; }); 
-                                                                    }}
-                                                                    className="w-full h-6 text-slate-400 hover:text-amber-600 text-[10px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded transition-colors"
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
+                                                    {/* Back (Matched Food Item) */}
                                                     <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl p-3 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-900/30 dark:to-slate-900 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between shadow-sm shadow-indigo-100 dark:shadow-none">
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
@@ -1300,7 +1175,6 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    )}
                                                 </div>
                                             </div>
 
@@ -1359,9 +1233,196 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                     );
                                 })}
                             </div>
+                    </div>
+                )}
+
+                {/* Step 1 Check: Are we ready to proceed to Portion Match Step 2? */}
+                {mappingStep === 'FOOD_MATCH' && ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id]) && (
+                    <div className="mt-6 flex justify-end">
+                        <button 
+                            onClick={() => setMappingStep('PORTION_MATCH')}
+                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-sm shadow-indigo-500/20 transition-all flex items-center gap-2"
+                        >
+                            Verify Portions & Nutrition <ArrowLeft className="rotate-180" size={16} />
+                        </button>
+                    </div>
+                )}
+
+                {/* Step 2: PORTION MATCHING */}
+                {mappingStep === 'PORTION_MATCH' && (
+                    <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
+                        <div className="flex items-center justify-between mb-4 mt-2">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400 flex items-center gap-2">
+                                <Layers size={14} /> Step 2: Portion & Nutrition Verification
+                            </h3>
+                            <button 
+                                onClick={() => setMappingStep('FOOD_MATCH')}
+                                className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline flex items-center gap-1"
+                            >
+                                <ArrowLeft size={10} /> Back to Food Matches
+                            </button>
+                        </div>
+                        
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                            Review the automatically mapped portions. If a portion couldn't be accurately identified, select the relevant unit below.
+                        </p>
+                        
+                        <div className="grid gap-4">
+                            {ingredients.map((ing) => {
+                                const originalDetails = parseRecipeAmount(ing.amount);
+                                const dbItem = matchedIngredients[ing.id];
+                                
+                                const isAccepted = !!stepTwoSaved[ing.id];
+                                
+                                // Default initialize state if missing
+                                const inputs = stepTwoInputs[ing.id] || { 
+                                    multiplier: String(originalDetails.quantity), 
+                                    measure: originalDetails.measure_label 
+                                };
+
+                                const handleSaveStepTwo = async () => {
+                                    if (!inputs.multiplier || isNaN(Number(inputs.multiplier))) {
+                                        toast.error('Please enter a valid multiplier'); return;
+                                    }
+                                    if (!inputs.measure) {
+                                        toast.error('Please select a unit/measure'); return;
+                                    }
+
+                                    setStepTwoInputs(prev => ({ ...prev, [ing.id]: { ...prev[ing.id], isSaving: true } }));
+                                    
+                                    try {
+                                        let unitWeight = 0;
+                                        
+                                        // Is it a direct database matched portion? (which is a number)
+                                        if (!isNaN(Number(inputs.measure))) {
+                                            unitWeight = Number(inputs.measure);
+                                        } 
+                                        // Standard weights
+                                        else if (['g', 'gram', 'grams'].includes(inputs.measure)) unitWeight = 1;
+                                        else if (['oz', 'ounce', 'ounces'].includes(inputs.measure)) unitWeight = 28.3495;
+                                        else if (['lb', 'lbs', 'pound', 'pounds'].includes(inputs.measure)) unitWeight = 453.592;
+                                        else if (['ml', 'milliliters'].includes(inputs.measure)) unitWeight = 1; // approx
+                                        else {
+                                            // Unknown string measure - we need a weight... this is an edge case if they select the "Recipe Default" but it's totally unknown.
+                                            // Just assign 0 for now so the UI fails gracefully.
+                                            throw new Error(`Cannot parse unit weight for measure: ${inputs.measure}`);
+                                        }
+
+                                        const totalWeight = Math.round(Number(inputs.multiplier) * unitWeight * 10) / 10;
+                                        const originalMeasureLabel = isNaN(Number(inputs.measure)) ? inputs.measure : 
+                                            (dbItem?.portions?.find((p: any) => p.weight_g === Number(inputs.measure))?.label || originalDetails.measure_label);
+
+                                        // 1. Update recipe ingredient with final mapped data
+                                        const { error: ingError } = await supabase
+                                            .from('ingredients')
+                                            .update({ 
+                                                food_item_id: dbItem.id,
+                                                weight_g: totalWeight
+                                                // notice we DO NOT touch 'item' or 'amount' (preserving raw text)
+                                            })
+                                            .eq('id', ing.id);
+
+                                        if (ingError) throw ingError;
+
+                                        // 2. Optionally update food_items portions if we mapped an unknown string measure
+                                        if (isNaN(Number(inputs.measure)) && !['g', 'gram', 'grams', 'oz', 'ounce', 'ounces', 'lb', 'lbs', 'pound', 'pounds', 'ml', 'milliliters'].includes(inputs.measure)) {
+                                            const newPortion = { label: inputs.measure, weight_g: unitWeight };
+                                            const updatedPortions = [...(dbItem.portions || [])];
+                                            const existingIdx = updatedPortions.findIndex(p => p.label.toLowerCase() === inputs.measure.toLowerCase());
+                                            
+                                            // Only save if it's explicitly a missing string we figured out a weight for (this happens if they matched it somehow)
+                                            // Wait, if they chose a string, they MUST have entered a custom gram value right?
+                                            // But wait, the Step 2 UI doesn't have a total weight input anymore. It relies on the drop down picking an existing DB option!
+                                            // If they selected the "Recipe Default" string option... the unitWeight logic above would throw an Error unless it's g/oz/lb/ml.
+                                            // So no need to auto-learn portions here right now because they can't define custom unit weights in this simplified modal.
+                                        }
+
+                                        setStepTwoSaved(prev => ({ ...prev, [ing.id]: true }));
+                                        toast.success('Saved to recipe!');
+                                    } catch (err: any) {
+                                        console.error('Save step two error:', err);
+                                        toast.error(err.message || 'Failed to save mapping');
+                                    } finally {
+                                        setStepTwoInputs(prev => ({ ...prev, [ing.id]: { ...prev[ing.id], isSaving: false } }));
+                                    }
+                                };
+                                
+                                return (
+                                    <div key={ing.id} className={cn(
+                                        "relative rounded-lg border p-[10px] shadow-sm flex flex-col gap-2 transition-all",
+                                        isAccepted ? "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800" : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                                    )}>
+                                        {/* Original Text Fallback View */}
+                                        <div className={cn(
+                                            "rounded p-2 px-3 text-xs border flex items-center gap-3",
+                                            isAccepted ? "bg-emerald-100/50 dark:bg-emerald-800/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50" : "bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800"
+                                        )}>
+                                            <span className="font-semibold uppercase tracking-widest text-[9px] opacity-70">Original</span> 
+                                            <span className="italic">"{ing.amount} {ing.item}"</span>
+                                        </div>
+                                        
+                                        {/* Edit Form */}
+                                        <div className="grid grid-cols-[1fr_2fr_auto] gap-2 items-end">
+                                            <div>
+                                                <label className={cn("text-[9px] uppercase font-bold mb-1 block", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-500")}>Qty</label>
+                                                <input 
+                                                    type="number"
+                                                    value={inputs.multiplier}
+                                                    onChange={e => setStepTwoInputs(prev => ({ ...prev, [ing.id]: { ...inputs, multiplier: e.target.value } }))}
+                                                    disabled={isAccepted}
+                                                    step="0.01"
+                                                    className={cn(
+                                                        "w-full h-8 rounded px-2 text-xs font-bold focus:outline-none focus:ring-1",
+                                                        isAccepted 
+                                                            ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 focus:ring-emerald-500" 
+                                                            : "bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:ring-indigo-500"
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className={cn("text-[9px] uppercase font-bold mb-1 block", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-500")}>Unit Type</label>
+                                                <select
+                                                    value={inputs.measure}
+                                                    onChange={e => setStepTwoInputs(prev => ({ ...prev, [ing.id]: { ...inputs, measure: e.target.value } }))}
+                                                    disabled={isAccepted}
+                                                    className={cn(
+                                                        "w-full h-8 rounded px-2 text-xs focus:outline-none cursor-pointer",
+                                                        isAccepted 
+                                                            ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 focus:ring-emerald-500" 
+                                                            : "bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:ring-indigo-500"
+                                                    )}
+                                                >
+                                                    <option value={originalDetails.measure_label}>{originalDetails.measure_label} (Recipe Default)</option>
+                                                    <option disabled>--- Database Portions ---</option>
+                                                    {dbItem?.portions?.map((p: any, idx: number) => (
+                                                        <option key={idx} value={p.weight_g}>{p.label} ({p.weight_g}g unit)</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="pl-2 border-l border-slate-100 dark:border-slate-800 flex flex-col justify-end">
+                                                <button 
+                                                    onClick={isAccepted ? () => setStepTwoSaved(prev => ({ ...prev, [ing.id]: false })) : handleSaveStepTwo}
+                                                    disabled={inputs.isSaving}
+                                                    className={cn(
+                                                        "h-8 px-5 rounded text-[10px] font-bold transition-colors flex items-center justify-center min-w-[80px]",
+                                                        isAccepted
+                                                            ? "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent"
+                                                            : "bg-white hover:bg-slate-50 border border-slate-200 dark:border-slate-800 text-indigo-600"
+                                                    )}
+                                                >
+                                                    {inputs.isSaving ? <Loader2 size={12} className="animate-spin" /> : isAccepted ? "Saved" : "Accept"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
-                ))}
+                )}
+                    </div>
+                )
+            )}
 
                 {activeSection === 'related' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
