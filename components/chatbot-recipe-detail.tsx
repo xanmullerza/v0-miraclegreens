@@ -1161,7 +1161,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                                     </div>
                                                                     {conflict.itemToAccept.portions && conflict.itemToAccept.portions.length > 0 && (
                                                                         <select 
-                                                                            className="w-full h-6 bg-amber-50/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded px-1 text-[9px] text-amber-700 dark:text-amber-400 focus:outline-none placeholder:text-amber-400"
+                                                                            className="w-full h-8 bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-800 rounded px-2 text-xs font-medium text-amber-700 dark:text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500 hover:bg-amber-100 dark:hover:bg-slate-800 transition-colors appearance-none cursor-pointer"
                                                                             onChange={(e) => {
                                                                                 if (e.target.value) {
                                                                                     setCustomPortions(prev => ({ ...prev, [ing.id]: e.target.value }));
@@ -1169,9 +1169,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                                             }}
                                                                             value=""
                                                                         >
-                                                                            <option value="" disabled>Or pick existing DB portion...</option>
+                                                                            <option value="" disabled className="text-slate-500 dark:text-slate-400">Or pick existing DB portion...</option>
                                                                             {conflict.itemToAccept.portions.map((p: any, idx: number) => (
-                                                                                <option key={idx} value={p.weight_g}>{p.label} ({p.weight_g}g)</option>
+                                                                                <option key={idx} value={p.weight_g} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 py-1">
+                                                                                    {p.label} ({p.weight_g}g)
+                                                                                </option>
                                                                             ))}
                                                                         </select>
                                                                     )}
