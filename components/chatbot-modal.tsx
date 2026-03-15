@@ -1536,7 +1536,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             <div className={cn(
                 "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto",
                 isInline 
-                    ? "relative w-full h-full rounded-2xl md:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm" 
+                    ? "relative w-full h-full" 
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 

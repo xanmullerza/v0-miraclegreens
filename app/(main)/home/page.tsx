@@ -25,31 +25,29 @@ export default function HomePage() {
     };
 
     return (
-        <PageContainer maxWidth="max-w-7xl">
-            <div className="animate-in fade-in duration-500 py-1">
-                {/* Main Chatbot Area */}
-                <div className="h-[calc(100vh-40px)] animate-in slide-in-from-bottom-4 duration-700">
-                    <ChatbotModal 
-                        isInline={true} 
-                        onClose={() => {}} 
-                        onRecipeDetected={handleRecipeDetected}
-                    />
-                </div>
-
-                {/* Recipe Preview Modal for URL-parsed recipes */}
-                <RecipePreview
-                    isOpen={recipeEditorOpen}
-                    recipe={detectedRecipe}
-                    onClose={() => {
-                        setRecipeEditorOpen(false);
-                        setDetectedRecipe(null);
-                    }}
-                    onSave={(recipe) => {
-                        setRecipeEditorOpen(false);
-                        setDetectedRecipe(null);
-                    }}
+        <div className="h-screen w-full bg-slate-50 dark:bg-[#020617] overflow-hidden">
+            {/* Main Chatbot Area - Full Screen */}
+            <div className="h-full w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <ChatbotModal 
+                    isInline={true} 
+                    onClose={() => {}} 
+                    onRecipeDetected={handleRecipeDetected}
                 />
             </div>
-        </PageContainer>
+
+            {/* Recipe Preview Modal for URL-parsed recipes */}
+            <RecipePreview
+                isOpen={recipeEditorOpen}
+                recipe={detectedRecipe}
+                onClose={() => {
+                    setRecipeEditorOpen(false);
+                    setDetectedRecipe(null);
+                }}
+                onSave={(recipe) => {
+                    setRecipeEditorOpen(false);
+                    setDetectedRecipe(null);
+                }}
+            />
+        </div>
     );
 }

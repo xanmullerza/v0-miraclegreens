@@ -174,10 +174,17 @@ export const useRDA = (age: number | undefined, gender: 'male' | 'female' | unde
                     setRdas(rdaMap);
                 }
 
-            } catch (err) {
-                console.error("Error fetching RDA:", err);
-                if (isMounted) {
-                    setRdas(getFallbackRDAs(age, gender, calories, weight));
+            } catch (err: any) {
+                // Suppress AbortError warnings (e.g., from component unmounting during fetch)
+                if (err?.name === 'AbortError') {
+                    if (isMounted) {
+                        setRdas(getFallbackRDAs(age, gender, calories, weight));
+                    }
+                } else {
+                    console.error("Error fetching RDA:", err);
+                    if (isMounted) {
+                        setRdas(getFallbackRDAs(age, gender, calories, weight));
+                    }
                 }
             }
         };

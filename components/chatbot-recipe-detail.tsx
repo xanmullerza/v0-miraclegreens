@@ -109,75 +109,116 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
         try {
             setLoading(true);
 
-            // Fetch recipe
-            const { data: recipeData, error: recipeError } = await supabase
-                .from('recipes')
-                .select('*')
-                .eq('id', recipeId)
-                .single();
-
-            if (recipeError) throw recipeError;
-
-            // Fetch ingredients with full food item data
-            const { data: ingredientsData, error: ingredientsError } = await supabase
-                .from('ingredients')
-                .select('*, food_items(*)')
-                .eq('recipe_id', recipeId)
-                .order('id', { ascending: true });
-
-            if (ingredientsError) throw ingredientsError;
-            setIngredients(ingredientsData || []);
-
-            // Pre-populate mapping states if data exists
-            if (ingredientsData && ingredientsData.length > 0) {
-                const initialMatches: Record<string, any> = {};
-                const initialAccepted: Record<string, boolean> = {};
-                const initialStepTwoSaved: Record<string, boolean> = {};
-                
-                ingredientsData.forEach((ing) => {
-                    if (ing.food_items) {
-                        initialMatches[ing.id] = ing.food_items;
-                        initialAccepted[ing.id] = true;
-                        // If weight_g is explicitly set, it's accepted in Step 2 too
-                        if (ing.weight_g && ing.weight_g > 0) {
-                            initialStepTwoSaved[ing.id] = true;
+            if (String(recipeId).startsWith('local-')) {
+                // Fetch from LocalStorage
+                const localData = localStorage.getItem('local_recipes');
+                if (localData) {
+                    const localRecipes: any[] = JSON.parse(localData);
+                    const localRecipe = localRecipes.find(r => r.id === recipeId);
+                    
+                    if (localRecipe) {
+                        setRecipe(localRecipe);
+                        setIngredients(localRecipe.ingredients || []);
+                        setInstructions(localRecipe.instructions || []);
+                        
+                        // Pre-populate mapping states for local recipe
+                        if (localRecipe.ingredients && localRecipe.ingredients.length > 0) {
+                            const initialMatches: Record<string, any> = {};
+                            const initialAccepted: Record<string, boolean> = {};
+                            const initialStepTwoSaved: Record<string, boolean> = {};
+                            
+                            localRecipe.ingredients.forEach((ing: any) => {
+                                if (ing.food_items || ing.food_item) {
+                                    initialMatches[ing.id] = ing.food_items || ing.food_item;
+                                    initialAccepted[ing.id] = true;
+                                    if (ing.weight_g && ing.weight_g > 0) {
+                                        initialStepTwoSaved[ing.id] = true;
+                                    }
+                                }
+                            });
+                            
+                            setMatchedIngredients(initialMatches);
+                            setAcceptedMatches(initialAccepted);
+                            setStepTwoSaved(initialStepTwoSaved);
                         }
+                    } else {
+                        throw new Error('Local recipe not found');
                     }
-                });
-                
-                setMatchedIngredients(initialMatches);
-                setAcceptedMatches(initialAccepted);
-                setStepTwoSaved(initialStepTwoSaved);
+                } else {
+                    throw new Error('No local recipes found');
+                }
+            } else {
+                // Fetch from Supabase
+                // Fetch recipe
+                const { data: recipeData, error: recipeError } = await supabase
+                    .from('recipes')
+                    .select('*')
+                    .eq('id', recipeId)
+                    .single();
+
+                if (recipeError) throw recipeError;
+
+                // Fetch ingredients with full food item data
+                const { data: ingredientsData, error: ingredientsError } = await supabase
+                    .from('ingredients')
+                    .select('*, food_items(*)')
+                    .eq('recipe_id', recipeId)
+                    .order('id', { ascending: true });
+
+                if (ingredientsError) throw ingredientsError;
+                setIngredients(ingredientsData || []);
+
+                // Pre-populate mapping states if data exists
+                if (ingredientsData && ingredientsData.length > 0) {
+                    const initialMatches: Record<string, any> = {};
+                    const initialAccepted: Record<string, boolean> = {};
+                    const initialStepTwoSaved: Record<string, boolean> = {};
+                    
+                    ingredientsData.forEach((ing) => {
+                        if (ing.food_items) {
+                            initialMatches[ing.id] = ing.food_items;
+                            initialAccepted[ing.id] = true;
+                            // If weight_g is explicitly set, it's accepted in Step 2 too
+                            if (ing.weight_g && ing.weight_g > 0) {
+                                initialStepTwoSaved[ing.id] = true;
+                            }
+                        }
+                    });
+                    
+                    setMatchedIngredients(initialMatches);
+                    setAcceptedMatches(initialAccepted);
+                    setStepTwoSaved(initialStepTwoSaved);
+                }
+
+                // Calculate phytonutrients from ingredients
+                let aggregatedPhytos: Record<string, string> = {};
+                if (ingredientsData && ingredientsData.length > 0) {
+                    ingredientsData.forEach((ing) => {
+                        const foodPhytos = ing.food_items?.phytonutrients;
+                        if (foodPhytos && typeof foodPhytos === 'object') {
+                            aggregatedPhytos = { ...aggregatedPhytos, ...foodPhytos };
+                        }
+                    });
+                }
+
+                // Set recipe with aggregated phytonutrients
+                if (recipeData) {
+                    setRecipe({
+                        ...recipeData,
+                        phytonutrients: aggregatedPhytos
+                    });
+                }
+
+                // Fetch instructions
+                const { data: instructionsData, error: instructionsError } = await supabase
+                    .from('instructions')
+                    .select('*')
+                    .eq('recipe_id', recipeId)
+                    .order('step_order', { ascending: true });
+
+                if (instructionsError) throw instructionsError;
+                setInstructions(instructionsData || []);
             }
-
-            // Calculate phytonutrients from ingredients
-            let aggregatedPhytos: Record<string, string> = {};
-            if (ingredientsData && ingredientsData.length > 0) {
-                ingredientsData.forEach((ing) => {
-                    const foodPhytos = ing.food_items?.phytonutrients;
-                    if (foodPhytos && typeof foodPhytos === 'object') {
-                        aggregatedPhytos = { ...aggregatedPhytos, ...foodPhytos };
-                    }
-                });
-            }
-
-            // Set recipe with aggregated phytonutrients
-            if (recipeData) {
-                setRecipe({
-                    ...recipeData,
-                    phytonutrients: aggregatedPhytos
-                });
-            }
-
-            // Fetch instructions
-            const { data: instructionsData, error: instructionsError } = await supabase
-                .from('instructions')
-                .select('*')
-                .eq('recipe_id', recipeId)
-                .order('step_order', { ascending: true });
-
-            if (instructionsError) throw instructionsError;
-            setInstructions(instructionsData || []);
         } catch (error) {
             console.error('Error fetching recipe:', error);
             toast.error('Failed to load recipe details');
@@ -1213,7 +1254,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {/* Left: Macros */}
                             {(() => {
-                                const servings = recipe.servings || 1;
+                                const servings = Math.max(recipe.servings || 1, 1);
                                 const scaleFactor = nutritionViewMode === 'per-serving' ? 1 / servings : 1;
                                 const energyVal = calculatedNutrition.calories * scaleFactor;
                                 const proteinVal = calculatedNutrition.protein * scaleFactor;
