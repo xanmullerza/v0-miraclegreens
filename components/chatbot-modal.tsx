@@ -1521,7 +1521,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
     return (
         <div className={cn(
-            "z-50",
+            "z-50 relative",
             isInline ? "w-full h-full" : "fixed inset-0 flex pointer-events-none"
         )}>
             {/* Backdrop - only on mobile and when NOT inline */}
@@ -1536,7 +1536,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             <div className={cn(
                 "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto",
                 isInline 
-                    ? "relative w-full h-full rounded-3xl border shadow-sm overflow-hidden" 
+                    ? "relative w-full h-full rounded-2xl md:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm" 
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
@@ -2239,8 +2239,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     {/* Input Bar */}
                     <div className="flex gap-2 p-4 pb-6">
                         <button
-                            onClick={() => setShowQuickActions(!showQuickActions)}
-                            className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors active:scale-95"
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowQuickActions(prev => !prev);
+                            }}
+                            className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors active:scale-95 z-[60] pointer-events-auto"
                             title="Quick actions menu"
                         >
                             <Menu size={16} />
