@@ -21,7 +21,7 @@ export function HeaderLogo({
 
     return (
         <div suppressHydrationWarning className={cn(
-            "flex items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl w-full md:max-w-[900px] mx-auto xl:mx-0 transition-all duration-500"
+            "flex items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl max-w-[900px] mx-auto transition-all duration-500"
         )}>
             {/* Left - Home Button */}
             <Link
