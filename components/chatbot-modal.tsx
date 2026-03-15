@@ -1522,7 +1522,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     return (
         <div className={cn(
             "z-50",
-            isInline ? "w-full h-[calc(100vh-180px)]" : "fixed inset-0 flex pointer-events-none"
+            isInline ? "w-full h-full" : "fixed inset-0 flex pointer-events-none"
         )}>
             {/* Backdrop - only on mobile and when NOT inline */}
             {!isInline && (
@@ -1562,10 +1562,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         )}
                         <div>
                             <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
-                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : chatbotView === 'conversation-history' ? 'Conversation History' : 'Q&A Assistant'}
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : chatbotView === 'conversation-history' ? 'Conversation History' : (isInline ? 'Vitala Intelligence' : 'Q&A Assistant')}
                             </h3>
-                            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">
-                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : chatbotView === 'nutridex' ? 'Explore nutrients' : chatbotView === 'comparator' ? 'Compare nutrition' : chatbotView === 'lifeguard' ? 'Find substitutes' : chatbotView === 'conversation-history' ? 'View past conversations' : 'Ask me anything'}
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold mt-0.5">
+                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : chatbotView === 'nutridex' ? 'Explore nutrients' : chatbotView === 'comparator' ? 'Compare nutrition' : chatbotView === 'lifeguard' ? 'Find substitutes' : chatbotView === 'conversation-history' ? 'View past conversations' : (isInline ? 'Your personal nutrition assistant' : 'Ask me anything')}
                             </p>
                         </div>
                     </div>

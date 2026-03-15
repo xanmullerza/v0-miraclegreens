@@ -26,9 +26,9 @@ export default function HomePage() {
 
     return (
         <PageContainer maxWidth="max-w-7xl">
-            <div className="animate-in fade-in duration-500 pt-2 pb-2">
+            <div className="animate-in fade-in duration-500 py-1">
                 {/* Main Chatbot Area */}
-                <div className="h-[calc(100vh-60px)] animate-in slide-in-from-bottom-4 duration-700">
+                <div className="h-[calc(100vh-40px)] animate-in slide-in-from-bottom-4 duration-700">
                     <ChatbotModal 
                         isInline={true} 
                         onClose={() => {}} 
