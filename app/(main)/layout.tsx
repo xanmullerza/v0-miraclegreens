@@ -92,18 +92,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <div suppressHydrationWarning className="h-screen w-full flex bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
-            {/* Content Area */}
-            <div className={cn(
-                "flex flex-col transition-all duration-300 ease-in-out overflow-hidden",
-                getContentWidth(),
-                pathname === '/home' ? 'w-full' : ''
-            )}>
-                {/* Header & Nav */}
-                {pathname !== '/home' && (
-                    <div suppressHydrationWarning className="z-40 border-b border-slate-200 dark:border-slate-800">
+        <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
+            {/* Unified Header & Nav - Spans both panels */}
+            {pathname !== '/home' && (
+                <>
+                    {/* Header */}
+                    <div suppressHydrationWarning className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
                         <div className="px-2 sm:px-4 w-full flex justify-center pointer-events-none">
-                            <div className="pointer-events-auto w-full max-w-[900px]">
+                            <div className="pointer-events-auto w-full max-w-[1600px]">
                                 <HeaderLogo 
                                     showSubtext={true}
                                     userStatus={
@@ -115,72 +111,84 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                 />
                             </div>
                         </div>
-                        <DashboardNav />
                     </div>
-                )}
 
-                {/* Main Content */}
-                <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#020617] custom-scrollbar">
-                    <div className={cn(
-                        "px-2 sm:px-4 flex justify-center",
-                        pathname !== '/home' && "py-4"
-                    )}>
-                        <div className="w-full max-w-[900px]">
-                            {children}
-                        </div>
-                    </div>
-                    {pathname !== '/home' && <Footer />}
-                </main>
-            </div>
-
-            {/* Divider + Resize Button */}
-            {pathname !== '/home' && resizeMode !== 'content-only' && (
-                <>
-                    <div className="w-px bg-slate-200 dark:bg-slate-800" />
-                    <button
-                        onClick={toggleResize}
-                        className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-10 h-10 rounded-l-lg bg-slate-100 dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                        title={getResizeTooltip()}
-                    >
-                        {getResizeIcon()}
-                    </button>
+                    {/* Dashboard Navigation */}
+                    <DashboardNav />
                 </>
             )}
 
-            {/* Chat Area - Only show when not '/home' */}
-            {pathname !== '/home' && (
+            {/* Main content flex container */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* Content Area */}
                 <div className={cn(
-                    "flex flex-col transition-all duration-300 ease-in-out overflow-hidden border-l border-slate-200 dark:border-slate-800 relative",
-                    getChatWidth()
+                    "flex flex-col transition-all duration-300 ease-in-out overflow-hidden",
+                    getContentWidth(),
+                    pathname === '/home' ? 'w-full' : ''
                 )}>
-                    <ChatbotModal
-                        onClose={() => {}}
-                        isInline={true}
-                    />
-                    
-                    {/* Mobile Resize Button */}
-                    {resizeMode !== 'content-only' && (
+                    {/* Main Content */}
+                    <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#020617] custom-scrollbar">
+                        <div className={cn(
+                            "px-2 sm:px-4 flex justify-center",
+                            pathname !== '/home' && "py-4"
+                        )}>
+                            <div className="w-full max-w-[900px]">
+                                {children}
+                            </div>
+                        </div>
+                        {pathname !== '/home' && <Footer />}
+                    </main>
+                </div>
+
+                {/* Divider + Resize Button */}
+                {pathname !== '/home' && resizeMode !== 'content-only' && (
+                    <>
+                        <div className="w-px bg-slate-200 dark:bg-slate-800" />
                         <button
                             onClick={toggleResize}
-                            className="lg:hidden absolute top-20 right-4 z-30 flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400"
+                            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-10 h-10 rounded-l-lg bg-slate-100 dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                             title={getResizeTooltip()}
                         >
                             {getResizeIcon()}
                         </button>
-                    )}
-                </div>
-            )}
+                    </>
+                )}
 
-            {/* FAB for content-only mode on mobile */}
-            {pathname !== '/home' && resizeMode === 'content-only' && (
-                <button
-                    onClick={toggleResize}
-                    className="fixed bottom-6 right-6 z-30 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
-                    title="Show Chat"
-                >
-                    <Columns size={24} />
-                </button>
-            )}
+                {/* Chat Area - Only show when not '/home' */}
+                {pathname !== '/home' && (
+                    <div className={cn(
+                        "flex flex-col transition-all duration-300 ease-in-out overflow-hidden border-l border-slate-200 dark:border-slate-800 relative",
+                        getChatWidth()
+                    )}>
+                        <ChatbotModal
+                            onClose={() => {}}
+                            isInline={true}
+                        />
+                        
+                        {/* Mobile Resize Button */}
+                        {resizeMode !== 'content-only' && (
+                            <button
+                                onClick={toggleResize}
+                                className="lg:hidden absolute top-20 right-4 z-30 flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400"
+                                title={getResizeTooltip()}
+                            >
+                                {getResizeIcon()}
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* FAB for content-only mode on mobile */}
+                {pathname !== '/home' && resizeMode === 'content-only' && (
+                    <button
+                        onClick={toggleResize}
+                        className="fixed bottom-6 right-6 z-30 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
+                        title="Show Chat"
+                    >
+                        <Columns size={24} />
+                    </button>
+                )}
+            </div>
 
             {/* RDA Drawer */}
             <RDADrawer />
