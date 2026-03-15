@@ -26,19 +26,9 @@ export default function HomePage() {
 
     return (
         <PageContainer maxWidth="max-w-7xl">
-            <div className="space-y-6 animate-in fade-in duration-500 pb-4">
-                {/* Hero Section - Simplified for Chatbot Focus */}
-                <div className="text-center space-y-2 py-4">
-                    <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">
-                        Vitala Intelligence
-                    </h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto font-bold uppercase tracking-widest">
-                        Your personal nutrition assistant
-                    </p>
-                </div>
-
+            <div className="animate-in fade-in duration-500 pt-2 pb-2">
                 {/* Main Chatbot Area */}
-                <div className="h-[calc(100vh-140px)] animate-in slide-in-from-bottom-4 duration-700">
+                <div className="h-[calc(100vh-60px)] animate-in slide-in-from-bottom-4 duration-700">
                     <ChatbotModal 
                         isInline={true} 
                         onClose={() => {}} 
