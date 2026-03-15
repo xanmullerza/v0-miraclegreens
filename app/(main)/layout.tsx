@@ -96,10 +96,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             {/* Unified Header & Nav - Spans both panels */}
             {pathname !== '/home' && (
                 <>
-                    {/* Header */}
+                    {/* Header - Centered */}
                     <div suppressHydrationWarning className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
-                        <div className="px-2 sm:px-4 w-full flex justify-center pointer-events-none">
-                            <div className="pointer-events-auto w-full max-w-[1600px]">
+                        <div className="w-full flex justify-center px-2 sm:px-4 pointer-events-none">
+                            <div className="pointer-events-auto w-full">
                                 <HeaderLogo 
                                     showSubtext={true}
                                     userStatus={
@@ -113,8 +113,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         </div>
                     </div>
 
-                    {/* Dashboard Navigation */}
-                    <DashboardNav />
+                    {/* Dashboard Navigation - Centered */}
+                    <div className="w-full flex justify-center">
+                        <div className="w-full">
+                            <DashboardNav />
+                        </div>
+                    </div>
                 </>
             )}
 

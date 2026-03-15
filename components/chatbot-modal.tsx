@@ -1544,11 +1544,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
-                {/* Header */}
-                <Header />
+                {/* Header & Nav - Only show when NOT inline (overlay mode) */}
+                {!isInline && (
+                    <>
+                        {/* Header */}
+                        <Header />
 
-                {/* Dashboard Navigation */}
-                <DashboardNav />
+                        {/* Dashboard Navigation */}
+                        <DashboardNav />
+                    </>
+                )}
 
                 {/* Back Button & Context (shown when navigating within chatbot) */}
                 {(showRecipeBuilder || chatbotView !== 'messages') && (
