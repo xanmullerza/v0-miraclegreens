@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -77,31 +77,34 @@ function DashboardLayoutContent({
                 {/* Main Content */}
                 <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
                     {/* Header & Nav Container */}
-                    <div suppressHydrationWarning className={cn(
-                        "z-40 sticky top-0 w-full flex flex-col transition-all duration-500 ease-in-out bg-slate-50 dark:bg-[#020617]",
-                        showRDADrawer && isDesktop && "lg:translate-x-[192px]"
-                    )}>
-                        {/* Main Header (Logo & Subtext) */}
-                        <div className="px-2 sm:px-4 w-full flex justify-center pointer-events-none">
-                            <div className="pointer-events-auto w-full max-w-[900px]">
-                                <HeaderLogo 
-                                    showSubtext={true}
-                                    userStatus={
-                                        user ? 'cloud' :
-                                            (profile.name || profile.nickname) ? 'local' :
-                                                'anonymous'
-                                    }
-                                    userAvatarUrl={user?.user_metadata?.avatar_url}
-                                />
+                    {pathname !== '/home' && (
+                        <div suppressHydrationWarning className={cn(
+                            "z-40 sticky top-0 w-full flex flex-col transition-all duration-500 ease-in-out bg-slate-50 dark:bg-[#020617]",
+                            showRDADrawer && isDesktop && "lg:translate-x-[192px]"
+                        )}>
+                            {/* Main Header (Logo & Subtext) */}
+                            <div className="px-2 sm:px-4 w-full flex justify-center pointer-events-none">
+                                <div className="pointer-events-auto w-full max-w-[900px]">
+                                    <HeaderLogo 
+                                        showSubtext={true}
+                                        userStatus={
+                                            user ? 'cloud' :
+                                                (profile.name || profile.nickname) ? 'local' :
+                                                    'anonymous'
+                                        }
+                                        userAvatarUrl={user?.user_metadata?.avatar_url}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Navigation Bar */}
-                        <DashboardNav />
-                    </div>
+                            {/* Navigation Bar */}
+                            <DashboardNav />
+                        </div>
+                    )}
 
                     <div suppressHydrationWarning className={cn(
-                        "px-2 sm:px-4 pt-4 pb-20 flex-1 flex justify-center transition-all duration-500 ease-in-out",
+                        "px-2 sm:px-4 flex-1 flex justify-center transition-all duration-500 ease-in-out",
+                        pathname !== '/home' && "pt-4 pb-20",
                         showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
                         <div className="w-full max-w-[900px]">
@@ -109,12 +112,14 @@ function DashboardLayoutContent({
                         </div>
                     </div>
 
-                    <div suppressHydrationWarning className={cn(
-                        "w-full transition-all duration-500 ease-in-out",
-                        showRDADrawer && isDesktop && "lg:translate-x-[192px]"
-                    )}>
-                        <Footer />
-                    </div>
+                    {pathname !== '/home' && (
+                        <div suppressHydrationWarning className={cn(
+                            "w-full transition-all duration-500 ease-in-out",
+                            showRDADrawer && isDesktop && "lg:translate-x-[192px]"
+                        )}>
+                            <Footer />
+                        </div>
+                    )}
                 </main>
             </div>
 
