@@ -16,6 +16,8 @@ import { ChatbotPlanner } from '@/components/chatbot-planner';
 import { ChatbotNutridexFull } from '@/components/chatbot-nutridex-full';
 import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
 import { ChatbotLifeguardFull } from '@/components/chatbot-lifeguard-full';
+import { Header } from '@/components/header';
+import { DashboardNav } from '@/components/dashboard-nav';
 import { toast } from 'sonner';
 
 interface Message {
@@ -1541,44 +1543,36 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             )}>
                 
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
-                    <div className="flex items-center gap-2">
-                        {(showRecipeBuilder || chatbotView !== 'messages') && (
-                            <button
-                                onClick={() => {
-                                    if (showRecipeBuilder) {
-                                        handleCloseRecipeBuilder();
-                                    } else if (chatbotView === 'recipe-detail') {
-                                        handleBackFromRecipeDetail();
-                                    } else {
-                                        handleBackToMessages();
-                                    }
-                                }}
-                                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
-                                title="Back"
-                            >
-                                <ArrowLeft size={16} />
-                            </button>
-                        )}
+                <Header />
+
+                {/* Dashboard Navigation */}
+                <DashboardNav />
+
+                {/* Back Button & Context (shown when navigating within chatbot) */}
+                {(showRecipeBuilder || chatbotView !== 'messages') && (
+                    <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-800/50">
+                        <button
+                            onClick={() => {
+                                if (showRecipeBuilder) {
+                                    handleCloseRecipeBuilder();
+                                } else if (chatbotView === 'recipe-detail') {
+                                    handleBackFromRecipeDetail();
+                                } else {
+                                    handleBackToMessages();
+                                }
+                            }}
+                            className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                            title="Back"
+                        >
+                            <ArrowLeft size={16} />
+                        </button>
                         <div>
-                            <h3 className="font-black uppercase tracking-wider text-slate-900 dark:text-white text-sm">
-                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : chatbotView === 'conversation-history' ? 'Conversation History' : (isInline ? 'Vitala Intelligence' : 'Q&A Assistant')}
-                            </h3>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold mt-0.5">
-                                {showRecipeBuilder ? 'Step-by-step recipe creation' : chatbotView === 'all-recipes' ? 'Browse all recipes' : chatbotView === 'my-recipes' ? 'Your saved recipes' : chatbotView === 'shopping' ? 'Your shopping list' : chatbotView === 'pantry' ? 'Your pantry items' : chatbotView === 'planner' ? 'Your meal plan' : chatbotView === 'nutridex' ? 'Explore nutrients' : chatbotView === 'comparator' ? 'Compare nutrition' : chatbotView === 'lifeguard' ? 'Find substitutes' : chatbotView === 'conversation-history' ? 'View past conversations' : (isInline ? 'Your personal nutrition assistant' : 'Ask me anything')}
-                            </p>
+                            <h4 className="font-semibold text-slate-900 dark:text-white text-xs uppercase tracking-widest">
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : chatbotView === 'conversation-history' ? 'Conversation History' : 'Navigation'}
+                            </h4>
                         </div>
                     </div>
-                    {!isInline && (
-                        <button
-                            onClick={handleCloseModal}
-                            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
-                            title="Minimize (all history and state are preserved across sessions)"
-                        >
-                            <X size={16} />
-                        </button>
-                    )}
-                </div>
+                )}
 
                 {/* Content Area - Messages, Recipe Builder, or Recipe Views */}
                 {/* Recipe Builder - Full Screen */}
