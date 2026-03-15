@@ -26,7 +26,7 @@ export function DashboardNav() {
     const getResizeIcon = () => {
         if (resizeMode === 'equal') return <Columns size={16} />;
         if (resizeMode === 'content-focus') return <PanelRightOpen size={16} />;
-        if (resizeMode === 'content-only') return <CloseIcon size={16} />;
+        if (resizeMode === 'content-only') return <MessageCircle size={16} />;
         return <Columns size={16} />;
     };
 
@@ -105,7 +105,13 @@ export function DashboardNav() {
                 })}
                 {/* View Ratio Toggle Button */}
                 <button
-                    onClick={toggleResize}
+                    onClick={() => {
+                        if (resizeMode === 'content-only') {
+                            setIsChatbotOpen(true);
+                        } else {
+                            toggleResize();
+                        }
+                    }}
                     className={cn(
                         "w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95 hidden lg:flex",
                         resizeMode === 'equal' && "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-blue-500 hover:border-blue-500/40 hover:bg-blue-500/5",
@@ -115,17 +121,6 @@ export function DashboardNav() {
                     title={getResizeTooltip()}
                 >
                     {getResizeIcon()}
-                </button>
-                {/* Chatbot Button */}
-                <button
-                    onClick={() => setIsChatbotOpen(true)}
-                    className={cn(
-                        "w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95",
-                        "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-blue-500 hover:border-blue-500/40 hover:bg-blue-500/5"
-                    )}
-                    title="Chatbot"
-                >
-                    <MessageCircle size={16} />
                 </button>
             </div>
             </div>
