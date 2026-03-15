@@ -105,13 +105,7 @@ export function DashboardNav() {
                 })}
                 {/* View Ratio Toggle Button */}
                 <button
-                    onClick={() => {
-                        if (resizeMode === 'content-only') {
-                            setIsChatbotOpen(true);
-                        } else {
-                            toggleResize();
-                        }
-                    }}
+                    onClick={toggleResize}
                     className={cn(
                         "w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95 hidden lg:flex",
                         resizeMode === 'equal' && "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-blue-500 hover:border-blue-500/40 hover:bg-blue-500/5",
