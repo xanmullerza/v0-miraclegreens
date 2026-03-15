@@ -1523,10 +1523,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
     return (
         <div className={cn(
-            "z-50 relative",
-            isInline ? "w-full h-full" : "fixed inset-0 flex pointer-events-none"
+            "z-50",
+            isInline 
+                ? "relative w-full h-full flex flex-col" 
+                : "fixed inset-0 flex pointer-events-none"
         )}>
-            {/* Backdrop - only on mobile and when NOT inline */}
+            {/* Backdrop - only when NOT inline */}
             {!isInline && (
                 <div
                     onClick={handleCloseModal}
@@ -1538,7 +1540,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             <div className={cn(
                 "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto",
                 isInline 
-                    ? "relative w-full h-full" 
+                    ? "relative w-full h-full flex-1" 
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
