@@ -1,30 +1,64 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
+import { ChatbotModal } from '@/components/chatbot-modal';
+import { RecipePreview } from '@/components/recipe/recipe-preview';
+
+interface ParsedRecipe {
+    title: string;
+    ingredients_text: string;
+    instructions_text: string;
+    servings?: number;
+    prep_time?: number;
+    source_url: string;
+    image_url?: string;
+}
 
 export default function HomePage() {
+    const [recipeEditorOpen, setRecipeEditorOpen] = useState(false);
+    const [detectedRecipe, setDetectedRecipe] = useState<ParsedRecipe | null>(null);
+
+    const handleRecipeDetected = (recipe: ParsedRecipe) => {
+        setDetectedRecipe(recipe);
+        setRecipeEditorOpen(true);
+    };
+
     return (
         <PageContainer maxWidth="max-w-7xl">
-            <div className="space-y-12 animate-in fade-in duration-500">
-                {/* Hero Section */}
-                <div className="text-center space-y-6 py-12">
-                    <h1 className="text-5xl md:text-6xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">
-                        Welcome to Vitala
+            <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+                {/* Hero Section - Simplified for Chatbot Focus */}
+                <div className="text-center space-y-4 py-6">
+                    <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">
+                        Vitala Intelligence
                     </h1>
-                    <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium">
-                        Your personal nutrition intelligence platform
+                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto font-bold uppercase tracking-widest">
+                        Your personal nutrition assistant
                     </p>
                 </div>
 
-                {/* Content Area - Add your content here */}
-                <div className="min-h-[400px] animate-in slide-in-from-bottom-4 duration-700">
-                    <div className="p-12 rounded-3xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-center">
-                        <p className="text-slate-500 dark:text-slate-400">
-                            Content coming soon...
-                        </p>
-                    </div>
+                {/* Main Chatbot Area */}
+                <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
+                    <ChatbotModal 
+                        isInline={true} 
+                        onClose={() => {}} 
+                        onRecipeDetected={handleRecipeDetected}
+                    />
                 </div>
+
+                {/* Recipe Preview Modal for URL-parsed recipes */}
+                <RecipePreview
+                    isOpen={recipeEditorOpen}
+                    recipe={detectedRecipe}
+                    onClose={() => {
+                        setRecipeEditorOpen(false);
+                        setDetectedRecipe(null);
+                    }}
+                    onSave={(recipe) => {
+                        setRecipeEditorOpen(false);
+                        setDetectedRecipe(null);
+                    }}
+                />
             </div>
         </PageContainer>
     );

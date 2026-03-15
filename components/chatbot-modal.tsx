@@ -40,6 +40,7 @@ interface ParsedRecipe {
 interface ChatbotModalProps {
     onClose: () => void;
     onRecipeDetected?: (recipe: ParsedRecipe) => void;
+    isInline?: boolean;
 }
 
 // Simple formatter component for markdown-like text
@@ -216,7 +217,7 @@ async function loadConversationHistory(userId: string) {
     }
 }
 
-export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
+export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: ChatbotModalProps) {
     const router = useRouter();
     const { user, saveRecipe } = useDataPersistence();
     const builderRef = useRef<IngredientBuilderHandle>(null);
@@ -1519,15 +1520,25 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex pointer-events-none">
-            {/* Backdrop - only on mobile */}
-            <div
-                onClick={handleCloseModal}
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm md:hidden pointer-events-auto"
-            />
+        <div className={cn(
+            "z-50",
+            isInline ? "w-full h-[calc(100vh-180px)]" : "fixed inset-0 flex pointer-events-none"
+        )}>
+            {/* Backdrop - only on mobile and when NOT inline */}
+            {!isInline && (
+                <div
+                    onClick={handleCloseModal}
+                    className="absolute inset-0 bg-black/50 backdrop-blur-sm md:hidden pointer-events-auto"
+                />
+            )}
             
-            {/* Drawer */}
-            <div className="absolute inset-y-0 right-0 w-full md:w-1/3 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col pointer-events-auto">
+            {/* Drawer/Container */}
+            <div className={cn(
+                "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto",
+                isInline 
+                    ? "w-full h-full rounded-3xl border shadow-sm overflow-hidden" 
+                    : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
+            )}>
                 
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
@@ -1558,13 +1569,15 @@ export function ChatbotModal({ onClose, onRecipeDetected }: ChatbotModalProps) {
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={handleCloseModal}
-                        className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
-                        title="Minimize (all history and state are preserved across sessions)"
-                    >
-                        <X size={16} />
-                    </button>
+                    {!isInline && (
+                        <button
+                            onClick={handleCloseModal}
+                            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
+                            title="Minimize (all history and state are preserved across sessions)"
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
                 </div>
 
                 {/* Content Area - Messages, Recipe Builder, or Recipe Views */}
