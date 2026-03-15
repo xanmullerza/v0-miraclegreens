@@ -1538,7 +1538,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             
             {/* Drawer/Container */}
             <div className={cn(
-                "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto",
+                "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto overflow-hidden",
                 isInline 
                     ? "relative w-full h-full flex-1" 
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
