@@ -99,7 +99,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     {/* Header - Centered */}
                     <div suppressHydrationWarning className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
                         <div className="w-full flex justify-center px-2 sm:px-4 pointer-events-none">
-                            <div className="pointer-events-auto">
+                            <div className="pointer-events-auto w-full">
                                 <HeaderLogo 
                                     showSubtext={true}
                                     userStatus={
