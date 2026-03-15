@@ -1536,7 +1536,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             <div className={cn(
                 "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto",
                 isInline 
-                    ? "w-full h-full rounded-3xl border shadow-sm overflow-hidden" 
+                    ? "relative w-full h-full rounded-3xl border shadow-sm overflow-hidden" 
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
@@ -2044,7 +2044,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
                     {/* Quick Actions Drawer */}
                     {showQuickActions && (
-                        <div className="absolute bottom-full left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 space-y-2 animate-in slide-in-from-bottom-3">
+                        <div className="absolute bottom-full left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 space-y-2 animate-in slide-in-from-bottom-3">
                             {/* Recipe Button */}
                             <div>
                                 <button
