@@ -983,22 +983,30 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 return;
             }
 
+            console.log('Parsed response object:', data, 'Type:', typeof data, 'Is array:', Array.isArray(data));
+
             // Unwrap array responses from N8N
             if (Array.isArray(data) && data.length > 0) {
                 data = data[0];
-                console.log('Unwrapped array response:', data);
+                console.log('✓ Unwrapped array response:', data);
             }
+
+            console.log('After unwrap - data:', data, 'Has content field:', data?.content !== undefined);
 
             // Handle content-wrapped JSON (parse if needed)
             if (data && typeof data.content === 'string') {
+                console.log('Attempting to parse content field as JSON:', data.content.substring(0, 100) + '...');
                 try {
                     const parsedContent = JSON.parse(data.content);
-                    console.log('Parsed content from string:', parsedContent);
+                    console.log('✓ Successfully parsed content from string:', parsedContent);
                     data = parsedContent;
-                } catch (e) {
-                    console.log('Content is not JSON, treating as text');
+                } catch (parseErr) {
+                    const errorMsg = parseErr instanceof Error ? parseErr.message : String(parseErr);
+                    console.error('✗ Failed to parse content as JSON:', errorMsg, 'Content:', data.content);
                 }
             }
+
+            console.log('Final data object before isRecipe check:', data, 'Has isRecipe:', data?.isRecipe !== undefined);
 
             // Check if response indicates recipe detection
             if (typeof data === 'object' && data.isRecipe !== undefined) {
@@ -1022,6 +1030,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         source_url: 'image-upload',
                         image_url: undefined,
                     };
+                    console.log('✓ Recipe detected and parsed:', recipeData.title);
                     setSuccessRecipe(recipeData);
                     setMessages(prev => [...prev, {
                         id: (Date.now() + 1).toString(),
@@ -1033,7 +1042,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 }
             } else {
                 // Response doesn't have isRecipe flag - treat as non-recipe
-                console.warn('Response missing isRecipe flag:', data);
+                console.warn('✗ Response missing isRecipe flag:', data);
                 setMessages(prev => [...prev, {
                     id: (Date.now() + 1).toString(),
                     type: 'bot',
