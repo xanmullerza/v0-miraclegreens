@@ -12,6 +12,11 @@ import { supabase } from '@/lib/supabase';
 import { searchLocalFood } from '@/lib/services/nutrition';
 import { calculateSurvivalStatus, SURVIVAL_PROFILES, INITIAL_STORES } from '@/lib/utils/survival-sim';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { LifeguardLongevityMeter } from '@/components/lifeguard/longevity-meter';
+import { LifeguardDeficitAnalysis } from '@/components/lifeguard/deficit-analysis';
+import { LifeguardDiagnosticWarnings } from '@/components/lifeguard/diagnostic-warnings';
+import { LifeguardScenarioComparison } from '@/components/lifeguard/scenario-comparison';
+import { LifeguardSurvivalCalendar } from '@/components/lifeguard/survival-calendar';
 
 interface InventoryItem {
     id: string;
@@ -614,44 +619,52 @@ export function ChatbotLifeguardFullIntegration() {
 
             {step === 'lifeline' && (
                 <div className="space-y-4">
-                    {/* Longevity Meter */}
-                    <Card className="p-4 bg-gradient-to-r from-slate-900 to-slate-800">
-                        <div className="flex items-center justify-between mb-2">
-                            <div>
-                                <p className="text-[10px] font-black uppercase text-amber-400">Survival</p>
-                                <p className="text-2xl font-black text-white">{(() => {
-                                    const profile = SURVIVAL_PROFILES[profileType];
-                                    const energyDays = inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0) / profile.energy_floor;
-                                    const criticalDay = Math.max(0, Math.ceil(energyDays + 20));
-                                    return Math.min(criticalDay, 30);
-                                })()}</p>
-                                <p className="text-xs font-bold text-amber-300">days</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className={cn("w-12 h-12 rounded-full flex items-center justify-center border-2 animate-pulse", simStatus.isTerminal ? "border-rose-500 bg-rose-500/10" : "border-emerald-500 bg-emerald-500/10")}>
-                                    <p className={cn("text-xl font-black", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
-                                        {simStatus.results.energy > 0 ? '✓' : '✗'}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                    {/* Phase 1: Critical Components */}
+                    <LifeguardLongevityMeter
+                        inventory={inventory}
+                        simStatus={simStatus}
+                        waterStatus={waterStatus}
+                        profileType={profileType}
+                        simulationDay={simulationDay}
+                        onSimulationDayChange={setSimulationDay}
+                        onProfileTypeChange={setProfileType}
+                        energyUnit={energyUnit}
+                    />
 
-                        <div className="space-y-2 text-xs">
-                            <div className="flex justify-between text-slate-300">
-                                <span>Day {simulationDay}</span>
-                                <span>Energy: {Math.round(simStatus.results.energy)} kcal</span>
-                            </div>
-                            <input
-                                type="range"
-                                min="0"
-                                max="30"
-                                step="1"
-                                value={simulationDay}
-                                onChange={(e) => setSimulationDay(parseInt(e.target.value))}
-                                className="w-full h-2 bg-slate-700 rounded-full accent-amber-500"
-                            />
-                        </div>
-                    </Card>
+                    <LifeguardSurvivalCalendar
+                        inventory={inventory}
+                        adjustedInventory={adjustedInventory}
+                        profileType={profileType}
+                        waterStatus={waterStatus}
+                    />
+
+                    <LifeguardScenarioComparison
+                        inventory={inventory}
+                        comparisonInventory={comparisonInventory}
+                        comparisonMode={comparisonMode}
+                        comparisonWaterStatus={comparisonWaterStatus}
+                        adjustedInventory={adjustedInventory}
+                        comparisonAdjustedInventory={comparisonAdjustedInventory}
+                        comparisonSimStatus={comparisonSimStatus}
+                        profileType={profileType}
+                        simulationDay={simulationDay}
+                        waterStatus={waterStatus}
+                        onStartComparison={startComparison}
+                        onCloseComparison={() => setComparisonMode(false)}
+                        onComparisonInventoryChange={setComparisonInventory}
+                        onComparisonWaterStatusChange={setComparisonWaterStatus}
+                    />
+
+                    <LifeguardDeficitAnalysis
+                        inventory={inventory}
+                        simStatus={simStatus}
+                        profileType={profileType}
+                        simulationDay={simulationDay}
+                    />
+
+                    <LifeguardDiagnosticWarnings
+                        simStatus={simStatus}
+                    />
 
                     {/* Generated Recipes */}
                     {generatedRecipes.length > 0 && (
@@ -686,49 +699,6 @@ export function ChatbotLifeguardFullIntegration() {
                                         </Button>
                                     </div>
                                 ))}
-                            </div>
-                        </Card>
-                    )}
-
-                    {/* Timeline */}
-                    {inventory.length > 0 && (
-                        <Card className="p-4">
-                            <h3 className="text-sm font-black uppercase mb-3">30-Day Survival Timeline</h3>
-                            <div className="space-y-2">
-                                {[
-                                    { label: 'Energy', icon: '🔥', color: 'from-red-500 to-orange-500' },
-                                    { label: 'Vitamin C', icon: '🍊', color: 'from-orange-500 to-amber-500' },
-                                    { label: 'B1 (Thiamine)', icon: '💊', color: 'from-purple-500 to-pink-500' }
-                                ].map((nutrient, idx) => {
-                                    const profile = SURVIVAL_PROFILES[profileType];
-                                    let daysLeft = 30;
-                                    if (nutrient.label === 'Energy') {
-                                        daysLeft = Math.ceil((INITIAL_STORES.energy + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0)) / profile.energy_floor);
-                                    } else if (nutrient.label === 'Vitamin C') {
-                                        daysLeft = Math.ceil((INITIAL_STORES.vit_c * profile.vit_c_floor + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['Vitamin C'] || 0) * (i.weight_g / 100), 0)) / profile.vit_c_floor);
-                                    } else if (nutrient.label === 'B1 (Thiamine)') {
-                                        daysLeft = Math.ceil((INITIAL_STORES.b1 * profile.b1_floor + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['B1 (Thiamine)'] || 0) * (i.weight_g / 100), 0)) / profile.b1_floor);
-                                    }
-
-                                    return (
-                                        <div key={idx} className="space-y-1">
-                                            <div className="flex items-center justify-between text-xs">
-                                                <span className="font-black uppercase">{nutrient.icon} {nutrient.label}</span>
-                                                <span className={cn("font-black px-2 py-0.5 rounded text-white", daysLeft > 20 ? 'bg-emerald-500' : daysLeft > 10 ? 'bg-amber-500' : 'bg-rose-500')}>
-                                                    Day {Math.min(daysLeft, 30)}
-                                                </span>
-                                            </div>
-                                            <div className="flex gap-0.5 h-2">
-                                                {Array.from({ length: 30 }).map((_, day) => (
-                                                    <div
-                                                        key={day}
-                                                        className={cn('flex-1 rounded-sm', day >= daysLeft ? 'bg-slate-300 dark:bg-slate-700' : `bg-gradient-to-r ${nutrient.color}`)}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
                             </div>
                         </Card>
                     )}
