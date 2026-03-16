@@ -16,6 +16,7 @@ import { ChatbotPlanner } from '@/components/chatbot-planner';
 import { ChatbotNutridexFull } from '@/components/chatbot-nutridex-full';
 import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
 import { ChatbotLifeguardFull } from '@/components/chatbot-lifeguard-full';
+import ProfilePage from '@/app/(main)/profile/page';
 import { Header } from '@/components/header';
 import { DashboardNav } from '@/components/dashboard-nav';
 import { toast } from 'sonner';
@@ -259,8 +260,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
-    // Chatbot view state - ALWAYS reset to 'messages' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'dashboard' | 'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('dashboard');
+    // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
+    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
     const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('all-recipes'); // Always reset on refresh
     
@@ -1194,7 +1195,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         if (chatbotView === 'conversation-history') {
             setChatbotView('messages');
         } else {
-            resetChatbotState();
+            setChatbotView('dashboard');
+            setShowQuickActions(false);
+            setExpandedRecipeMenu(false);
+            setExpandedAppsMenu(false);
+            setExpandedWidgetsMenu(false);
+            setShowRecipeBuilder(false);
+            setIsCreatingRecipe(false);
         }
     };
 
@@ -1885,7 +1892,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto p-4">
                         <div className="grid grid-cols-2 gap-3">
                             <button
-                                onClick={() => setChatbotView('all-recipes')}
+                                onClick={() => setChatbotView('cookbook')}
                                 className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
                             >
                                 <span className="text-emerald-500 text-2xl">📚</span>
@@ -1893,7 +1900,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('planner')}
+                                onClick={() => setChatbotView('plannerMenu')}
                                 className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
                             >
                                 <span className="text-blue-500 text-2xl">🗓️</span>
@@ -1901,7 +1908,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('nutridex')}
+                                onClick={() => setChatbotView('widgetsMenu')}
                                 className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
                             >
                                 <span className="text-purple-500 text-2xl">⚙️</span>
@@ -1909,13 +1916,128 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('my-recipes')}
+                                onClick={() => setChatbotView('profile')}
                                 className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
                             >
                                 <span className="text-sky-500 text-2xl">👤</span>
                                 <span className="text-sm font-semibold">Profile</span>
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {/* Cookbook Menu */}
+                {!showRecipeBuilder && chatbotView === 'cookbook' && (
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => setChatbotView('all-recipes')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-emerald-500 text-2xl">📖</span>
+                                <span className="text-sm font-semibold">List Recipes</span>
+                            </button>
+
+                            <button
+                                onClick={() => { setShowRecipeBuilder(true); setChatbotView('recipe-builder'); }}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-indigo-500 text-2xl">📥</span>
+                                <span className="text-sm font-semibold">Import Recipes</span>
+                            </button>
+
+                            <button
+                                onClick={() => toast('Export is coming soon 👀')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-cyan-500 text-2xl">📤</span>
+                                <span className="text-sm font-semibold">Export Recipes</span>
+                            </button>
+
+                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 text-center">
+                                <span className="text-slate-400 text-2xl">⏳</span>
+                                <span className="text-sm font-semibold text-slate-500">Coming Soon</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Planner Menu */}
+                {!showRecipeBuilder && chatbotView === 'plannerMenu' && (
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => setChatbotView('planner')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-blue-500 text-2xl">🗂️</span>
+                                <span className="text-sm font-semibold">Meal Planner</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('pantry')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-green-500 text-2xl">🧺</span>
+                                <span className="text-sm font-semibold">Pantry</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('shopping')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-amber-500 text-2xl">🛒</span>
+                                <span className="text-sm font-semibold">Shopping List</span>
+                            </button>
+
+                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 text-center">
+                                <span className="text-slate-400 text-2xl">⏳</span>
+                                <span className="text-sm font-semibold text-slate-500">Coming Soon</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Widgets Menu */}
+                {!showRecipeBuilder && chatbotView === 'widgetsMenu' && (
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => setChatbotView('nutridex')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-fuchsia-500 text-2xl">🧪</span>
+                                <span className="text-sm font-semibold">Nutridex</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('comparator')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-indigo-500 text-2xl">⚖️</span>
+                                <span className="text-sm font-semibold">Comparator</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('lifeguard')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-teal-500 text-2xl">🛡️</span>
+                                <span className="text-sm font-semibold">Lifeguard</span>
+                            </button>
+
+                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 text-center">
+                                <span className="text-slate-400 text-2xl">⏳</span>
+                                <span className="text-sm font-semibold text-slate-500">Coming Soon</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Profile View */}
+                {!showRecipeBuilder && chatbotView === 'profile' && (
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <ProfilePage />
                     </div>
                 )}
 
