@@ -2124,6 +2124,14 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
+                                onClick={() => setChatbotView('my-recipes')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                            >
+                                <span className="text-sky-500 text-2xl">👩‍🍳</span>
+                                <span className="text-sm font-semibold">My Recipes</span>
+                            </button>
+
+                            <button
                                 onClick={() => { setShowRecipeBuilder(true); setChatbotView('recipe-builder'); }}
                                 className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
@@ -2137,14 +2145,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             >
                                 <span className="text-cyan-500 text-2xl">📤</span>
                                 <span className="text-sm font-semibold">Export Recipes</span>
-                            </button>
-
-                            <button
-                                onClick={() => setChatbotView('my-recipes')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
-                            >
-                                <span className="text-sky-500 text-2xl">👩‍🍳</span>
-                                <span className="text-sm font-semibold">My Recipes</span>
                             </button>
                         </div>
                     </div>
