@@ -2120,7 +2120,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-emerald-500 text-2xl">📖</span>
-                                <span className="text-sm font-semibold">List Recipes</span>
+                                <span className="text-sm font-semibold">Public Recipes</span>
                             </button>
 
                             <button
@@ -2139,10 +2139,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <span className="text-sm font-semibold">Export Recipes</span>
                             </button>
 
-                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 text-center">
-                                <span className="text-slate-400 text-2xl">⏳</span>
-                                <span className="text-sm font-semibold text-slate-500">Coming Soon</span>
-                            </div>
+                            <button
+                                onClick={() => setChatbotView('my-recipes')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                            >
+                                <span className="text-sky-500 text-2xl">👩‍🍳</span>
+                                <span className="text-sm font-semibold">My Recipes</span>
+                            </button>
                         </div>
                     </div>
                 )}
