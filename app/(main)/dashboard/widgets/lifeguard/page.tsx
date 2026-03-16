@@ -23,6 +23,9 @@ import { LifeguardDeficitAnalysis } from '@/components/lifeguard/deficit-analysi
 import { LifeguardDiagnosticWarnings } from '@/components/lifeguard/diagnostic-warnings';
 import { LifeguardScenarioComparison } from '@/components/lifeguard/scenario-comparison';
 import { LifeguardSurvivalCalendar } from '@/components/lifeguard/survival-calendar';
+import { LifeguardInventoryManager } from '@/components/lifeguard/inventory-manager';
+import { LifeguardProtocolSuggestions } from '@/components/lifeguard/protocol-suggestions';
+import { LifeguardBiologicalHierarchy } from '@/components/lifeguard/biological-hierarchy';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -735,50 +738,13 @@ export default function SurvivalModePage() {
 
                     {step === 'ingredients' && (
                         <div className="space-y-12 animate-in fade-in duration-500">
-
-                            {/* Inventory Section - Below Search Bar */}
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <h2 className="text-xl font-black uppercase italic italic tracking-tight">Active Pantry</h2>
-                                    <Badge className="bg-amber-500">{inventory.length} ITEMS</Badge>
-                                </div>
-                                <div className="space-y-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
-                                    {inventory.length === 0 ? (
-                                        <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Pantry is empty.</p>
-                                        </div>
-                                    ) : (
-                                        inventory.map(item => (
-                                            <div key={item.id} className="p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between group shadow-sm">
-                                                <div className="min-w-0">
-                                                    <h4 className="text-xs font-black uppercase truncate">{item.name}</h4>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <input
-                                                            type="number"
-                                                            value={item.weight_g}
-                                                            onChange={(e) => updateInventoryWeight(item.id, parseInt(e.target.value))}
-                                                            className="w-16 bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-[10px] font-black p-1 text-center"
-                                                        />
-                                                        <span className="text-[9px] font-bold text-slate-400 uppercase">Grams</span>
-                                                    </div>
-                                                </div>
-                                                <button onClick={() => removeInventoryItem(item.id)} className="text-slate-200 hover:text-rose-500 transition-colors">
-                                                    <X size={16} />
-                                                </button>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                                {inventory.length > 0 && (
-                                    <Button
-                                        onClick={findMeals}
-                                        className="w-full h-14 bg-amber-500 hover:bg-amber-600 rounded-2xl font-black uppercase tracking-widest text-[10px]"
-                                        disabled={isSearching}
-                                    >
-                                        {isSearching ? <Loader2 className="animate-spin" /> : 'Project Lifeline'}
-                                    </Button>
-                                )}
-                            </div>
+                            <LifeguardInventoryManager
+                                inventory={inventory}
+                                isSearching={isSearching}
+                                onUpdateWeight={updateInventoryWeight}
+                                onRemoveItem={removeInventoryItem}
+                                onFindMeals={findMeals}
+                            />
                         </div>
                     )}
 
@@ -829,66 +795,16 @@ export default function SurvivalModePage() {
 
                             <LifeguardDiagnosticWarnings simStatus={simStatus} />
 
-                            {/* Suggested Protocols to Fix Issues */}
-                            <div className="space-y-6 pt-12 border-t border-slate-100 dark:border-slate-800">
-                                <div className="flex items-center justify-between px-4">
-                                    <h3 className="text-2xl font-black uppercase italic tracking-tight">Protocol Lifelines</h3>
-                                    <Button variant="ghost" onClick={() => setStep('ingredients')} className="text-[10px] font-black uppercase">Adjust Pantry</Button>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {suggestions.length === 0 ? (
-                                        <div className="md:col-span-2 p-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">No matching protocols in library.</p>
-                                            <p className="text-[8px] font-bold text-slate-400 uppercase mt-2">Add more diverse ingredients to unlock recommendations.</p>
-                                        </div>
-                                    ) : (
-                                        suggestions.map(recipe => (
-                                            <div key={recipe.id} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-[2.5rem] flex flex-col justify-between hover:shadow-xl transition-all">
-                                                <div className="flex items-center gap-4 mb-4">
-                                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                                        {recipe.image ? <img src={recipe.image} className="w-full h-full object-cover rounded-2xl" /> : <ChefHat className="text-slate-300" size={24} />}
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-lg font-black uppercase italic truncate max-w-[200px]">{recipe.title}</h4>
-                                                        <p className="text-[9px] font-bold text-emerald-500 uppercase">{recipe.calories} KCAL SHIELD</p>
-                                                    </div>
-                                                </div>
-                                                <Button
-                                                    onClick={() => eatMeal(recipe)}
-                                                    className="w-full h-12 bg-slate-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-widest text-[9px]"
-                                                >
-                                                    Consume Protocol
-                                                </Button>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
+                            <LifeguardProtocolSuggestions
+                                suggestions={suggestions}
+                                onEatMeal={eatMeal}
+                                onAdjustPantry={() => setStep('ingredients')}
+                            />
                         </div>
                     )}
                 </div>
 
-                {/* Survival Context Note */}
-                <div className="p-10 bg-slate-900 text-white rounded-[4rem] space-y-6 animate-in fade-in delay-500 border border-amber-500/10 shadow-3xl">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-amber-500/20 rounded-2xl">
-                            <Info className="text-amber-500" size={24} />
-                        </div>
-                        <h5 className="text-xl font-black uppercase italic tracking-[0.1em]">Biological Hierarchy of Needs</h5>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        {[
-                            { label: 'Stability (3 Hrs)', detail: 'Regulate core temp or face hypothermia.', color: 'text-amber-500' },
-                            { label: 'Hydration (3 Days)', detail: 'Without water, blood thickens and kidneys fail.', color: 'text-blue-500' },
-                            { label: 'Nutrition (3 Weeks)', detail: 'Body begins consuming vital organs for energy.', color: 'text-emerald-500' }
-                        ].map((rule, idx) => (
-                            <div key={idx} className="space-y-2 border-l-2 border-slate-800 pl-6">
-                                <p className={cn("font-black text-xs uppercase tracking-widest", rule.color)}>{rule.label}</p>
-                                <p className="text-[10px] font-medium text-slate-400 leading-relaxed italic">{rule.detail}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <LifeguardBiologicalHierarchy />
             </div>
         </PageContainer >
     );
