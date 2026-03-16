@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { Columns, PanelRightOpen, X as CloseIcon, MessageCircle } from 'lucide-react';
+import { Columns, PanelRightOpen, X as CloseIcon } from 'lucide-react';
 
 type ResizeMode = 'equal' | 'content-focus' | 'content-only';
 
@@ -14,9 +14,7 @@ interface SplitLayoutProps {
 
 export function SplitLayout({ contentArea, chatbotArea, onResizeModeChange }: SplitLayoutProps) {
     const [resizeMode, setResizeMode] = useState<ResizeMode>('equal');
-    const [mobileView, setMobileView] = useState<'content' | 'chat'>('content');
 
-    // Keep mobile split view logic separate from desktop resize modes
     const handleToggleResize = () => {
         let nextMode: ResizeMode;
         if (resizeMode === 'equal') nextMode = 'content-focus';
@@ -25,10 +23,6 @@ export function SplitLayout({ contentArea, chatbotArea, onResizeModeChange }: Sp
 
         setResizeMode(nextMode);
         onResizeModeChange?.(nextMode);
-    };
-
-    const handleToggleMobileView = () => {
-        setMobileView(prev => (prev === 'content' ? 'chat' : 'content'));
     };
 
     const getResizeIcon = () => {
@@ -56,12 +50,13 @@ export function SplitLayout({ contentArea, chatbotArea, onResizeModeChange }: Sp
         resizeMode === 'content-focus' ? 'lg:w-1/3' :
         'lg:w-0';
 
-    // Mobile display should show exactly one panel at a time
-    const contentDisplay = mobileView === 'content' ? 'block lg:flex' : 'hidden lg:flex';
+    // Mobile hides chatbot and shows content full-screen;
+    // desktop uses split resize mode.
+    const contentDisplay = 'block';
 
-    const chatDisplay = mobileView === 'chat'
-        ? `block ${resizeMode === 'content-only' ? 'lg:hidden' : 'lg:flex'}`
-        : `hidden ${resizeMode === 'content-only' ? 'lg:hidden' : 'lg:flex'}`;
+    const chatDisplay = resizeMode === 'content-only'
+        ? 'hidden'
+        : 'hidden lg:flex';
 
     return (
         <div className="flex h-screen w-full bg-white dark:bg-slate-900">
@@ -108,15 +103,6 @@ export function SplitLayout({ contentArea, chatbotArea, onResizeModeChange }: Sp
                 )}
             </div>
 
-            {/* Mobile view toggle for one-panel UI */}
-            <button
-                onClick={handleToggleMobileView}
-                className="fixed bottom-6 right-6 z-30 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
-                title={mobileView === 'content' ? 'Switch to Chat' : 'Switch to Content'}
-                aria-label={mobileView === 'content' ? 'Switch to Chat panel' : 'Switch to Content panel'}
-            >
-                {mobileView === 'content' ? <MessageCircle size={24} /> : <Columns size={24} />}
-            </button>
         </div>
     );
 }
