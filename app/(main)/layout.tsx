@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Columns, PanelRightOpen, X as CloseIcon } from 'lucide-react';
+import { Columns, PanelRightOpen, X as CloseIcon, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { ChatbotModal } from '@/components/chatbot-modal';
@@ -34,6 +34,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const { resizeMode, toggleResize } = useSplitView();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
     const [recipeEditorOpen, setRecipeEditorOpen] = useState(false);
     const [detectedRecipe, setDetectedRecipe] = useState<ParsedRecipe | null>(null);
 
@@ -43,6 +44,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         window.addEventListener('resize', checkDesktop);
         return () => window.removeEventListener('resize', checkDesktop);
     }, []);
+
+    // Hide split view on mobile, show chat FAB overlay
+    const isMobile = !isDesktop;
 
     useEffect(() => {
         const getUser = async () => {
@@ -143,7 +147,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 </div>
 
                 {/* Divider + Resize Button */}
-                {pathname !== '/home' && resizeMode !== 'content-only' && (
+                {pathname !== '/home' && !isMobile && resizeMode !== 'content-only' && (
                     <>
                         <div className="w-px bg-slate-200 dark:bg-slate-800" />
                         <button
@@ -156,8 +160,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </>
                 )}
 
-                {/* Chat Area - Only show when not '/home' */}
-                {pathname !== '/home' && (
+                {/* Chat Area - Desktop only (mobile uses overlay button) */}
+                {pathname !== '/home' && !isMobile && (
                     <div className={cn(
                         "flex flex-col transition-all duration-300 ease-in-out overflow-hidden border-l border-slate-200 dark:border-slate-800 relative",
                         getChatWidth()
@@ -167,7 +171,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             isInline={true}
                         />
                         
-                        {/* Mobile Resize Button */}
+                        {/* Mobile Resize Button (should not appear on mobile since compartment hidden) */}
                         {resizeMode !== 'content-only' && (
                             <button
                                 onClick={toggleResize}
@@ -180,15 +184,24 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </div>
                 )}
 
-                {/* FAB for content-only mode on mobile */}
-                {pathname !== '/home' && resizeMode === 'content-only' && (
-                    <button
-                        onClick={toggleResize}
-                        className="fixed bottom-6 right-6 z-30 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
-                        title="Show Chat"
-                    >
-                        <Columns size={24} />
-                    </button>
+                {/* Mobile chatbot FAB */}
+                {isMobile && (
+                    <>
+                        <button
+                            onClick={() => setIsMobileChatOpen(true)}
+                            className="fixed bottom-6 right-6 z-50 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-700 text-white shadow-lg transition-all active:scale-95"
+                            title="Open Chat"
+                            aria-label="Open Chat"
+                        >
+                            <MessageCircle size={24} />
+                        </button>
+                        {isMobileChatOpen && (
+                            <ChatbotModal
+                                onClose={() => setIsMobileChatOpen(false)}
+                                isInline={false}
+                            />
+                        )}
+                    </>
                 )}
             </div>
 
