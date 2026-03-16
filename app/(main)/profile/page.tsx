@@ -836,9 +836,9 @@ function ProfilePageContent() {
                                     </div>
                                 </div>
                                 <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                    {/* Exclusions */}
+                                    {/* Allergen Exclusions */}
                                     <div className="space-y-4">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Allergen Sensitivities</Label>
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Allergen Exclusions</Label>
                                         <div className="flex flex-wrap gap-2">
                                             {['Dairy', 'Eggs', 'Peanuts', 'Tree Nuts', 'Shellfish', 'Fish', 'Soy', 'Gluten', 'Sesame', 'Mustard', 'Celery', 'Sulfites'].map(allergen => {
                                                 const isSelected = formData.exclusions?.includes(allergen);
@@ -863,7 +863,7 @@ function ProfilePageContent() {
                                                 );
                                             })}
                                         </div>
-                                        <p className="text-[10px] text-slate-400 italic">Mark your allergies/sensitivities. Allergen warnings will only show for items you've flagged here.</p>
+                                        <p className="text-[10px] text-slate-400 italic">Select allergens to exclude from your meals and recipes.</p>
                                     </div>
 
                                     {/* Health Conditions */}
