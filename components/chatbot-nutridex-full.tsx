@@ -189,7 +189,7 @@ export function ChatbotNutridexFull() {
             // Try to find foods high in this nutrient
             const { data, error } = await supabase
                 .from('food_items')
-                .select('id, name, common_name, image_url, ' + col)
+                .select('id, name, common_name, image, ' + col)
                 .not(col, 'is', null)
                 .order(col, { ascending: false })
                 .limit(10);
@@ -198,7 +198,7 @@ export function ChatbotNutridexFull() {
                 // FALLBACK: Try micronutrients JSONB column
                 const { data: jsonMatch, error: jsonError } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, image_url, micronutrients')
+                    .select('id, name, common_name, image, micronutrients')
                     .not('micronutrients', 'is', null)
                     .limit(200);
 
@@ -212,7 +212,7 @@ export function ChatbotNutridexFull() {
                         rank: idx + 1,
                         name: item.name,
                         common_name: item.common_name,
-                        image_url: item.image_url,
+                        image_url: item.image || null,
                         value: item.micronutrients[nutrient.id] || 0
                     }));
                     setTopFoods(rankings);
@@ -224,7 +224,7 @@ export function ChatbotNutridexFull() {
                     rank: idx + 1,
                     name: item.name,
                     common_name: item.common_name,
-                    image_url: item.image_url,
+                    image_url: item.image || null,
                     value: item[col] || 0
                 }));
                 setTopFoods(rankings);
