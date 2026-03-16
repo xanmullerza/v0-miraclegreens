@@ -997,7 +997,14 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             if (data && typeof data.content === 'string') {
                 console.log('Attempting to parse content field as JSON:', data.content.substring(0, 100) + '...');
                 try {
-                    const parsedContent = JSON.parse(data.content);
+                    // Replace literal newlines/tabs with escaped versions before parsing
+                    // This handles JSON strings containing multiline text (ingredients, instructions)
+                    const escapedContent = data.content
+                        .replace(/\n/g, '\\n')  // Literal newlines → escaped
+                        .replace(/\r/g, '\\r')  // Carriage returns → escaped
+                        .replace(/\t/g, '\\t'); // Tabs → escaped
+                    
+                    const parsedContent = JSON.parse(escapedContent);
                     console.log('✓ Successfully parsed content from string:', parsedContent);
                     data = parsedContent;
                 } catch (parseErr) {
