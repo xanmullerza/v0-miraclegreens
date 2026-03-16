@@ -963,29 +963,66 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
             const data = await response.json();
             
-            // Extract bot response
-            let botResponse = '';
-            if (typeof data === 'string') {
-                botResponse = data;
-            } else if (data.output) {
-                botResponse = data.output;
-            } else if (data.response) {
-                botResponse = data.response;
-            } else if (data.content) {
-                botResponse = data.content;
-            } else if (data.message) {
-                botResponse = data.message;
-            } else {
-                botResponse = JSON.stringify(data);
-            }
+            // Check if response indicates recipe detection
+            let isParsedRecipe = false;
+            let recipeData: ParsedRecipe | null = null;
 
-            const botMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                type: 'bot',
-                content: botResponse,
-                timestamp: new Date(),
-            };
-            setMessages(prev => [...prev, botMessage]);
+            // Handle JSON response with isRecipe flag
+            if (typeof data === 'object' && data.isRecipe !== undefined) {
+                if (data.isRecipe === false) {
+                    // Not a recipe - show error
+                    setMessages(prev => [...prev, {
+                        id: (Date.now() + 1).toString(),
+                        type: 'bot',
+                        content: data.message || "This doesn't look like a recipe. Please share a recipe image (cookbook page, recipe card, or handwritten recipe).",
+                        timestamp: new Date(),
+                    }]);
+                } else if (data.isRecipe === true) {
+                    // Valid recipe detected - parse the data
+                    recipeData = {
+                        title: data.title || 'Untitled Recipe',
+                        ingredients_text: data.ingredients_text || '',
+                        instructions_text: data.instructions_text || '',
+                        servings: data.servings || 4,
+                        prep_time: data.prep_time || 30,
+                        cook_time: data.cook_time || 0,
+                        source_url: 'image-upload',
+                        image_url: undefined,
+                    };
+                    isParsedRecipe = true;
+                    setSuccessRecipe(recipeData);
+                    setMessages(prev => [...prev, {
+                        id: (Date.now() + 1).toString(),
+                        type: 'bot',
+                        content: `✅ Great! I've extracted "${(recipeData as ParsedRecipe).title}" from your image. Would you like to save it to your library?`,
+                        timestamp: new Date(),
+                        recipeData: recipeData as ParsedRecipe,
+                    }]);
+                }
+            } else {
+                // Fallback to generic text response if not structured
+                let botResponse = '';
+                if (typeof data === 'string') {
+                    botResponse = data;
+                } else if (data.output) {
+                    botResponse = data.output;
+                } else if (data.response) {
+                    botResponse = data.response;
+                } else if (data.content) {
+                    botResponse = data.content;
+                } else if (data.message) {
+                    botResponse = data.message;
+                } else {
+                    botResponse = JSON.stringify(data);
+                }
+
+                setMessages(prev => [...prev, {
+                    id: (Date.now() + 1).toString(),
+                    type: 'bot',
+                    content: botResponse,
+                    timestamp: new Date(),
+                }]);
+            }
         } catch (error) {
             console.error('Error uploading image:', error);
             const errorMessage: Message = {
