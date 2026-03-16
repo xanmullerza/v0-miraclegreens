@@ -17,8 +17,6 @@ import { ChatbotNutridexFull } from '@/components/chatbot-nutridex-full';
 import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
 import { ChatbotLifeguardFull } from '@/components/chatbot-lifeguard-full';
 import ProfilePage from '@/app/(main)/profile/page';
-import { Header } from '@/components/header';
-import { DashboardNav } from '@/components/dashboard-nav';
 import { toast } from 'sonner';
 
 interface Message {
@@ -1645,15 +1643,23 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
-                {/* Header & Nav - Only show when NOT inline (overlay mode) */}
+                {/* Mobile breadcrumbs bar for overlay mode */}
                 {!isInline && (
-                    <>
-                        {/* Header */}
-                        <Header />
-
-                        {/* Dashboard Navigation */}
-                        <DashboardNav />
-                    </>
+                    <div className="flex flex-col gap-1 border-b border-slate-200 dark:border-slate-800 bg-slate-900/95 p-3 text-slate-100">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[11px] uppercase tracking-wider font-semibold">Chatbot</span>
+                            <button
+                                onClick={handleCloseModal}
+                                className="rounded-md p-1 text-slate-100 hover:bg-slate-800 transition"
+                                title="Close"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className="text-[11px] text-slate-300">
+                            Chatbot / {getChatbotViewTitle()}
+                        </div>
+                    </div>
                 )}
 
                 {/* Back Button & Context (shown when navigating within chatbot) */}

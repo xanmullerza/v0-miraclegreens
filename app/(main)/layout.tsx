@@ -121,37 +121,29 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
             {/* Unified Header & Nav - Spans both panels */}
             {pathname !== '/home' && (
-                isMobile ? (
-                    <div className="w-full bg-slate-900/95 border-b border-slate-800 backdrop-blur-sm">
-                        <div className="mx-auto flex h-12 items-center gap-2 px-4 text-sm sm:px-6">
-                            {getBreadcrumbs()}
-                        </div>
-                    </div>
-                ) : (
-                    <>
-                        {/* Header - Centered */}
-                        <div suppressHydrationWarning className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
-                            <div className="w-full flex justify-center px-2 sm:px-4 pointer-events-none">
-                                <div className="pointer-events-auto w-full">
-                                    <HeaderLogo 
-                                        showSubtext={true}
-                                        userStatus={
-                                            user ? 'cloud' :
-                                                (profile.name || profile.nickname) ? 'local' :
-                                                    'anonymous'
-                                        }
-                                        userAvatarUrl={user?.user_metadata?.avatar_url}
-                                    />
-                                </div>
+                <>
+                    {/* Header - Centered */}
+                    <div suppressHydrationWarning className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
+                        <div className="w-full flex justify-center px-2 sm:px-4 pointer-events-none">
+                            <div className="pointer-events-auto w-full">
+                                <HeaderLogo 
+                                    showSubtext={true}
+                                    userStatus={
+                                        user ? 'cloud' :
+                                            (profile.name || profile.nickname) ? 'local' :
+                                                'anonymous'
+                                    }
+                                    userAvatarUrl={user?.user_metadata?.avatar_url}
+                                />
                             </div>
                         </div>
+                    </div>
 
-                        {/* Dashboard Navigation - Centered */}
-                        <div className="w-full flex justify-center">
-                            <DashboardNav />
-                        </div>
-                    </>
-                )
+                    {/* Dashboard Navigation - Centered */}
+                    <div className="w-full flex justify-center">
+                        <DashboardNav />
+                    </div>
+                </>
             )}
 
             {/* Main content flex container */}
