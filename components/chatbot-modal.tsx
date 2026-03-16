@@ -260,7 +260,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
     // Chatbot view state - ALWAYS reset to 'messages' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('messages');
+    const [chatbotView, setChatbotView] = useState<'dashboard' | 'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
     const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('all-recipes'); // Always reset on refresh
     
@@ -332,9 +332,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 if (e.state.previousView) {
                     setPreviousView(e.state.previousView);
                 }
-            } else if (chatbotView !== 'messages') {
-                // If there's a popstate but no state data, go back to messages
-                setChatbotView('messages');
+            } else if (chatbotView !== 'dashboard') {
+                // If there's a popstate but no state data, go back to dashboard
+                setChatbotView('dashboard');
             }
         };
 
@@ -1646,7 +1646,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </button>
                         <div>
                             <h4 className="font-semibold text-slate-900 dark:text-white text-xs uppercase tracking-widest">
-                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : chatbotView === 'conversation-history' ? 'Conversation History' : 'Navigation'}
+                                {showRecipeBuilder ? 'Create Recipe' : chatbotView === 'dashboard' ? 'Quick Actions' : chatbotView === 'all-recipes' ? 'All Recipes' : chatbotView === 'my-recipes' ? 'My Recipes' : chatbotView === 'recipe-detail' ? 'Recipe Details' : chatbotView === 'shopping' ? 'Shopping' : chatbotView === 'pantry' ? 'Pantry' : chatbotView === 'planner' ? 'Planner' : chatbotView === 'nutridex' ? 'Nutridex' : chatbotView === 'comparator' ? 'Comparator' : chatbotView === 'lifeguard' ? 'Lifeguard' : chatbotView === 'conversation-history' ? 'Conversation History' : 'Navigation'}
                             </h4>
                         </div>
                     </div>
@@ -1877,6 +1877,45 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </div>
                             </>
                         )}
+                    </div>
+                )}
+
+                {/* Dashboard Menu - 2x2 grid seen when chat opens */}
+                {!showRecipeBuilder && chatbotView === 'dashboard' && (
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => setChatbotView('all-recipes')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-emerald-500 text-2xl">📚</span>
+                                <span className="text-sm font-semibold">Cookbook</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('planner')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-blue-500 text-2xl">🗓️</span>
+                                <span className="text-sm font-semibold">Planner</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('nutridex')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-purple-500 text-2xl">⚙️</span>
+                                <span className="text-sm font-semibold">Widgets</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('my-recipes')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center hover:shadow-lg transition-shadow"
+                            >
+                                <span className="text-sky-500 text-2xl">👤</span>
+                                <span className="text-sm font-semibold">Profile</span>
+                            </button>
+                        </div>
                     </div>
                 )}
 
