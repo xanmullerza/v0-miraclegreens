@@ -983,6 +983,23 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 return;
             }
 
+            // Unwrap array responses from N8N
+            if (Array.isArray(data) && data.length > 0) {
+                data = data[0];
+                console.log('Unwrapped array response:', data);
+            }
+
+            // Handle content-wrapped JSON (parse if needed)
+            if (data && typeof data.content === 'string') {
+                try {
+                    const parsedContent = JSON.parse(data.content);
+                    console.log('Parsed content from string:', parsedContent);
+                    data = parsedContent;
+                } catch (e) {
+                    console.log('Content is not JSON, treating as text');
+                }
+            }
+
             // Check if response indicates recipe detection
             if (typeof data === 'object' && data.isRecipe !== undefined) {
                 if (data.isRecipe === false) {
