@@ -259,7 +259,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
     // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('dashboard');
+    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
 
     const getChatbotViewTitle = () => {
@@ -281,6 +281,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             case 'comparator': return 'Comparator';
             case 'lifeguard': return 'Lifeguard';
             case 'conversation-history': return 'Conversation History';
+            case 'comingSoon': return 'Coming Soon';
             default: return 'Navigation';
         }
     };
@@ -364,6 +365,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 { label: 'Chatbot', view: 'dashboard' },
                 { label: 'Messages', view: 'messages' },
                 { label: 'Conversations', view: 'conversation-history' },
+            ],
+            comingSoon: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Coming Soon', view: 'comingSoon' },
             ],
         };
 
@@ -2061,6 +2066,38 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             >
                                 <span className="text-sky-500 text-2xl">👤</span>
                                 <span className="text-sm font-semibold">Profile</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('messages')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                            >
+                                <span className="text-emerald-500 text-2xl">💬</span>
+                                <span className="text-sm font-semibold">Chat</span>
+                            </button>
+
+                            <button
+                                onClick={() => setChatbotView('comingSoon')}
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                            >
+                                <span className="text-yellow-500 text-2xl">🛠️</span>
+                                <span className="text-sm font-semibold">Coming Soon</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Coming Soon Page */}
+                {!showRecipeBuilder && chatbotView === 'comingSoon' && (
+                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                        <div className="p-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-center">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Coming Soon</h3>
+                            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">This feature is on the way! Stay tuned for updates.</p>
+                            <button
+                                onClick={() => setChatbotView('dashboard')}
+                                className="mt-4 px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
+                            >
+                                Back to Dashboard
                             </button>
                         </div>
                     </div>
