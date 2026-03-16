@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useRef } from 'react';
-import { Search, ChevronLeft, Activity, Zap, Gem, Battery, ChevronDown } from 'lucide-react';
+import { Search, ChevronLeft, Activity, Zap, Gem, Battery, ChevronDown, Lightbulb, UtensilsCrossed } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { cn } from '@/lib/utils';
 import {
     DropdownMenu,
@@ -84,6 +85,7 @@ export function ChatbotNutridexFull() {
     const [selectedNutrient, setSelectedNutrient] = useState<Nutrient | null>(null);
     const [topFoods, setTopFoods] = useState<FoodRanking[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [detailTab, setDetailTab] = useState<'foods' | 'learn'>('foods');
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Enhance RDAs based on user profile and daily targets
@@ -142,21 +144,93 @@ export function ChatbotNutridexFull() {
         setSelectedNutrient(nutrient);
         setIsLoading(true);
         try {
+            // Map display names to database column names
+            const columnMap: Record<string, string> = {
+                'Energy': 'energy_kcal',
+                'Protein': 'protein_g',
+                'Carbs': 'carbs_g',
+                'Fat': 'fat_g',
+                'Fiber': 'fiber_g',
+                'Sodium': 'sodium_mg',
+                'Potassium': 'potassium_mg',
+                'Magnesium': 'magnesium_mg',
+                'Calcium': 'calcium_mg',
+                'Phosphorus': 'phosphorus_mg',
+                'Iron': 'iron_mg',
+                'Zinc': 'zinc_mg',
+                'Copper': 'copper_mg',
+                'Manganese': 'manganese_mg',
+                'Selenium': 'selenium_ug',
+                'Vitamin A': 'vitamin_a_ug',
+                'Vitamin C': 'vitamin_c_mg',
+                'Vitamin D': 'vitamin_d_ug',
+                'Vitamin E': 'vitamin_e_mg',
+                'Vitamin K': 'vitamin_k_ug',
+                'B1 (Thiamine)': 'b1_mg',
+                'B2 (Riboflavin)': 'b2_mg',
+                'B3 (Niacin)': 'b3_mg',
+                'B5 (Pantothenic Acid)': 'b5_mg',
+                'B6 (Pyridoxine)': 'b6_mg',
+                'B7 (Biotin)': 'b7_ug',
+                'B9 (Folate)': 'b9_ug',
+                'B12 (Cobalamin)': 'b12_ug',
+                'Choline': 'choline_mg',
+                'Omega-3': 'omega3_ala_g',
+                'Water': 'water_g'
+            };
+
+            const col = columnMap[nutrient.id];
+            if (!col) {
+                console.warn(`No column mapping for nutrient: ${nutrient.id}`);
+                setTopFoods([]);
+                return;
+            }
+
+            // Try to find foods high in this nutrient
             const { data, error } = await supabase
                 .from('food_items')
-                .select('id, name, common_name, image_url, ' + nutrient.id)
-                .order(nutrient.id, { ascending: false })
+                .select('id, name, common_name, image_url, ' + col)
+                .not(col, 'is', null)
+                .not('category', 'in', '(Flavour,Supplements)')
+                .order(col, { ascending: false })
                 .limit(10);
 
-            if (error) throw error;
-            const rankings: FoodRanking[] = (data || []).map((item: any, idx) => ({
-                rank: idx + 1,
-                name: item.name,
-                common_name: item.common_name,
-                image_url: item.image_url,
-                value: item[nutrient.id] || 0
-            }));
-            setTopFoods(rankings);
+            if (error) {
+                // FALLBACK: Try micronutrients JSONB column
+                const { data: jsonMatch, error: jsonError } = await supabase
+                    .from('food_items')
+                    .select('id, name, common_name, image_url, micronutrients')
+                    .not('category', 'in', '(Flavour,Supplements)')
+                    .not('micronutrients', 'is', null)
+                    .limit(200);
+
+                if (!jsonError && jsonMatch) {
+                    const sorted = jsonMatch
+                        .filter(f => f.micronutrients && f.micronutrients[nutrient.id] !== undefined)
+                        .sort((a, b) => (b.micronutrients[nutrient.id] || 0) - (a.micronutrients[nutrient.id] || 0))
+                        .slice(0, 10);
+                    
+                    const rankings: FoodRanking[] = sorted.map((item: any, idx) => ({
+                        rank: idx + 1,
+                        name: item.name,
+                        common_name: item.common_name,
+                        image_url: item.image_url,
+                        value: item.micronutrients[nutrient.id] || 0
+                    }));
+                    setTopFoods(rankings);
+                } else {
+                    setTopFoods([]);
+                }
+            } else {
+                const rankings: FoodRanking[] = (data || []).map((item: any, idx) => ({
+                    rank: idx + 1,
+                    name: item.name,
+                    common_name: item.common_name,
+                    image_url: item.image_url,
+                    value: item[col] || 0
+                }));
+                setTopFoods(rankings);
+            }
         } catch (error) {
             console.error('Error fetching nutrient data:', error);
             setTopFoods([]);
@@ -167,12 +241,15 @@ export function ChatbotNutridexFull() {
 
     // Detail View
     if (selectedNutrient) {
+        const info = nutrientInfo[selectedNutrient.id];
+        
         return (
             <div className="space-y-3 max-h-[550px] overflow-y-auto">
                 <button
                     onClick={() => {
                         setSelectedNutrient(null);
                         setTopFoods([]);
+                        setDetailTab('foods');
                     }}
                     className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-bold uppercase tracking-wider mb-2"
                 >
@@ -191,6 +268,38 @@ export function ChatbotNutridexFull() {
                     </div>
                 </div>
 
+                {/* Tab Buttons */}
+                <div className="flex gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                    <button
+                        onClick={() => setDetailTab('foods')}
+                        className={cn(
+                            "flex-1 text-[11px] font-black uppercase tracking-wider px-2 py-1.5 rounded transition-colors",
+                            detailTab === 'foods'
+                                ? "bg-emerald-600 text-white"
+                                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                        )}
+                    >
+                        <span className="inline-flex items-center gap-1">
+                            <UtensilsCrossed size={12} /> Foods
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => setDetailTab('learn')}
+                        className={cn(
+                            "flex-1 text-[11px] font-black uppercase tracking-wider px-2 py-1.5 rounded transition-colors",
+                            detailTab === 'learn'
+                                ? "bg-amber-600 text-white"
+                                : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                        )}
+                    >
+                        <span className="inline-flex items-center gap-1">
+                            <Lightbulb size={12} /> Learn
+                        </span>
+                    </button>
+                </div>
+
+                {/* Foods Tab */}
+                {detailTab === 'foods' && (
                 <div className="space-y-2">
                     {isLoading ? (
                         <div className="text-center py-6 text-xs text-muted-foreground">Loading...</div>
@@ -220,6 +329,62 @@ export function ChatbotNutridexFull() {
                         <div className="text-center py-6 text-xs text-muted-foreground">No foods found</div>
                     )}
                 </div>
+                )}
+
+                {/* Learn Tab */}
+                {detailTab === 'learn' && info && (
+                <div className="space-y-4">
+                    {/* Description */}
+                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-800">
+                        <h4 className="font-black text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-2">Overview</h4>
+                        <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">{info.description}</p>
+                    </div>
+
+                    {/* Importance */}
+                    <div className="bg-amber-50 dark:bg-amber-900/10 rounded-lg p-4 border border-amber-200/50 dark:border-amber-800/30">
+                        <h4 className="font-black text-xs uppercase tracking-[0.2em] text-amber-700 dark:text-amber-400 mb-2">Why It Matters</h4>
+                        <p className="text-xs leading-relaxed text-amber-900 dark:text-amber-200">{info.importance}</p>
+                    </div>
+
+                    {/* Benefits */}
+                    {info.benefits && info.benefits.length > 0 && (
+                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-800">
+                        <h4 className="font-black text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-2">Benefits</h4>
+                        <ul className="space-y-1.5">
+                            {info.benefits.map((benefit, i) => (
+                                <li key={i} className="flex gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                    <span className="text-emerald-500 font-black">✓</span>
+                                    <span>{benefit}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    )}
+
+                    {/* Deficiency Signs */}
+                    {info.deficiencySigns && info.deficiencySigns.length > 0 && (
+                    <div className="bg-red-50/50 dark:bg-red-900/10 rounded-lg p-4 border border-red-200/50 dark:border-red-800/30">
+                        <h4 className="font-black text-xs uppercase tracking-[0.2em] text-red-700 dark:text-red-400 mb-2">Deficiency Signs</h4>
+                        <ul className="space-y-1.5">
+                            {info.deficiencySigns.map((sign, i) => (
+                                <li key={i} className="flex gap-2 text-xs text-red-900 dark:text-red-200">
+                                    <span className="font-black">·</span>
+                                    <span>{sign}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    )}
+
+                    {/* Sources */}
+                    {info.sources && info.sources.length > 0 && (
+                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-800">
+                        <h4 className="font-black text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-2">Food Sources</h4>
+                        <p className="text-xs text-slate-700 dark:text-slate-300">{info.sources.join(', ')}</p>
+                    </div>
+                    )}
+                </div>
+                )}
             </div>
         );
     }
