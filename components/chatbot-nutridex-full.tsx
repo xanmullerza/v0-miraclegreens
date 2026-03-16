@@ -191,16 +191,14 @@ export function ChatbotNutridexFull() {
                 .from('food_items')
                 .select('id, name, common_name, image_url, ' + col)
                 .not(col, 'is', null)
-                .not('category', 'in', '(Flavour,Supplements)')
                 .order(col, { ascending: false })
                 .limit(10);
 
-            if (error) {
+            if (error || !data || data.length === 0) {
                 // FALLBACK: Try micronutrients JSONB column
                 const { data: jsonMatch, error: jsonError } = await supabase
                     .from('food_items')
                     .select('id, name, common_name, image_url, micronutrients')
-                    .not('category', 'in', '(Flavour,Supplements)')
                     .not('micronutrients', 'is', null)
                     .limit(200);
 
@@ -334,17 +332,33 @@ export function ChatbotNutridexFull() {
                 {/* Learn Tab */}
                 {detailTab === 'learn' && info && (
                 <div className="space-y-4">
-                    {/* Description */}
+                    {/* History & Importance Header */}
                     <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-800">
-                        <h4 className="font-black text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-2">Overview</h4>
-                        <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">{info.description}</p>
+                        <p className="text-xs leading-relaxed italic text-slate-700 dark:text-slate-300 border-l-4 border-amber-500/40 pl-3">
+                            "{info.history} {info.importance}"
+                        </p>
                     </div>
 
-                    {/* Importance */}
+                    {/* Why It Matters */}
                     <div className="bg-amber-50 dark:bg-amber-900/10 rounded-lg p-4 border border-amber-200/50 dark:border-amber-800/30">
                         <h4 className="font-black text-xs uppercase tracking-[0.2em] text-amber-700 dark:text-amber-400 mb-2">Why It Matters</h4>
                         <p className="text-xs leading-relaxed text-amber-900 dark:text-amber-200">{info.importance}</p>
                     </div>
+
+                    {/* 5 Fast Facts */}
+                    {info.relatedFacts && info.relatedFacts.length > 0 && (
+                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-800">
+                        <h4 className="font-black text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400 mb-3">5 Fast Facts</h4>
+                        <div className="space-y-2.5">
+                            {info.relatedFacts.map((fact, i) => (
+                                <div key={i} className="flex gap-2.5 text-xs text-slate-700 dark:text-slate-300">
+                                    <span className="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-400 font-black shrink-0 text-[10px]">{i + 1}</span>
+                                    <span className="leading-relaxed">{fact}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    )}
 
                     {/* Benefits */}
                     {info.benefits && info.benefits.length > 0 && (
