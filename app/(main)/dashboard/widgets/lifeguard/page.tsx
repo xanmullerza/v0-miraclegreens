@@ -29,6 +29,8 @@ import { LifeguardBiologicalHierarchy } from '@/components/lifeguard/biological-
 import { LifeguardSecurityAssessment } from '@/components/lifeguard/security-assessment';
 import { LifeguardWaterAssessment } from '@/components/lifeguard/water-assessment';
 import { LifeguardStepNavigation } from '@/components/lifeguard/step-navigation';
+import { LifeguardScenarioPresets } from '@/components/lifeguard/scenario-presets';
+import { LifeguardMealPlanner, type EmergencyRecipe } from '@/components/lifeguard/meal-planner';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -85,26 +87,6 @@ export default function SurvivalModePage() {
     // Meal Planner
     const [generatedRecipes, setGeneratedRecipes] = useState<any[]>([]);
     const [isGeneratingRecipes, setIsGeneratingRecipes] = useState(false);
-
-    interface EmergencyRecipe {
-        id: string;
-        name: string;
-        description: string;
-        purpose: 'energy' | 'nutrients' | 'balanced' | 'quick';
-        servingSize: number; // grams per serving
-        servings: number; // number of servings available
-        ingredients: { item: InventoryItem; amount_g: number }[];
-        nutrition: {
-            energy_kcal: number;
-            vitamin_c: number;
-            b1: number;
-            potential_days: number;
-        };
-        efficiency: number; // 0-100 score
-        difficulty: 'simple' | 'moderate' | 'complex';
-        prepTime: number; // minutes
-        icon: string;
-    }
 
     const generateEmergencyRecipes = async () => {
         if (inventory.length === 0) {
@@ -458,6 +440,43 @@ export default function SurvivalModePage() {
         toast.success("Simulation Reset.");
     };
 
+    const loadPresetKit = async (presetFoods: { name: string; weight_g: number }[]) => {
+        try {
+            // Search for each food in the preset
+            const foodIds: any[] = [];
+            for (const food of presetFoods) {
+                const results = await searchLocalFood(food.name);
+                if (results.length > 0) {
+                    foodIds.push({
+                        ...results[0],
+                        weight_g: food.weight_g
+                    });
+                }
+            }
+
+            if (foodIds.length === 0) {
+                toast.error("No foods found for this preset");
+                return;
+            }
+
+            // Add all foods to inventory
+            const newInventory = foodIds.map(food => ({
+                id: food.id,
+                name: food.common_name || food.name,
+                weight_g: food.weight_g,
+                nutrition: food
+            }));
+
+            setInventory([...inventory, ...newInventory]);
+            addBoost(`LOADED: ${presetFoods.length}-ITEM SURVIVAL KIT!`);
+            toast.success(`Loaded ${newInventory.length} items to pantry`);
+            setStep('lifeline');
+        } catch (error) {
+            console.error('Error loading preset:', error);
+            toast.error("Failed to load preset kit");
+        }
+    };
+
     const findMeals = async () => {
         if (inventory.length === 0) {
             toast.error("Add some essentials first!");
@@ -671,6 +690,10 @@ export default function SurvivalModePage() {
                                 onRemoveItem={removeInventoryItem}
                                 onFindMeals={findMeals}
                             />
+
+                            <LifeguardScenarioPresets 
+                                onLoadPreset={loadPresetKit}
+                            />
                         </div>
                     )}
 
@@ -710,6 +733,14 @@ export default function SurvivalModePage() {
                                 onCloseComparison={() => setComparisonMode(false)}
                                 onComparisonInventoryChange={setComparisonInventory}
                                 onComparisonWaterStatusChange={setComparisonWaterStatus}
+                            />
+
+                            <LifeguardMealPlanner 
+                                recipes={generatedRecipes}
+                                isGenerating={isGeneratingRecipes}
+                                onGenerate={generateEmergencyRecipes}
+                                onConsume={consumeRecipe}
+                                hasInventory={inventory.length > 0}
                             />
 
                             <LifeguardDeficitAnalysis
