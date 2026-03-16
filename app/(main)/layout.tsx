@@ -64,6 +64,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     // Determine widths based on resize mode
     const getContentWidth = () => {
         if (pathname === '/home') return 'w-full';
+        if (!isDesktop) return 'w-full';
         switch (resizeMode) {
             case 'equal': return 'w-1/2';
             case 'content-focus': return 'w-2/3';
