@@ -961,13 +961,29 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 throw new Error(`API error: ${response.status}`);
             }
 
-            const data = await response.json();
-            
-            // Check if response indicates recipe detection
-            let isParsedRecipe = false;
-            let recipeData: ParsedRecipe | null = null;
+            const responseText = await response.text();
+            console.log('Raw image response:', responseText);
 
-            // Handle JSON response with isRecipe flag
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('Response is not JSON:', responseText);
+                // If response isn't JSON, it's likely image analysis text - reject it
+                setMessages(prev => [...prev, {
+                    id: (Date.now() + 1).toString(),
+                    type: 'bot',
+                    content: "❌ Please upload only recipe images (cookbook pages, recipe cards, handwritten recipes, or recipe screenshots). I can only extract recipes from image uploads.",
+                    timestamp: new Date(),
+                }]);
+                setIsLoading(false);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+                return;
+            }
+
+            // Check if response indicates recipe detection
             if (typeof data === 'object' && data.isRecipe !== undefined) {
                 if (data.isRecipe === false) {
                     // Not a recipe - show error
@@ -979,7 +995,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     }]);
                 } else if (data.isRecipe === true) {
                     // Valid recipe detected - parse the data
-                    recipeData = {
+                    const recipeData: ParsedRecipe = {
                         title: data.title || 'Untitled Recipe',
                         ingredients_text: data.ingredients_text || '',
                         instructions_text: data.instructions_text || '',
@@ -989,37 +1005,22 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         source_url: 'image-upload',
                         image_url: undefined,
                     };
-                    isParsedRecipe = true;
                     setSuccessRecipe(recipeData);
                     setMessages(prev => [...prev, {
                         id: (Date.now() + 1).toString(),
                         type: 'bot',
-                        content: `✅ Great! I've extracted "${(recipeData as ParsedRecipe).title}" from your image. Would you like to save it to your library?`,
+                        content: `✅ Great! I've extracted "${recipeData.title}" from your image. Would you like to save it to your library?`,
                         timestamp: new Date(),
-                        recipeData: recipeData as ParsedRecipe,
+                        recipeData: recipeData,
                     }]);
                 }
             } else {
-                // Fallback to generic text response if not structured
-                let botResponse = '';
-                if (typeof data === 'string') {
-                    botResponse = data;
-                } else if (data.output) {
-                    botResponse = data.output;
-                } else if (data.response) {
-                    botResponse = data.response;
-                } else if (data.content) {
-                    botResponse = data.content;
-                } else if (data.message) {
-                    botResponse = data.message;
-                } else {
-                    botResponse = JSON.stringify(data);
-                }
-
+                // Response doesn't have isRecipe flag - treat as non-recipe
+                console.warn('Response missing isRecipe flag:', data);
                 setMessages(prev => [...prev, {
                     id: (Date.now() + 1).toString(),
                     type: 'bot',
-                    content: botResponse,
+                    content: "❌ Please upload only recipe images. I couldn't detect a recipe in this image.",
                     timestamp: new Date(),
                 }]);
             }
