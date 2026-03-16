@@ -284,6 +284,103 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             default: return 'Navigation';
         }
     };
+
+    const getBreadcrumbTrail = () => {
+        const mapToTrail: Record<string, Array<{ label: string; view: typeof chatbotView }>> = {
+            dashboard: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Dashboard', view: 'dashboard' },
+            ],
+            cookbook: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Cookbook', view: 'cookbook' },
+            ],
+            plannerMenu: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Planner', view: 'plannerMenu' },
+            ],
+            widgetsMenu: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Widgets', view: 'widgetsMenu' },
+            ],
+            profile: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Profile', view: 'profile' },
+            ],
+            messages: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Messages', view: 'messages' },
+            ],
+            'recipe-builder': [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Create Recipe', view: 'recipe-builder' },
+            ],
+            'all-recipes': [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Cookbook', view: 'cookbook' },
+                { label: 'All Recipes', view: 'all-recipes' },
+            ],
+            'my-recipes': [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Cookbook', view: 'cookbook' },
+                { label: 'My Recipes', view: 'my-recipes' },
+            ],
+            'recipe-detail': [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Cookbook', view: 'cookbook' },
+                { label: 'Recipe Details', view: 'recipe-detail' },
+            ],
+            shopping: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Planner', view: 'plannerMenu' },
+                { label: 'Shopping', view: 'shopping' },
+            ],
+            pantry: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Planner', view: 'plannerMenu' },
+                { label: 'Pantry', view: 'pantry' },
+            ],
+            planner: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Planner', view: 'plannerMenu' },
+                { label: 'Meal Planner', view: 'planner' },
+            ],
+            nutridex: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Widgets', view: 'widgetsMenu' },
+                { label: 'Nutridex', view: 'nutridex' },
+            ],
+            comparator: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Widgets', view: 'widgetsMenu' },
+                { label: 'Comparator', view: 'comparator' },
+            ],
+            lifeguard: [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Widgets', view: 'widgetsMenu' },
+                { label: 'Lifeguard', view: 'lifeguard' },
+            ],
+            'conversation-history': [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Messages', view: 'messages' },
+                { label: 'Conversations', view: 'conversation-history' },
+            ],
+        };
+
+        return mapToTrail[chatbotView] || mapToTrail.dashboard;
+    };
+
+    const breadcrumbTrail = getBreadcrumbTrail();
+
+    const navigateToView = (view: typeof chatbotView) => {
+        setShowRecipeBuilder(false);
+        setShowQuickActions(false);
+        setExpandedRecipeMenu(false);
+        setExpandedAppsMenu(false);
+        setExpandedWidgetsMenu(false);
+        setChatbotView(view);
+    };
+
     const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('all-recipes'); // Always reset on refresh
     
     // Conversation history state
@@ -1656,8 +1753,22 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <X size={16} />
                             </button>
                         </div>
-                        <div className="text-[11px] text-slate-300">
-                            Chatbot / {getChatbotViewTitle()}
+                        <div className="flex flex-wrap gap-2 text-[11px] text-slate-300">
+                            {breadcrumbTrail.map((crumb, index) => (
+                                <button
+                                    key={`${crumb.label}-${index}`}
+                                    onClick={() => navigateToView(crumb.view)}
+                                    className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors"
+                                >
+                                    {index > 0 && <span className="text-slate-500">/</span>}
+                                    <span className={cn(
+                                        'font-medium',
+                                        index === breadcrumbTrail.length - 1 ? 'text-white' : 'text-slate-300'
+                                    )}>
+                                        {crumb.label}
+                                    </span>
+                                </button>
+                            ))}
                         </div>
                     </div>
                 )}
@@ -1684,9 +1795,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             <h4 className="font-semibold text-slate-900 dark:text-white text-xs uppercase tracking-widest">
                                 {showRecipeBuilder ? 'Create Recipe' : getChatbotViewTitle()}
                             </h4>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 tracking-wide mt-1">
-                                Dashboard / {getChatbotViewTitle()}
-                            </p>
                         </div>
                     </div>
                 )}
