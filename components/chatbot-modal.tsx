@@ -15,7 +15,7 @@ import { ChatbotPantry } from '@/components/chatbot-pantry';
 import { ChatbotPlanner } from '@/components/chatbot-planner';
 import { ChatbotNutridexFull } from '@/components/chatbot-nutridex-full';
 import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
-import { ChatbotLifeguardFull } from '@/components/chatbot-lifeguard-full';
+import { ChatbotLifeguardFullIntegration } from '@/components/chatbot-lifeguard-full-integration';
 import ProfilePage from '@/app/(main)/profile/page';
 import { toast } from 'sonner';
 
@@ -2447,7 +2447,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Lifeguard View */}
                 {!showRecipeBuilder && chatbotView === 'lifeguard' && (
-                    <ChatbotLifeguardFull />
+                    <ChatbotLifeguardFullIntegration />
                 )}
 
                 {/* Conversation History View */}
