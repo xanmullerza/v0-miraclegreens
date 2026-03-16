@@ -1928,7 +1928,15 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Cookbook Menu */}
                 {!showRecipeBuilder && chatbotView === 'cookbook' && (
-                    <div className="flex-1 overflow-y-auto p-4">
+                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                        <div className="flex justify-end mb-3">
+                            <button
+                                onClick={() => setChatbotView('dashboard')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                🏠 Back to Dashboard
+                            </button>
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setChatbotView('all-recipes')}
@@ -1964,7 +1972,15 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Planner Menu */}
                 {!showRecipeBuilder && chatbotView === 'plannerMenu' && (
-                    <div className="flex-1 overflow-y-auto p-4">
+                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                        <div className="flex justify-end mb-3">
+                            <button
+                                onClick={() => setChatbotView('dashboard')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                🏠 Back to Dashboard
+                            </button>
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setChatbotView('planner')}
@@ -2000,7 +2016,15 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Widgets Menu */}
                 {!showRecipeBuilder && chatbotView === 'widgetsMenu' && (
-                    <div className="flex-1 overflow-y-auto p-4">
+                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                        <div className="flex justify-end mb-3">
+                            <button
+                                onClick={() => setChatbotView('dashboard')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                🏠 Back to Dashboard
+                            </button>
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setChatbotView('nutridex')}
@@ -2036,7 +2060,15 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Profile View */}
                 {!showRecipeBuilder && chatbotView === 'profile' && (
-                    <div className="flex-1 overflow-y-auto p-4">
+                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                        <div className="flex justify-end mb-3">
+                            <button
+                                onClick={() => setChatbotView('dashboard')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                🏠 Back to Dashboard
+                            </button>
+                        </div>
                         <ProfilePage />
                     </div>
                 )}
