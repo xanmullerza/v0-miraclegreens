@@ -48,7 +48,7 @@ export function HeaderLogo({
 
     return (
         <div suppressHydrationWarning className={cn(
-            "flex items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl w-full max-w-[900px] mx-auto transition-all duration-500"
+            "flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 w-full transition-all duration-500"
         )}>
             {/* Left - View Ratio / Mobile Toggle */}
             {isMobile ? (
