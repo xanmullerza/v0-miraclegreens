@@ -30,11 +30,10 @@ interface ParsedRecipe {
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { profile, showRDADrawer } = useUserPreferences();
-    const { isChatbotOpen } = useChatbot();
+    const { isChatbotOpen, setIsChatbotOpen } = useChatbot();
     const { resizeMode, toggleResize } = useSplitView();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
-    const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
     const [recipeEditorOpen, setRecipeEditorOpen] = useState(false);
     const [detectedRecipe, setDetectedRecipe] = useState<ParsedRecipe | null>(null);
 
@@ -206,24 +205,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </div>
                 )}
 
-                {/* Mobile chatbot FAB */}
-                {isMobile && (
-                    <>
-                        <button
-                            onClick={() => setIsMobileChatOpen(true)}
-                            className="fixed bottom-6 right-6 z-50 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-700 text-white shadow-lg transition-all active:scale-95"
-                            title="Open Chat"
-                            aria-label="Open Chat"
-                        >
-                            <MessageCircle size={24} />
-                        </button>
-                        {isMobileChatOpen && (
-                            <ChatbotModal
-                                onClose={() => setIsMobileChatOpen(false)}
-                                isInline={false}
-                            />
-                        )}
-                    </>
+                {/* Mobile chatbot Modal */}
+                {isMobile && isChatbotOpen && (
+                    <ChatbotModal
+                        onClose={() => setIsChatbotOpen(false)}
+                        isInline={false}
+                    />
                 )}
             </div>
 

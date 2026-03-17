@@ -3,9 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer } from 'lucide-react';
+import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
+import { useChatbot } from '@/lib/context/chatbot-context';
+import { useState, useEffect } from 'react';
 
 interface HeaderLogoProps {
     showSubtext?: boolean;
@@ -20,6 +22,15 @@ export function HeaderLogo({
 }: HeaderLogoProps) {
     const pathname = usePathname();
     const { resizeMode, toggleResize } = useSplitView();
+    const { isChatbotOpen, setIsChatbotOpen } = useChatbot();
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const getResizeIcon = () => {
         if (resizeMode === 'equal') return <Computer size={18} />;
@@ -39,19 +50,44 @@ export function HeaderLogo({
         <div suppressHydrationWarning className={cn(
             "flex items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl w-full max-w-[900px] mx-auto transition-all duration-500"
         )}>
-            {/* Left - View Ratio Toggle */}
-            <button
-                onClick={toggleResize}
-                className={cn(
-                    "flex h-12 w-12 border-r border-slate-200 dark:border-slate-800 items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
-                    resizeMode === 'equal' && "text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800",
-                    resizeMode === 'content-focus' && "text-cyan-500 hover:bg-cyan-500/5",
-                    resizeMode === 'content-only' && "text-emerald-500 hover:bg-emerald-500/5"
-                )}
-                title={getResizeTooltip()}
-            >
-                {getResizeIcon()}
-            </button>
+            {/* Left - View Ratio / Mobile Toggle */}
+            {isMobile ? (
+                <div className="flex border-r border-slate-200 dark:border-slate-800 items-center flex-shrink-0">
+                    <button
+                        onClick={() => setIsChatbotOpen(false)}
+                        className={cn(
+                            "flex h-12 w-10 items-center justify-center transition-all focus:outline-none active:scale-95",
+                            !isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                        )}
+                        title="Show Content Pane"
+                    >
+                        <Globe size={18} />
+                    </button>
+                    <button
+                        onClick={() => setIsChatbotOpen(true)}
+                        className={cn(
+                            "flex h-12 w-10 items-center justify-center transition-all focus:outline-none active:scale-95",
+                            isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                        )}
+                        title="Show Chatbot Pane"
+                    >
+                        <LayoutGrid size={18} />
+                    </button>
+                </div>
+            ) : (
+                <button
+                    onClick={toggleResize}
+                    className={cn(
+                        "flex h-12 w-12 border-r border-slate-200 dark:border-slate-800 items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
+                        resizeMode === 'equal' && "text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800",
+                        resizeMode === 'content-focus' && "text-cyan-500 hover:bg-cyan-500/5",
+                        resizeMode === 'content-only' && "text-emerald-500 hover:bg-emerald-500/5"
+                    )}
+                    title={getResizeTooltip()}
+                >
+                    {getResizeIcon()}
+                </button>
+            )}
 
             {/* Center - Logo Area */}
             <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-1 justify-center">
