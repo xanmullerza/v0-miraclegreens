@@ -314,6 +314,7 @@ const RecipeListItem = ({
   onMarkEaten,
   isEaten = false,
   pantryItems = [],
+  onRecipeClick,
 }: {
   recipe: Recipe;
   mealLabel: string;
@@ -322,6 +323,7 @@ const RecipeListItem = ({
   onMarkEaten?: () => void;
   isEaten?: boolean;
   pantryItems?: any[];
+  onRecipeClick?: (recipeId: string) => void;
 }) => {
   const router = useRouter();
 
@@ -454,7 +456,7 @@ const RecipeListItem = ({
   }, [liveIngs]);
   return (
     <div
-      onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
+      onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/dashboard/library/meals/${recipe.id}`)}
       className={cn(
         'group relative rounded-2xl border hover:shadow-lg transition-all cursor-pointer overflow-hidden p-1 lg:p-0',
         isEaten
@@ -833,6 +835,7 @@ interface MealPlannerContentProps {
   hideControls?: boolean;
   isFilterOpen?: boolean;
   setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  onRecipeClick?: (recipeId: string) => void;
 }
 
 // Named export for use in other components (like Kitchen tabs)
@@ -844,6 +847,7 @@ export default function MealPlannerContent({
   hideControls = false,
   isFilterOpen: externalIsFilterOpen,
   setIsFilterOpen: externalSetIsFilterOpen,
+  onRecipeClick,
 }: MealPlannerContentProps) {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -2327,6 +2331,7 @@ export default function MealPlannerContent({
                     onMarkEaten={() => handleMarkEaten(plan.breakfast, 'breakfast')}
                     isEaten={eatenMeals.has('breakfast')}
                     pantryItems={pantryItems}
+                    onRecipeClick={onRecipeClick}
                   />
                 )}
                 {selectedTypes.map((st) => st.toLowerCase()).includes('lunch') && (
@@ -2338,6 +2343,7 @@ export default function MealPlannerContent({
                     onMarkEaten={() => handleMarkEaten(plan.lunch, 'lunch')}
                     isEaten={eatenMeals.has('lunch')}
                     pantryItems={pantryItems}
+                    onRecipeClick={onRecipeClick}
                   />
                 )}
                 {selectedTypes.map((st) => st.toLowerCase()).includes('dinner') && (
@@ -2349,6 +2355,7 @@ export default function MealPlannerContent({
                     onMarkEaten={() => handleMarkEaten(plan.dinner, 'dinner')}
                     isEaten={eatenMeals.has('dinner')}
                     pantryItems={pantryItems}
+                    onRecipeClick={onRecipeClick}
                   />
                 )}
               </div>

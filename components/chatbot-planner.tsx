@@ -5,12 +5,13 @@ import MealPlannerContent from '@/components/planner-content';
 
 interface ChatbotPlannerProps {
     onBack?: () => void;
+    onRecipeClick?: (recipeId: string) => void;
 }
 
-export function ChatbotPlanner({ onBack }: ChatbotPlannerProps) {
+export function ChatbotPlanner({ onBack, onRecipeClick }: ChatbotPlannerProps) {
     return (
         <div className="flex-1 overflow-y-auto flex flex-col relative w-full h-full">
-            <MealPlannerContent />
+            <MealPlannerContent onRecipeClick={onRecipeClick} />
         </div>
     );
 }

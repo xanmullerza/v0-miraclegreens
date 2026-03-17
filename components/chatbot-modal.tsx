@@ -1210,7 +1210,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setExpandedRecipeMenu(false);
     };
 
-    const handleRecipeClick = (recipeId: string, fromView: 'all-recipes' | 'my-recipes') => {
+    const handleRecipeClick = (recipeId: string, fromView: 'all-recipes' | 'my-recipes' | 'planner') => {
         setSelectedRecipeId(recipeId);
         setPreviousView(fromView);
         setChatbotView('recipe-detail');
@@ -2431,7 +2431,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Planner View */}
                 {!showRecipeBuilder && chatbotView === 'planner' && (
-                    <ChatbotPlanner />
+                    <ChatbotPlanner onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'planner')} />
                 )}
 
                 {/* Nutridex View */}
