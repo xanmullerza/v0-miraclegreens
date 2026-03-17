@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Apple, Calendar, ShoppingBasket, Shapes, Salad, LayoutGrid, MessageCircle, Columns, PanelRightOpen, X as CloseIcon } from 'lucide-react';
+import { Calendar, ShoppingBasket, Shapes, MessageCircle, Columns, PanelRightOpen, X as CloseIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/lib/context/chatbot-context';
 import { useSplitView } from '@/lib/context/split-view-context';
@@ -14,9 +14,6 @@ export function DashboardNav() {
 
     // Determine active button
     const getActiveButton = () => {
-        if (pathname.includes('/dashboard/library/foods')) return 'foods';
-        if (pathname.includes('/dashboard/library/meals')) return 'meals';
-        if (pathname.includes('/dashboard/library/widgets')) return 'widgets';
         if (pathname.includes('/dashboard/meal-o-matic/shopping')) return 'shopping';
         if (pathname.includes('/dashboard/meal-o-matic/pantry')) return 'pantry';
         if (pathname.includes('/dashboard/meal-o-matic/planner')) return 'planner';
@@ -40,9 +37,6 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'foods', icon: Apple, label: 'Foods', path: '/dashboard/library/foods', color: 'emerald' },
-        { id: 'meals', icon: Salad, label: 'Meals', path: '/dashboard/library/meals', color: 'rose' },
-        { id: 'widgets', icon: LayoutGrid, label: 'Widgets', path: '/dashboard/library/widgets', color: 'cyan' },
         { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/dashboard/meal-o-matic/shopping', color: 'amber' },
         { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/dashboard/meal-o-matic/pantry', color: 'sky' },
         { id: 'planner', icon: Calendar, label: 'Planner', path: '/dashboard/meal-o-matic/planner', color: 'purple' },
