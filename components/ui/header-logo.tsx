@@ -52,7 +52,7 @@ export function HeaderLogo({
 
     return (
         <div suppressHydrationWarning className={cn(
-            "grid grid-cols-3 items-center bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 w-full transition-all duration-500 overflow-hidden h-12"
+            "grid grid-cols-3 items-center bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12"
         )}>
             {/* Left - Spacer to maintain centering */}
             <div className="flex h-full w-full" />

@@ -149,16 +149,16 @@ const DietCard = ({
   <div
     onClick={onClick}
     className={cn(
-      'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:opacity-90',
+      'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:shadow-md active:scale-95',
       selected
-        ? 'bg-primary text-primary-foreground border-primary shadow-md'
-        : 'border-border bg-card text-muted-foreground hover:bg-muted/50',
+        ? 'bg-primary text-primary-foreground border-primary shadow-lg ring-2 ring-primary/20'
+        : 'border-border bg-card text-muted-foreground hover:bg-muted hover:border-muted-foreground/20',
     )}
   >
     <Icon
-      className={cn('h-5 w-5 mb-1', selected ? 'text-primary-foreground' : 'text-muted-foreground')}
+      className={cn('h-5 w-5 mb-1', selected ? 'text-primary-foreground' : 'text-emerald-500/60')}
     />
-    <span className="text-xs font-semibold text-center leading-tight">
+    <span className="text-[10px] font-black uppercase tracking-widest text-center leading-tight">
       {label || (type === 'anything' ? 'Anything' : type)}
     </span>
   </div>
@@ -180,16 +180,16 @@ const GoalCard = ({
   <div
     onClick={onClick}
     className={cn(
-      'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:opacity-90',
+      'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:shadow-md active:scale-95',
       selected
-        ? 'bg-primary text-primary-foreground border-primary shadow-md'
-        : 'border-border bg-card text-muted-foreground hover:bg-muted/50',
+        ? 'bg-primary text-primary-foreground border-primary shadow-lg ring-2 ring-primary/20'
+        : 'border-border bg-card text-muted-foreground hover:bg-muted hover:border-muted-foreground/20',
     )}
   >
     <Icon
-      className={cn('h-5 w-5 mb-1', selected ? 'text-primary-foreground' : 'text-muted-foreground')}
+      className={cn('h-5 w-5 mb-1', selected ? 'text-primary-foreground' : 'text-emerald-500/60')}
     />
-    <span className="text-xs font-semibold text-center leading-tight">
+    <span className="text-[10px] font-black uppercase tracking-widest text-center leading-tight">
       {label || type.replace('-', ' ')}
     </span>
   </div>
@@ -211,16 +211,16 @@ const ActivityCard = ({
   <div
     onClick={onClick}
     className={cn(
-      'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:opacity-90',
+      'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:shadow-md active:scale-95',
       selected
-        ? 'bg-primary text-primary-foreground border-primary shadow-md'
-        : 'border-border bg-card text-muted-foreground hover:bg-muted/50',
+        ? 'bg-primary text-primary-foreground border-primary shadow-lg ring-2 ring-primary/20'
+        : 'border-border bg-card text-muted-foreground hover:bg-muted hover:border-muted-foreground/20',
     )}
   >
     <Icon
-      className={cn('h-5 w-5 mb-1', selected ? 'text-primary-foreground' : 'text-muted-foreground')}
+      className={cn('h-5 w-5 mb-1', selected ? 'text-primary-foreground' : 'text-emerald-500/60')}
     />
-    <span className="text-xs font-semibold text-center leading-tight">{label || type}</span>
+    <span className="text-[10px] font-black uppercase tracking-widest text-center leading-tight">{label || type}</span>
   </div>
 );
 
@@ -460,8 +460,8 @@ const RecipeListItem = ({
       className={cn(
         'group relative rounded-2xl border hover:shadow-lg transition-all cursor-pointer overflow-hidden p-1 lg:p-0',
         isEaten
-          ? 'bg-emerald-50/60 dark:bg-emerald-900/20 border-emerald-400/40 opacity-75'
-          : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:border-emerald-500/30',
+          ? 'bg-emerald-500/10 border-emerald-500/20 opacity-75'
+          : 'bg-card border-border hover:border-emerald-500/30',
       )}
     >
       {isEaten && (
@@ -471,7 +471,7 @@ const RecipeListItem = ({
       )}
       <div className="lg:grid lg:grid-cols-[100px_1fr_60px_60px_60px_60px_240px] gap-1.5 lg:items-center lg:px-6">
         {/* Thumbnail */}
-        <div className="aspect-[4/3] lg:aspect-square w-full lg:w-24 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+        <div className="aspect-[4/3] lg:aspect-square w-full lg:w-24 rounded-xl lg:rounded-none bg-muted overflow-hidden relative">
           {recipe.image ? (
             <img
               src={recipe.image}
@@ -479,7 +479,7 @@ const RecipeListItem = ({
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-300">
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
               <ChefHat size={18} className="opacity-20" />
             </div>
           )}
@@ -490,7 +490,7 @@ const RecipeListItem = ({
 
         {/* Info */}
         <div className="p-1 lg:p-0">
-          <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+          <h3 className="font-bold text-sm tracking-tight text-foreground leading-tight capitalize">
             {recipe.title}
           </h3>
           <div className="flex items-center gap-2 mt-0.5">
@@ -604,26 +604,26 @@ const RecipeListItem = ({
 
         {/* Stats (Desktop View) */}
         <div className="hidden lg:flex flex-col items-end gap-0.5">
-          <span className="text-[7px] uppercase font-black text-slate-400">Energy</span>
-          <span className="font-black text-[10px] text-slate-900 dark:text-white">
+          <span className="text-[7px] uppercase font-black text-muted-foreground/50">Energy</span>
+          <span className="font-black text-[10px] text-foreground">
             {formatEnergy(recipe.calories, unit)}
           </span>
         </div>
         <div className="hidden lg:flex flex-col items-end gap-0.5">
-          <span className="text-[7px] uppercase font-black text-slate-400">Carbs</span>
-          <span className="font-black text-[10px] text-slate-900 dark:text-white">
+          <span className="text-[7px] uppercase font-black text-muted-foreground/50">Carbs</span>
+          <span className="font-black text-[10px] text-foreground">
             {recipe.carbs.toFixed(1)}g
           </span>
         </div>
         <div className="hidden lg:flex flex-col items-end gap-0.5">
-          <span className="text-[7px] uppercase font-black text-slate-400">Fat</span>
-          <span className="font-black text-[10px] text-slate-900 dark:text-white">
+          <span className="text-[7px] uppercase font-black text-muted-foreground/50">Fat</span>
+          <span className="font-black text-[10px] text-foreground">
             {recipe.fat.toFixed(1)}g
           </span>
         </div>
         <div className="hidden lg:flex flex-col items-end gap-0.5">
-          <span className="text-[7px] uppercase font-black text-slate-400">Protein</span>
-          <span className="font-black text-[10px] text-slate-900 dark:text-white">
+          <span className="text-[7px] uppercase font-black text-muted-foreground/50">Protein</span>
+          <span className="font-black text-[10px] text-foreground">
             {recipe.protein.toFixed(1)}g
           </span>
         </div>
@@ -729,10 +729,10 @@ const RecipeListItem = ({
       {activePanel && (
         <div
           onClick={(e: React.MouseEvent) => e.stopPropagation()}
-          className="border-t border-slate-200 dark:border-slate-800 px-4 py-3 animate-in slide-in-from-top-2 duration-200"
+          className="border-t border-border px-4 py-3 animate-in slide-in-from-top-2 duration-200"
         >
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
               {activePanel === 'stocked' ? (
                 <span className="flex items-center gap-1.5">
                   <Check size={10} className="text-emerald-500" />

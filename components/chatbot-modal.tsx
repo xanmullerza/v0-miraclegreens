@@ -2026,50 +2026,50 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setChatbotView('cookbook')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-emerald-500 text-2xl">📚</span>
-                                <span className="text-sm font-semibold">Cookbook</span>
+                                <span className="text-sm font-semibold text-foreground">Cookbook</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('plannerMenu')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-blue-500 text-2xl">🗓️</span>
-                                <span className="text-sm font-semibold">Planner</span>
+                                <span className="text-sm font-semibold text-foreground">Planner</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('widgetsMenu')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-purple-500 text-2xl">⚙️</span>
-                                <span className="text-sm font-semibold">Widgets</span>
+                                <span className="text-sm font-semibold text-foreground">Widgets</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('profile')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-sky-500 text-2xl">👤</span>
-                                <span className="text-sm font-semibold">Profile</span>
+                                <span className="text-sm font-semibold text-foreground">Profile</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('messages')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-emerald-500 text-2xl">💬</span>
-                                <span className="text-sm font-semibold">Chat</span>
+                                <span className="text-sm font-semibold text-foreground">Chat</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('comingSoon')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-yellow-500 text-2xl">🛠️</span>
-                                <span className="text-sm font-semibold">Coming Soon</span>
+                                <span className="text-sm font-semibold text-foreground">Coming Soon</span>
                             </button>
                         </div>
                     </div>
@@ -2678,7 +2678,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 e.stopPropagation();
                                 setShowQuickActions(prev => !prev);
                             }}
-                            className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors active:scale-95 z-[60] pointer-events-auto"
+                            className="w-10 h-10 rounded-lg bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-muted transition-colors active:scale-95 z-[60] pointer-events-auto"
                             title="Quick actions menu"
                         >
                             <Menu size={16} />
@@ -2689,7 +2689,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                             placeholder="Ask a question or paste a recipe URL..."
-                            className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            className="flex-1 px-3 py-2 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                         <input
                             ref={fileInputRef}

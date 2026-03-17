@@ -119,12 +119,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
+        <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
             {/* Unified Header & Nav - Spans both panels */}
             {pathname !== '/home' && (
                 <>
                     {/* Header - Centered */}
-                    <div suppressHydrationWarning className="z-40 bg-slate-50 dark:bg-[#020617]">
+                    <div suppressHydrationWarning className="z-40 bg-background">
                         <div className="w-full flex pointer-events-none">
                             <div className="pointer-events-auto w-full">
                                 <HeaderLogo 
@@ -141,17 +141,17 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </div>
 
                     {/* Breadcrumb Bar - Spans Full Width */}
-                    <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-800/50">
+                    <div className="flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 bg-background/80 backdrop-blur-sm">
                         <button
                             onClick={() => router.back()}
-                            className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                            className="p-1 hover:bg-accent rounded-lg transition-colors text-muted-foreground"
                             title="Back"
                         >
                             <ArrowLeft size={14} />
                         </button>
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">Zum</span>
-                            <span className="text-slate-300 dark:text-slate-600">/</span>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Zum</span>
+                            <span className="text-border">/</span>
                             <div className="flex items-center gap-2">
                                 {getBreadcrumbs()}
                             </div>
@@ -169,7 +169,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     pathname === '/home' ? 'w-full' : ''
                 )}>
                     {/* Main Content */}
-                    <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#020617] custom-scrollbar">
+                    <main className="flex-1 overflow-y-auto bg-background custom-scrollbar">
                         <div className={cn(
                             "px-2 sm:px-4 flex justify-center",
                             pathname !== '/home' && "py-4"
