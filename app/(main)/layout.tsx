@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Columns, PanelRightOpen, X as CloseIcon, MessageCircle } from 'lucide-react';
+import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { ChatbotModal } from '@/components/chatbot-modal';
@@ -83,10 +83,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     };
 
     const getResizeIcon = () => {
-        if (resizeMode === 'equal') return <Columns size={18} />;
-        if (resizeMode === 'content-focus') return <PanelRightOpen size={18} />;
-        if (resizeMode === 'content-only') return <CloseIcon size={18} />;
-        return <Columns size={18} />;
+        if (resizeMode === 'equal') return <Computer size={18} />;
+        if (resizeMode === 'content-focus') return <TabletSmartphone size={18} />;
+        if (resizeMode === 'content-only') return <Smartphone size={18} />;
+        return <Computer size={18} />;
     };
 
     const getResizeTooltip = () => {

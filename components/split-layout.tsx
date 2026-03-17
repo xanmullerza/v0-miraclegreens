@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { Columns, PanelRightOpen, X as CloseIcon } from 'lucide-react';
+import { Smartphone, TabletSmartphone, Monitor as Computer } from 'lucide-react';
 
 type ResizeMode = 'equal' | 'content-focus' | 'content-only';
 
@@ -26,10 +26,10 @@ export function SplitLayout({ contentArea, chatbotArea, onResizeModeChange }: Sp
     };
 
     const getResizeIcon = () => {
-        if (resizeMode === 'equal') return <Columns size={18} />;
-        if (resizeMode === 'content-focus') return <PanelRightOpen size={18} />;
-        if (resizeMode === 'content-only') return <CloseIcon size={18} />;
-        return <Columns size={18} />;
+        if (resizeMode === 'equal') return <Computer size={18} />;
+        if (resizeMode === 'content-focus') return <TabletSmartphone size={18} />;
+        if (resizeMode === 'content-only') return <Smartphone size={18} />;
+        return <Computer size={18} />;
     };
 
     const getResizeTooltip = () => {

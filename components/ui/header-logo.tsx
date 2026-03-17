@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf, Home, User, Columns, PanelRightOpen, MessageCircle } from 'lucide-react';
+import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 
@@ -22,10 +22,10 @@ export function HeaderLogo({
     const { resizeMode, toggleResize } = useSplitView();
 
     const getResizeIcon = () => {
-        if (resizeMode === 'equal') return <Columns size={18} />;
-        if (resizeMode === 'content-focus') return <PanelRightOpen size={18} />;
-        if (resizeMode === 'content-only') return <MessageCircle size={18} />;
-        return <Columns size={18} />;
+        if (resizeMode === 'equal') return <Computer size={18} />;
+        if (resizeMode === 'content-focus') return <TabletSmartphone size={18} />;
+        if (resizeMode === 'content-only') return <Smartphone size={18} />;
+        return <Computer size={18} />;
     };
 
     const getResizeTooltip = () => {
