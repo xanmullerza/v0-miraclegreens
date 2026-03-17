@@ -140,8 +140,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         </div>
                     </div>
 
-                    {/* Breadcrumb Bar - Spans Full Width */}
-                    <div className="flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 bg-background/80 backdrop-blur-sm">
+                    {/* Breadcrumb Bar - Spans Full Width (Mobile Only) */}
+                    <div className="flex lg:hidden items-center gap-3 px-4 py-2 border-b border-border shrink-0 bg-background/80 backdrop-blur-sm">
                         <button
                             onClick={() => router.back()}
                             className="p-1 hover:bg-accent rounded-lg transition-colors text-muted-foreground"
