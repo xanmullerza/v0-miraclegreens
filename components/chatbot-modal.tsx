@@ -613,13 +613,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             const { data: { user } } = await supabase.auth.getUser();
             if (!user?.id) return;
 
-            // Find the saved recipe by source_url and user_id
+            // Find the recipe - either user's own recipe OR a curated system recipe
             const { data: savedRecipe, error } = await supabase
                 .from('recipes')
                 .select('id')
                 .eq('source_url', recipeToView.source_url)
-                .eq('user_id', user.id)
-                .eq('is_curated', false)
+                .or(`user_id.eq.${user.id},and(is_curated.eq.true,user_id.is.null)`)
                 .single();
 
             if (error || !savedRecipe) {
