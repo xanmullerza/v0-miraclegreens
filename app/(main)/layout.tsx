@@ -90,9 +90,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     };
 
     const getResizeTooltip = () => {
-        if (resizeMode === 'equal') return 'Focus Content (67%)';
-        if (resizeMode === 'content-focus') return 'Content Only (Hide Chat)';
-        if (resizeMode === 'content-only') return 'Equal Split (50/50)';
+        if (resizeMode === 'content-focus') return 'Equal Split (50/50)';
+        if (resizeMode === 'equal') return 'Content Only (Hide Chat)';
+        if (resizeMode === 'content-only') return 'Focus Content (70/30)';
         return 'Toggle View';
     };
 

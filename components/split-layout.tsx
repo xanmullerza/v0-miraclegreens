@@ -13,13 +13,13 @@ interface SplitLayoutProps {
 }
 
 export function SplitLayout({ contentArea, chatbotArea, onResizeModeChange }: SplitLayoutProps) {
-    const [resizeMode, setResizeMode] = useState<ResizeMode>('equal');
+    const [resizeMode, setResizeMode] = useState<ResizeMode>('content-focus');
 
     const handleToggleResize = () => {
         let nextMode: ResizeMode;
-        if (resizeMode === 'equal') nextMode = 'content-focus';
-        else if (resizeMode === 'content-focus') nextMode = 'content-only';
-        else nextMode = 'equal';
+        if (resizeMode === 'content-focus') nextMode = 'equal';
+        else if (resizeMode === 'equal') nextMode = 'content-only';
+        else nextMode = 'content-focus';
 
         setResizeMode(nextMode);
         onResizeModeChange?.(nextMode);
@@ -33,9 +33,9 @@ export function SplitLayout({ contentArea, chatbotArea, onResizeModeChange }: Sp
     };
 
     const getResizeTooltip = () => {
-        if (resizeMode === 'equal') return 'Equal split (50/50)';
-        if (resizeMode === 'content-focus') return 'Content focus (70/30)';
-        if (resizeMode === 'content-only') return 'Content only (hide chat)';
+        if (resizeMode === 'content-focus') return 'Equal split (50/50)';
+        if (resizeMode === 'equal') return 'Content only (hide chat)';
+        if (resizeMode === 'content-only') return 'Content focus (70/30)';
         return 'Toggle view';
     };
 

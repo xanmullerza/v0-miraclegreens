@@ -13,7 +13,7 @@ interface SplitViewContextType {
 const SplitViewContext = createContext<SplitViewContextType | undefined>(undefined);
 
 export function SplitViewProvider({ children }: { children: ReactNode }) {
-    const [resizeMode, setResizeMode] = useState<ResizeMode>('equal');
+    const [resizeMode, setResizeMode] = useState<ResizeMode>('content-focus');
     const [isMounted, setIsMounted] = useState(false);
 
     // Load saved resize mode on mount
@@ -34,9 +34,9 @@ export function SplitViewProvider({ children }: { children: ReactNode }) {
 
     const toggleResize = () => {
         setResizeMode(prev => {
-            if (prev === 'equal') return 'content-focus';
-            if (prev === 'content-focus') return 'content-only';
-            return 'equal';
+            if (prev === 'content-focus') return 'equal';
+            if (prev === 'equal') return 'content-only';
+            return 'content-focus';
         });
     };
 
