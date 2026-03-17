@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -260,6 +260,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(false); // Always reset on refresh
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
+    const [videoURL, setVideoURL] = useState('');
     const [isDragging, setIsDragging] = useState(false);
     
     // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
@@ -2122,7 +2123,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
                         
                         <div className="grid grid-cols-2 gap-3 w-full">
-                            {/* Option 1: Manual Creation */}
+                            {/* Option 1: Manual Entry */}
                             <div 
                                 onClick={handleManualRecipeCreation}
                                 className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col h-full relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300 cursor-pointer"
@@ -2145,7 +2146,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </div>
                             </div>
 
-                            {/* Option 2: Paste Content */}
+                            {/* Option 2: Paste Text */}
                             <div 
                                 onClick={() => {
                                     setChatbotView('messages');
@@ -2171,7 +2172,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </div>
                             </div>
 
-                            {/* Option 3: URL */}
+                            {/* Option 3: Paste URL */}
                             <div 
                                 onClick={() => {
                                     setChatbotView('messages');
@@ -2229,7 +2230,77 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     UPLOAD
                                 </div>
                             </div>
+
+                            {/* Option 5: Voice Assisted */}
+                            <div 
+                                onClick={() => {
+                                    setChatbotView('messages');
+                                    setIsCreatingRecipe(true);
+                                }}
+                                className="bg-amber-500/10 dark:bg-amber-500/5 rounded-2xl p-4 border border-amber-500/20 flex flex-col h-full relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300 cursor-pointer"
+                            >
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Mic size={40} className="text-amber-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                                        <Mic size={16} className="text-amber-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 5</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Voice Assisted</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Describe your recipe by talking.
+                                </p>
+                                <div className="text-center py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-amber-600 transition-colors">
+                                    RECORD
+                                </div>
+                            </div>
+
+                            {/* Option 6: Video Import */}
+                            <div 
+                                onClick={() => {
+                                    setChatbotView('messages');
+                                    setIsCreatingRecipe(true);
+                                }}
+                                className="bg-cyan-500/10 dark:bg-cyan-500/5 rounded-2xl p-4 border border-cyan-500/20 flex flex-col h-full relative overflow-hidden group hover:border-cyan-500/40 transition-all duration-300 cursor-pointer"
+                            >
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Video size={40} className="text-cyan-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                                        <Video size={16} className="text-cyan-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 6</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Video Import</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Import from YouTube or TikTok.
+                                </p>
+                                <div className="text-center py-2 rounded-xl bg-cyan-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-cyan-600 transition-colors">
+                                    WATCH
+                                </div>
+                            </div>
                         </div>
+
+                        {/* Full-width Import Database Button */}
+                        <button
+                            onClick={() => toast('Database import is coming soon!')}
+                            className="w-full mt-4 p-4 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-between group hover:scale-[1.02] transition-all duration-300 shadow-xl overflow-hidden relative"
+                        >
+                            <div className="absolute inset-0 bg-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity" />
+                            <div className="flex items-center gap-4 relative z-10">
+                                <div className="w-10 h-10 rounded-xl bg-white/10 dark:bg-slate-900/10 flex items-center justify-center">
+                                    <Database size={20} className="text-emerald-500" />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="font-black text-[10px] uppercase tracking-widest opacity-60">Bulk Import</h4>
+                                    <h3 className="font-black text-xs uppercase tracking-tight">Import Recipe Database</h3>
+                                </div>
+                            </div>
+                            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform text-emerald-500" />
+                        </button>
                     </div>
                 )}
 
@@ -2438,7 +2509,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 </div>
                 )}
 
-                {/* Create Recipe Options - Shown when creating recipe */}
                 {!showRecipeBuilder && chatbotView === 'messages' && isCreatingRecipe && !successRecipe && (
                     <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center">
                         <div className="grid grid-cols-2 gap-3 w-full">
@@ -2561,7 +2631,88 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-rose-500">Drop image here or click</span>
                                 </div>
                             </div>
+
+                            {/* Option 5: Voice Assisted */}
+                            <div className="bg-amber-500/10 dark:bg-amber-500/5 rounded-2xl p-4 border border-amber-500/20 flex flex-col h-full relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Mic size={40} className="text-amber-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                                        <Mic size={16} className="text-amber-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Option 5</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Voice Assisted</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Describe your recipe and we&apos;ll build it.
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        if (isRecording) stopAudioRecording();
+                                        else startAudioRecording();
+                                    }}
+                                    className={cn(
+                                        "w-full py-2.5 rounded-xl text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md flex items-center justify-center gap-2",
+                                        isRecording 
+                                            ? "bg-red-500 hover:bg-red-600 shadow-red-500/20 animate-pulse" 
+                                            : "bg-amber-500 hover:bg-amber-600 shadow-amber-500/20"
+                                    )}
+                                >
+                                    {isRecording ? <Square size={12} /> : <Mic size={12} />}
+                                    {isRecording ? "STOP RECORDING" : "START RECORDING"}
+                                </button>
+                            </div>
+
+                            {/* Option 6: Video Import */}
+                            <div className="bg-cyan-500/10 dark:bg-cyan-500/5 rounded-2xl p-4 border border-cyan-500/20 flex flex-col h-full relative overflow-hidden group hover:border-cyan-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Video size={40} className="text-cyan-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                                        <Video size={16} className="text-cyan-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Option 6</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Video Import</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
+                                    Extract from YouTube or TikTok.
+                                </p>
+                                <input
+                                    type="text"
+                                    value={videoURL}
+                                    onChange={(e) => setVideoURL(e.target.value)}
+                                    placeholder="Paste video URL..."
+                                    className="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none text-slate-900 dark:text-white placeholder-slate-400 text-[10px] focus:outline-none focus:ring-2 focus:ring-cyan-500/50 mb-3 flex-1"
+                                />
+                                <button
+                                    onClick={() => toast('Video import is coming soon!')}
+                                    disabled={!videoURL.trim() || isLoading}
+                                    className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-cyan-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {isLoading ? <Loader2 size={12} className="animate-spin" /> : <span>✓ Import Video</span>}
+                                </button>
+                            </div>
                         </div>
+
+                        {/* Full-width Import Database Button */}
+                        <button
+                            onClick={() => toast('Database import is coming soon!')}
+                            className="w-full mt-4 p-4 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-between group hover:scale-[1.02] transition-all duration-300 shadow-xl overflow-hidden relative"
+                        >
+                            <div className="absolute inset-0 bg-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity" />
+                            <div className="flex items-center gap-4 relative z-10">
+                                <div className="w-10 h-10 rounded-xl bg-white/10 dark:bg-slate-900/10 flex items-center justify-center">
+                                    <Database size={20} className="text-emerald-500" />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="font-black text-[10px] uppercase tracking-widest opacity-60">Bulk Import</h4>
+                                    <h3 className="font-black text-xs uppercase tracking-tight">Import Recipe Database</h3>
+                                </div>
+                            </div>
+                            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform text-emerald-500" />
+                        </button>
                     </div>
                 )}
 
