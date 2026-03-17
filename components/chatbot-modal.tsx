@@ -2037,57 +2037,114 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {/* Dashboard Menu - 2x2 grid seen when chat opens */}
+                {/* Dashboard Menu - Flattened into sections */}
                 {!showRecipeBuilder && chatbotView === 'dashboard' && (
-                    <div className="flex-1 overflow-y-auto p-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <button
-                                onClick={() => setChatbotView('cookbook')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                            >
-                                <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">📚</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Cookbook</span>
-                            </button>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                        {/* Cookbook Section */}
+                        <div className="bg-white/50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Cookbook</h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <button
+                                    onClick={() => setChatbotView('all-recipes')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">📖</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Public Recipes</span>
+                                </button>
+                                <button
+                                    onClick={() => setChatbotView('my-recipes')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.3)] transition-all">👩‍🍳</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">My Recipes</span>
+                                </button>
+                                <button
+                                    onClick={() => setChatbotView('import-options')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] transition-all">📥</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Import Recipes</span>
+                                </button>
+                                <button
+                                    onClick={() => toast('Export is coming soon 👀')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.3)] transition-all">📤</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Export Recipes</span>
+                                </button>
+                            </div>
+                        </div>
 
-                            <button
-                                onClick={() => setChatbotView('plannerMenu')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                            >
-                                <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all">🗓️</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Planner</span>
-                            </button>
+                        {/* Planner Section */}
+                        <div className="bg-white/50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Planner</h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <button
+                                    onClick={() => setChatbotView('planner')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all">🗂️</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Meal Planner</span>
+                                </button>
+                                <button
+                                    onClick={() => setChatbotView('pantry')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(34,197,94,0.3)] transition-all">🧺</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-green-500 transition-colors">Pantry</span>
+                                </button>
+                                <button
+                                    onClick={() => setChatbotView('shopping')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.3)] transition-all">🛒</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">Shopping</span>
+                                </button>
+                            </div>
+                        </div>
 
-                            <button
-                                onClick={() => setChatbotView('widgetsMenu')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                            >
-                                <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.3)] transition-all">⚙️</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-purple-500 transition-colors">Widgets</span>
-                            </button>
-
-                            <button
-                                onClick={() => setChatbotView('profile')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                            >
-                                <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(14,165,233,0.3)] transition-all">👤</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">Profile</span>
-                            </button>
-
-                            <button
-                                onClick={() => setChatbotView('messages')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                            >
-                                <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">💬</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Chat</span>
-                            </button>
-
-                            <button
-                                onClick={() => setChatbotView('comingSoon')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                            >
-                                <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(234,179,8,0.3)] transition-all">🛠️</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-yellow-500 transition-colors">Coming Soon</span>
-                            </button>
+                        {/* Widgets Section */}
+                        <div className="bg-white/50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Widgets</h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <button
+                                    onClick={() => setChatbotView('nutridex')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(217,70,239,0.3)] transition-all">🧪</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-fuchsia-500 transition-colors">Nutridex</span>
+                                </button>
+                                <button
+                                    onClick={() => setChatbotView('comparator')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all">⚖️</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Comparator</span>
+                                </button>
+                                <button
+                                    onClick={() => setChatbotView('lifeguard')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(20,184,166,0.3)] transition-all">🛡️</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-teal-500 transition-colors">Lifeguard</span>
+                                </button>
+                                <button
+                                    onClick={() => setChatbotView('messages')}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">💬</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">AI Chat</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
