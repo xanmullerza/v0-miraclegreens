@@ -1,0 +1,528 @@
+'use client';
+
+import React, { useState, useEffect, Fragment } from 'react';
+import {
+    Plus, Minus, List, Trash2, ChevronDown, CheckCircle2,
+    Loader2, ShoppingBasket, Sparkles, Beef,
+} from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
+import { formatFoodName } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import {
+    type ShoppingItem,
+    SHOPPING_STORAGE_KEY,
+    enrichmentCache,
+    cn,
+    getCategoryGroup,
+    getCategoryColor,
+    CATEGORY_ORDER,
+    smartCombineQuantities,
+    aggregateQuantities,
+    formatGramsFull,
+    PORTION_EXCLUDE_REGEX,
+} from './shopping-types';
+
+export function ShoppingItemList() {
+    const [items, setItems] = useState<ShoppingItem[]>([]);
+    const [manualItems, setManualItems] = useState<ShoppingItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [enriching, setEnriching] = useState(false);
+
+    // Expanded panel state
+    const [expandedActionId, setExpandedActionId] = useState<string | null>(null);
+    const [expandedRemoveId, setExpandedRemoveId] = useState<string | null>(null);
+    const [expandedBreakdownId, setExpandedBreakdownId] = useState<string | null>(null);
+
+    // Inline add panel state
+    const [pantryAddItem, setPantryAddItem] = useState<ShoppingItem | null>(null);
+    const [pantryAddQty, setPantryAddQty] = useState('1');
+    const [pantryAddPortions, setPantryAddPortions] = useState<{ label: string; weight_g: number }[]>([]);
+    const [pantryAddSelectedPortion, setPantryAddSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
+    const [pantryAddFoodId, setPantryAddFoodId] = useState<string | null>(null);
+
+    // Pantry tick loading
+    const [tickLoadingId, setTickLoadingId] = useState<string | null>(null);
+
+    const clearAllPanels = () => {
+        setExpandedActionId(null);
+        setExpandedRemoveId(null);
+        setExpandedBreakdownId(null);
+        setPantryAddItem(null);
+    };
+
+    // ── Load from localStorage ──────────────────────────────────
+    useEffect(() => {
+        const load = () => {
+            const saved = localStorage.getItem(SHOPPING_STORAGE_KEY);
+            if (saved) {
+                try { setManualItems(JSON.parse(saved)); } catch { /* ignore */ }
+            }
+            setLoading(false);
+        };
+        load();
+        window.addEventListener('storage', load);
+        return () => window.removeEventListener('storage', load);
+    }, []);
+
+    // ── Save to localStorage (with dedup) ───────────────────────
+    useEffect(() => {
+        if (loading) return;
+        const deduped: ShoppingItem[] = [];
+        const seenIds = new Map<string, number>();
+        for (const item of manualItems) {
+            if (item.food_item_id && seenIds.has(item.food_item_id)) {
+                const idx = seenIds.get(item.food_item_id)!;
+                deduped[idx] = { ...deduped[idx], quantity: `${deduped[idx].quantity} + ${item.quantity}` };
+            } else {
+                if (item.food_item_id) seenIds.set(item.food_item_id, deduped.length);
+                deduped.push(item);
+            }
+        }
+        if (deduped.length < manualItems.length) setManualItems(deduped);
+        localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify(deduped));
+    }, [manualItems, loading]);
+
+    // ── Enrich & combine ────────────────────────────────────────
+    useEffect(() => {
+        let cancelled = false;
+        const enrichAndCombine = async () => {
+            let combined = [...manualItems].map(item => {
+                const key = item.food_item_id || item.name.toLowerCase();
+                const cached = enrichmentCache.get(key);
+                if (cached) {
+                    const u = { ...item };
+                    if (!item.category && cached.category) u.category = cached.category;
+                    if (!item.image && cached.image) u.image = cached.image;
+                    if (!item.common_name && cached.common_name) u.common_name = cached.common_name;
+                    if (!item.food_item_id && cached.id) u.food_item_id = cached.id;
+                    return u;
+                }
+                return item;
+            });
+
+            const needById = combined.filter(i => i.food_item_id && (!i.category || !i.image));
+            const needByName = combined.filter(i => !i.food_item_id && !i.category);
+
+            if (needById.length > 0 || needByName.length > 0) {
+                setEnriching(true);
+                const idMap = new Map<string, any>();
+                if (needById.length > 0) {
+                    const ids = needById.map(i => i.food_item_id).filter(Boolean) as string[];
+                    if (ids.length > 0) {
+                        const { data } = await supabase.from('food_items').select('id, category, image, common_name').in('id', ids);
+                        data?.forEach((d: any) => { idMap.set(d.id, d); enrichmentCache.set(d.id, d); });
+                    }
+                }
+                const nameMap = new Map<string, any>();
+                if (needByName.length > 0 && !cancelled) {
+                    const names = [...new Set(needByName.map(i => i.name.toLowerCase()))];
+                    const orConds = names.map(n => `name.ilike.%${n}%,common_name.ilike.%${n}%`).join(',');
+                    const { data } = await supabase.from('food_items').select('id, name, common_name, category, image').or(orConds).limit(names.length * 5);
+                    if (data) {
+                        for (const searchName of names) {
+                            let best: any = null, bestScore = 0;
+                            for (const d of data) {
+                                const dn = (d.name || '').toLowerCase(), dc = (d.common_name || '').toLowerCase();
+                                let score = 0;
+                                if (dn === searchName || dc === searchName) score = 4;
+                                else if (dn.startsWith(searchName) || dc.startsWith(searchName)) score = 3;
+                                else if (searchName.startsWith(dn) || searchName.startsWith(dc)) score = 2;
+                                else if (dn.includes(searchName) || dc.includes(searchName)) score = 1;
+                                if (score > bestScore) { bestScore = score; best = d; }
+                            }
+                            if (best) { nameMap.set(searchName, best); enrichmentCache.set(searchName, best); }
+                        }
+                    }
+                }
+
+                if (!cancelled) {
+                    combined = combined.map(item => {
+                        if (item.food_item_id && idMap.has(item.food_item_id)) {
+                            const d = idMap.get(item.food_item_id);
+                            const u = { ...item };
+                            if (!item.category && d.category) u.category = d.category;
+                            if (!item.image && d.image) u.image = d.image;
+                            if (!item.common_name && d.common_name) u.common_name = d.common_name;
+                            return u;
+                        }
+                        if (!item.category && nameMap.has(item.name.toLowerCase())) {
+                            const d = nameMap.get(item.name.toLowerCase());
+                            const u = { ...item };
+                            if (d.category) u.category = d.category;
+                            if (d.image) u.image = d.image;
+                            if (d.common_name) u.common_name = d.common_name;
+                            if (d.id) u.food_item_id = d.id;
+                            return u;
+                        }
+                        return item;
+                    });
+                }
+                setEnriching(false);
+            }
+
+            if (!cancelled) setItems(combined);
+        };
+        enrichAndCombine();
+        return () => { cancelled = true; };
+    }, [manualItems]);
+
+    // ── Item actions ────────────────────────────────────────────
+
+    const removeItem = (id: string) => {
+        setManualItems(prev => prev.filter(i => i.id !== id));
+        setItems(prev => prev.filter(i => i.id !== id));
+        try {
+            const saved = JSON.parse(localStorage.getItem(SHOPPING_STORAGE_KEY) || '[]');
+            localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify(saved.filter((i: any) => i.id !== id)));
+        } catch { /* ignore */ }
+    };
+
+    const confirmDelete = (item: ShoppingItem) => {
+        const name = item.common_name || item.name;
+        toast.custom(
+            (t) => (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 shadow-lg max-w-sm">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+                        Remove <span className="font-black text-rose-600 dark:text-rose-400">{name}</span> from list?
+                    </p>
+                    <div className="flex gap-2 justify-end">
+                        <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">Cancel</button>
+                        <button onClick={() => { toast.dismiss(t); removeItem(item.id); setExpandedActionId(null); }} className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded transition-colors">Remove</button>
+                    </div>
+                </div>
+            ),
+            { duration: Infinity }
+        );
+    };
+
+    // ── Pantry tick (quick add) ─────────────────────────────────
+
+    const quickAddToPantry = async (item: ShoppingItem) => {
+        setTickLoadingId(item.id);
+        try {
+            let foodItemId = item.food_item_id || null;
+            if (!foodItemId && item.name) {
+                const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                const { data } = await supabase.from('food_items').select('id').or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`).limit(1).maybeSingle();
+                if (data) foodItemId = data.id;
+            }
+            if (!foodItemId) { removeItem(item.id); return; }
+
+            const rawQty = (item.quantity || '').trim();
+            const qtyStr = rawQty.split(/\s*\+\s*/).map(s => s.trim()).filter(s => !/^as\s+needed$/i.test(s) && s.length > 0).join(' + ') || rawQty || '1';
+
+            const saved = localStorage.getItem('pantry_quantities');
+            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+            const existing = quantities[foodItemId];
+            quantities[foodItemId] = existing ? `${existing} + ${qtyStr}` : qtyStr;
+            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const isAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
+
+            if (isAdmin) {
+                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
+            } else if (currentUser) {
+                const { data: existingRow } = await supabase.from('pantry_items').select('id').eq('user_id', currentUser.id).eq('food_item_id', foodItemId).maybeSingle();
+                if (!existingRow) {
+                    await supabase.from('pantry_items').insert({ user_id: currentUser.id, name: item.name, quantity: quantities[foodItemId], food_item_id: foodItemId });
+                } else {
+                    await supabase.from('pantry_items').update({ quantity: quantities[foodItemId] }).eq('id', existingRow.id);
+                }
+            }
+
+            removeItem(item.id);
+            toast.success(`"${item.common_name || item.name}" added to pantry`);
+        } catch {
+            toast.error('Failed to add to pantry');
+        } finally {
+            setTickLoadingId(null);
+        }
+    };
+
+    // ── Inline add-more panel ───────────────────────────────────
+
+    const openAddPanel = async (item: ShoppingItem) => {
+        if (pantryAddItem?.id === item.id) { setPantryAddItem(null); return; }
+        setExpandedRemoveId(null); setExpandedBreakdownId(null);
+
+        const qtyMatch = (item.quantity || '1').match(/^(\d+(?:\.\d+)?)/);
+        setPantryAddQty(qtyMatch ? qtyMatch[1] : '1');
+        setPantryAddPortions([]); setPantryAddSelectedPortion(null); setPantryAddFoodId(null);
+        setPantryAddItem(item);
+
+        let foodItemId = item.food_item_id || null;
+        if (!foodItemId && item.name) {
+            try {
+                const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                const { data } = await supabase.from('food_items').select('id').or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`).limit(1).maybeSingle();
+                if (data) foodItemId = data.id;
+            } catch { /* ignore */ }
+        }
+
+        if (foodItemId) {
+            setPantryAddFoodId(foodItemId);
+            try {
+                const measures = await fetchFoodMeasures(foodItemId);
+                if (measures?.length) {
+                    setPantryAddPortions(measures);
+                    const filtered = measures.filter((m: any) => !PORTION_EXCLUDE_REGEX.test(m.label));
+                    const seen = new Set<number>();
+                    const deduped = filtered.filter((m: any) => { if (seen.has(m.weight_g)) return false; seen.add(m.weight_g); return true; });
+                    const each = deduped.find((m: any) => /each/i.test(m.label));
+                    setPantryAddSelectedPortion(each || deduped[0] || null);
+                }
+            } catch { /* ignore */ }
+        }
+    };
+
+    const confirmAddToList = () => {
+        if (!pantryAddItem) return;
+        const qty = pantryAddQty || '1';
+        const qtyStr = pantryAddSelectedPortion ? `${qty} ${pantryAddSelectedPortion.label} (${pantryAddSelectedPortion.weight_g}g)` : qty;
+
+        const normalize = (s: string) => s.toLowerCase().trim();
+        const idx = manualItems.findIndex(i => (pantryAddItem.food_item_id && i.food_item_id) ? i.food_item_id === pantryAddItem.food_item_id : normalize(i.name) === normalize(pantryAddItem.name));
+
+        if (idx >= 0) {
+            const updated = [...manualItems];
+            updated[idx] = { ...updated[idx], quantity: smartCombineQuantities(updated[idx].quantity, qtyStr) };
+            setManualItems(updated);
+            toast.success(`Updated ${pantryAddItem.common_name || pantryAddItem.name} quantity`);
+        } else {
+            setManualItems(prev => [...prev, {
+                id: `manual-${Date.now()}`, name: pantryAddItem.common_name || pantryAddItem.name,
+                quantity: qtyStr, unit: '', source: 'manual', image: pantryAddItem.image,
+                image_url: pantryAddItem.image_url, food_item_id: pantryAddItem.food_item_id,
+            } as ShoppingItem]);
+            toast.success(`Added ${pantryAddItem.common_name || pantryAddItem.name}`);
+        }
+        setPantryAddItem(null);
+    };
+
+    // ── Group items by category ─────────────────────────────────
+
+    const grouped = items.reduce((acc, item) => {
+        const g = getCategoryGroup(item.category);
+        if (!acc[g]) acc[g] = [];
+        acc[g].push(item);
+        return acc;
+    }, {} as Record<string, ShoppingItem[]>);
+
+    // ── Render ──────────────────────────────────────────────────
+
+    if (loading || enriching) {
+        return (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+                <Loader2 className="animate-spin text-emerald-500" size={32} />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading your list...</p>
+            </div>
+        );
+    }
+
+    if (items.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/10">
+                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-4">
+                    <ShoppingBasket size={32} />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Your List is Empty</h3>
+                <p className="text-slate-500 text-center text-sm max-w-xs px-4">
+                    Search for foods above to add items to your shopping list.
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-3">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    {items.length} item{items.length !== 1 ? 's' : ''}
+                </p>
+                <button
+                    onClick={() => {
+                        if (!confirm('Clear all items from your grocery list?')) return;
+                        setManualItems([]); setItems([]);
+                        localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify([]));
+                        toast.success('Grocery list cleared');
+                    }}
+                    className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5"
+                >
+                    <Trash2 size={12} /> Clear All
+                </button>
+            </div>
+
+            {/* Category Groups */}
+            {Object.entries(grouped)
+                .sort(([a], [b]) => {
+                    const ia = CATEGORY_ORDER.indexOf(a), ib = CATEGORY_ORDER.indexOf(b);
+                    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+                })
+                .map(([group, groupItems]) => {
+                    const colors = getCategoryColor(group);
+                    return (
+                        <div key={group} className={cn("rounded-xl border p-3", colors.bg, colors.border)}>
+                            <div className="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2 text-slate-700 dark:text-slate-400">
+                                <colors.icon size={16} className="text-slate-600 dark:text-slate-500" />
+                                {group}
+                                <button
+                                    onClick={() => { groupItems.forEach(i => removeItem(i.id)); toast.success(`${group} cleared`); }}
+                                    className="ml-auto p-1 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500 transition-colors"
+                                    title="Delete category"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
+                            </div>
+                            <div className="space-y-1.5">
+                                {groupItems.map(item => (
+                                    <Fragment key={item.id}>
+                                        {/* Item Row */}
+                                        <div
+                                            className="flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 cursor-pointer group"
+                                            onClick={() => { clearAllPanels(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
+                                        >
+                                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
+                                                {(item.image || item.image_url) ? (
+                                                    <img src={item.image || item.image_url} alt={item.common_name || item.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <Beef size={16} className="text-slate-400 dark:text-slate-500" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-1">
+                                                    {item.is_miracle_product && <Sparkles size={10} className="text-amber-500 shrink-0" />}
+                                                    <span className="font-black text-[11px] uppercase tracking-wide text-slate-900 dark:text-white truncate block">
+                                                        {formatFoodName(item.common_name || item.name)}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Pantry tick */}
+                                            {(() => {
+                                                const parts = (item.quantity || '').split(/\s*\+\s*/).map(s => s.trim()).filter(s => s.length > 0 && !/^as\s+needed$/i.test(s) && /\d/.test(s));
+                                                const hasWeight = parts.length > 0;
+                                                return (
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); if (hasWeight) quickAddToPantry(item); }}
+                                                        disabled={tickLoadingId === item.id || !hasWeight}
+                                                        title={hasWeight ? 'Add to pantry' : 'Add a weight first'}
+                                                        className={cn(
+                                                            "p-1 rounded-full border-2 transition-all shrink-0",
+                                                            hasWeight
+                                                                ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+                                                                : "border-slate-300 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                                                        )}
+                                                    >
+                                                        {tickLoadingId === item.id ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
+                                                    </button>
+                                                );
+                                            })()}
+
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); clearAllPanels(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
+                                                className={cn(
+                                                    "p-1 rounded-lg transition-all shrink-0",
+                                                    expandedActionId === item.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-slate-400 hover:text-emerald-500"
+                                                )}
+                                            >
+                                                <ChevronDown size={12} className={cn("transition-transform", expandedActionId === item.id && "rotate-180")} />
+                                            </button>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        {expandedActionId === item.id && (
+                                            <div className="flex items-center gap-2 justify-center px-2 py-2 bg-slate-50 dark:bg-slate-900/30 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-lg">
+                                                <button onClick={(e) => { e.stopPropagation(); openAddPanel(item); }} className="p-2 rounded-lg text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500" title="Add more"><Plus size={16} /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); setExpandedBreakdownId(null); setExpandedRemoveId(expandedRemoveId === item.id ? null : item.id); }} className="p-2 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Remove"><Minus size={16} /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); setExpandedRemoveId(null); setExpandedBreakdownId(expandedBreakdownId === item.id ? null : item.id); }} className="p-2 rounded-lg text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500" title="Details"><List size={16} /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); confirmDelete(item); }} className="p-2 rounded-lg text-slate-300 dark:text-slate-600 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Delete"><Trash2 size={16} /></button>
+                                            </div>
+                                        )}
+
+                                        {/* Remove Panel */}
+                                        {expandedRemoveId === item.id && (
+                                            <div className="p-3 rounded-lg border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                <p className="text-xs font-bold text-slate-900 dark:text-white mb-2">Remove from {item.name}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <Button size="sm" variant="outline" onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const qty = parseInt(item.quantity);
+                                                        if (qty && qty > 1) {
+                                                            const updated = { ...item, quantity: String(qty - 1) };
+                                                            removeItem(item.id);
+                                                            if (parseInt(updated.quantity) > 0) {
+                                                                const list = JSON.parse(localStorage.getItem(SHOPPING_STORAGE_KEY) || '[]');
+                                                                list.push(updated);
+                                                                localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify(list));
+                                                                setManualItems(list);
+                                                            }
+                                                            setExpandedRemoveId(null);
+                                                        }
+                                                    }} className="h-8 px-3 text-xs">Remove 1</Button>
+                                                    <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setExpandedRemoveId(null); }} className="h-8 px-3 text-xs text-slate-500">Cancel</Button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Breakdown Panel */}
+                                        {expandedBreakdownId === item.id && (
+                                            <div className="p-3 rounded-lg border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                <p className="text-xs font-bold text-slate-900 dark:text-white mb-2">Package Details</p>
+                                                <div className="flex justify-between items-center p-2 bg-white dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-700">
+                                                    <span className="text-xs text-slate-600 dark:text-slate-300">{item.quantity} {item.unit}</span>
+                                                    <span className="text-[10px] text-slate-400">Qty in list</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Add-More Panel */}
+                                        {pantryAddItem?.id === item.id && (
+                                            <div className="px-3 py-2 rounded-lg border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">Add to List</p>
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Qty</Label>
+                                                        <Input type="number" min="0.1" step="1" value={pantryAddQty} onChange={(e) => setPantryAddQty(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full h-8 text-sm" />
+                                                    </div>
+                                                    {pantryAddPortions.length > 0 && (
+                                                        <div>
+                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Serving</Label>
+                                                            <select
+                                                                value={pantryAddSelectedPortion?.label || ''}
+                                                                onChange={(e) => { const p = pantryAddPortions.find(p => p.label === e.target.value); if (p) setPantryAddSelectedPortion(p); }}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="w-full px-3 py-1.5 h-8 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                            >
+                                                                <option value="">Weight...</option>
+                                                                {(() => {
+                                                                    const seen = new Set<number>();
+                                                                    return pantryAddPortions
+                                                                        .filter(p => !PORTION_EXCLUDE_REGEX.test(p.label))
+                                                                        .filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; })
+                                                                        .map(p => <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>);
+                                                                })()}
+                                                            </select>
+                                                        </div>
+                                                    )}
+                                                    <Button onClick={(e) => { e.stopPropagation(); confirmAddToList(); }} className="w-full h-8 gap-1 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px]">
+                                                        <Plus size={14} /> Add
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Fragment>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+        </div>
+    );
+}
