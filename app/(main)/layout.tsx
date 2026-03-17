@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { ChatbotModal } from '@/components/chatbot-modal';
@@ -27,6 +27,7 @@ interface ParsedRecipe {
 }
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+    const router = useRouter();
     const pathname = usePathname();
     const { profile, showRDADrawer } = useUserPreferences();
     const { isChatbotOpen, setIsChatbotOpen } = useChatbot();
@@ -108,9 +109,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         };
 
         return segments.map((segment, index) => (
-            <span key={`${segment}-${index}`} className="flex items-center gap-1 text-xs uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                {index > 0 && <span className="text-slate-400 dark:text-slate-500">/</span>}
-                <span>{humanize(segment)}</span>
+            <span key={`${segment}-${index}`} className="flex items-center gap-1">
+                {index > 0 && <span className="text-slate-300 dark:text-slate-600">/</span>}
+                <span className="font-semibold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest whitespace-nowrap">
+                    {humanize(segment)}
+                </span>
             </span>
         ));
     };
@@ -133,6 +136,24 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                     }
                                     userAvatarUrl={user?.user_metadata?.avatar_url}
                                 />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Breadcrumb Bar - Spans Full Width */}
+                    <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-800/50">
+                        <button
+                            onClick={() => router.back()}
+                            className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                            title="Back"
+                        >
+                            <ArrowLeft size={14} />
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">Zum</span>
+                            <span className="text-slate-300 dark:text-slate-600">/</span>
+                            <div className="flex items-center gap-2">
+                                {getBreadcrumbs()}
                             </div>
                         </div>
                     </div>
