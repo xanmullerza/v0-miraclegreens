@@ -8,7 +8,6 @@ import { HeaderLogo } from '@/components/ui/header-logo';
 import { ChatbotModal } from '@/components/chatbot-modal';
 import { RecipePreview } from '@/components/recipe/recipe-preview';
 import { Footer } from '@/components/footer';
-import { DashboardNav } from '@/components/dashboard-nav';
 import { RDADrawer } from '@/components/rda-drawer';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
@@ -136,11 +135,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                 />
                             </div>
                         </div>
-                    </div>
-
-                    {/* Dashboard Navigation - Centered */}
-                    <div className="w-full flex justify-center">
-                        <DashboardNav />
                     </div>
                 </>
             )}

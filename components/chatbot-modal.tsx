@@ -19,7 +19,6 @@ import { ChatbotLifeguardFullIntegration } from '@/components/chatbot-lifeguard-
 import ProfilePage from '@/app/(main)/profile/page';
 import { toast } from 'sonner';
 import { HeaderLogo } from '@/components/ui/header-logo';
-import { DashboardNav } from '@/components/dashboard-nav';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface Message {
@@ -1748,8 +1747,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
-                {/* Unified Header & Nav - Internal to Chatbot Pane */}
-                <div className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617] scale-90 -translate-y-1">
+                {/* Unified Header - Internal to Chatbot Pane */}
+                <div className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
                     <div className="w-full flex justify-center px-2 pointer-events-none">
                         <div className="pointer-events-auto w-full">
                             <HeaderLogo 
@@ -1763,11 +1762,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             />
                         </div>
                     </div>
-                </div>
-
-                {/* Dashboard Navigation - Internal to Chatbot Pane */}
-                <div className="w-full flex justify-center scale-90 -mt-2 border-b border-slate-200 dark:border-slate-800 pb-2 bg-slate-50 dark:bg-[#020617]">
-                    <DashboardNav />
                 </div>
 
                 {/* Back Button & Context (shown when navigating within chatbot) */}
