@@ -48,7 +48,7 @@ import { searchLocalFood } from '@/lib/services/nutrition';
 import { DidYouKnow } from '@/components/DidYouKnow';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
+    <div className={cn("bg-card shadow-xl rounded-[2.5rem] border border-border overflow-hidden", className)}>
         {children}
     </div>
 );
@@ -657,19 +657,19 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
 
     const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [], forceRaw = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[], forceRaw?: boolean }) => {
         const themes = {
-            indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
-            rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
-            orange: { bg: "bg-slate-900 border-slate-800", text: "text-orange-400", border: "border-slate-800", itemBorder: "border-orange-900/50" },
-            emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
-            blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" },
-            amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" }
+            indigo: { bg: "bg-card border-border", text: "text-indigo-600 dark:text-indigo-400", border: "border-border", itemBorder: "border-indigo-500/20" },
+            rose: { bg: "bg-card border-border", text: "text-rose-600 dark:text-rose-400", border: "border-border", itemBorder: "border-rose-500/20" },
+            orange: { bg: "bg-card border-border", text: "text-orange-600 dark:text-orange-400", border: "border-border", itemBorder: "border-orange-500/20" },
+            emerald: { bg: "bg-card border-border", text: "text-emerald-600 dark:text-emerald-400", border: "border-border", itemBorder: "border-emerald-500/20" },
+            blue: { bg: "bg-card border-border", text: "text-blue-600 dark:text-blue-400", border: "border-border", itemBorder: "border-blue-500/20" },
+            amber: { bg: "bg-card border-border", text: "text-amber-600 dark:text-amber-400", border: "border-border", itemBorder: "border-amber-500/20" }
         };
         const t = (themes as any)[theme] || themes.indigo;
 
         return (
-            <div className={cn("p-6 pt-5 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
+            <div className={cn("p-6 pt-5 rounded-3xl border mb-6", t.bg)}>
                 <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
-                {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
+                {subtitle && <p className={cn("text-[9px] text-muted-foreground mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                     {Object.entries(items).map(([label, keys]) => {
                         let val = 0;
@@ -726,10 +726,10 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                         const hasBreakdown = breakdownLabels.includes(label);
 
                         return (
-                            <div key={label} onClick={() => router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
+                            <div key={label} onClick={() => router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-card cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                                 <p className={cn(
                                     "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
-                                    title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'
+                                    title === 'Biological Ratios' ? 'text-muted-foreground' : 'uppercase text-foreground/60'
                                 )}>
                                     {label}
                                 </p>
@@ -739,7 +739,7 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                             <div className="flex items-baseline gap-1">
                                                 <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
                                             </div>
-                                            <p className="text-[9px] font-bold text-slate-400">
+                                            <p className="text-[9px] font-bold text-muted-foreground">
                                                 {val.toFixed(1)}{unitStr}
                                             </p>
                                         </>
@@ -750,12 +750,12 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                                 <span className={cn("text-[10px] font-bold", (unitStr === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitStr}</span>
                                             </div>
                                             {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
-                                                <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                <p className="text-[9px] font-bold text-muted-foreground mt-0.5">
                                                     Target: {Math.round(rda)}{unitStr}
                                                 </p>
                                             )}
                                             {ratioTarget && (
-                                                <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                <p className="text-[9px] font-bold text-muted-foreground mt-0.5">
                                                     Ideal: {ratioTarget}
                                                 </p>
                                             )}

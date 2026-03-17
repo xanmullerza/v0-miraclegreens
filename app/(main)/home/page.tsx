@@ -24,7 +24,7 @@ export default function HomePage() {
     };
 
     return (
-        <div className="h-screen w-full bg-slate-50 dark:bg-[#020617] overflow-hidden flex flex-col">
+        <div className="h-screen w-full bg-background overflow-hidden flex flex-col">
             {/* Full Screen Chatbot */}
             <div className="flex-1 w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <ChatbotModal 

@@ -81,7 +81,7 @@ export function HeaderLogo({
                 {/* Theme Toggle */}
                 <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    className="flex h-12 w-12 border-l border-slate-200 dark:border-slate-800 items-center justify-center transition-all focus:outline-none text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 active:scale-95"
+                    className="flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50 active:scale-95"
                     title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
                 >
                     <div className="relative w-[18px] h-[18px] flex items-center justify-center">
@@ -110,12 +110,12 @@ export function HeaderLogo({
 
                 {/* View Ratio Control */}
                 {isMobile ? (
-                    <div className="flex border-l border-slate-200 dark:border-slate-800 items-center flex-shrink-0 h-full">
+                    <div className="flex border-l border-border items-center flex-shrink-0 h-full">
                         <button
                             onClick={() => setIsChatbotOpen(false)}
                             className={cn(
-                                "flex h-12 w-10 items-center justify-center transition-all focus:outline-none active:scale-95 border-r border-slate-100 dark:border-slate-800/10",
-                                !isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                "flex h-12 w-10 items-center justify-center transition-all focus:outline-none active:scale-95 border-r border-border/50",
+                                !isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-slate-800/50"
                             )}
                             title="Show Content Pane"
                         >
@@ -125,7 +125,7 @@ export function HeaderLogo({
                             onClick={() => setIsChatbotOpen(true)}
                             className={cn(
                                 "flex h-12 w-10 items-center justify-center transition-all focus:outline-none active:scale-95",
-                                isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-slate-800/50"
                             )}
                             title="Show Chatbot Pane"
                         >
@@ -136,8 +136,8 @@ export function HeaderLogo({
                     <button
                         onClick={toggleResize}
                         className={cn(
-                            "flex h-12 w-12 border-l border-slate-200 dark:border-slate-800 items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
-                            resizeMode === 'equal' && "text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/50",
+                            "flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
+                            resizeMode === 'equal' && "text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50",
                             resizeMode === 'content-focus' && "text-cyan-500 hover:bg-cyan-500/5",
                             resizeMode === 'content-only' && "text-emerald-500 hover:bg-emerald-500/5"
                         )}
@@ -148,11 +148,11 @@ export function HeaderLogo({
                 )}
 
                 {/* Profile Button */}
-                <div className="flex flex-shrink-0 border-l border-slate-200 dark:border-slate-800 h-full overflow-hidden">
+                <div className="flex flex-shrink-0 border-l border-border h-full overflow-hidden">
                     {pathname === '/profile' ? (
                         <Link
                             href="/dashboard"
-                            className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-emerald-500 active:scale-95"
+                            className="h-12 w-12 flex items-center justify-center hover:bg-muted dark:hover:bg-slate-800 transition-colors text-muted-foreground hover:text-emerald-500 active:scale-95"
                             title="Go Home"
                         >
                             <Home size={18} />
@@ -160,7 +160,7 @@ export function HeaderLogo({
                     ) : (
                         <Link
                             href="/profile"
-                            className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors active:scale-95"
+                            className="h-12 w-12 flex items-center justify-center hover:bg-muted dark:hover:bg-slate-800 transition-colors active:scale-95"
                             title="Profile"
                         >
                             <div className={cn(

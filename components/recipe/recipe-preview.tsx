@@ -132,19 +132,19 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
 
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-2xl shadow-2xl">
+            <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-card rounded-2xl shadow-2xl">
                 
                 {/* Header */}
-                <div className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between">
-                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                <div className="sticky top-0 z-40 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+                    <h2 className="text-lg font-black uppercase tracking-wider text-foreground">
                         Review Recipe
                     </h2>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-900/30 flex items-center justify-center transition-all"
+                        className="w-8 h-8 rounded-full bg-muted hover:bg-rose-100 dark:hover:bg-rose-900/30 flex items-center justify-center transition-all"
                         title="Close"
                     >
-                        <X size={18} className="text-slate-600 dark:text-slate-400" />
+                        <X size={18} className="text-muted-foreground" />
                     </button>
                 </div>
 
@@ -153,7 +153,7 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                     {/* Hero Image & Title */}
                     <div className="space-y-4">
                         {recipe.image_url && (
-                            <div className="w-full h-64 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                            <div className="w-full h-64 rounded-xl overflow-hidden bg-muted">
                                 <img
                                     src={recipe.image_url}
                                     alt={recipe.title}
@@ -162,7 +162,7 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                             </div>
                         )}
                         <div>
-                            <h1 className="text-3xl font-black text-slate-900 dark:text-white leading-tight">
+                            <h1 className="text-3xl font-black text-foreground leading-tight">
                                 {recipe.title}
                             </h1>
                             <a
@@ -178,37 +178,37 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
 
                     {/* Quick Info */}
                     <div className="grid grid-cols-3 gap-4">
-                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                        <div className="bg-muted/50 rounded-xl p-4 text-center">
                             <div className="flex items-center justify-center mb-2">
                                 <Users size={20} className="text-emerald-600 dark:text-emerald-400" />
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
                                 Servings
                             </p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white">
+                            <p className="text-2xl font-black text-foreground">
                                 {recipe.servings || 4}
                             </p>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                        <div className="bg-muted/50 rounded-xl p-4 text-center">
                             <div className="flex items-center justify-center mb-2">
                                 <Clock size={20} className="text-amber-600 dark:text-amber-400" />
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
                                 Prep Time
                             </p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white">
+                            <p className="text-2xl font-black text-foreground">
                                 {recipe.prep_time || 30}
                                 <span className="text-sm"> min</span>
                             </p>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                        <div className="bg-muted/50 rounded-xl p-4 text-center">
                             <div className="flex items-center justify-center mb-2">
                                 <ChefHat size={20} className="text-violet-600 dark:text-violet-400" />
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
                                 Status
                             </p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white">
+                            <p className="text-2xl font-black text-foreground">
                                 ✓ Ready
                             </p>
                         </div>
@@ -220,10 +220,10 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                             <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                                 <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">📝</span>
                             </div>
-                            <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                            <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
                                 Ingredients
                             </h3>
-                            <span className="ml-auto text-sm font-bold text-slate-400">
+                            <span className="ml-auto text-sm font-bold text-muted-foreground">
                                 {ingredientsList.length} items
                             </span>
                         </div>
@@ -232,10 +232,10 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                                 ingredientsList.map((ingredient) => (
                                     <div
                                         key={ingredient.id}
-                                        className="flex gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        className="flex gap-3 p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                                     >
                                         <span className="text-emerald-600 dark:text-emerald-400 font-bold flex-shrink-0">•</span>
-                                        <span className="text-slate-700 dark:text-slate-300">
+                                        <span className="text-foreground/80">
                                             {ingredient.text}
                                         </span>
                                     </div>
@@ -252,10 +252,10 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                             <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                                 <span className="text-sm font-black text-amber-700 dark:text-amber-400">👨‍🍳</span>
                             </div>
-                            <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                            <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
                                 Instructions
                             </h3>
-                            <span className="ml-auto text-sm font-bold text-slate-400">
+                            <span className="ml-auto text-sm font-bold text-muted-foreground">
                                 {instructionsList.length} steps
                             </span>
                         </div>
@@ -264,14 +264,14 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                                 instructionsList.map((instruction) => (
                                     <div
                                         key={instruction.id}
-                                        className="flex gap-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        className="flex gap-4 p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                                     >
                                         <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
                                             <span className="text-xs font-black text-amber-700 dark:text-amber-400">
                                                 {instruction.id + 1}
                                             </span>
                                         </div>
-                                        <span className="text-slate-700 dark:text-slate-300 pt-1">
+                                        <span className="text-foreground/80 pt-1">
                                             {instruction.text}
                                         </span>
                                     </div>
@@ -294,12 +294,12 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                 </div>
 
                 {/* Footer */}
-                <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 py-4 flex gap-3">
+                <div className="sticky bottom-0 bg-card border-t border-border px-6 py-4 flex gap-3">
                     {savedRecipeId ? (
                         <>
                             <button
                                 onClick={onClose}
-                                className="flex-1 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                                className="flex-1 px-4 py-3 rounded-lg border-2 border-border text-foreground/70 font-bold uppercase tracking-wider text-sm hover:bg-muted transition-all active:scale-95"
                             >
                                 Close
                             </button>
@@ -315,7 +315,7 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                         <>
                             <button
                                 onClick={onClose}
-                                className="flex-1 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                                className="flex-1 px-4 py-3 rounded-lg border-2 border-border text-foreground/70 font-bold uppercase tracking-wider text-sm hover:bg-muted transition-all active:scale-95"
                             >
                                 Cancel
                             </button>

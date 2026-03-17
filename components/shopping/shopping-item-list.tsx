@@ -185,12 +185,12 @@ export function ShoppingItemList() {
         const name = item.common_name || item.name;
         toast.custom(
             (t) => (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 shadow-lg max-w-sm">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+                <div className="bg-card border border-border rounded-lg p-4 shadow-lg max-w-sm">
+                    <p className="text-sm font-semibold text-foreground mb-3">
                         Remove <span className="font-black text-rose-600 dark:text-rose-400">{name}</span> from list?
                     </p>
                     <div className="flex gap-2 justify-end">
-                        <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">Cancel</button>
+                        <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted rounded transition-colors">Cancel</button>
                         <button onClick={() => { toast.dismiss(t); removeItem(item.id); setExpandedActionId(null); }} className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded transition-colors">Remove</button>
                     </div>
                 </div>
@@ -320,19 +320,19 @@ export function ShoppingItemList() {
         return (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
                 <Loader2 className="animate-spin text-emerald-500" size={32} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading your list...</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground italic">Loading your list...</p>
             </div>
         );
     }
 
     if (items.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/10">
-                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-4">
+            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-border rounded-2xl bg-card/50">
+                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground/30 mb-4">
                     <ShoppingBasket size={32} />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Your List is Empty</h3>
-                <p className="text-slate-500 text-center text-sm max-w-xs px-4">
+                <h3 className="text-lg font-bold text-foreground mb-1">Your List is Empty</h3>
+                <p className="text-muted-foreground text-center text-sm max-w-xs px-4">
                     Search for foods above to add items to your shopping list.
                 </p>
             </div>
@@ -343,7 +343,7 @@ export function ShoppingItemList() {
         <div className="space-y-3">
             {/* Toolbar */}
             <div className="flex items-center justify-between">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     {items.length} item{items.length !== 1 ? 's' : ''}
                 </p>
                 <button
@@ -353,7 +353,7 @@ export function ShoppingItemList() {
                         localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify([]));
                         toast.success('Grocery list cleared');
                     }}
-                    className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5"
+                    className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-rose-500 transition-colors flex items-center gap-1.5"
                 >
                     <Trash2 size={12} /> Clear All
                 </button>
@@ -369,12 +369,12 @@ export function ShoppingItemList() {
                     const colors = getCategoryColor(group);
                     return (
                         <div key={group} className={cn("rounded-xl border p-3", colors.bg, colors.border)}>
-                            <div className="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2 text-slate-700 dark:text-slate-400">
-                                <colors.icon size={16} className="text-slate-600 dark:text-slate-500" />
+                            <div className="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2 text-muted-foreground">
+                                <colors.icon size={16} className="text-muted-foreground/60" />
                                 {group}
                                 <button
                                     onClick={() => { groupItems.forEach(i => removeItem(i.id)); toast.success(`${group} cleared`); }}
-                                    className="ml-auto p-1 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500 transition-colors"
+                                    className="ml-auto p-1 rounded-lg text-muted-foreground hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500 transition-colors"
                                     title="Delete category"
                                 >
                                     <Trash2 size={12} />
@@ -385,20 +385,20 @@ export function ShoppingItemList() {
                                     <Fragment key={item.id}>
                                         {/* Item Row */}
                                         <div
-                                            className="flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 cursor-pointer group"
+                                            className="flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all bg-card border-border hover:border-emerald-400/50 cursor-pointer group"
                                             onClick={() => { clearAllPanels(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
                                         >
-                                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
+                                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted border-border shrink-0 flex items-center justify-center">
                                                 {(item.image || item.image_url) ? (
                                                     <img src={item.image || item.image_url} alt={item.common_name || item.name} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <Beef size={16} className="text-slate-400 dark:text-slate-500" />
+                                                    <Beef size={16} className="text-muted-foreground/40" />
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-1">
                                                     {item.is_miracle_product && <Sparkles size={10} className="text-amber-500 shrink-0" />}
-                                                    <span className="font-black text-[11px] uppercase tracking-wide text-slate-900 dark:text-white truncate block">
+                                                    <span className="font-black text-[11px] uppercase tracking-wide text-foreground truncate block">
                                                         {formatFoodName(item.common_name || item.name)}
                                                     </span>
                                                 </div>
@@ -417,7 +417,7 @@ export function ShoppingItemList() {
                                                             "p-1 rounded-full border-2 transition-all shrink-0",
                                                             hasWeight
                                                                 ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
-                                                                : "border-slate-300 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                                                                : "border-border text-muted-foreground/30 cursor-not-allowed"
                                                         )}
                                                     >
                                                         {tickLoadingId === item.id ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
@@ -429,7 +429,7 @@ export function ShoppingItemList() {
                                                 onClick={(e) => { e.stopPropagation(); clearAllPanels(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
                                                 className={cn(
                                                     "p-1 rounded-lg transition-all shrink-0",
-                                                    expandedActionId === item.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-slate-400 hover:text-emerald-500"
+                                                    expandedActionId === item.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-muted-foreground hover:text-emerald-500"
                                                 )}
                                             >
                                                 <ChevronDown size={12} className={cn("transition-transform", expandedActionId === item.id && "rotate-180")} />
@@ -438,18 +438,18 @@ export function ShoppingItemList() {
 
                                         {/* Action Buttons */}
                                         {expandedActionId === item.id && (
-                                            <div className="flex items-center gap-2 justify-center px-2 py-2 bg-slate-50 dark:bg-slate-900/30 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-lg">
-                                                <button onClick={(e) => { e.stopPropagation(); openAddPanel(item); }} className="p-2 rounded-lg text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500" title="Add more"><Plus size={16} /></button>
-                                                <button onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); setExpandedBreakdownId(null); setExpandedRemoveId(expandedRemoveId === item.id ? null : item.id); }} className="p-2 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Remove"><Minus size={16} /></button>
-                                                <button onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); setExpandedRemoveId(null); setExpandedBreakdownId(expandedBreakdownId === item.id ? null : item.id); }} className="p-2 rounded-lg text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500" title="Details"><List size={16} /></button>
-                                                <button onClick={(e) => { e.stopPropagation(); confirmDelete(item); }} className="p-2 rounded-lg text-slate-300 dark:text-slate-600 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Delete"><Trash2 size={16} /></button>
+                                            <div className="flex items-center gap-2 justify-center px-2 py-2 bg-muted/30 border border-t-0 border-border rounded-b-lg">
+                                                <button onClick={(e) => { e.stopPropagation(); openAddPanel(item); }} className="p-2 rounded-lg text-muted-foreground hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500" title="Add more"><Plus size={16} /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); setExpandedBreakdownId(null); setExpandedRemoveId(expandedRemoveId === item.id ? null : item.id); }} className="p-2 rounded-lg text-muted-foreground hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Remove"><Minus size={16} /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); setExpandedRemoveId(null); setExpandedBreakdownId(expandedBreakdownId === item.id ? null : item.id); }} className="p-2 rounded-lg text-muted-foreground hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500" title="Details"><List size={16} /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); confirmDelete(item); }} className="p-2 rounded-lg text-muted-foreground/30 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Delete"><Trash2 size={16} /></button>
                                             </div>
                                         )}
 
                                         {/* Remove Panel */}
                                         {expandedRemoveId === item.id && (
                                             <div className="p-3 rounded-lg border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/20 animate-in slide-in-from-top-2 duration-200">
-                                                <p className="text-xs font-bold text-slate-900 dark:text-white mb-2">Remove from {item.name}</p>
+                                                <p className="text-xs font-bold text-foreground mb-2">Remove from {item.name}</p>
                                                 <div className="flex items-center gap-2">
                                                     <Button size="sm" variant="outline" onClick={(e) => {
                                                         e.stopPropagation();
@@ -466,7 +466,7 @@ export function ShoppingItemList() {
                                                             setExpandedRemoveId(null);
                                                         }
                                                     }} className="h-8 px-3 text-xs">Remove 1</Button>
-                                                    <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setExpandedRemoveId(null); }} className="h-8 px-3 text-xs text-slate-500">Cancel</Button>
+                                                    <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setExpandedRemoveId(null); }} className="h-8 px-3 text-xs text-muted-foreground">Cancel</Button>
                                                 </div>
                                             </div>
                                         )}
@@ -474,10 +474,10 @@ export function ShoppingItemList() {
                                         {/* Breakdown Panel */}
                                         {expandedBreakdownId === item.id && (
                                             <div className="p-3 rounded-lg border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
-                                                <p className="text-xs font-bold text-slate-900 dark:text-white mb-2">Package Details</p>
-                                                <div className="flex justify-between items-center p-2 bg-white dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-700">
-                                                    <span className="text-xs text-slate-600 dark:text-slate-300">{item.quantity} {item.unit}</span>
-                                                    <span className="text-[10px] text-slate-400">Qty in list</span>
+                                                <p className="text-xs font-bold text-foreground mb-2">Package Details</p>
+                                                <div className="flex justify-between items-center p-2 bg-card rounded border border-border">
+                                                    <span className="text-xs text-foreground">{item.quantity} {item.unit}</span>
+                                                    <span className="text-[10px] text-muted-foreground">Qty in list</span>
                                                 </div>
                                             </div>
                                         )}
@@ -488,17 +488,17 @@ export function ShoppingItemList() {
                                                 <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">Add to List</p>
                                                 <div className="space-y-2">
                                                     <div>
-                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Qty</Label>
+                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Qty</Label>
                                                         <Input type="number" min="0.1" step="1" value={pantryAddQty} onChange={(e) => setPantryAddQty(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full h-8 text-sm" />
                                                     </div>
                                                     {pantryAddPortions.length > 0 && (
                                                         <div>
-                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Serving</Label>
+                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Serving</Label>
                                                             <select
                                                                 value={pantryAddSelectedPortion?.label || ''}
                                                                 onChange={(e) => { const p = pantryAddPortions.find(p => p.label === e.target.value); if (p) setPantryAddSelectedPortion(p); }}
                                                                 onClick={(e) => e.stopPropagation()}
-                                                                className="w-full px-3 py-1.5 h-8 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                className="w-full px-3 py-1.5 h-8 border border-border rounded-lg bg-card text-sm font-bold text-foreground"
                                                             >
                                                                 <option value="">Weight...</option>
                                                                 {(() => {

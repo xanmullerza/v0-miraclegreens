@@ -39,7 +39,7 @@ const TAB_CONFIG: TopTab[] = [
         id: 'library',
         label: 'Library',
         icon: Library,
-        color: 'text-slate-400',
+        color: 'text-muted-foreground',
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
         defaultHref: '/dashboard/library/foods',
@@ -54,7 +54,7 @@ const TAB_CONFIG: TopTab[] = [
         id: 'mealomatic',
         label: 'Mealomatic',
         icon: Calendar,
-        color: 'text-slate-400',
+        color: 'text-muted-foreground',
         activeColor: 'text-amber-400',
         activeBg: 'bg-amber-500/10 border-amber-500/30',
         defaultHref: '/dashboard/meal-o-matic/planner',
@@ -70,7 +70,7 @@ const TAB_CONFIG: TopTab[] = [
         id: 'widgets',
         label: 'Widgets',
         icon: LayoutGrid,
-        color: 'text-slate-400',
+        color: 'text-muted-foreground',
         activeColor: 'text-purple-400',
         activeBg: 'bg-purple-500/10 border-purple-500/30',
         defaultHref: '/dashboard/widgets/comparator',
@@ -110,7 +110,7 @@ export function DashboardTabs() {
     return (
         <div className="w-full animate-in fade-in duration-300">
             {/* Compact Bar with Dividers - Labels Only */}
-            <div className="flex items-center justify-center px-2 py-1.5 bg-slate-900/30 rounded-lg border border-slate-800/50 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center justify-center px-2 py-1.5 bg-muted/30 rounded-lg border border-border overflow-x-auto scrollbar-hide">
                 {TAB_CONFIG.map((tab, idx) => {
                     const Icon = tab.icon;
                     const isActive = currentTab.id === tab.id;
@@ -127,14 +127,14 @@ export function DashboardTabs() {
                                     'flex items-center gap-1.5 px-2.5 py-1 rounded transition-all duration-300 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap',
                                     isActive
                                         ? cn(tab.activeBg)
-                                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
+                                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                                 )}
                             >
                                 <Icon
                                     size={14}
                                     className={cn(
                                         'transition-colors duration-300 hidden md:inline flex-shrink-0',
-                                        isActive ? tab.activeColor : 'text-slate-600 group-hover:text-slate-400'
+                                        isActive ? tab.activeColor : 'text-muted-foreground/60 group-hover:text-muted-foreground'
                                     )}
                                 />
                                 <span className={cn(
@@ -147,7 +147,7 @@ export function DashboardTabs() {
 
                             {/* Divider - except after last item */}
                             {idx < TAB_CONFIG.length - 1 && (
-                                <div className="h-3 w-px bg-slate-700/50 mx-0.5" />
+                                <div className="h-3 w-px bg-border mx-0.5" />
                             )}
                         </div>
                     );
@@ -170,7 +170,7 @@ export function DashboardTabs() {
                                 'group flex items-center px-2.5 py-1 rounded transition-all duration-300 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap flex-shrink-0',
                                 isSubActive
                                     ? cn(currentTab.activeBg, 'shadow-sm')
-                                    : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.03] border border-transparent'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent'
                             )}
                         >
                             <span>{sub.label}</span>

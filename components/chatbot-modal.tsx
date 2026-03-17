@@ -1907,14 +1907,14 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <div className="space-y-2">
                                     {recipeInstructions.map((step, idx) => (
                                         <div key={idx} className="flex gap-2 group">
-                                            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-400 shrink-0">
+                                            <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center font-black text-[10px] text-muted-foreground shrink-0 border border-border">
                                                 {idx + 1}
                                             </div>
                                             <textarea
                                                 value={step}
                                                 onChange={(e) => handleUpdateInstruction(idx, e.target.value)}
                                                 placeholder={`Step ${idx + 1}...`}
-                                                className="flex-1 px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[50px] resize-none"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[50px] resize-none"
                                             />
                                             {recipeInstructions.length > 1 && (
                                                 <button
@@ -1931,7 +1931,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <div className="flex gap-2 mt-4">
                                     <button
                                         onClick={() => setRecipeStep(2)}
-                                        className="flex-1 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-sm transition-colors"
+                                        className="flex-1 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-muted font-bold text-sm uppercase tracking-widest transition-colors"
                                     >
                                         ← Back
                                     </button>
@@ -1993,7 +1993,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <div className="flex gap-2 mt-4">
                                     <button
                                         onClick={() => setRecipeStep(3)}
-                                        className="flex-1 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-sm transition-colors"
+                                        className="flex-1 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-muted font-bold text-sm uppercase tracking-widest transition-colors"
                                     >
                                         ← Back
                                     </button>
@@ -2078,9 +2078,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Coming Soon Page */}
                 {!showRecipeBuilder && chatbotView === 'comingSoon' && (
                     <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
-                        <div className="p-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-center">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Coming Soon</h3>
-                            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">This feature is on the way! Stay tuned for updates.</p>
+                        <div className="p-6 rounded-xl border border-dashed border-border bg-muted/30 text-center">
+                            <h3 className="text-lg font-bold text-foreground">Coming Soon</h3>
+                            <p className="mt-2 text-sm text-muted-foreground">This feature is on the way! Stay tuned for updates.</p>
                             <button
                                 onClick={() => setChatbotView('dashboard')}
                                 className="mt-4 px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
@@ -2097,7 +2097,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-end mb-3">
                             <button
                                 onClick={() => setChatbotView('dashboard')}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-secondary text-secondary-foreground hover:bg-muted transition-colors uppercase tracking-widest"
                             >
                                 🏠 Back to Dashboard
                             </button>
@@ -2105,34 +2105,34 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setChatbotView('all-recipes')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-emerald-500 text-2xl">📖</span>
-                                <span className="text-sm font-semibold">Public Recipes</span>
+                                <span className="text-sm font-semibold text-foreground">Public Recipes</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('my-recipes')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-sky-500 text-2xl">👩‍🍳</span>
-                                <span className="text-sm font-semibold">My Recipes</span>
+                                <span className="text-sm font-semibold text-foreground">My Recipes</span>
                             </button>
 
                             <button
                                 onClick={() => { setShowRecipeBuilder(true); setChatbotView('recipe-builder'); }}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-indigo-500 text-2xl">📥</span>
-                                <span className="text-sm font-semibold">Import Recipes</span>
+                                <span className="text-sm font-semibold text-foreground">Import Recipes</span>
                             </button>
 
                             <button
                                 onClick={() => toast('Export is coming soon 👀')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-cyan-500 text-2xl">📤</span>
-                                <span className="text-sm font-semibold">Export Recipes</span>
+                                <span className="text-sm font-semibold text-foreground">Export Recipes</span>
                             </button>
                         </div>
                     </div>
@@ -2152,31 +2152,31 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setChatbotView('planner')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-blue-500 text-2xl">🗂️</span>
-                                <span className="text-sm font-semibold">Meal Planner</span>
+                                <span className="text-sm font-semibold text-foreground">Meal Planner</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('pantry')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-green-500 text-2xl">🧺</span>
-                                <span className="text-sm font-semibold">Pantry</span>
+                                <span className="text-sm font-semibold text-foreground">Pantry</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('shopping')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-amber-500 text-2xl">🛒</span>
-                                <span className="text-sm font-semibold">Shopping List</span>
+                                <span className="text-sm font-semibold text-foreground">Shopping List</span>
                             </button>
 
-                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 text-center">
-                                <span className="text-slate-400 text-2xl">⏳</span>
-                                <span className="text-sm font-semibold text-slate-500">Coming Soon</span>
+                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 p-4 text-center">
+                                <span className="text-muted-foreground/30 text-2xl">⏳</span>
+                                <span className="text-sm font-black uppercase tracking-widest text-muted-foreground/50">Coming Soon</span>
                             </div>
                         </div>
                     </div>
@@ -2196,31 +2196,31 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setChatbotView('nutridex')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-fuchsia-500 text-2xl">🧪</span>
-                                <span className="text-sm font-semibold">Nutridex</span>
+                                <span className="text-sm font-semibold text-foreground">Nutridex</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('comparator')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-indigo-500 text-2xl">⚖️</span>
-                                <span className="text-sm font-semibold">Comparator</span>
+                                <span className="text-sm font-semibold text-foreground">Comparator</span>
                             </button>
 
                             <button
                                 onClick={() => setChatbotView('lifeguard')}
-                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
+                                className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transform transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] shadow-sm hover:shadow-lg"
                             >
                                 <span className="text-teal-500 text-2xl">🛡️</span>
-                                <span className="text-sm font-semibold">Lifeguard</span>
+                                <span className="text-sm font-semibold text-foreground">Lifeguard</span>
                             </button>
 
-                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 text-center">
-                                <span className="text-slate-400 text-2xl">⏳</span>
-                                <span className="text-sm font-semibold text-slate-500">Coming Soon</span>
+                            <div className="flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 p-4 text-center">
+                                <span className="text-muted-foreground/30 text-2xl">⏳</span>
+                                <span className="text-sm font-black uppercase tracking-widest text-muted-foreground/50">Coming Soon</span>
                             </div>
                         </div>
                     </div>
@@ -2232,7 +2232,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-end mb-3">
                             <button
                                 onClick={() => setChatbotView('dashboard')}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-muted text-foreground hover:bg-secondary transition-colors"
                             >
                                 🏠 Back to Dashboard
                             </button>
@@ -2257,7 +2257,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     'px-4 py-2.5 rounded-xl text-sm leading-relaxed',
                                     message.type === 'user'
                                         ? 'max-w-xs bg-emerald-500 text-white rounded-br-none font-medium'
-                                        : 'max-w-sm bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-none'
+                                        : 'max-w-sm bg-muted text-foreground rounded-bl-none border border-border/50'
                                 )}
                             >
                                 {message.type === 'bot' ? (
@@ -2286,8 +2286,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     ))}
                     {isLoading && (
                         <div className="flex gap-3 justify-start">
-                            <div className="bg-slate-100 dark:bg-slate-800 px-4 py-2.5 rounded-xl rounded-bl-none">
-                                <Loader2 size={16} className="text-slate-400 animate-spin" />
+                            <div className="bg-muted px-4 py-2.5 rounded-xl rounded-bl-none border border-border/50">
+                                <Loader2 size={16} className="text-muted-foreground animate-spin" />
                             </div>
                         </div>
                     )}
@@ -2300,9 +2300,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {!showRecipeBuilder && chatbotView === 'messages' && isCreatingRecipe && !successRecipe && (
                     <div className="flex-1 overflow-y-auto p-4 space-y-3">
                         {/* Option 1: Manual Creation */}
-                        <div className="bg-gradient-to-r from-emerald-50 to-emerald-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-emerald-200 dark:border-emerald-500/30">
-                            <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">✏️ Option 1: Manually Create</h4>
-                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+                        <div className="bg-emerald-500/10 rounded-lg p-4 border border-emerald-500/30">
+                            <h4 className="font-semibold text-foreground text-sm mb-2">✏️ Option 1: Manually Create</h4>
+                            <p className="text-xs text-muted-foreground mb-3">
                                 Step-by-step form to add all the details yourself.
                             </p>
                             <button
@@ -2314,9 +2314,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
 
                         {/* Option 2: Paste Content */}
-                        <div className="bg-gradient-to-r from-blue-50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-500/30">
-                            <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">📋 Option 2: Paste Recipe Text</h4>
-                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+                        <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/30">
+                            <h4 className="font-semibold text-foreground text-sm mb-2">📋 Option 2: Paste Recipe Text</h4>
+                            <p className="text-xs text-muted-foreground mb-3">
                                 Copy-paste recipe instructions and we&apos;ll parse the ingredients automatically.
                             </p>
                             <textarea
@@ -2324,7 +2324,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 value={pastedRecipeContent}
                                 onChange={(e) => setPastedRecipeContent(e.target.value)}
                                 placeholder="Paste recipe content here..."
-                                className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-3"
+                                className="w-full px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-3"
                                 rows={4}
                             />
                             <button
@@ -2346,9 +2346,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
 
                         {/* Option 3: URL (existing) */}
-                        <div className="bg-gradient-to-r from-purple-50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-800/30 rounded-lg p-4 border border-purple-200 dark:border-purple-500/30">
-                            <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-2">🔗 Option 3: Paste Recipe URL</h4>
-                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+                        <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/30">
+                            <h4 className="font-semibold text-foreground text-sm mb-2">🔗 Option 3: Paste Recipe URL</h4>
+                            <p className="text-xs text-muted-foreground mb-3">
                                 Paste a recipe link and we'll automatically extract all the details.
                             </p>
                             <input
@@ -2356,7 +2356,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 value={pastedRecipeURL}
                                 onChange={(e) => setpastedRecipeURL(e.target.value)}
                                 placeholder="Paste recipe URL here (e.g., https://www.example.com/recipe)"
-                                className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
+                                className="w-full px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
                                 onKeyPress={(e) => {
                                     if (e.key === 'Enter' && pastedRecipeURL.trim() && !isLoading) {
                                         handlePasteRecipeURL();
@@ -2455,12 +2455,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <button
                                     key={conversation.id}
                                     onClick={() => loadConversationFromHistory(conversation)}
-                                    className="w-full text-left p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700"
+                                    className="w-full text-left p-3 rounded-lg bg-card hover:bg-muted transition-colors border border-border"
                                 >
-                                    <p className="font-medium text-sm text-slate-900 dark:text-white mb-1">
+                                    <p className="font-bold text-sm text-foreground mb-1 uppercase tracking-tight">
                                         {conversation.title}
                                     </p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    <p className="text-xs text-muted-foreground">
                                         {conversation.messages?.length || 0} messages
                                     </p>
                                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
@@ -2477,7 +2477,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
                     {/* Quick Actions Drawer */}
                     {showQuickActions && (
-                        <div className="absolute bottom-full left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 space-y-2 animate-in slide-in-from-bottom-3">
+                        <div className="absolute bottom-full left-0 right-0 z-50 bg-card border-t border-border p-4 space-y-2 animate-in slide-in-from-bottom-3">
                             {/* Recipe Button */}
                             <div>
                                 <button

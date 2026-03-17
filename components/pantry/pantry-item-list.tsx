@@ -186,10 +186,10 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
         const displayName = food.common_name || food.name;
         toast.custom(
             (t) => (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 shadow-lg max-w-sm">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Remove <span className="font-black text-rose-600 dark:text-rose-400">{displayName}</span> from pantry?</p>
+                <div className="bg-card border border-border rounded-lg p-4 shadow-lg max-w-sm">
+                    <p className="text-sm font-semibold text-foreground mb-3">Remove <span className="font-black text-rose-600 dark:text-rose-400">{displayName}</span> from pantry?</p>
                     <div className="flex gap-2 justify-end">
-                        <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">Cancel</button>
+                        <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted rounded transition-colors">Cancel</button>
                         <button onClick={() => { toast.dismiss(t); removeFromPantry(food.id, food.name, food.source_table || 'food_items'); }} className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded transition-colors">Remove</button>
                     </div>
                 </div>
@@ -202,10 +202,10 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
         if (items.length === 0) return;
         toast.custom(
             (t) => (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 shadow-lg max-w-sm">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Remove all <span className="font-black text-rose-600 dark:text-rose-400">{items.length} {categoryName}</span> items?</p>
+                <div className="bg-card border border-border rounded-lg p-4 shadow-lg max-w-sm">
+                    <p className="text-sm font-semibold text-foreground mb-3">Remove all <span className="font-black text-rose-600 dark:text-rose-400">{items.length} {categoryName}</span> items?</p>
                     <div className="flex gap-2 justify-end">
-                        <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">Cancel</button>
+                        <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted rounded transition-colors">Cancel</button>
                         <button onClick={async () => {
                             toast.dismiss(t);
                             for (const food of items) {
@@ -339,12 +339,12 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
         if (filtered.length === 0) return null;
         return (
             <div>
-                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Serving</Label>
+                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Serving</Label>
                 <select
                     value={selected?.label || ''}
                     onChange={(e) => { const p = filtered.find(p => p.label === e.target.value); if (p) onSelect(p); }}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full px-3 py-2 h-8 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2 h-8 border border-border rounded-lg bg-card text-sm font-bold text-foreground"
                 >
                     <option value="">Weight...</option>
                     {filtered.map(p => <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>)}
@@ -372,19 +372,19 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
         return (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
                 <Loader2 className="animate-spin text-amber-500" size={32} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Checking your kitchen...</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground italic">Checking your kitchen...</p>
             </div>
         );
     }
 
     if (foods.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/10">
-                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-4">
+            <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-border rounded-2xl bg-card/50">
+                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground/30 mb-4">
                     <ShoppingBasket size={32} />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Pantry Empty</h3>
-                <p className="text-slate-500 text-center text-sm max-w-xs px-4">Search for foods above to stock your pantry.</p>
+                <h3 className="text-lg font-bold text-foreground mb-1">Pantry Empty</h3>
+                <p className="text-muted-foreground text-center text-sm max-w-xs px-4">Search for foods above to stock your pantry.</p>
             </div>
         );
     }
@@ -393,8 +393,8 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
         <div className="space-y-3">
             {/* Toolbar */}
             <div className="flex items-center justify-between">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{foods.length} item{foods.length !== 1 ? 's' : ''}</p>
-                <button onClick={clearPantry} className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{foods.length} item{foods.length !== 1 ? 's' : ''}</p>
+                <button onClick={clearPantry} className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-rose-500 transition-colors flex items-center gap-1.5">
                     <Trash2 size={12} /> Clear All
                 </button>
             </div>
@@ -405,10 +405,10 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                 const colors = getCategoryColor(groupName);
                 return (
                     <div key={groupName} className={cn("rounded-xl border p-3", colors.bg, colors.border)}>
-                        <div className="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2 text-slate-700 dark:text-slate-400">
-                            <colors.icon size={16} className="text-slate-600 dark:text-slate-500" />
+                        <div className="text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2 text-muted-foreground">
+                            <colors.icon size={16} className="text-muted-foreground/60" />
                             {groupName}
-                            <button onClick={(e) => { e.stopPropagation(); confirmDeleteCategory(groupName, items); }} className="ml-auto p-1 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500 transition-colors" title="Delete category">
+                            <button onClick={(e) => { e.stopPropagation(); confirmDeleteCategory(groupName, items); }} className="ml-auto p-1 rounded-lg text-muted-foreground hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500 transition-colors" title="Delete category">
                                 <Trash2 size={12} />
                             </button>
                         </div>
@@ -417,14 +417,14 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                                 <Fragment key={food.id}>
                                     {/* Item Row */}
                                     <div
-                                        className="flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-amber-400/50 cursor-pointer"
+                                        className="flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all bg-card border-border hover:border-amber-400/50 cursor-pointer"
                                         onClick={() => setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id)}
                                     >
-                                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
-                                            {food.image ? <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" /> : <Beef size={16} className="text-slate-400" />}
+                                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted border-border shrink-0 flex items-center justify-center">
+                                            {food.image ? <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" /> : <Beef size={16} className="text-muted-foreground/40" />}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <span className="font-black text-[11px] uppercase tracking-wide text-slate-900 dark:text-white truncate block">
+                                            <span className="font-black text-[11px] uppercase tracking-wide text-foreground truncate block">
                                                 {formatFoodName(food.common_name || food.name)}
                                             </span>
                                         </div>
@@ -432,7 +432,7 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                                         {/* Weight badge */}
                                         {(() => {
                                             const rawEntries = parseQuantityEntries(food.quantity);
-                                            if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 shrink-0">In Stock</span>;
+                                            if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-muted-foreground/30 px-2 py-1 rounded-md bg-muted shrink-0">In Stock</span>;
                                             let totalG = 0;
                                             for (const raw of rawEntries) {
                                                 const p = parseQuantityEntry(raw);
@@ -444,7 +444,7 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
 
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
-                                            className={cn("p-1 rounded-lg transition-all shrink-0", expandedQuantityId === food.id ? "text-amber-500 bg-amber-100 dark:bg-amber-950/40" : "text-slate-400 hover:text-amber-500")}
+                                            className={cn("p-1 rounded-lg transition-all shrink-0", expandedQuantityId === food.id ? "text-amber-500 bg-amber-100 dark:bg-amber-950/40" : "text-muted-foreground hover:text-amber-500")}
                                         >
                                             <ChevronDown size={12} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
                                         </button>
@@ -452,11 +452,11 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
 
                                     {/* Action Buttons */}
                                     {expandedQuantityId === food.id && (
-                                        <div className="flex items-center gap-2 justify-center px-2 py-2 bg-slate-50 dark:bg-slate-900/30 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-lg">
-                                            <button onClick={(e) => { e.stopPropagation(); openBuyMore(food); }} className="p-2 rounded-lg text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500" title="Add stock"><Plus size={16} /></button>
-                                            <button onClick={(e) => { e.stopPropagation(); openRemove(food); }} className="p-2 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Remove stock"><Minus size={16} /></button>
-                                            <button onClick={(e) => { e.stopPropagation(); setExpandedBreakdownId(expandedBreakdownId === food.id ? null : food.id); }} className="p-2 rounded-lg text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500" title="Stock breakdown"><List size={16} /></button>
-                                            <button onClick={(e) => { e.stopPropagation(); confirmDelete(food); }} className="p-2 rounded-lg text-slate-300 dark:text-slate-600 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Delete"><Trash2 size={16} /></button>
+                                        <div className="flex items-center gap-2 justify-center px-2 py-2 bg-muted/30 border border-t-0 border-border rounded-b-lg">
+                                            <button onClick={(e) => { e.stopPropagation(); openBuyMore(food); }} className="p-2 rounded-lg text-muted-foreground hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500" title="Add stock"><Plus size={16} /></button>
+                                            <button onClick={(e) => { e.stopPropagation(); openRemove(food); }} className="p-2 rounded-lg text-muted-foreground hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Remove stock"><Minus size={16} /></button>
+                                            <button onClick={(e) => { e.stopPropagation(); setExpandedBreakdownId(expandedBreakdownId === food.id ? null : food.id); }} className="p-2 rounded-lg text-muted-foreground hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500" title="Stock breakdown"><List size={16} /></button>
+                                            <button onClick={(e) => { e.stopPropagation(); confirmDelete(food); }} className="p-2 rounded-lg text-muted-foreground/30 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500" title="Delete"><Trash2 size={16} /></button>
                                         </div>
                                     )}
 
@@ -466,18 +466,18 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                                             <p className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2">Add Stock</p>
                                             <div className="space-y-2">
                                                 <div>
-                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Qty</Label>
+                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Qty</Label>
                                                     <Input type="number" value={buyMoreQty} onChange={(e) => setBuyMoreQty(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full h-8 text-sm" />
                                                 </div>
                                                 {buyMorePortions.length > 0 ? renderPortionSelect(buyMorePortions, buyMoreSelectedPortion, setBuyMoreSelectedPortion) : (
                                                     <div className="flex gap-2">
                                                         <div className="flex-1">
-                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Weight</Label>
+                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Weight</Label>
                                                             <Input type="number" value={buyMoreWeight} onChange={(e) => setBuyMoreWeight(e.target.value)} onClick={(e) => e.stopPropagation()} placeholder="e.g. 100" className="w-full h-8 text-sm" />
                                                         </div>
                                                         <div>
-                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Unit</Label>
-                                                            <select value={buyMoreUnit} onChange={(e) => setBuyMoreUnit(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-20 px-2 py-1.5 h-8 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white">
+                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Unit</Label>
+                                                            <select value={buyMoreUnit} onChange={(e) => setBuyMoreUnit(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-20 px-2 py-1.5 h-8 border border-border rounded-lg bg-card text-sm font-bold text-foreground">
                                                                 <option value="g">g</option><option value="ml">ml</option><option value="oz">oz</option><option value="lb">lb</option>
                                                             </select>
                                                         </div>
@@ -496,18 +496,18 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                                             <p className="text-[9px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-2">Remove Stock</p>
                                             <div className="space-y-2">
                                                 <div>
-                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Qty</Label>
+                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Qty</Label>
                                                     <Input type="number" value={removeQty} onChange={(e) => setRemoveQty(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full h-8 text-sm" />
                                                 </div>
                                                 {removePortions.length > 0 ? renderPortionSelect(removePortions, removeSelectedPortion, setRemoveSelectedPortion) : (
                                                     <div className="flex gap-2">
                                                         <div className="flex-1">
-                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Weight</Label>
+                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Weight</Label>
                                                             <Input type="number" value={removeWeight} onChange={(e) => setRemoveWeight(e.target.value)} onClick={(e) => e.stopPropagation()} placeholder="e.g. 100" className="w-full h-8 text-sm" />
                                                         </div>
                                                         <div>
-                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Unit</Label>
-                                                            <select value={removeUnit} onChange={(e) => setRemoveUnit(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-20 px-2 py-1.5 h-8 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white">
+                                                            <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">Unit</Label>
+                                                            <select value={removeUnit} onChange={(e) => setRemoveUnit(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-20 px-2 py-1.5 h-8 border border-border rounded-lg bg-card text-sm font-bold text-foreground">
                                                                 <option value="g">g</option><option value="ml">ml</option><option value="oz">oz</option><option value="lb">lb</option>
                                                             </select>
                                                         </div>
@@ -547,11 +547,11 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                                                                     {isBulk ? (
-                                                                        <><span className="text-xs font-black text-slate-800 dark:text-slate-200">{totalWeight != null ? formatGramsEntry(totalWeight) : ''}</span><span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{foodName}</span></>
+                                                                        <><span className="text-xs font-black text-foreground">{totalWeight != null ? formatGramsEntry(totalWeight) : ''}</span><span className="text-xs font-semibold text-muted-foreground">{foodName}</span></>
                                                                     ) : (
-                                                                        <><span className="text-xs font-black text-slate-800 dark:text-slate-200">{e.qty}</span>
-                                                                        {e.label ? <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{pluralizeUnit(e.label, e.qty)} {foodName}</span>
-                                                                        : <span className="text-xs font-semibold text-slate-400">{foodName}</span>}</>
+                                                                        <><span className="text-xs font-black text-foreground">{e.qty}</span>
+                                                                        {e.label ? <span className="text-xs font-semibold text-muted-foreground">{pluralizeUnit(e.label, e.qty)} {foodName}</span>
+                                                                        : <span className="text-xs font-semibold text-muted-foreground/60">{foodName}</span>}</>
                                                                     )}
                                                                 </div>
                                                                 {!isBulk && totalWeight != null && <span className="text-[10px] font-black text-white bg-emerald-500 px-2 py-0.5 rounded-md">{totalWeight.toLocaleString()}g total</span>}

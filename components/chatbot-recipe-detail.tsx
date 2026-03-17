@@ -1702,9 +1702,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
 
                                 return (
-                                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                                    <div className="rounded-2xl border border-border bg-card p-4 flex flex-col gap-4">
                                         {/* Threshold toggle */}
-                                        <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                                        <div className="flex gap-1 rounded-lg bg-muted p-0.5">
                                             {thresholds.map(t => (
                                                 <button
                                                     key={t}
@@ -1712,8 +1712,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     className={cn(
                                                         'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
                                                         storedVitaminThreshold === t
-                                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                            ? 'bg-card text-foreground shadow-sm'
+                                                            : 'text-muted-foreground hover:text-foreground'
                                                     )}
                                                 >
                                                     {t}%
@@ -1725,18 +1725,18 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         <div className="flex items-center justify-center gap-3">
                                             <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
                                                 <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
-                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-muted/30" />
                                                     <circle cx="40" cy="40" r={R2} fill="none" stroke="#eab308" strokeWidth={S2} strokeLinecap="butt"
                                                         style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
                                                 </svg>
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">{count}</span>
-                                                    <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
+                                                    <span className="text-base font-black text-foreground leading-none">{count}</span>
+                                                    <span className="text-[8px] text-muted-foreground font-bold">/ {total}</span>
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-lg font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
-                                                <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider leading-tight">stored<br />vitamins</div>
+                                                <div className="text-lg font-black text-foreground">{Math.round(arcPct * 100)}%</div>
+                                                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider leading-tight">stored<br />vitamins</div>
                                             </div>
                                         </div>
 
@@ -1749,7 +1749,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         'flex flex-col items-start justify-between rounded-lg px-2 py-1.5 font-bold border',
                                                         hit
                                                             ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400'
-                                                            : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
+                                                            : 'bg-muted border-transparent text-muted-foreground/50'
                                                     )}>
                                                         <div className="text-left w-full">
                                                             <div className="text-[10px] font-black">{fullName}</div>
@@ -1771,15 +1771,15 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
                         {/* Phytonutrients */}
                         {recipe?.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 && (
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4">
+                            <div className="rounded-2xl border border-border bg-muted/30 p-4">
                                 <h4 className="font-bold flex items-center gap-2 mb-3 uppercase tracking-wider text-sm text-green-600 dark:text-green-400">
                                     <Dna className="h-4 w-4" /> Phytonutrients
                                 </h4>
                                 <div className="space-y-2">
                                     {Object.entries(recipe.phytonutrients).slice(0, 3).map(([name, description]) => (
-                                        <div key={name} className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-green-200 dark:border-green-700">
+                                        <div key={name} className="p-2 rounded-lg bg-card border border-green-200 dark:border-green-800/30">
                                             <p className="text-[10px] font-semibold text-green-700 dark:text-green-400">{name}</p>
-                                            <p className="text-[9px] text-slate-600 dark:text-slate-400 line-clamp-2">{description}</p>
+                                            <p className="text-[9px] text-muted-foreground line-clamp-2">{description}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -1964,21 +1964,21 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         "absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl p-3 flex items-center justify-between border transition-colors",
                                                         isMatched && !isAccepted ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" :
                                                         isAccepted ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800" :
-                                                        "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                                                        "bg-card border-border"
                                                     )}>
                                                         <div className="flex items-center gap-3">
                                                             <div className={cn(
                                                                 "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm",
                                                                 isAccepted ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600" :
-                                                                "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                                                                "bg-muted text-muted-foreground"
                                                             )}>
                                                                 {isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
                                                             </div>
                                                             <div>
-                                                                <p className="text-sm font-bold text-slate-900 dark:text-white capitalize truncate max-w-[180px]">
+                                                                <p className="text-sm font-bold text-foreground capitalize truncate max-w-[180px]">
                                                                     {cleanIngredientDisplay(ing.base_ingredient || ing.item)}
                                                                 </p>
-                                                                <p className="text-xs text-slate-500 font-medium">
+                                                                <p className="text-xs text-muted-foreground font-medium">
                                                                     {(ing.amount?.includes('0.25') && (ing.base_ingredient || ing.item)?.match(/^\d/)) ? '' : ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
                                                                 </p>
                                                             </div>
@@ -2154,20 +2154,20 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
 
                 {/* Step 2: PORTION MATCHING */}
                 {mappingStep === 'PORTION_MATCH' && (
-                    <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
+                    <div className="mt-8 border-t border-border pt-6">
                         <div className="flex items-center justify-between mb-4 mt-2">
                             <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400 flex items-center gap-2">
                                 <Layers size={14} /> Step 2: Portion & Nutrition Verification
                             </h3>
                             <button 
                                 onClick={() => setMappingStep('FOOD_MATCH')}
-                                className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline flex items-center gap-1"
+                                className="text-[10px] uppercase font-bold text-muted-foreground hover:text-indigo-600 hover:underline flex items-center gap-1"
                             >
                                 <ArrowLeft size={10} /> Back to Food Matches
                             </button>
                         </div>
                         
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                        <p className="text-sm text-muted-foreground mb-6">
                             Review the automatically mapped portions. If a portion couldn't be accurately identified, select the relevant unit below.
                         </p>
                         
@@ -2275,12 +2275,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                 return (
                                     <div key={ing.id} className={cn(
                                         "relative rounded-lg border p-[10px] shadow-sm flex flex-col gap-2 transition-all",
-                                        isAccepted ? "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800" : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                                        isAccepted ? "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800" : "bg-card border-border shadow-none"
                                     )}>
                                         {/* Original Text Fallback View */}
                                         <div className={cn(
                                             "rounded p-2 px-3 text-xs border flex items-center gap-3",
-                                            isAccepted ? "bg-emerald-100/50 dark:bg-emerald-800/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50" : "bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800"
+                                            isAccepted ? "bg-emerald-100/50 dark:bg-emerald-800/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50" : "bg-muted text-muted-foreground border-border/50"
                                         )}>
                                             <span className="font-semibold uppercase tracking-widest text-[9px] opacity-70">Original</span> 
                                             <span className="italic">"{ing.amount} {ing.item}"</span>
@@ -2289,7 +2289,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                         {/* Edit Form */}
                                         <div className="grid grid-cols-[1fr_2fr_auto] gap-2 items-end">
                                             <div>
-                                                <label className={cn("text-[9px] uppercase font-bold mb-1 block", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-500")}>Qty</label>
+                                                <label className={cn("text-[9px] uppercase font-bold mb-1 block", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-muted-foreground")}>Qty</label>
                                                 <input 
                                                     type="number"
                                                     value={inputs.multiplier}
@@ -2300,12 +2300,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         "w-full h-8 rounded px-2 text-xs font-bold focus:outline-none focus:ring-1",
                                                         isAccepted 
                                                             ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 focus:ring-emerald-500" 
-                                                            : "bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:ring-indigo-500"
+                                                            : "bg-muted border border-border text-foreground focus:ring-indigo-500"
                                                     )}
                                                 />
                                             </div>
                                             <div>
-                                                <label className={cn("text-[9px] uppercase font-bold mb-1 block", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-500")}>Unit Type</label>
+                                                <label className={cn("text-[9px] uppercase font-bold mb-1 block", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-muted-foreground")}>Unit Type</label>
                                                 <select
                                                     value={inputs.measure}
                                                     onChange={e => setStepTwoInputs(prev => ({ ...prev, [ing.id]: { ...inputs, measure: e.target.value } }))}
@@ -2314,7 +2314,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         "w-full h-8 rounded px-2 text-xs focus:outline-none cursor-pointer",
                                                         isAccepted 
                                                             ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 focus:ring-emerald-500" 
-                                                            : "bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:ring-indigo-500"
+                                                            : "bg-muted border border-border text-foreground focus:ring-indigo-500"
                                                     )}
                                                 >
                                                     <option value={originalDetails.measure_label}>{originalDetails.measure_label} (Recipe Default)</option>
@@ -2330,10 +2330,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                     <option value="1">milliliter (1g approx)</option>
                                                 </select>
                                             </div>
-                                            <div className="pl-2 border-l border-slate-100 dark:border-slate-800 flex flex-col justify-end items-center gap-1">
+                                            <div className="pl-2 border-l border-border flex flex-col justify-end items-center gap-1">
                                                 <div className={cn(
                                                     "px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 animate-in fade-in zoom-in duration-300",
-                                                    isOutlier ? "bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                                    isOutlier ? "bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800" : "bg-muted text-muted-foreground"
                                                 )}>
                                                     {isOutlier && <AlertTriangle size={10} />}
                                                     {liveTotalWeight}g
@@ -2348,7 +2348,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                                         "h-8 px-5 rounded text-[10px] font-bold transition-colors flex items-center justify-center min-w-[80px] gap-1.5 group",
                                                         isAccepted
                                                             ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
-                                                            : "bg-white hover:bg-slate-50 border border-slate-200 dark:border-slate-800 text-indigo-600"
+                                                            : "bg-muted hover:bg-muted/80 border border-border text-indigo-600 shadow-sm"
                                                     )}
                                                 >
                                                     {inputs.isSaving ? (
@@ -2437,13 +2437,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                                             <a
                                                 key={meal.id}
                                                 href={`/dashboard/library/meals/${meal.id}`}
-                                                className="group flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all"
+                                                className="group flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:border-emerald-500/30 hover:bg-muted transition-all"
                                             >
-                                                <div className="w-16 h-16 rounded-md overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex-shrink-0">
+                                                <div className="w-16 h-16 rounded-md overflow-hidden bg-muted border border-border flex-shrink-0">
                                                     {meal.image ? (
                                                         <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
+                                                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                                             <Layers size={14} className="opacity-20" />
                                                         </div>
                                                     )}

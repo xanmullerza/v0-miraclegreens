@@ -90,7 +90,7 @@ export function MixLabView() {
                 <Button
                     variant="ghost"
                     onClick={() => setShowSpiceLab(false)}
-                    className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-black uppercase tracking-widest text-[10px]"
+                    className="text-muted-foreground hover:text-foreground font-black uppercase tracking-widest text-[10px]"
                 >
                     <ArrowLeft size={16} className="mr-2" />
                     Back to Mix Lab
@@ -104,9 +104,9 @@ export function MixLabView() {
         <div className="space-y-8">
             {/* Header */}
             <div className="flex flex-wrap gap-4 items-center justify-between">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30">
                     <FlaskConical size={16} className="text-purple-500" />
-                    <span className="text-xs font-black uppercase tracking-widest text-purple-600">
+                    <span className="text-xs font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">
                         Mix Lab
                     </span>
                 </div>
@@ -120,16 +120,16 @@ export function MixLabView() {
             </div>
 
             {/* Intro Section */}
-            <div className="bg-gradient-to-br from-purple-500/10 via-fuchsia-500/10 to-pink-500/10 rounded-3xl p-8 border border-purple-200 dark:border-purple-800">
+            <div className="bg-muted/50 rounded-3xl p-8 border border-border">
                 <div className="flex items-center gap-4 mb-6">
                     <div className="p-4 rounded-2xl bg-purple-500 text-white shadow-lg shadow-purple-500/20">
                         <Beaker size={32} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                        <h2 className="text-2xl font-black uppercase tracking-tight text-foreground">
                             DIY Concoctions
                         </h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                        <p className="text-sm text-muted-foreground">
                             Create and save your homemade spice blends, sauces, and condiments
                         </p>
                     </div>
@@ -141,13 +141,13 @@ export function MixLabView() {
                         <div
                             key={cat.name}
                             onClick={() => handleCategoryClick(cat)}
-                            className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 hover:border-purple-500/30 hover:shadow-lg transition-all cursor-pointer group"
+                            className="bg-card rounded-2xl p-4 border border-border hover:border-purple-500/30 hover:shadow-lg transition-all cursor-pointer group"
                         >
                             <div className="text-3xl mb-3">{cat.icon}</div>
-                            <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors">
+                            <h3 className="font-bold text-sm text-foreground group-hover:text-purple-600 transition-colors">
                                 {cat.name}
                             </h3>
-                            <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">
+                            <p className="text-[10px] text-muted-foreground/60 mt-1 line-clamp-2">
                                 {cat.description}
                             </p>
                             {cat.action === 'spicelab' && (
@@ -162,10 +162,10 @@ export function MixLabView() {
 
             {/* Search */}
             <div className="relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <Input
                     placeholder="Search your mixes..."
-                    className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                    className="pl-12 h-14 rounded-2xl border-border bg-card shadow-sm focus:ring-purple-500 focus:border-purple-500"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -175,15 +175,15 @@ export function MixLabView() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="animate-spin text-purple-500" size={40} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading your mixes...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground italic">Loading your mixes...</p>
                 </div>
             ) : filteredMixes.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-purple-200 dark:border-purple-800 rounded-[3rem]">
-                    <div className="p-6 rounded-full bg-purple-100 dark:bg-purple-900/30 mb-6">
+                <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-border rounded-[3rem]">
+                    <div className="p-6 rounded-full bg-purple-500/10 mb-6">
                         <FlaskConical size={48} className="text-purple-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-600 dark:text-slate-300 mb-2">No mixes yet</h3>
-                    <p className="text-sm text-slate-400 mb-6">Start creating your homemade concoctions!</p>
+                    <h3 className="text-lg font-bold text-foreground mb-2">No mixes yet</h3>
+                    <p className="text-sm text-muted-foreground mb-6">Start creating your homemade concoctions!</p>
                     <Button
                         onClick={() => router.push('/admin/recipebuilder?type=mix')}
                         className="bg-purple-500 hover:bg-purple-600 text-white rounded-full px-8"
@@ -198,7 +198,7 @@ export function MixLabView() {
                         <div
                             key={mix.id}
                             onClick={() => router.push(`/dashboard/library/meals/${mix.id}`)}
-                            className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-purple-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
+                            className="group bg-card rounded-2xl border border-border hover:border-purple-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
                         >
                             <div className="aspect-video bg-gradient-to-br from-purple-100 to-fuchsia-100 dark:from-purple-900/30 dark:to-fuchsia-900/30 flex items-center justify-center">
                                 {mix.image ? (
@@ -208,7 +208,7 @@ export function MixLabView() {
                                 )}
                             </div>
                             <div className="p-4">
-                                <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors">
+                                <h3 className="font-bold text-foreground group-hover:text-purple-600 transition-colors">
                                     {mix.name}
                                 </h3>
                                 {mix.category && (

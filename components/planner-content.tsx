@@ -243,7 +243,7 @@ const RecipeCard = ({
         className="absolute inset-x-0 top-0 bottom-[140px] z-10"
       />
       <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
-        <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-muted-foreground">
+        <div className="absolute inset-0 bg-muted flex items-center justify-center text-muted-foreground">
           {recipe.image && !imageError ? (
             <img
               src={recipe.image}
@@ -494,15 +494,15 @@ const RecipeListItem = ({
             {recipe.title}
           </h3>
           <div className="flex items-center gap-2 mt-0.5">
-            <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter">
+            <div className="flex items-center gap-0.5 text-[8px] text-muted-foreground font-bold uppercase tracking-tighter">
               <Clock size={8} />
               {recipe.prepTime}m
             </div>
-            <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter">
+            <div className="flex items-center gap-0.5 text-[8px] text-muted-foreground font-bold uppercase tracking-tighter">
               <Users size={8} />
               {recipe.servings}P
             </div>
-            <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[7px] border-none uppercase tracking-wide px-1 py-0">
+            <Badge className="bg-muted text-muted-foreground text-[7px] border-none uppercase tracking-wide px-1 py-0">
               {recipe.type}
             </Badge>
           </div>
@@ -578,7 +578,7 @@ const RecipeListItem = ({
                       'text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border transition-all flex items-center justify-center gap-1.5',
                       isEaten
                         ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default'
-                        : 'border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white',
+                        : 'border-border bg-muted/30 text-muted-foreground hover:bg-secondary hover:text-foreground',
                     )}
                   >
                     {isEaten && <Check size={10} />}
@@ -591,7 +591,7 @@ const RecipeListItem = ({
                       e.stopPropagation();
                       onRegenerate();
                     }}
-                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-border bg-muted/30 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all flex items-center justify-center gap-1.5"
                   >
                     <RotateCcw size={10} />
                     Shuffle
@@ -698,7 +698,7 @@ const RecipeListItem = ({
                     'text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border transition-all flex items-center justify-center gap-0.5',
                     isEaten
                       ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default'
-                      : 'border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white',
+                      : 'border-border bg-muted/30 text-muted-foreground hover:bg-secondary hover:text-foreground',
                   )}
                 >
                   {isEaten && <Check size={8} />}
@@ -713,7 +713,7 @@ const RecipeListItem = ({
                     e.stopPropagation();
                     onRegenerate();
                   }}
-                  className="text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-0.5"
+                  className="text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border border-border bg-muted/30 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all flex items-center justify-center gap-0.5"
                 >
                   <RotateCcw size={8} /> Shuffle
                 </button>
@@ -747,7 +747,7 @@ const RecipeListItem = ({
             </h4>
             <button
               onClick={() => setActivePanel(null)}
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <X size={14} />
             </button>
@@ -767,7 +767,7 @@ const RecipeListItem = ({
               </span>
             ))}
             {(activePanel === 'stocked' ? uniqueMatched : uniqueMissing).length === 0 && (
-              <span className="text-[10px] text-slate-400 italic">
+              <span className="text-[10px] text-muted-foreground italic">
                 {activePanel === 'stocked'
                   ? 'No ingredients in pantry yet'
                   : 'All ingredients stocked!'}
@@ -2297,7 +2297,7 @@ export default function MealPlannerContent({
           {step === 3 && plan && (
             <div className="space-y-6 animate-in fade-in-up duration-500">
               {/* List Header */}
-              <div className="hidden lg:grid lg:grid-cols-[100px_1fr_60px_60px_60px_60px_240px] gap-1.5 px-6 pb-2 text-[8px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
+              <div className="hidden lg:grid lg:grid-cols-[100px_1fr_60px_60px_60px_60px_240px] gap-1.5 px-6 pb-2 text-[8px] font-black uppercase tracking-wider text-muted-foreground/50 border-b border-border">
                 <div className="flex items-center gap-1.5">
                   <Camera size={12} /> Plate
                 </div>
@@ -2425,7 +2425,7 @@ export default function MealPlannerContent({
                   const over = energyVal > energyRda;
 
                   const MacroBar = ({ pct, color }: { pct: number; color: string }) => (
-                    <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                    <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{ width: `${pct}%`, backgroundColor: color }}
@@ -2434,7 +2434,7 @@ export default function MealPlannerContent({
                   );
 
                   return (
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                       {/* Top row: donut left, energy summary right */}
                       <div className="flex items-center gap-4 mb-4">
                         {/* Donut */}
@@ -2447,7 +2447,7 @@ export default function MealPlannerContent({
                               fill="none"
                               stroke="currentColor"
                               strokeWidth={STROKE}
-                              className="text-slate-200 dark:text-slate-800"
+                              className="text-muted dark:text-muted/20"
                             />
                             <circle
                               cx="48"
@@ -2545,7 +2545,7 @@ export default function MealPlannerContent({
                           },
                         ].map(({ label, val, rda, pct, color, textColor }) => (
                           <div key={label} className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 w-12 flex-shrink-0">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground w-12 flex-shrink-0">
                               {label}
                             </span>
                             <MacroBar pct={pct} color={color} />

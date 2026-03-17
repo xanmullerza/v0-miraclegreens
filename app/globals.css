@@ -4,24 +4,24 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #fdfaf6; /* Warmer off-white */
-  --foreground: #020617;
-  --card: #fefefe; /* Very soft white */
-  --card-foreground: #020617;
-  --popover: #fefefe;
-  --popover-foreground: #020617;
+  --background: #f7f3eb; /* Warm parchment background */
+  --foreground: #0f172a;
+  --card: #fffdf9; /* Soft cream for cards */
+  --card-foreground: #0f172a;
+  --popover: #fffdf9;
+  --popover-foreground: #0f172a;
   --primary: #10b981; /* Emerald 500 */
   --primary-foreground: #ffffff;
-  --secondary: #f4f1ea; /* Soft Beige */
+  --secondary: #efece4; /* Muted beige */
   --secondary-foreground: #1e293b;
-  --muted: #f1f1ec;
+  --muted: #efece4;
   --muted-foreground: #64748b;
-  --accent: #f2ece4; /* Warm Beige */
+  --accent: #f2ede4;
   --accent-foreground: #0f172a;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #e8e8e1;
-  --input: #e8e8e1;
+  --border: #e6e0d4;
+  --input: #e6e0d4;
   --ring: #10b981;
   --chart-1: #10b981;
   --chart-2: #f59e0b;
