@@ -262,7 +262,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     
     // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('dashboard');
+    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import-options'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
 
     const getChatbotViewTitle = () => {
@@ -284,6 +284,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             case 'comparator': return 'Comparator';
             case 'lifeguard': return 'Lifeguard';
             case 'conversation-history': return 'Conversation History';
+            case 'import-options': return 'Import Options';
             case 'comingSoon': return 'Coming Soon';
             default: return 'Navigation';
         }
@@ -2119,6 +2120,60 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 )}
 
                 {/* Cookbook Menu */}
+                {/* Import Options View */}
+                {!showRecipeBuilder && chatbotView === 'import-options' && (
+                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                        <div className="flex justify-end mb-3">
+                            <button
+                                onClick={() => setChatbotView('cookbook')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-secondary text-secondary-foreground hover:bg-muted transition-colors uppercase tracking-widest"
+                            >
+                                📚 Back to Cookbook
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                onClick={handleManualRecipeCreation}
+                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                            >
+                                <span className="text-3xl transition-all">✏️</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Manual Entry</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setChatbotView('messages');
+                                    setIsCreatingRecipe(true);
+                                }}
+                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                            >
+                                <span className="text-3xl transition-all">📋</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Paste Text</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setChatbotView('messages');
+                                    setIsCreatingRecipe(true);
+                                }}
+                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                            >
+                                <span className="text-3xl transition-all">🔗</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-purple-500 transition-colors">Paste URL</span>
+                            </button>
+
+                            <button
+                                onClick={() => toast('Import by Photo is coming soon 👀')}
+                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                            >
+                                <span className="text-3xl transition-all">📸</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-rose-500 transition-colors">Upload Photo</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Cookbook Menu */}
                 {!showRecipeBuilder && chatbotView === 'cookbook' && (
                     <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
@@ -2147,7 +2202,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => { setShowRecipeBuilder(true); setChatbotView('recipe-builder'); }}
+                                onClick={() => setChatbotView('import-options')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">📥</span>
