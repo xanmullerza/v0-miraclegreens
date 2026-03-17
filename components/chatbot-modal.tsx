@@ -1747,25 +1747,27 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
-                {/* Unified Header - Internal to Chatbot Pane */}
-                <div className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
-                    <div className="w-full flex pointer-events-none">
-                        <div className="pointer-events-auto w-full">
-                            <HeaderLogo 
-                                showSubtext={false}
-                                userStatus={
-                                    user ? 'cloud' :
-                                        (profile?.name || profile?.nickname) ? 'local' :
-                                            'anonymous'
-                                }
-                                userAvatarUrl={user?.user_metadata?.avatar_url}
-                            />
+                {/* Unified Header - Internal to Chatbot Pane (Mobile Only) */}
+                {!isInline && (
+                    <div className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
+                        <div className="w-full flex pointer-events-none">
+                            <div className="pointer-events-auto w-full">
+                                <HeaderLogo 
+                                    showSubtext={false}
+                                    userStatus={
+                                        user ? 'cloud' :
+                                            (profile?.name || profile?.nickname) ? 'local' :
+                                                'anonymous'
+                                    }
+                                    userAvatarUrl={user?.user_metadata?.avatar_url}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                {/* Back Button & Context (shown when navigating within chatbot) */}
-                {(showRecipeBuilder || chatbotView !== 'messages') && (
+                {/* Back Button & Context (Preserved for Mobile, hidden on Desktop Inline mode as requested) */}
+                {!isInline && (showRecipeBuilder || chatbotView !== 'messages') && (
                     <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-800/50">
                         <button
                             onClick={() => {
@@ -1789,6 +1791,31 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 {showRecipeBuilder ? 'Create Recipe' : getChatbotViewTitle()}
                             </h4>
                         </div>
+                    </div>
+                )}
+
+                {/* Desktop Inline Mode Back Button (Minimal) */}
+                {isInline && (showRecipeBuilder || (chatbotView !== 'messages' && chatbotView !== 'dashboard')) && (
+                    <div className="p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
+                        <button
+                            onClick={() => {
+                                if (showRecipeBuilder) {
+                                    handleCloseRecipeBuilder();
+                                } else if (chatbotView === 'recipe-detail') {
+                                    handleBackFromRecipeDetail();
+                                } else {
+                                    handleBackToMessages();
+                                }
+                            }}
+                            className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400 flex items-center gap-2 hover:text-emerald-500"
+                        >
+                            <ArrowLeft size={14} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Back</span>
+                        </button>
+                        <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            {showRecipeBuilder ? 'Create Recipe' : getChatbotViewTitle()}
+                        </span>
                     </div>
                 )}
 
