@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Search, ChevronLeft, Activity, Zap, Gem, Battery, ChevronDown, Lightbulb, UtensilsCrossed } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -254,7 +254,16 @@ export function ChatbotNutridexFull() {
         }
     }, [excludeFlavour, excludeSupplements]);
 
-    // Detail View
+    // Re-fetch foods when filter checkboxes change
+    const refetchFoods = useCallback(() => {
+        if (selectedNutrient) {
+            selectNutrient(selectedNutrient);
+        }
+    }, [selectedNutrient, selectNutrient]);
+
+    useEffect(() => {
+        refetchFoods();
+    }, [excludeFlavour, excludeSupplements, refetchFoods]);
     if (selectedNutrient) {
         const info = nutrientInfo[selectedNutrient.id];
         
