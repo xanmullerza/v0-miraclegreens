@@ -18,6 +18,9 @@ import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
 import { ChatbotLifeguardFullIntegration } from '@/components/chatbot-lifeguard-full-integration';
 import ProfilePage from '@/app/(main)/profile/page';
 import { toast } from 'sonner';
+import { HeaderLogo } from '@/components/ui/header-logo';
+import { DashboardNav } from '@/components/dashboard-nav';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface Message {
     id: string;
@@ -221,6 +224,7 @@ async function loadConversationHistory(userId: string) {
 export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: ChatbotModalProps) {
     const router = useRouter();
     const { user, saveRecipe } = useDataPersistence();
+    const { profile } = useUserPreferences();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
     const INITIAL_MESSAGES: Message[] = [
@@ -1744,42 +1748,31 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
-                {/* Mobile breadcrumbs bar for overlay mode */}
-                {!isInline && (
-                    <div className="flex flex-col gap-1 border-b border-slate-200 dark:border-slate-800 bg-slate-900/95 p-3 text-slate-100">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[11px] uppercase tracking-wider font-semibold">Chatbot</span>
-                            <button
-                                onClick={handleCloseModal}
-                                className="rounded-md p-1 text-slate-100 hover:bg-slate-800 transition"
-                                title="Close"
-                            >
-                                <X size={16} />
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 text-[11px] text-slate-300">
-                            {breadcrumbTrail.map((crumb, index) => (
-                                <button
-                                    key={`${crumb.label}-${index}`}
-                                    onClick={() => navigateToView(crumb.view)}
-                                    className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors"
-                                >
-                                    {index > 0 && <span className="text-slate-500">/</span>}
-                                    <span className={cn(
-                                        'font-medium',
-                                        index === breadcrumbTrail.length - 1 ? 'text-white' : 'text-slate-300'
-                                    )}>
-                                        {crumb.label}
-                                    </span>
-                                </button>
-                            ))}
+                {/* Unified Header & Nav - Internal to Chatbot Pane */}
+                <div className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617] scale-90 -translate-y-1">
+                    <div className="w-full flex justify-center px-2 pointer-events-none">
+                        <div className="pointer-events-auto w-full">
+                            <HeaderLogo 
+                                showSubtext={false}
+                                userStatus={
+                                    user ? 'cloud' :
+                                        (profile?.name || profile?.nickname) ? 'local' :
+                                            'anonymous'
+                                }
+                                userAvatarUrl={user?.user_metadata?.avatar_url}
+                            />
                         </div>
                     </div>
-                )}
+                </div>
+
+                {/* Dashboard Navigation - Internal to Chatbot Pane */}
+                <div className="w-full flex justify-center scale-90 -mt-2 border-b border-slate-200 dark:border-slate-800 pb-2 bg-slate-50 dark:bg-[#020617]">
+                    <DashboardNav />
+                </div>
 
                 {/* Back Button & Context (shown when navigating within chatbot) */}
                 {(showRecipeBuilder || chatbotView !== 'messages') && (
-                    <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-800/50">
+                    <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-800/50">
                         <button
                             onClick={() => {
                                 if (showRecipeBuilder) {
@@ -1793,10 +1786,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
                             title="Back"
                         >
-                            <ArrowLeft size={16} />
+                            <ArrowLeft size={14} />
                         </button>
-                        <div>
-                            <h4 className="font-semibold text-slate-900 dark:text-white text-xs uppercase tracking-widest">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">Zum</span>
+                            <span className="text-slate-300 dark:text-slate-600">/</span>
+                            <h4 className="font-semibold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">
                                 {showRecipeBuilder ? 'Create Recipe' : getChatbotViewTitle()}
                             </h4>
                         </div>
