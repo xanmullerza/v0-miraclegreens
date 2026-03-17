@@ -86,6 +86,8 @@ export function ChatbotNutridexFull() {
     const [topFoods, setTopFoods] = useState<FoodRanking[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [detailTab, setDetailTab] = useState<'foods' | 'learn'>('foods');
+    const [excludeFlavour, setExcludeFlavour] = useState(true);
+    const [excludeSupplements, setExcludeSupplements] = useState(true);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Enhance RDAs based on user profile and daily targets
@@ -191,10 +193,17 @@ export function ChatbotNutridexFull() {
                 .from('food_items')
                 .select('id, name, common_name, image, category, ' + col)
                 .not(col, 'is', null)
-                .neq('category', 'Flavour')
-                .neq('category', 'Supplements')
                 .order(col, { ascending: false })
-                .limit(10);
+                .limit(20);
+
+            // Filter by category preferences
+            const filterData = (items: any[]) => {
+                return items.filter(item => {
+                    if (excludeFlavour && item.category === 'Flavour') return false;
+                    if (excludeSupplements && item.category === 'Supplements') return false;
+                    return true;
+                }).slice(0, 10);
+            };
 
             if (error || !data || data.length === 0) {
                 // FALLBACK: Try micronutrients JSONB column
@@ -206,7 +215,12 @@ export function ChatbotNutridexFull() {
 
                 if (!jsonError && jsonMatch) {
                     const sorted = jsonMatch
-                        .filter(f => f.micronutrients && f.micronutrients[nutrient.id] !== undefined && f.category !== 'Flavour' && f.category !== 'Supplements')
+                        .filter(f => {
+                            if (!f.micronutrients || f.micronutrients[nutrient.id] === undefined) return false;
+                            if (excludeFlavour && f.category === 'Flavour') return false;
+                            if (excludeSupplements && f.category === 'Supplements') return false;
+                            return true;
+                        })
                         .sort((a, b) => (b.micronutrients[nutrient.id] || 0) - (a.micronutrients[nutrient.id] || 0))
                         .slice(0, 10);
                     
@@ -222,7 +236,8 @@ export function ChatbotNutridexFull() {
                     setTopFoods([]);
                 }
             } else {
-                const rankings: FoodRanking[] = (data || []).map((item: any, idx) => ({
+                const filtered = filterData(data || []);
+                const rankings: FoodRanking[] = filtered.map((item: any, idx) => ({
                     rank: idx + 1,
                     name: item.name,
                     common_name: item.common_name,
@@ -237,7 +252,7 @@ export function ChatbotNutridexFull() {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [excludeFlavour, excludeSupplements]);
 
     // Detail View
     if (selectedNutrient) {
@@ -298,9 +313,34 @@ export function ChatbotNutridexFull() {
                     </button>
                 </div>
 
-                {/* Foods Tab */}
+                {/* Category Filters (visible on Foods tab) */}
                 {detailTab === 'foods' && (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
+                    <div className="space-y-2 bg-slate-900/30 rounded-lg p-2.5 border border-slate-700/50">
+                        <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Exclude categories:</p>
+                        <div className="space-y-1.5">
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={excludeFlavour}
+                                    onChange={(e) => setExcludeFlavour(e.target.checked)}
+                                    className="w-3.5 h-3.5 rounded border-slate-600 cursor-pointer accent-emerald-500"
+                                />
+                                <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-300 transition-colors">Flavour/Spices</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={excludeSupplements}
+                                    onChange={(e) => setExcludeSupplements(e.target.checked)}
+                                    className="w-3.5 h-3.5 rounded border-slate-600 cursor-pointer accent-emerald-500"
+                                />
+                                <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-300 transition-colors">Supplements</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-2">
                     {isLoading ? (
                         <div className="text-center py-6 text-xs text-muted-foreground">Loading...</div>
                     ) : topFoods.length > 0 ? (
@@ -328,6 +368,7 @@ export function ChatbotNutridexFull() {
                     ) : (
                         <div className="text-center py-6 text-xs text-muted-foreground">No foods found</div>
                     )}
+                    </div>
                 </div>
                 )}
 
