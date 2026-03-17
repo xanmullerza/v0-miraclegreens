@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -260,6 +260,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [isCreatingRecipe, setIsCreatingRecipe] = useState(false); // Always reset on refresh
     const [pastedRecipeContent, setPastedRecipeContent] = useState('');
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
+    const [isDragging, setIsDragging] = useState(false);
     
     // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
     const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import-options'>('dashboard');
@@ -1051,8 +1052,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         }
     };
 
-    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
+    const processRecipeImage = async (file: File) => {
         if (!file) return;
 
         // Add user message showing file was uploaded
@@ -1104,9 +1104,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     timestamp: new Date(),
                 }]);
                 setIsLoading(false);
-                if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                }
                 return;
             }
 
@@ -1118,34 +1115,24 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 console.log('✓ Unwrapped array response:', data);
             }
 
-            console.log('After unwrap - data:', data, 'Has content field:', data?.content !== undefined);
-
             // Handle content-wrapped JSON (parse if needed)
             if (data && typeof data.content === 'string') {
-                console.log('Attempting to parse content field as JSON:', data.content.substring(0, 100) + '...');
                 try {
-                    // Replace literal newlines/tabs with escaped versions before parsing
-                    // This handles JSON strings containing multiline text (ingredients, instructions)
                     const escapedContent = data.content
-                        .replace(/\n/g, '\\n')  // Literal newlines → escaped
-                        .replace(/\r/g, '\\r')  // Carriage returns → escaped
-                        .replace(/\t/g, '\\t'); // Tabs → escaped
+                        .replace(/\n/g, '\\n')
+                        .replace(/\r/g, '\\r')
+                        .replace(/\t/g, '\\t');
                     
                     const parsedContent = JSON.parse(escapedContent);
-                    console.log('✓ Successfully parsed content from string:', parsedContent);
                     data = parsedContent;
                 } catch (parseErr) {
-                    const errorMsg = parseErr instanceof Error ? parseErr.message : String(parseErr);
-                    console.error('✗ Failed to parse content as JSON:', errorMsg, 'Content:', data.content);
+                    console.error('✗ Failed to parse content as JSON:', parseErr);
                 }
             }
-
-            console.log('Final data object before isRecipe check:', data, 'Has isRecipe:', data?.isRecipe !== undefined);
 
             // Check if response indicates recipe detection
             if (typeof data === 'object' && data.isRecipe !== undefined) {
                 if (data.isRecipe === false) {
-                    // Not a recipe - show error
                     setMessages(prev => [...prev, {
                         id: (Date.now() + 1).toString(),
                         type: 'bot',
@@ -1153,7 +1140,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         timestamp: new Date(),
                     }]);
                 } else if (data.isRecipe === true) {
-                    // Valid recipe detected - parse the data
                     const recipeData: ParsedRecipe = {
                         title: data.title || 'Untitled Recipe',
                         ingredients_text: data.ingredients_text || '',
@@ -1164,7 +1150,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         source_url: 'image-upload',
                         image_url: undefined,
                     };
-                    console.log('✓ Recipe detected and parsed:', recipeData.title);
                     setSuccessRecipe(recipeData);
                     setMessages(prev => [...prev, {
                         id: (Date.now() + 1).toString(),
@@ -1175,8 +1160,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     }]);
                 }
             } else {
-                // Response doesn't have isRecipe flag - treat as non-recipe
-                console.warn('✗ Response missing isRecipe flag:', data);
                 setMessages(prev => [...prev, {
                     id: (Date.now() + 1).toString(),
                     type: 'bot',
@@ -1195,10 +1178,15 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
-            // Reset file input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+        }
+    };
+
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        await processRecipeImage(file);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
         }
     };
 
@@ -2122,53 +2110,125 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Cookbook Menu */}
                 {/* Import Options View */}
                 {!showRecipeBuilder && chatbotView === 'import-options' && (
-                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
-                        <div className="flex justify-end mb-3">
+                    <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center animate-in fade-in duration-200">
+                        <div className="w-full flex justify-between items-center mb-6">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Import Methods</h3>
                             <button
                                 onClick={() => setChatbotView('cookbook')}
-                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-secondary text-secondary-foreground hover:bg-muted transition-colors uppercase tracking-widest"
+                                className="px-3 py-1.5 rounded-xl text-[10px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-emerald-500 transition-colors uppercase tracking-widest border border-slate-200 dark:border-slate-700"
                             >
-                                📚 Back to Cookbook
+                                📚 Back
                             </button>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <button
+                        
+                        <div className="grid grid-cols-2 gap-3 w-full">
+                            {/* Option 1: Manual Creation */}
+                            <div 
                                 onClick={handleManualRecipeCreation}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col h-full relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300 cursor-pointer"
                             >
-                                <span className="text-3xl transition-all">✏️</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Manual Entry</span>
-                            </button>
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Pencil size={40} className="text-emerald-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                                        <Pencil size={16} className="text-emerald-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 1</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Manual Entry</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Add all details yourself using our form.
+                                </p>
+                                <div className="text-center py-2 rounded-xl bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-emerald-600 transition-colors">
+                                    LET&apos;S GO
+                                </div>
+                            </div>
 
-                            <button
+                            {/* Option 2: Paste Content */}
+                            <div 
                                 onClick={() => {
                                     setChatbotView('messages');
                                     setIsCreatingRecipe(true);
                                 }}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                className="bg-blue-500/10 dark:bg-blue-500/5 rounded-2xl p-4 border border-blue-500/20 flex flex-col h-full relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 cursor-pointer"
                             >
-                                <span className="text-3xl transition-all">📋</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Paste Text</span>
-                            </button>
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <FileText size={40} className="text-blue-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <FileText size={16} className="text-blue-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 2</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Paste Text</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Paste instructions and we&apos;ll parse them.
+                                </p>
+                                <div className="text-center py-2 rounded-xl bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-blue-600 transition-colors">
+                                    START
+                                </div>
+                            </div>
 
-                            <button
+                            {/* Option 3: URL */}
+                            <div 
                                 onClick={() => {
                                     setChatbotView('messages');
                                     setIsCreatingRecipe(true);
                                 }}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                className="bg-purple-500/10 dark:bg-purple-500/5 rounded-2xl p-4 border border-purple-500/20 flex flex-col h-full relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300 cursor-pointer"
                             >
-                                <span className="text-3xl transition-all">🔗</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-purple-500 transition-colors">Paste URL</span>
-                            </button>
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Link size={40} className="text-purple-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <Link size={16} className="text-purple-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 3</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Paste URL</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Import automatically from any link.
+                                </p>
+                                <div className="text-center py-2 rounded-xl bg-purple-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-purple-600 transition-colors">
+                                    IMPORT
+                                </div>
+                            </div>
 
-                            <button
-                                onClick={() => toast('Import by Photo is coming soon 👀')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                            {/* Option 4: Photo Upload */}
+                            <div 
+                                className={cn(
+                                    "bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border-2 border-dashed flex flex-col h-full relative overflow-hidden group transition-all duration-300 cursor-pointer",
+                                    isDragging ? "border-rose-500 bg-rose-500/20" : "border-rose-500/20 hover:border-rose-500/40"
+                                )}
+                                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                onDragLeave={() => setIsDragging(false)}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    const file = e.dataTransfer.files?.[0];
+                                    if (file) processRecipeImage(file);
+                                }}
+                                onClick={() => fileInputRef.current?.click()}
                             >
-                                <span className="text-3xl transition-all">📸</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-rose-500 transition-colors">Upload Photo</span>
-                            </button>
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Camera size={40} className="text-rose-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                                        <Camera size={16} className="text-rose-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 4</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Upload Photo</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Extract recipe from any image.
+                                </p>
+                                <div className="text-center py-2 rounded-xl bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-rose-500/80 transition-colors">
+                                    UPLOAD
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -2380,87 +2440,127 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Create Recipe Options - Shown when creating recipe */}
                 {!showRecipeBuilder && chatbotView === 'messages' && isCreatingRecipe && !successRecipe && (
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                        {/* Option 1: Manual Creation */}
-                        <div className="bg-emerald-500/10 rounded-lg p-4 border border-emerald-500/30">
-                            <h4 className="font-semibold text-foreground text-sm mb-2">✏️ Option 1: Manually Create</h4>
-                            <p className="text-xs text-muted-foreground mb-3">
-                                Step-by-step form to add all the details yourself.
-                            </p>
-                            <button
-                                onClick={handleManualRecipeCreation}
-                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 transition-colors active:scale-95"
-                            >
-                                Let&apos;s Go <ChevronRight size={12} />
-                            </button>
-                        </div>
+                    <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center">
+                        <div className="grid grid-cols-2 gap-3 w-full">
+                            {/* Option 1: Manual Creation */}
+                            <div className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col h-full relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Pencil size={40} className="text-emerald-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                                        <Pencil size={16} className="text-emerald-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Option 1</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Manually Create</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Step-by-step form to add all the details yourself.
+                                </p>
+                                <button
+                                    onClick={handleManualRecipeCreation}
+                                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-emerald-500/20"
+                                >
+                                    LET&apos;S GO
+                                </button>
+                            </div>
 
-                        {/* Option 2: Paste Content */}
-                        <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/30">
-                            <h4 className="font-semibold text-foreground text-sm mb-2">📋 Option 2: Paste Recipe Text</h4>
-                            <p className="text-xs text-muted-foreground mb-3">
-                                Copy-paste recipe instructions and we&apos;ll parse the ingredients automatically.
-                            </p>
-                            <textarea
-                                ref={recipeContentRef}
-                                value={pastedRecipeContent}
-                                onChange={(e) => setPastedRecipeContent(e.target.value)}
-                                placeholder="Paste recipe content here..."
-                                className="w-full px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-3"
-                                rows={4}
-                            />
-                            <button
-                                onClick={handlePasteRecipeContent}
-                                disabled={!pastedRecipeContent.trim() || isLoading}
-                                className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 size={14} className="animate-spin" />
-                                        Parsing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>✓ Parse & Review</span>
-                                    </>
+                            {/* Option 2: Paste Content */}
+                            <div className="bg-blue-500/10 dark:bg-blue-500/5 rounded-2xl p-4 border border-blue-500/20 flex flex-col h-full relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <FileText size={40} className="text-blue-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <FileText size={16} className="text-blue-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Option 2</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Paste Recipe Text</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
+                                    We&apos;ll parse ingredients automatically.
+                                </p>
+                                <textarea
+                                    ref={recipeContentRef}
+                                    value={pastedRecipeContent}
+                                    onChange={(e) => setPastedRecipeContent(e.target.value)}
+                                    placeholder="Paste content here..."
+                                    className="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none text-slate-900 dark:text-white placeholder-slate-400 text-[10px] focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none mb-3 min-h-[60px] flex-1"
+                                />
+                                <button
+                                    onClick={handlePasteRecipeContent}
+                                    disabled={!pastedRecipeContent.trim() || isLoading}
+                                    className="w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-blue-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {isLoading ? <Loader2 size={12} className="animate-spin" /> : <span>✓ Parse & Review</span>}
+                                </button>
+                            </div>
+
+                            {/* Option 3: URL */}
+                            <div className="bg-purple-500/10 dark:bg-purple-500/5 rounded-2xl p-4 border border-purple-500/20 flex flex-col h-full relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300">
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Link size={40} className="text-purple-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <Link size={16} className="text-purple-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Option 3</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Paste Recipe URL</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
+                                    We&apos;ll extract all details.
+                                </p>
+                                <input
+                                    type="text"
+                                    value={pastedRecipeURL}
+                                    onChange={(e) => setpastedRecipeURL(e.target.value)}
+                                    placeholder="https://..."
+                                    className="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none text-slate-900 dark:text-white placeholder-slate-400 text-[10px] focus:outline-none focus:ring-2 focus:ring-purple-500/50 mb-3 flex-1"
+                                />
+                                <button
+                                    onClick={handlePasteRecipeURL}
+                                    disabled={!pastedRecipeURL.trim() || isLoading}
+                                    className="w-full py-2.5 rounded-xl bg-purple-500 hover:bg-purple-600 text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-purple-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {isLoading ? <Loader2 size={12} className="animate-spin" /> : <span>✓ Import Recipe</span>}
+                                </button>
+                            </div>
+
+                            {/* Option 4: Photo Upload / Dropzone */}
+                            <div 
+                                className={cn(
+                                    "bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border-2 border-dashed flex flex-col h-full relative overflow-hidden group transition-all duration-300 cursor-pointer",
+                                    isDragging ? "border-rose-500 bg-rose-500/20" : "border-rose-500/20 hover:border-rose-500/40"
                                 )}
-                            </button>
-                        </div>
-
-                        {/* Option 3: URL (existing) */}
-                        <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/30">
-                            <h4 className="font-semibold text-foreground text-sm mb-2">🔗 Option 3: Paste Recipe URL</h4>
-                            <p className="text-xs text-muted-foreground mb-3">
-                                Paste a recipe link and we'll automatically extract all the details.
-                            </p>
-                            <input
-                                type="text"
-                                value={pastedRecipeURL}
-                                onChange={(e) => setpastedRecipeURL(e.target.value)}
-                                placeholder="Paste recipe URL here (e.g., https://www.example.com/recipe)"
-                                className="w-full px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter' && pastedRecipeURL.trim() && !isLoading) {
-                                        handlePasteRecipeURL();
-                                    }
+                                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                onDragLeave={() => setIsDragging(false)}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    setIsDragging(false);
+                                    const file = e.dataTransfer.files?.[0];
+                                    if (file) processRecipeImage(file);
                                 }}
-                            />
-                            <button
-                                onClick={handlePasteRecipeURL}
-                                disabled={!pastedRecipeURL.trim() || isLoading}
-                                className="w-full px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
+                                onClick={() => fileInputRef.current?.click()}
                             >
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 size={14} className="animate-spin" />
-                                        Extracting...
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>✓ Import Recipe</span>
-                                    </>
-                                )}
-                            </button>
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Camera size={40} className="text-rose-500" />
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                                        <Camera size={16} className="text-rose-500" />
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Option 4</h4>
+                                </div>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Upload Photo</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
+                                    Snap a photo of any recipe to extract.
+                                </p>
+                                <div className="flex flex-col items-center justify-center py-4 bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-rose-500/10 transition-colors group-hover:bg-rose-500/10">
+                                    <Upload size={20} className="text-rose-500 mb-2 animate-bounce" />
+                                    <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-rose-500">Drop image here or click</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
