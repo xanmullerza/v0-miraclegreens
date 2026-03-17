@@ -189,8 +189,10 @@ export function ChatbotNutridexFull() {
             // Try to find foods high in this nutrient
             const { data, error } = await supabase
                 .from('food_items')
-                .select('id, name, common_name, image, ' + col)
+                .select('id, name, common_name, image, category, ' + col)
                 .not(col, 'is', null)
+                .neq('category', 'Flavour')
+                .neq('category', 'Supplements')
                 .order(col, { ascending: false })
                 .limit(10);
 
@@ -198,13 +200,13 @@ export function ChatbotNutridexFull() {
                 // FALLBACK: Try micronutrients JSONB column
                 const { data: jsonMatch, error: jsonError } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, image, micronutrients')
+                    .select('id, name, common_name, image, micronutrients, category')
                     .not('micronutrients', 'is', null)
                     .limit(200);
 
                 if (!jsonError && jsonMatch) {
                     const sorted = jsonMatch
-                        .filter(f => f.micronutrients && f.micronutrients[nutrient.id] !== undefined)
+                        .filter(f => f.micronutrients && f.micronutrients[nutrient.id] !== undefined && f.category !== 'Flavour' && f.category !== 'Supplements')
                         .sort((a, b) => (b.micronutrients[nutrient.id] || 0) - (a.micronutrients[nutrient.id] || 0))
                         .slice(0, 10);
                     
