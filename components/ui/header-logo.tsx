@@ -3,8 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf, Home, User } from 'lucide-react';
+import { Leaf, Home, User, Columns, PanelRightOpen, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSplitView } from '@/lib/context/split-view-context';
 
 interface HeaderLogoProps {
     showSubtext?: boolean;
@@ -18,21 +19,39 @@ export function HeaderLogo({
     userAvatarUrl,
 }: HeaderLogoProps) {
     const pathname = usePathname();
+    const { resizeMode, toggleResize } = useSplitView();
+
+    const getResizeIcon = () => {
+        if (resizeMode === 'equal') return <Columns size={18} />;
+        if (resizeMode === 'content-focus') return <PanelRightOpen size={18} />;
+        if (resizeMode === 'content-only') return <MessageCircle size={18} />;
+        return <Columns size={18} />;
+    };
+
+    const getResizeTooltip = () => {
+        if (resizeMode === 'equal') return 'Focus Content (67%)';
+        if (resizeMode === 'content-focus') return 'Content Only (Hide Chat)';
+        if (resizeMode === 'content-only') return 'Equal Split (50/50)';
+        return 'Toggle View';
+    };
 
     return (
         <div suppressHydrationWarning className={cn(
             "flex items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl w-full max-w-[900px] mx-auto transition-all duration-500"
         )}>
-            {/* Left - Home Button */}
-            <Link
-                href="/home"
+            {/* Left - View Ratio Toggle */}
+            <button
+                onClick={toggleResize}
                 className={cn(
-                    "flex h-12 w-12 border-r border-slate-200 dark:border-slate-800 items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:outline-none flex-shrink-0"
+                    "flex h-12 w-12 border-r border-slate-200 dark:border-slate-800 items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
+                    resizeMode === 'equal' && "text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800",
+                    resizeMode === 'content-focus' && "text-cyan-500 hover:bg-cyan-500/5",
+                    resizeMode === 'content-only' && "text-emerald-500 hover:bg-emerald-500/5"
                 )}
-                title="Home"
+                title={getResizeTooltip()}
             >
-                <Home size={18} />
-            </Link>
+                {getResizeIcon()}
+            </button>
 
             {/* Center - Logo Area */}
             <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-1 justify-center">

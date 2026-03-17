@@ -1,16 +1,15 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Calendar, ShoppingBasket, Shapes, MessageCircle, Columns, PanelRightOpen, X as CloseIcon } from 'lucide-react';
+import { Calendar, ShoppingBasket, Shapes, X as CloseIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/lib/context/chatbot-context';
-import { useSplitView } from '@/lib/context/split-view-context';
+
 
 export function DashboardNav() {
     const router = useRouter();
     const pathname = usePathname();
     const { setIsChatbotOpen } = useChatbot();
-    const { resizeMode, toggleResize } = useSplitView();
 
     // Determine active button
     const getActiveButton = () => {
@@ -20,19 +19,7 @@ export function DashboardNav() {
         return null;
     };
 
-    const getResizeIcon = () => {
-        if (resizeMode === 'equal') return <Columns size={16} />;
-        if (resizeMode === 'content-focus') return <PanelRightOpen size={16} />;
-        if (resizeMode === 'content-only') return <MessageCircle size={16} />;
-        return <Columns size={16} />;
-    };
 
-    const getResizeTooltip = () => {
-        if (resizeMode === 'equal') return 'Focus Content (67%)';
-        if (resizeMode === 'content-focus') return 'Content Only (Hide Chat)';
-        if (resizeMode === 'content-only') return 'Equal Split (50/50)';
-        return 'Toggle View';
-    };
 
     const activeButton = getActiveButton();
 
@@ -97,19 +84,7 @@ export function DashboardNav() {
                         </button>
                     );
                 })}
-                {/* View Ratio Toggle Button */}
-                <button
-                    onClick={toggleResize}
-                    className={cn(
-                        "w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95 hidden lg:flex",
-                        resizeMode === 'equal' && "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-blue-500 hover:border-blue-500/40 hover:bg-blue-500/5",
-                        resizeMode === 'content-focus' && "bg-cyan-500/10 border-cyan-500/50 text-cyan-500 hover:border-cyan-500/40",
-                        resizeMode === 'content-only' && "bg-emerald-500/10 border-emerald-500/50 text-emerald-500 hover:border-emerald-500/40"
-                    )}
-                    title={getResizeTooltip()}
-                >
-                    {getResizeIcon()}
-                </button>
+
             </div>
             </div>
         </>
