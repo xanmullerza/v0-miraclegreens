@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -1737,77 +1737,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 
-                {/* Unified Header - Internal to Chatbot Pane (Mobile Only) */}
-                {!isInline && (
-                    <div className="z-40 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#020617]">
-                        <div className="w-full flex pointer-events-none">
-                            <div className="pointer-events-auto w-full">
-                                <HeaderLogo 
-                                    showSubtext={false}
-                                    userStatus={
-                                        user ? 'cloud' :
-                                            (profile?.name || profile?.nickname) ? 'local' :
-                                                'anonymous'
-                                    }
-                                    userAvatarUrl={user?.user_metadata?.avatar_url}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Back Button & Context (Preserved for Mobile, hidden on Desktop Inline mode as requested) */}
-                {!isInline && (showRecipeBuilder || chatbotView !== 'messages') && (
-                    <div className="flex items-center gap-3 px-4 py-2 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-800/50">
-                        <button
-                            onClick={() => {
-                                if (showRecipeBuilder) {
-                                    handleCloseRecipeBuilder();
-                                } else if (chatbotView === 'recipe-detail') {
-                                    handleBackFromRecipeDetail();
-                                } else {
-                                    handleBackToMessages();
-                                }
-                            }}
-                            className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
-                            title="Back"
-                        >
-                            <ArrowLeft size={14} />
-                        </button>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">Zum</span>
-                            <span className="text-slate-300 dark:text-slate-600">/</span>
-                            <h4 className="font-semibold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">
-                                {showRecipeBuilder ? 'Create Recipe' : getChatbotViewTitle()}
-                            </h4>
-                        </div>
-                    </div>
-                )}
-
-                {/* Desktop Inline Mode Back Button (Minimal) */}
-                {isInline && (showRecipeBuilder || (chatbotView !== 'messages' && chatbotView !== 'dashboard')) && (
-                    <div className="p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
-                        <button
-                            onClick={() => {
-                                if (showRecipeBuilder) {
-                                    handleCloseRecipeBuilder();
-                                } else if (chatbotView === 'recipe-detail') {
-                                    handleBackFromRecipeDetail();
-                                } else {
-                                    handleBackToMessages();
-                                }
-                            }}
-                            className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400 flex items-center gap-2 hover:text-emerald-500"
-                        >
-                            <ArrowLeft size={14} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Back</span>
-                        </button>
-                        <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            {showRecipeBuilder ? 'Create Recipe' : getChatbotViewTitle()}
-                        </span>
-                    </div>
-                )}
+                {/* Top components removed - using bottom navigation as requested */}
 
                 {/* Content Area - Messages, Recipe Builder, or Recipe Views */}
                 {/* Recipe Builder - Full Screen */}
@@ -2041,7 +1971,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {!showRecipeBuilder && chatbotView === 'dashboard' && (
                     <div className="flex-1 overflow-y-auto p-4 space-y-6">
                         {/* Cookbook Section */}
-                        <div className="bg-white/50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="bg-emerald-500/10 dark:bg-emerald-500/20 rounded-3xl p-6 border border-emerald-500/20 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                                <Salad size={120} className="text-emerald-500 -rotate-12" />
+                            </div>
                             <div className="flex items-center gap-2 mb-6">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Cookbook</h3>
@@ -2079,7 +2012,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
 
                         {/* Planner Section */}
-                        <div className="bg-white/50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                                <Calendar size={120} className="text-blue-500 -rotate-12" />
+                            </div>
                             <div className="flex items-center gap-2 mb-6">
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Planner</h3>
@@ -2110,7 +2046,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
 
                         {/* Widgets Section */}
-                        <div className="bg-white/50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="bg-purple-500/10 dark:bg-purple-500/20 rounded-3xl p-6 border border-purple-500/20 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                                <Package size={120} className="text-purple-500 -rotate-12" />
+                            </div>
                             <div className="flex items-center gap-2 mb-6">
                                 <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Widgets</h3>
@@ -3153,6 +3092,38 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 </div>
                 )}
+
+                {/* Bottom Navigation Footer (Mobile Optimized) */}
+                <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50">
+                    <button
+                        onClick={() => window.history.back()}
+                        className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
+                        title="Go Back"
+                    >
+                        <ChevronLeft size={24} />
+                    </button>
+                    
+                    <button
+                        onClick={() => setChatbotView('dashboard')}
+                        className={cn(
+                            "w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-95 group",
+                            chatbotView === 'dashboard' 
+                                ? "bg-emerald-500 text-white shadow-emerald-500/40" 
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
+                        )}
+                        title="Home"
+                    >
+                        <Home size={24} className={cn(chatbotView === 'dashboard' ? "" : "group-hover:scale-110 transition-transform")} />
+                    </button>
+
+                    <button
+                        onClick={() => window.history.forward()}
+                        className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
+                        title="Go Forward"
+                    >
+                        <ChevronRight size={24} />
+                    </button>
+                </div>
             </div>
         </div>
     );
