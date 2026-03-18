@@ -8,51 +8,161 @@ export interface EquipmentInference {
   confidence: 'high' | 'medium' | 'low';
 }
 
-const EQUIPMENT_KEYWORDS: Record<string, string[]> = {
-  blender: ['blend', 'blended', 'puree', 'pureed', 'smoothie', 'slurry'],
-  'food processor': ['process', 'processed', 'chop finely', 'minced'],
-  wok: ['wok', 'stir fry', 'stir-fry', 'wok fried'],
-  oven: ['bake', 'baked', 'roast', 'roasted', 'broil', 'broiled'],
-  stovetop: ['pan fry', 'pan-fry', 'sauté', 'saute', 'boil', 'boiled', 'simmer', 'simmered', 'fry', 'fried'],
-  'instant pot': ['instant pot', 'pressure cook', 'pressure cooked'],
-  'air fryer': ['air fry', 'air-fry', 'air fried'],
-  microwave: ['microwave', 'microwaved'],
-  griller: ['grill', 'grilled', 'bbq', 'barbecue'],
-  'deep fryer': ['deep fry', 'deep-fry', 'deep fried'],
-  mortar: ['mortar', 'pestle', 'ground', 'crush', 'crushed'],
-  'immersion blender': ['immersion blend', 'hand blend', 'stick blend'],
-  juicer: ['juice', 'juiced', 'extract', 'extracted'],
-};
+export interface EquipmentCategory {
+  id: string;
+  tier: 0 | 1 | 2 | 3 | 4;
+  label: string;
+  emoji: string;
+  description: string;
+  items: string[];
+}
 
 /**
- * Standardized equipment types available for selection
+ * Tiered equipment categories for the Cooking Setup filter.
+ * Tier 0 = Raw/No Prep, Tier 4 = Full Electronic kitchen.
+ * Filter logic is "at least": a recipe is eligible if every piece of
+ * equipment it requires is present in the user's selected set.
  */
-export const AVAILABLE_EQUIPMENT = [
-  'knife',
-  'stovetop',
-  'oven',
-  'blender',
-  'food processor',
-  'wok',
-  'instant pot',
-  'air fryer',
-  'microwave',
-  'griller',
-  'deep fryer',
-  'mortar',
-  'immersion blender',
-  'juicer',
-  'can opener',
-  'chopping board',
+export const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
+  {
+    id: 'raw',
+    tier: 0,
+    label: 'No Prep / Raw',
+    emoji: '🥗',
+    description: 'No heat or tools needed — edible straight away',
+    items: ['raw'],
+  },
+  {
+    id: 'manual',
+    tier: 1,
+    label: 'Manual',
+    emoji: '🔪',
+    description: 'Muscle-powered tools only — no heat, no electricity',
+    items: [
+      'knife',
+      'cutting board',
+      'mortar and pestle',
+      'grater',
+      'peeler',
+      'mandoline',
+      'whisk',
+      'rolling pin',
+      'colander',
+      'can opener',
+      'salad spinner',
+    ],
+  },
+  {
+    id: 'fire',
+    tier: 2,
+    label: 'Fire / Thermal',
+    emoji: '🔥',
+    description: 'Open flame or gas — no socket required',
+    items: [
+      'open fire',
+      'gas stovetop',
+      'charcoal grill',
+      'gas wok',
+      'charcoal smoker',
+    ],
+  },
+  {
+    id: 'electric',
+    tier: 3,
+    label: 'Electric',
+    emoji: '⚡',
+    description: 'Plugs in — simple motor or heating element, no circuit board',
+    items: [
+      'electric stovetop',
+      'electric grill',
+      'toaster',
+      'electric kettle',
+      'hand mixer',
+      'juicer',
+      'immersion blender',
+    ],
+  },
+  {
+    id: 'electronic',
+    tier: 4,
+    label: 'Electronic',
+    emoji: '💡',
+    description: 'Has a circuit board — digital controls or programmable logic',
+    items: [
+      'blender',
+      'food processor',
+      'microwave',
+      'air fryer',
+      'instant pot',
+      'deep fryer',
+      'rice cooker',
+      'sous vide',
+    ],
+  },
 ];
 
 /**
+ * Flat list of all available equipment strings (derived from categories).
+ * Kept for backward compatibility with existing code.
+ */
+export const AVAILABLE_EQUIPMENT: string[] = EQUIPMENT_CATEGORIES.flatMap(
+  (cat) => cat.items
+);
+
+/**
+ * Look up which category/tier an equipment item belongs to.
+ */
+export function getEquipmentTier(equipmentId: string): number {
+  const cat = EQUIPMENT_CATEGORIES.find((c) => c.items.includes(equipmentId));
+  return cat ? cat.tier : -1;
+}
+
+const EQUIPMENT_KEYWORDS: Record<string, string[]> = {
+  // Raw
+  raw: ['raw', 'uncooked', 'fresh', 'no cook', 'no-cook'],
+
+  // Manual
+  knife: ['slice', 'sliced', 'dice', 'diced', 'chop', 'chopped', 'mince', 'minced', 'julienne', 'cut'],
+  'cutting board': ['chop', 'dice', 'slice', 'cut'],
+  'mortar and pestle': ['mortar', 'pestle', 'ground', 'crush', 'crushed', 'pound', 'pounded'],
+  grater: ['grate', 'grated', 'shred', 'shredded', 'zest', 'zested'],
+  peeler: ['peel', 'peeled'],
+  mandoline: ['mandoline', 'mandolin', 'thin slice', 'paper thin'],
+  whisk: ['whisk', 'whisked', 'beat', 'beaten'],
+  'rolling pin': ['roll', 'rolled', 'flatten', 'flattened'],
+  colander: ['drain', 'drained', 'rinse', 'rinsed', 'strain', 'strained'],
+  'can opener': ['canned', 'tinned', 'tin of', 'can of'],
+  'salad spinner': ['salad spinner', 'spin dry'],
+
+  // Fire / Thermal
+  'open fire': ['open fire', 'campfire', 'camp fire', 'fire pit', 'coal'],
+  'gas stovetop': ['gas stove', 'gas range', 'gas burner', 'gas hob'],
+  'charcoal grill': ['charcoal grill', 'charcoal bbq', 'charcoal barbecue', 'bbq', 'barbecue', 'grill', 'grilled'],
+  'gas wok': ['gas wok', 'wok', 'wok fried', 'stir fry', 'stir-fry'],
+  'charcoal smoker': ['smoker', 'smoked', 'smoking', 'wood smoke'],
+
+  // Electric
+  'electric stovetop': ['electric stove', 'electric range', 'electric hob', 'coil stove', 'radiant stove', 'stovetop', 'pan fry', 'pan-fry', 'sauté', 'saute', 'boil', 'boiled', 'simmer', 'simmered', 'fry', 'fried'],
+  'electric grill': ['electric grill', 'contact grill', 'panini press', 'george foreman'],
+  toaster: ['toast', 'toasted', 'toaster'],
+  'electric kettle': ['kettle', 'boiling water', 'hot water'],
+  'hand mixer': ['hand mixer', 'stand mixer', 'electric mixer', 'beat', 'whip', 'whipped cream'],
+  juicer: ['juice', 'juiced', 'extract juice', 'cold press', 'centrifugal'],
+  'immersion blender': ['immersion blend', 'hand blend', 'stick blend', 'stick blender'],
+
+  // Electronic
+  blender: ['blend', 'blended', 'puree', 'pureed', 'smoothie', 'slurry', 'high speed blend'],
+  'food processor': ['food processor', 'process', 'processed', 'chop finely'],
+  microwave: ['microwave', 'microwaved'],
+  'air fryer': ['air fry', 'air-fry', 'air fried', 'air fryer'],
+  'instant pot': ['instant pot', 'pressure cook', 'pressure cooked', 'pressure cooker'],
+  'deep fryer': ['deep fry', 'deep-fry', 'deep fried', 'deep fryer'],
+  'rice cooker': ['rice cooker', 'rice machine'],
+  'sous vide': ['sous vide', 'sous-vide', 'water bath', 'immersion circulator'],
+};
+
+/**
  * Infer equipment from ingredient details and cooking state
- * @param ingredientName - name of the ingredient
- * @param modifier - how the ingredient is prepared (chopped, diced, etc.)
- * @param cookingState - cooking state of the ingredient
- * @param instructionText - recipe instruction text to check for equipment mentions
- * @returns Inferred equipment list and confidence level
  */
 export function inferEquipmentFromIngredient(
   ingredientName: string = '',
@@ -76,16 +186,16 @@ export function inferEquipmentFromIngredient(
       if (textToCheck.includes(keyword)) {
         inferredEquipment.add(equipment);
         totalMatches++;
-        // High confidence for cooking states, medium for modifiers
         if (cookingState.toLowerCase().includes(keyword)) highConfidenceMatches++;
       }
     }
   }
 
-  // Knife is almost always needed unless it's a smoothie/blended recipe
-  const isLiquidRecipe = textToCheck.includes('blend') || textToCheck.includes('smoothie');
-  if (!isLiquidRecipe && inferredEquipment.size > 0) {
+  // Knife implied when there's chopping/cutting but not a purely liquid recipe
+  const isLiquidRecipe = textToCheck.includes('blend') || textToCheck.includes('smoothie') || textToCheck.includes('juice');
+  if (!isLiquidRecipe && inferredEquipment.size > 0 && !inferredEquipment.has('raw')) {
     inferredEquipment.add('knife');
+    inferredEquipment.add('cutting board');
   }
 
   const confidence =
@@ -99,8 +209,6 @@ export function inferEquipmentFromIngredient(
 
 /**
  * Infer equipment from an array of ingredients
- * @param ingredients - array of ingredient objects
- * @returns Combined equipment list with frequency info
  */
 export function inferEquipmentFromIngredients(
   ingredients: Array<{
@@ -127,7 +235,6 @@ export function inferEquipmentFromIngredients(
     });
   });
 
-  // Sort by frequency and return top suggestions
   const suggested = Object.entries(equipmentFrequency)
     .sort(([, freqA], [, freqB]) => freqB - freqA)
     .map(([eq]) => eq);
@@ -137,8 +244,6 @@ export function inferEquipmentFromIngredients(
 
 /**
  * Infer equipment from recipe instructions text
- * @param instructions - array of instruction texts
- * @returns Inferred equipment from instructions
  */
 export function inferEquipmentFromInstructions(
   instructions: string[]
@@ -160,9 +265,6 @@ export function inferEquipmentFromInstructions(
 
 /**
  * Combine inferred equipment from ingredients and instructions
- * @param ingredients - ingredient array
- * @param instructions - instruction array
- * @returns Combined equipment suggestions
  */
 export function inferEquipmentFromRecipe(
   ingredients: Array<{

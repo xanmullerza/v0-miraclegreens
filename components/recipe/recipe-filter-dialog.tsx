@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { AVAILABLE_EQUIPMENT } from '@/lib/utils/equipment-inference';
+import { EQUIPMENT_CATEGORIES } from '@/lib/utils/equipment-inference';
 
 import {
   Dialog,
@@ -29,7 +29,7 @@ interface RecipeFilterDialogProps {
   onClose: () => void;
 }
 
-type SectionKey = 'equipment' | 'dietary' | 'exclusions' | 'health' | 'pantry' | 'extras';
+type SectionKey = 'cookingSetup' | 'dietary' | 'exclusions' | 'health' | 'pantry' | 'extras';
 
 const DIET_OPTIONS = ['anything', 'vegetarian', 'vegan', 'pescatarian'];
 
@@ -74,7 +74,7 @@ export function RecipeFilterDialog({
   const [localFilters, setLocalFilters] = useState(filters);
   const [isMobile, setIsMobile] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
-    equipment: true,
+    cookingSetup: true,
     dietary: true,
     exclusions: true,
     health: true,
@@ -101,6 +101,9 @@ export function RecipeFilterDialog({
       [section]: !prev[section],
     }));
   };
+
+  const selectedInCategory = (items: string[]) =>
+    items.filter((i) => localFilters.selectedEquipment.includes(i)).length;
 
   const handleEquipmentToggle = (equipment: string) => {
     const updated = localFilters.selectedEquipment.includes(equipment)
@@ -181,37 +184,79 @@ export function RecipeFilterDialog({
 
   const FilterContentInner = (
     <div className="p-4 sm:p-6 space-y-6 overflow-y-auto overflow-x-hidden flex-1 scrollbar-thin">
-      {/* Equipment Section */}
+      {/* Cooking Setup Section */}
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
         <button
-          onClick={() => handleToggleSection('equipment')}
+          onClick={() => handleToggleSection('cookingSetup')}
           className="w-full px-4 py-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
         >
           <h3 className="font-semibold text-slate-900 dark:text-white">
-            Equipment ({localFilters.selectedEquipment.length})
+            Cooking Setup ({localFilters.selectedEquipment.length})
           </h3>
-          {expandedSections.equipment ? (
+          {expandedSections.cookingSetup ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {expandedSections.equipment && (
-          <div className="p-4 bg-white dark:bg-slate-900 grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {AVAILABLE_EQUIPMENT.map((eq) => (
-              <label
-                key={eq}
-                className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              >
-                <Checkbox
-                  checked={localFilters.selectedEquipment.includes(eq)}
-                  onCheckedChange={() => handleEquipmentToggle(eq)}
-                />
-                <span className="text-sm capitalize text-slate-700 dark:text-slate-300">
-                  {eq}
-                </span>
-              </label>
-            ))}
+        {expandedSections.cookingSetup && (
+          <div className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
+            {EQUIPMENT_CATEGORIES.map((category) => {
+              const selectedCount = selectedInCategory(category.items);
+              const isRaw = category.tier === 0;
+              return (
+                <div key={category.id} className="px-4 py-3">
+                  {/* Category sub-header */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{category.emoji}</span>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          {category.label}
+                          {selectedCount > 0 && (
+                            <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-emerald-500 text-white rounded-full">
+                              {selectedCount}
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{category.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Items */}
+                  {isRaw ? (
+                    // Tier 0: single wide checkbox row
+                    <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                      <Checkbox
+                        checked={localFilters.selectedEquipment.includes('raw')}
+                        onCheckedChange={() => handleEquipmentToggle('raw')}
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">No Prep / Raw</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Salads, fresh fruit, ready-to-eat — no cooking needed</p>
+                      </div>
+                    </label>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {category.items.map((eq) => (
+                        <label
+                          key={eq}
+                          className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                        >
+                          <Checkbox
+                            checked={localFilters.selectedEquipment.includes(eq)}
+                            onCheckedChange={() => handleEquipmentToggle(eq)}
+                          />
+                          <span className="text-sm capitalize text-slate-700 dark:text-slate-300">
+                            {eq}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
