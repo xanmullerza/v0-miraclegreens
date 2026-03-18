@@ -31,6 +31,15 @@ import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
 import { RecipeFormDialog } from '@/components/ingredients/recipe-form-dialog';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
+import { supabase } from '@/lib/supabase';
+import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
+
+
+interface RecipeWithIngredients extends Recipe {
+    ingredients?: any[];
+}
+
 
 const CAL_TO_KJ = 4.184;
 const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
@@ -79,7 +88,11 @@ export function RecipesView({
     const [hasMore, setHasMore] = useState(true);
     const { searchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
+    const { filters } = useRecipeFilter();
+
     const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading } = useDataPersistence();
+    const [pantryItems, setPantryItems] = useState<any[]>([]);
+
 
     const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
@@ -110,13 +123,61 @@ export function RecipesView({
         if (!authLoading) {
             fetchRecipes(0, true);
         }
-    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading]);
+    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements]);
+
+    // Fetch pantry items when needed
+    const getPantryItems = async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            const [foodItemsRes, pantryItemsRes] = await Promise.all([
+                supabase.from('food_items').select('*').eq('is_in_pantry', true),
+                user ? supabase.from('pantry_items').select('*, scanned_products(nutrition), food_items(*)').eq('user_id', user.id) : { data: [] }
+            ]);
+
+            let combined: any[] = [
+                ...(foodItemsRes.data || []).map(f => ({ ...f, source_table: 'food_items' })),
+                ...(pantryItemsRes.data || []).map((item: any) => ({
+                    id: item.id,
+                    food_item_id: item.food_item_id,
+                    name: item.scanned_products?.name || item.food_items?.name || item.custom_name,
+                    quantity: item.quantity,
+                    source_table: 'pantry_items'
+                }))
+            ];
+
+            const saved = localStorage.getItem(PANTRY_QUANTITIES_KEY);
+            if (saved) {
+                const quantities = JSON.parse(saved);
+                combined = combined.map(item => ({
+                    ...item,
+                    quantity: quantities[item.id] || item.quantity
+                }));
+            }
+            return combined;
+        } catch (err) {
+            console.error('Failed to fetch pantry items', err);
+            return [];
+        }
+    };
 
     const fetchRecipes = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
         else setLoadingMore(true);
 
         try {
+            // Fetch pantry items first if needed
+            let currentPantry = pantryItems;
+            if (filters.pantryMode === 'pantry-only') {
+                currentPantry = await getPantryItems();
+                setPantryItems(currentPantry);
+            }
+
+            // Determine if we need to fetch ingredients for local filtering
+            const needsIngredients = filters.pantryMode === 'pantry-only' || 
+                                    filters.selectedExclusions.length > 0 || 
+                                    filters.selectedDietType !== 'anything';
+
+
             const { recipes: newItems, count } = await fetchRecipesBridge({
                 searchQuery,
                 selectedTypes,
@@ -125,20 +186,87 @@ export function RecipesView({
                 pageSize: PAGE_SIZE,
                 sortField,
                 sortDirection,
-                isMix
+                isMix,
+                includeDetails: needsIngredients
             });
 
-            if (count !== null) setTotalCount(count);
+            // LOCAL FILTERING
+            let filteredItems = newItems;
+
+            // 1. Dietary Preference Filter
+            if (filters.selectedDietType && filters.selectedDietType !== 'anything') {
+                filteredItems = filteredItems.filter(r => 
+                    r.diet && r.diet.map((d: string) => d.toLowerCase()).includes(filters.selectedDietType.toLowerCase())
+                );
+            }
+
+            // 1b. Health Conditions Filter
+            if (filters.selectedHealthConditions.length > 0) {
+                filteredItems = filteredItems.filter(r => 
+                    r.diet && filters.selectedHealthConditions.some(hc => 
+                        r.diet.map((d: string) => d.toLowerCase()).includes(hc.toLowerCase())
+                    )
+                );
+            }
+
+
+            // 2. Exclusions Filter
+            if (filters.selectedExclusions.length > 0) {
+                filteredItems = filteredItems.filter(r => {
+                    const recipeIngredients = (r as any).ingredients || [];
+                    return !recipeIngredients.some((ing: any) => {
+                        // Check if this ingredient should be ignored (it's a flavour or supplement and the user said it's okay)
+                        const category = ing.food_item?.category?.toLowerCase() || '';
+                        if (!filters.showFlavours && category === 'flavour') return false;
+                        if (!filters.showSupplements && category === 'supplements') return false;
+
+                        const name = (ing.item || '').toLowerCase();
+                        return filters.selectedExclusions.some(exc => name.includes(exc.toLowerCase()));
+                    });
+                });
+            }
+
+            // 3. Pantry Filter
+            if (filters.pantryMode === 'pantry-only') {
+                filteredItems = filteredItems.filter(r => {
+                    const recipeIngredients = (r as any).ingredients || [];
+                    
+                    // A recipe is makeable if all non-optional ingredients are in the pantry
+                    const missingIngredients = recipeIngredients.filter((ing: any) => {
+                        const category = ing.food_item?.category?.toLowerCase() || '';
+                        
+                        // Ignore optional categories if configured
+                        if (!filters.showFlavours && category === 'flavour') return false;
+                        if (!filters.showSupplements && category === 'supplements') return false;
+
+                        // Check if we have this ingredient in pantry
+                        // Match by food_item_id or name
+                        const inPantry = currentPantry.some(pi => 
+                            (ing.food_item_id && pi.food_item_id === ing.food_item_id) ||
+                            (pi.food_items?.id === ing.food_item_id) ||
+                            (pi.name?.toLowerCase() === ing.item?.toLowerCase())
+                        );
+
+                        return !inPantry;
+                    });
+
+
+                    return missingIngredients.length === 0;
+                });
+            }
 
             if (isNewSearch) {
-                setRecipes(newItems);
+                setRecipes(filteredItems);
                 setPage(0);
             } else {
-                setRecipes(prev => [...prev, ...newItems]);
+                setRecipes(prev => [...prev, ...filteredItems]);
                 setPage(pageNum);
             }
 
-            setHasMore(count ? (isNewSearch ? newItems.length : recipes.length + newItems.length) < count : false);
+            // Note: totalCount might be inaccurate now due to local filtering
+            if (count !== null) setTotalCount(count);
+            setHasMore(count ? (isNewSearch ? filteredItems.length : recipes.length + filteredItems.length) < count : false);
+
         } catch (error) {
             console.error('Error fetching recipes:', error);
             toast.error('Failed to load meal library');

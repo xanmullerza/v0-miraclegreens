@@ -28,7 +28,15 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
+import { supabase } from '@/lib/supabase';
+import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
+
+interface RecipeWithIngredients extends Recipe {
+    ingredients?: any[];
+}
+
 
 const CAL_TO_KJ = 4.184;
 const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
@@ -56,7 +64,10 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
     const [hasMore, setHasMore] = useState(true);
     const { searchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
+    const { filters } = useRecipeFilter();
     const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading } = useDataPersistence();
+    const [pantryItems, setPantryItems] = useState<any[]>([]);
+
 
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -68,14 +79,60 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
         if (!authLoading) {
             fetchMyRecipes(0, true);
         }
-    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, user]);
+    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, user, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements]);
+
+    const getPantryItems = async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            const [foodItemsRes, pantryItemsRes] = await Promise.all([
+                supabase.from('food_items').select('*').eq('is_in_pantry', true),
+                user ? supabase.from('pantry_items').select('*, scanned_products(nutrition), food_items(*)').eq('user_id', user.id) : { data: [] }
+            ]);
+
+            let combined: any[] = [
+                ...(foodItemsRes.data || []).map(f => ({ ...f, source_table: 'food_items' })),
+                ...(pantryItemsRes.data || []).map((item: any) => ({
+                    id: item.id,
+                    food_item_id: item.food_item_id,
+                    name: item.scanned_products?.name || item.food_items?.name || item.custom_name,
+                    quantity: item.quantity,
+                    source_table: 'pantry_items'
+                }))
+            ];
+
+            const saved = localStorage.getItem(PANTRY_QUANTITIES_KEY);
+            if (saved) {
+                const quantities = JSON.parse(saved);
+                combined = combined.map(item => ({
+                    ...item,
+                    quantity: quantities[item.id] || item.quantity
+                }));
+            }
+            return combined;
+        } catch (err) {
+            console.error('Failed to fetch pantry items', err);
+            return [];
+        }
+    };
 
     const fetchMyRecipes = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
         else setLoadingMore(true);
 
         try {
-            // Fetch all recipes
+            // Fetch pantry items first if needed
+            let currentPantry = pantryItems;
+            if (filters.pantryMode === 'pantry-only') {
+                currentPantry = await getPantryItems();
+                setPantryItems(currentPantry);
+            }
+
+            const needsIngredients = filters.pantryMode === 'pantry-only' || 
+                                    filters.selectedExclusions.length > 0 || 
+                                    filters.selectedDietType !== 'anything';
+
+
+            // Fetch recipes with ingredients if needed
             const { recipes: allRecipes } = await fetchRecipesBridge({
                 searchQuery,
                 selectedTypes,
@@ -84,19 +141,73 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
                 pageSize: 1000,
                 sortField,
                 sortDirection,
-                isMix: false
+                isMix: false,
+                includeDetails: needsIngredients
             });
 
-            // Filter logic:
-            // 1. If logged in: show recipes belonging to the user
-            // 2. If logged out: show recipes from local storage (which have local- prefix or no user_id)
-            const userRecipes = allRecipes.filter(r => {
+            // 1. Ownership logic
+            let userRecipesArr = allRecipes.filter(r => {
                 if (user) {
                     return r.user_id === user.id && !r.is_curated;
                 } else {
                     return r.id.toString().startsWith('local-') || !r.user_id;
                 }
             });
+
+            // 2. Dietary Preference Filter
+            if (filters.selectedDietType && filters.selectedDietType !== 'anything') {
+                userRecipesArr = userRecipesArr.filter(r => 
+                    r.diet && r.diet.map((d: string) => d.toLowerCase()).includes(filters.selectedDietType.toLowerCase())
+                );
+            }
+
+            // 2b. Health Conditions Filter
+            if (filters.selectedHealthConditions.length > 0) {
+                userRecipesArr = userRecipesArr.filter(r => 
+                    r.diet && filters.selectedHealthConditions.some(hc => 
+                        r.diet.map((d: string) => d.toLowerCase()).includes(hc.toLowerCase())
+                    )
+                );
+            }
+
+
+            // 3. Exclusions Filter
+            if (filters.selectedExclusions.length > 0) {
+                userRecipesArr = userRecipesArr.filter(r => {
+                    const recipeIngredients = (r as any).ingredients || [];
+                    return !recipeIngredients.some((ing: any) => {
+                        const category = ing.food_item?.category?.toLowerCase() || '';
+                        if (!filters.showFlavours && category === 'flavour') return false;
+                        if (!filters.showSupplements && category === 'supplements') return false;
+
+                        const name = (ing.item || '').toLowerCase();
+                        return filters.selectedExclusions.some(exc => name.includes(exc.toLowerCase()));
+                    });
+                });
+            }
+
+            // 4. Pantry Filter
+            if (filters.pantryMode === 'pantry-only') {
+                userRecipesArr = userRecipesArr.filter(r => {
+                    const recipeIngredients = (r as any).ingredients || [];
+                    const missingIngredients = recipeIngredients.filter((ing: any) => {
+                        const category = ing.food_item?.category?.toLowerCase() || '';
+                        if (!filters.showFlavours && category === 'flavour') return false;
+                        if (!filters.showSupplements && category === 'supplements') return false;
+
+                        return !currentPantry.some(pi => 
+                            (ing.food_item_id && pi.food_item_id === ing.food_item_id) ||
+                            (pi.food_items?.id === ing.food_item_id) ||
+                            (pi.name?.toLowerCase() === ing.item?.toLowerCase())
+                        );
+                    });
+
+                    return missingIngredients.length === 0;
+                });
+            }
+
+            const userRecipes = userRecipesArr;
+
 
             if (isNewSearch) {
                 setRecipes(userRecipes);

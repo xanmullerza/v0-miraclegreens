@@ -65,9 +65,9 @@ export function useDataPersistence() {
 
         try {
             // 1. Fetch from Supabase (Curated + User's own)
-            let query = supabase
-                .from('recipes')
-                .select('*', { count: 'exact' });
+            let query = includeDetails 
+                ? supabase.from('recipes').select('*, ingredients(*, food_item:food_items(*))', { count: 'exact' })
+                : supabase.from('recipes').select('*', { count: 'exact' });
 
             if (includeDetails) {
                 // Supabase doesn't support easy nested fetch in a single 'select *' for unrelated tables 
