@@ -264,7 +264,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [isDragging, setIsDragging] = useState(false);
     
     // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import-options'>('dashboard');
+    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import-options' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
 
     const getChatbotViewTitle = () => {
@@ -287,6 +287,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             case 'lifeguard': return 'Lifeguard';
             case 'conversation-history': return 'Conversation History';
             case 'import-options': return 'Import Options';
+            case 'import-paste-text': return 'Paste Text';
+            case 'import-paste-url': return 'Paste URL';
+            case 'import-upload-photo': return 'Upload Photo';
+            case 'import-voice': return 'Voice Recipe';
+            case 'import-video': return 'Video Import';
             case 'comingSoon': return 'Coming Soon';
             default: return 'Navigation';
         }
@@ -2150,10 +2155,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                             {/* Option 2: Paste Text */}
                             <div 
-                                onClick={() => {
-                                    setChatbotView('messages');
-                                    setIsCreatingRecipe(true);
-                                }}
+                                onClick={() => setChatbotView('import-paste-text')}
                                 className="bg-blue-500/10 dark:bg-blue-500/5 rounded-2xl p-4 border border-blue-500/20 flex flex-col h-full relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 cursor-pointer"
                             >
                                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -2176,10 +2178,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                             {/* Option 3: Paste URL */}
                             <div 
-                                onClick={() => {
-                                    setChatbotView('messages');
-                                    setIsCreatingRecipe(true);
-                                }}
+                                onClick={() => setChatbotView('import-paste-url')}
                                 className="bg-purple-500/10 dark:bg-purple-500/5 rounded-2xl p-4 border border-purple-500/20 flex flex-col h-full relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300 cursor-pointer"
                             >
                                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -2211,7 +2210,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 onDrop={(e) => {
                                     e.preventDefault();
                                     const file = e.dataTransfer.files?.[0];
-                                    if (file) processRecipeImage(file);
+                                    if (file) {
+                                        setChatbotView('import-upload-photo');
+                                        processRecipeImage(file);
+                                    }
                                 }}
                                 onClick={() => fileInputRef.current?.click()}
                             >
@@ -2235,10 +2237,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                             {/* Option 5: Voice Assisted */}
                             <div 
-                                onClick={() => {
-                                    setChatbotView('messages');
-                                    setIsCreatingRecipe(true);
-                                }}
+                                onClick={() => setChatbotView('import-voice')}
                                 className="bg-amber-500/10 dark:bg-amber-500/5 rounded-2xl p-4 border border-amber-500/20 flex flex-col h-full relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300 cursor-pointer"
                             >
                                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -2261,10 +2260,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                             {/* Option 6: Video Import */}
                             <div 
-                                onClick={() => {
-                                    setChatbotView('messages');
-                                    setIsCreatingRecipe(true);
-                                }}
+                                onClick={() => setChatbotView('import-video')}
                                 className="bg-cyan-500/10 dark:bg-cyan-500/5 rounded-2xl p-4 border border-cyan-500/20 flex flex-col h-full relative overflow-hidden group hover:border-cyan-500/40 transition-all duration-300 cursor-pointer"
                             >
                                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -2302,6 +2298,321 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </div>
                             </div>
                             <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform text-emerald-500" />
+                        </button>
+                    </div>
+                )}
+
+                {/* Import - Paste Text View */}
+                {!showRecipeBuilder && chatbotView === 'import-paste-text' && (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Paste Recipe Text</h3>
+                            <button
+                                onClick={() => setChatbotView('import-options')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-blue-500 transition-colors uppercase tracking-widest"
+                            >
+                                ← Back
+                            </button>
+                        </div>
+
+                        {!successRecipe ? (
+                            <>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Paste the recipe ingredients and instructions here:</p>
+                                <textarea
+                                    value={pastedRecipeContent}
+                                    onChange={(e) => setPastedRecipeContent(e.target.value)}
+                                    placeholder="Paste your recipe text here (ingredients and instructions)..."
+                                    className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                />
+                                <button
+                                    onClick={handlePasteRecipeContent}
+                                    disabled={!pastedRecipeContent.trim() || recipeLoading}
+                                    className="mt-3 w-full px-4 py-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-black uppercase tracking-widest text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {recipeLoading ? (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" />
+                                            Parsing...
+                                        </>
+                                    ) : (
+                                        'Parse Recipe'
+                                    )}
+                                </button>
+                            </>
+                        ) : (
+                            <div className="flex-1 flex flex-col">
+                                <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-xl p-4 border border-blue-500/20 mb-4">
+                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{successRecipe.title}</h4>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Recipe parsed successfully! Ready to save?</p>
+                                </div>
+                                <button
+                                    onClick={() => handleSaveAndViewRecipe(successRecipe)}
+                                    disabled={recipeSaving}
+                                    className="w-full px-4 py-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-black uppercase tracking-widest text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {recipeSaving ? (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={14} />
+                                            Save to Library
+                                        </>
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setSuccessRecipe(null);
+                                        setPastedRecipeContent('');
+                                    }}
+                                    className="mt-2 w-full px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-colors"
+                                >
+                                    Try Another
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Import - Paste URL View */}
+                {!showRecipeBuilder && chatbotView === 'import-paste-url' && (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Paste Recipe URL</h3>
+                            <button
+                                onClick={() => setChatbotView('import-options')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-purple-500 transition-colors uppercase tracking-widest"
+                            >
+                                ← Back
+                            </button>
+                        </div>
+
+                        {!successRecipe ? (
+                            <>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Paste a recipe URL from any cooking website:</p>
+                                <input
+                                    type="url"
+                                    value={pastedRecipeURL}
+                                    onChange={(e) => setpastedRecipeURL(e.target.value)}
+                                    placeholder="https://example.com/recipe/..."
+                                    className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                                <button
+                                    onClick={handlePasteRecipeURL}
+                                    disabled={!pastedRecipeURL.trim() || recipeLoading}
+                                    className="mt-3 w-full px-4 py-3 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-black uppercase tracking-widest text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {recipeLoading ? (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" />
+                                            Parsing...
+                                        </>
+                                    ) : (
+                                        'Parse Recipe'
+                                    )}
+                                </button>
+                            </>
+                        ) : (
+                            <div className="flex-1 flex flex-col">
+                                <div className="bg-purple-500/10 dark:bg-purple-500/20 rounded-xl p-4 border border-purple-500/20 mb-4">
+                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{successRecipe.title}</h4>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Recipe parsed successfully! Ready to save?</p>
+                                </div>
+                                <button
+                                    onClick={() => handleSaveAndViewRecipe(successRecipe)}
+                                    disabled={recipeSaving}
+                                    className="w-full px-4 py-3 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-black uppercase tracking-widest text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {recipeSaving ? (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={14} />
+                                            Save to Library
+                                        </>
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setSuccessRecipe(null);
+                                        setpastedRecipeURL('');
+                                    }}
+                                    className="mt-2 w-full px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-colors"
+                                >
+                                    Try Another
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Import - Upload Photo View */}
+                {!showRecipeBuilder && chatbotView === 'import-upload-photo' && (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Upload Recipe Photo</h3>
+                            <button
+                                onClick={() => setChatbotView('import-options')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors uppercase tracking-widest"
+                            >
+                                ← Back
+                            </button>
+                        </div>
+
+                        {!successRecipe ? (
+                            <>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Upload a photo of a recipe (from a book, magazine, or printed page):</p>
+                                <div className="flex-1 flex items-center justify-center mb-3">
+                                    <label className="flex flex-col items-center justify-center w-full h-32 rounded-lg border-2 border-dashed border-rose-500/30 hover:border-rose-500 transition cursor-pointer bg-rose-500/5">
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <Camera className="w-8 h-8 text-rose-500 mb-2" />
+                                            <p className="text-xs text-slate-600 dark:text-slate-400">Click to upload or drag and drop</p>
+                                        </div>
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => e.target.files?.[0] && processRecipeImage(e.target.files[0])} />
+                                    </label>
+                                </div>
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full px-4 py-3 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-sm transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Upload size={14} />
+                                    Upload Photo
+                                </button>
+                            </>
+                        ) : (
+                            <div className="flex-1 flex flex-col">
+                                <div className="bg-rose-500/10 dark:bg-rose-500/20 rounded-xl p-4 border border-rose-500/20 mb-4">
+                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{successRecipe.title}</h4>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Recipe extracted successfully! Ready to save?</p>
+                                </div>
+                                <button
+                                    onClick={() => handleSaveAndViewRecipe(successRecipe)}
+                                    disabled={recipeSaving}
+                                    className="w-full px-4 py-3 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {recipeSaving ? (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={14} />
+                                            Save to Library
+                                        </>
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => setSuccessRecipe(null)}
+                                    className="mt-2 w-full px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-colors"
+                                >
+                                    Upload Another
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Import - Voice View */}
+                {!showRecipeBuilder && chatbotView === 'import-voice' && (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Voice Recipe</h3>
+                            <button
+                                onClick={() => setChatbotView('import-options')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest"
+                            >
+                                ← Back
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Describe your recipe by talking:</p>
+                        <button
+                            onClick={() => {
+                                if (isRecording) stopAudioRecording();
+                                else startAudioRecording();
+                            }}
+                            className={cn(
+                                "w-full px-4 py-3 rounded-lg font-black uppercase tracking-widest text-sm transition-colors flex items-center justify-center gap-2 flex-1 mb-3",
+                                isRecording
+                                    ? "bg-red-500 hover:bg-red-600 text-white"
+                                    : "bg-amber-500 hover:bg-amber-600 text-white"
+                            )}
+                        >
+                            {isRecording ? (
+                                <>
+                                    <Square size={14} />
+                                    Stop Recording ({recordingTime}s)
+                                </>
+                            ) : (
+                                <>
+                                    <Mic size={14} />
+                                    Start Recording
+                                </>
+                            )}
+                        </button>
+
+                        {successRecipe && (
+                            <div className="flex-1 flex flex-col">
+                                <div className="bg-amber-500/10 dark:bg-amber-500/20 rounded-xl p-4 border border-amber-500/20 mb-4">
+                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{successRecipe.title}</h4>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Recipe created successfully! Ready to save?</p>
+                                </div>
+                                <button
+                                    onClick={() => handleSaveAndViewRecipe(successRecipe)}
+                                    disabled={recipeSaving}
+                                    className="w-full px-4 py-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {recipeSaving ? (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={14} />
+                                            Save to Library
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Import - Video View */}
+                {!showRecipeBuilder && chatbotView === 'import-video' && (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Video Import</h3>
+                            <button
+                                onClick={() => setChatbotView('import-options')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-cyan-500 transition-colors uppercase tracking-widest"
+                            >
+                                ← Back
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">Paste a YouTube or TikTok video link:</p>
+                        <input
+                            type="url"
+                            value={videoURL}
+                            onChange={(e) => setVideoURL(e.target.value)}
+                            placeholder="https://youtube.com/watch?v=... or https://tiktok.com/@..."
+                            className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 mb-3"
+                        />
+                        <button
+                            onClick={() => toast('Video recipe import is coming soon!')}
+                            disabled={!videoURL.trim()}
+                            className="w-full px-4 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase tracking-widest text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            <Video size={14} />
+                            Extract Recipe
                         </button>
                     </div>
                 )}
