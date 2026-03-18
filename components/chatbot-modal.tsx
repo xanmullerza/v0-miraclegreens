@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -2047,15 +2047,21 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
 
                         {/* Planner Section */}
-                        <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group">
+                        <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group cursor-pointer transition-all hover:border-blue-500/40" onClick={() => toast('🚀 Meal planning features coming soon! We\'re polishing the details to make it perfect for you.')}>
                             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Calendar size={120} className="text-blue-500 -rotate-12" />
                             </div>
+                            {/* Lock Icon */}
+                            {profile?.role !== 'admin' && (
+                                <div className="absolute top-3 right-3 z-10 bg-blue-500 rounded-full p-1.5 shadow-lg">
+                                    <Lock size={14} className="text-white" />
+                                </div>
+                            )}
                             <div className="flex items-center gap-2 mb-6">
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Planner</h3>
                             </div>
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className={cn("grid grid-cols-2 gap-6", profile?.role !== 'admin' && "opacity-50 pointer-events-none")}>
                                 <button
                                     onClick={() => setChatbotView('planner')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
@@ -2081,15 +2087,21 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
 
                         {/* Widgets Section */}
-                        <div className="bg-purple-500/10 dark:bg-purple-500/20 rounded-3xl p-6 border border-purple-500/20 shadow-sm relative overflow-hidden group">
+                        <div className="bg-purple-500/10 dark:bg-purple-500/20 rounded-3xl p-6 border border-purple-500/20 shadow-sm relative overflow-hidden group cursor-pointer transition-all hover:border-purple-500/40" onClick={() => toast('✨ Advanced widgets coming soon! We\'re polishing the details to make it perfect for you.')}>
                             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Package size={120} className="text-purple-500 -rotate-12" />
                             </div>
+                            {/* Lock Icon */}
+                            {profile?.role !== 'admin' && (
+                                <div className="absolute top-3 right-3 z-10 bg-purple-500 rounded-full p-1.5 shadow-lg">
+                                    <Lock size={14} className="text-white" />
+                                </div>
+                            )}
                             <div className="flex items-center gap-2 mb-6">
                                 <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Widgets</h3>
                             </div>
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className={cn("grid grid-cols-2 gap-6", profile?.role !== 'admin' && "opacity-50 pointer-events-none")}>
                                 <button
                                     onClick={() => setChatbotView('nutridex')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
