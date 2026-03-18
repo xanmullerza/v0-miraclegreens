@@ -133,22 +133,28 @@ export function RecipeFilterDialog({
   };
 
   const handleSave = async () => {
+    const profileUpdates: any = {};
+
+    if (localFilters.selectedDietType !== profile?.dietType) {
+      profileUpdates.dietType = localFilters.selectedDietType;
+    }
+
     if (
       JSON.stringify(localFilters.selectedExclusions) !==
       JSON.stringify(profile?.exclusions || [])
     ) {
-      await updateProfile({
-        exclusions: localFilters.selectedExclusions,
-      });
+      profileUpdates.exclusions = localFilters.selectedExclusions;
     }
 
     if (
       JSON.stringify(localFilters.selectedHealthConditions) !==
       JSON.stringify(profile?.healthConditions || [])
     ) {
-      await updateProfile({
-        healthConditions: localFilters.selectedHealthConditions,
-      });
+      profileUpdates.healthConditions = localFilters.selectedHealthConditions;
+    }
+
+    if (Object.keys(profileUpdates).length > 0) {
+      await updateProfile(profileUpdates);
     }
 
     Object.keys(localFilters).forEach((key) => {
