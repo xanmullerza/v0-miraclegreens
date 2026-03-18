@@ -11,6 +11,13 @@ import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { AVAILABLE_EQUIPMENT } from '@/lib/utils/equipment-inference';
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
 interface RecipeFilterDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -71,17 +78,6 @@ export function RecipeFilterDialog({
   useEffect(() => {
     setLocalFilters(filters);
   }, [filters, isOpen]);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
 
   const handleToggleSection = (section: SectionKey) => {
     setExpandedSections((prev) => ({
@@ -161,14 +157,12 @@ export function RecipeFilterDialog({
     toast.info('Filters reset to profile defaults');
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center">
-      <div className="bg-white dark:bg-slate-900 w-full sm:w-full sm:max-w-2xl rounded-t-3xl sm:rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl p-0 overflow-hidden sm:max-h-[90vh] flex flex-col gap-0 border-none sm:border bg-white dark:bg-slate-900 shadow-2xl rounded-t-3xl sm:rounded-2xl top-auto bottom-0 sm:top-[50%] sm:bottom-auto translate-y-0 sm:translate-y-[-50%]">
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex items-center justify-between">
+          <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center">
             Filter Recipes
             {hasActiveFilters && (
               <span className="ml-2 inline-block bg-blue-500 text-white text-xs font-bold rounded-full px-2.5 py-1">
@@ -179,17 +173,11 @@ export function RecipeFilterDialog({
                   (filters.showFlavours ? 1 : 0)}
               </span>
             )}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          </DialogTitle>
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6 overflow-y-auto overflow-x-hidden flex-1 scrollbar-thin">
           {/* Equipment Section */}
           <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
             <button
@@ -486,7 +474,7 @@ export function RecipeFilterDialog({
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex gap-3">
+        <div className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex gap-3">
           <Button
             variant="outline"
             onClick={handleReset}
@@ -500,7 +488,7 @@ export function RecipeFilterDialog({
             Apply
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
