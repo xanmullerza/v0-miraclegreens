@@ -31,6 +31,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
+import { inferEquipmentFromRecipe } from '@/lib/utils/equipment-inference';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
 
 interface RecipeWithIngredients extends Recipe {
@@ -129,11 +130,12 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
 
             const needsIngredients = filters.pantryMode === 'pantry-only' || 
                                     filters.selectedExclusions.length > 0 || 
-                                    filters.selectedDietType !== 'anything';
+                                    filters.selectedDietType !== 'anything' ||
+                                    filters.selectedEquipment.length > 0;
 
 
             // Fetch recipes with ingredients if needed
-            const { recipes: allRecipes } = await fetchRecipesBridge({
+            const { recipes: allRecipes, count } = await fetchRecipesBridge({
                 searchQuery,
                 selectedTypes,
                 showFavoritesOnly,
@@ -146,7 +148,7 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
             });
 
             // 1. Ownership logic
-            let userRecipesArr = allRecipes.filter(r => {
+            let filteredItems = allRecipes.filter(r => {
                 if (user) {
                     return r.user_id === user.id && !r.is_curated;
                 } else {
@@ -154,16 +156,16 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
                 }
             });
 
-            // 2. Dietary Preference Filter
+            // 1. Dietary Preference Filter
             if (filters.selectedDietType && filters.selectedDietType !== 'anything') {
-                userRecipesArr = userRecipesArr.filter(r => 
+                filteredItems = filteredItems.filter(r => 
                     r.diet && r.diet.map((d: string) => d.toLowerCase()).includes(filters.selectedDietType.toLowerCase())
                 );
             }
 
-            // 2b. Health Conditions Filter
+            // 1b. Health Conditions Filter
             if (filters.selectedHealthConditions.length > 0) {
-                userRecipesArr = userRecipesArr.filter(r => 
+                filteredItems = filteredItems.filter(r => 
                     r.diet && filters.selectedHealthConditions.some(hc => 
                         r.diet.map((d: string) => d.toLowerCase()).includes(hc.toLowerCase())
                     )
@@ -171,9 +173,16 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
             }
 
 
-            // 3. Exclusions Filter
+            // 2. Exclusions Filter
             if (filters.selectedExclusions.length > 0) {
-                userRecipesArr = userRecipesArr.filter(r => {
+                const searchExclusions = filters.selectedExclusions.map(exc => exc.toLowerCase());
+                
+                filteredItems = filteredItems.filter(r => {
+                    // Check Title and Type first (for things like "Spice Mix")
+                    const titleMatch = searchExclusions.some(exc => (r.title || '').toLowerCase().includes(exc));
+                    const typeMatch = searchExclusions.some(exc => (r.type || '').toLowerCase().includes(exc));
+                    if (titleMatch || typeMatch) return false;
+
                     const recipeIngredients = (r as any).ingredients || [];
                     return !recipeIngredients.some((ing: any) => {
                         const category = ing.food_item?.category?.toLowerCase() || '';
@@ -181,36 +190,61 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
                         if (!filters.showSupplements && category === 'supplements') return false;
 
                         const name = (ing.item || '').toLowerCase();
-                        return filters.selectedExclusions.some(exc => name.includes(exc.toLowerCase()));
+                        return searchExclusions.some(exc => name.includes(exc));
                     });
+                });
+            }
+
+            // 3. Equipment Filter
+            if (filters.selectedEquipment.length > 0) {
+                filteredItems = filteredItems.filter(r => {
+                    const inferred = inferEquipmentFromRecipe(
+                        (r as any).ingredients?.map((ing: any) => ({
+                            food_item_name: ing.item,
+                            modifier: ing.modifier,
+                            cooking_state: ing.cooking_state
+                        })) || [],
+                        (r as any).instructions?.map((i: any) => i.step_text) || []
+                    );
+                    
+                    // Recipe is OK if ALL its required equipment is in the selected list
+                    return inferred.every(e => filters.selectedEquipment.includes(e));
                 });
             }
 
             // 4. Pantry Filter
             if (filters.pantryMode === 'pantry-only') {
-                userRecipesArr = userRecipesArr.filter(r => {
+                const pantryIds = new Set(currentPantry.map(pi => pi.food_item_id || pi.id));
+                const pantryNames = new Set(currentPantry.map(pi => pi.name?.toLowerCase().trim()).filter(Boolean));
+
+                filteredItems = filteredItems.filter(r => {
                     const recipeIngredients = (r as any).ingredients || [];
+                    
+                    // If no ingredients, it's makeable
+                    if (recipeIngredients.length === 0) return true;
+
                     const missingIngredients = recipeIngredients.filter((ing: any) => {
                         const category = ing.food_item?.category?.toLowerCase() || '';
                         if (!filters.showFlavours && category === 'flavour') return false;
                         if (!filters.showSupplements && category === 'supplements') return false;
 
-                        return !currentPantry.some(pi => 
-                            (ing.food_item_id && pi.food_item_id === ing.food_item_id) ||
-                            (pi.food_items?.id === ing.food_item_id) ||
-                            (pi.name?.toLowerCase() === ing.item?.toLowerCase())
-                        );
+                        const inPantry = pantryIds.has(ing.food_item_id) || 
+                                       pantryNames.has(ing.item?.toLowerCase().trim());
+
+                        return !inPantry;
                     });
 
                     return missingIngredients.length === 0;
                 });
             }
 
-            const userRecipes = userRecipesArr;
+            const userRecipes = filteredItems;
+            setTotalCount(userRecipes.length);
 
 
             if (isNewSearch) {
-                setRecipes(userRecipes);
+                // For new search/filter, show the first page
+                setRecipes(userRecipes.slice(0, PAGE_SIZE));
                 setPage(0);
             } else {
                 // For pagination - slice the results

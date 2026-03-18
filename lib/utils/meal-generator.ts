@@ -1,6 +1,7 @@
-﻿import { supabase } from '../supabase';
+import { supabase } from '../supabase';
 import { Recipe, DietType } from '../data/recipes';
 import { scaleIngredient } from './recipe-scaling';
+import { inferEquipmentFromRecipe } from './equipment-inference';
 
 interface PlanSettings {
     targetCalories: number;
@@ -9,6 +10,12 @@ interface PlanSettings {
     favoritesOnly?: boolean;
     pantryItems?: any[];
     searchQuery?: string;
+    selectedEquipment?: string[];
+    selectedExclusions?: string[];
+    selectedHealthConditions?: string[];
+    showFlavours?: boolean;
+    showSupplements?: boolean;
+    strictPantry?: boolean;
 }
 
 export interface DailyPlan {
@@ -94,7 +101,14 @@ export const getRandomRecipeByType = async (
     diet: DietType,
     excludeId?: string,
     favoritesOnly?: boolean,
-    searchQuery?: string
+    searchQuery?: string,
+    options: {
+        equipment?: string[],
+        exclusions?: string[],
+        healthConditions?: string[],
+        showFlavours?: boolean,
+        showSupplements?: boolean
+    } = {}
 ): Promise<{ recipe: Recipe; micronutrients: Record<string, number> } | null> => {
     let query = supabase
         .from('recipes')
@@ -125,6 +139,7 @@ export const getRandomRecipeByType = async (
     // Transform and filter
     const recipesWithMicro: { recipe: Recipe; micronutrients: Record<string, number> }[] = recipesData
         .filter((r: any) => {
+            // 1. Diet Filter
             if (diet === 'anything') return true;
             if (diet === 'pescatarian') {
                 return r.diet.includes('pescatarian') || r.diet.includes('vegetarian') || r.diet.includes('vegan');
@@ -133,6 +148,56 @@ export const getRandomRecipeByType = async (
                 return r.diet.includes('vegetarian') || r.diet.includes('vegan');
             }
             return r.diet.includes(diet);
+        })
+        .filter((r: any) => {
+            // 2. Health Conditions Filter
+            if (options.healthConditions && options.healthConditions.length > 0) {
+                return options.healthConditions.some(hc => 
+                    r.diet.map((d: string) => d.toLowerCase()).includes(hc.toLowerCase())
+                );
+            }
+            return true;
+        })
+        .filter((r: any) => {
+            // 3. Exclusions Filter (Ingredient names + Recipe Title/Type)
+            if (options.exclusions && options.exclusions.length > 0) {
+                const title = (r.title || '').toLowerCase();
+                const type = (r.type || '').toLowerCase();
+                
+                // If title or type contains excluded word, reject immediately
+                const hasExcludedTitle = options.exclusions.some(exc => 
+                    title.includes(exc.toLowerCase()) || type.includes(exc.toLowerCase())
+                );
+                if (hasExcludedTitle) return false;
+
+                // Check ingredients
+                return !r.ingredients.some((ing: any) => {
+                    const category = ing.food_items?.category?.toLowerCase() || '';
+                    if (!options.showFlavours && category === 'flavour') return false;
+                    if (!options.showSupplements && category === 'supplements') return false;
+
+                    const name = (ing.item || '').toLowerCase();
+                    return options.exclusions?.some(exc => name.includes(exc.toLowerCase()));
+                });
+            }
+            return true;
+        })
+        .filter((r: any) => {
+            // 4. Equipment Filter
+            if (options.equipment && options.equipment.length > 0) {
+                const inferred = inferEquipmentFromRecipe(
+                    r.ingredients.map((ing: any) => ({
+                        food_item_name: ing.item,
+                        modifier: ing.modifier,
+                        cooking_state: ing.cooking_state
+                    })),
+                    r.instructions.map((i: any) => i.step_text)
+                );
+                
+                // If recipe requires something NOT in user's equipment, reject
+                return inferred.every(e => options.equipment?.includes(e));
+            }
+            return true;
         })
         .filter((r: any) => r.id !== excludeId) // Exclude current recipe
         .map((r: any) => {
@@ -158,10 +223,13 @@ export const getRandomRecipeByType = async (
                         baseIngredient: i.base_ingredient,
                         food_item_id: i.food_item_id,
                         weightG: i.weight_g,
-                        measureLabel: i.measure_label
+                        measureLabel: i.measure_label,
+                        category: i.food_items?.category?.toLowerCase() || ''
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                    servings: 1
+                    servings: 1,
+                    micronutrients: calculatedNutrition.micronutrients,
+                    phytonutrients: calculatedNutrition.phytonutrients
                 },
                 micronutrients: calculatedNutrition.micronutrients
             };
@@ -176,7 +244,18 @@ export const getRandomRecipeByType = async (
  * Now Async to fetch from Supabase.
  */
 export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPlan> => {
-    const { favoritesOnly, targetCalories, diet, numMeals } = settings;
+    const { 
+        favoritesOnly, 
+        targetCalories, 
+        diet, 
+        numMeals, 
+        selectedEquipment, 
+        selectedExclusions, 
+        selectedHealthConditions,
+        showFlavours = false,
+        showSupplements = false,
+        strictPantry = false
+    } = settings;
 
     // Fetch recipes from Supabase
     let query = supabase
@@ -209,60 +288,107 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
     const recipeMicronutrients: Record<string, Record<string, number>> = {};
     const recipePhytonutrients: Record<string, Record<string, string>> = {};
 
-    const allRecipes: Recipe[] = recipesData.map((r: any) => {
-        const calculatedNutrition = calculateNutrition(r.ingredients);
-
-        // Store micronutrients keyed by recipe ID
-        recipeMicronutrients[r.id] = calculatedNutrition.micronutrients;
-        recipePhytonutrients[r.id] = calculatedNutrition.phytonutrients;
-
-        return {
-            id: r.id,
-            title: r.title,
-            type: r.type,
-            calories: calculatedNutrition.calories || r.calories || 0,
-            energyKj: calculatedNutrition.energyKj || r.energy_kj || 0,
-            protein: calculatedNutrition.protein || r.protein || 0,
-            carbs: calculatedNutrition.carbs || r.carbs || 0,
-            fat: calculatedNutrition.fat || r.fat || 0,
-            diet: r.diet,
-            image: r.image,
-            prepTime: r.prep_time,
-            ingredients: r.ingredients.map((i: any) => ({
-                item: i.item,
-                amount: i.amount,
-                isMiracleProduct: i.is_miracle_product,
-                baseIngredient: i.base_ingredient,
-                food_item_id: i.food_item_id,
-                weightG: i.weight_g,
-                measureLabel: i.measure_label
-            })),
-            instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-            servings: 1
-        };
-    });
-
-    // Filter helper
-    const getRecipesByDiet = (params: { startRecipes: Recipe[], diet: DietType, type?: Recipe['type'] }) => {
-        return params.startRecipes.filter(r => {
-            if (params.type && r.type !== params.type) return false;
-
-            if (params.diet === 'anything') return true;
-            if (params.diet === 'pescatarian') {
+    const allRecipes: Recipe[] = recipesData
+        .filter((r: any) => {
+            // 1. Diet Filter
+            if (diet === 'anything') return true;
+            if (diet === 'pescatarian') {
                 return r.diet.includes('pescatarian') || r.diet.includes('vegetarian') || r.diet.includes('vegan');
             }
-            if (params.diet === 'vegetarian') {
+            if (diet === 'vegetarian') {
                 return r.diet.includes('vegetarian') || r.diet.includes('vegan');
             }
-            return r.diet.includes(params.diet);
+            return r.diet.includes(diet);
+        })
+        .filter((r: any) => {
+            // 2. Health Conditions Filter
+            if (selectedHealthConditions && selectedHealthConditions.length > 0) {
+                return selectedHealthConditions.some(hc => 
+                    r.diet.map((d: string) => d.toLowerCase()).includes(hc.toLowerCase())
+                );
+            }
+            return true;
+        })
+        .filter((r: any) => {
+            // 3. Exclusions Filter (Ingredient names + Recipe Title/Type)
+            if (selectedExclusions && selectedExclusions.length > 0) {
+                const title = (r.title || '').toLowerCase();
+                const type = (r.type || '').toLowerCase();
+                
+                // If title or type contains excluded word, reject immediately
+                const hasExcludedTitle = selectedExclusions.some(exc => 
+                    title.includes(exc.toLowerCase()) || type.includes(exc.toLowerCase())
+                );
+                if (hasExcludedTitle) return false;
+
+                // Check ingredients
+                return !r.ingredients.some((ing: any) => {
+                    const category = ing.food_items?.category?.toLowerCase() || '';
+                    if (!showFlavours && category === 'flavour') return false;
+                    if (!showSupplements && category === 'supplements') return false;
+
+                    const name = (ing.item || '').toLowerCase();
+                    return selectedExclusions?.some(exc => name.includes(exc.toLowerCase()));
+                });
+            }
+            return true;
+        })
+        .filter((r: any) => {
+            // 4. Equipment Filter
+            if (selectedEquipment && selectedEquipment.length > 0) {
+                const inferred = inferEquipmentFromRecipe(
+                    r.ingredients.map((ing: any) => ({
+                        food_item_name: ing.item,
+                        modifier: ing.modifier,
+                        cooking_state: ing.cooking_state
+                    })),
+                    r.instructions.map((i: any) => i.step_text)
+                );
+                
+                // If recipe requires something NOT in user's equipment, reject
+                return inferred.every(e => selectedEquipment?.includes(e));
+            }
+            return true;
+        })
+        .map((r: any) => {
+            const calculatedNutrition = calculateNutrition(r.ingredients);
+
+            // Store micronutrients keyed by recipe ID
+            recipeMicronutrients[r.id] = calculatedNutrition.micronutrients;
+            recipePhytonutrients[r.id] = calculatedNutrition.phytonutrients;
+
+            return {
+                id: r.id,
+                title: r.title,
+                type: r.type,
+                calories: calculatedNutrition.calories || r.calories || 0,
+                energyKj: calculatedNutrition.energyKj || r.energy_kj || 0,
+                protein: calculatedNutrition.protein || r.protein || 0,
+                carbs: calculatedNutrition.carbs || r.carbs || 0,
+                fat: calculatedNutrition.fat || r.fat || 0,
+                diet: r.diet,
+                image: r.image,
+                prepTime: r.prep_time,
+                ingredients: r.ingredients.map((i: any) => ({
+                    item: i.item,
+                    amount: i.amount,
+                    isMiracleProduct: i.is_miracle_product,
+                    baseIngredient: i.base_ingredient,
+                    food_item_id: i.food_item_id,
+                    weightG: i.weight_g,
+                    measureLabel: i.measure_label,
+                    category: i.food_items?.category?.toLowerCase() || ''
+                })),
+                instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
+                servings: 1
+            };
         });
-    };
 
     // Get candidates
-    const breakfastOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'breakfast' });
-    const lunchOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'lunch' });
-    const dinnerOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'dinner' });
-    const snackOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'snack' });
+    const breakfastOpts = allRecipes.filter(r => r.type === 'breakfast');
+    const lunchOpts = allRecipes.filter(r => r.type === 'lunch');
+    const dinnerOpts = allRecipes.filter(r => r.type === 'dinner');
+    const snackOpts = allRecipes.filter(r => r.type === 'snack');
 
     if (!breakfastOpts.length || !lunchOpts.length || !dinnerOpts.length) {
         throw new Error('Insufficient recipes for the selected criteria.');
@@ -295,41 +421,45 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
     };
 
     let bestPlan: DailyPlan | null = null;
-    let minDiff = Infinity;
     let maxMatchScore = -1;
 
     // Pantry lookup for scoring
-    const pantryIds = new Set(settings.pantryItems?.map(f => f.id) || []);
+    const pantryIds = new Set(settings.pantryItems?.map(f => f.food_item_id || f.id) || []);
     const pantryNames = new Set<string>();
     settings.pantryItems?.forEach(f => {
-        if (f.common_name) {
-            const cn = f.common_name.toLowerCase().trim();
-            pantryNames.add(cn);
-            if (cn.endsWith('s')) pantryNames.add(cn.replace(/s$/, ''));
-            else pantryNames.add(cn + 's');
-        }
-        if (f.name) {
-            const n = f.name.toLowerCase().trim();
-            pantryNames.add(n);
-            if (n.endsWith('s')) pantryNames.add(n.replace(/s$/, ''));
-            else pantryNames.add(n + 's');
-        }
+        const names = [f.name, f.common_name].filter(Boolean);
+        names.forEach(n => {
+            const lcn = n.toLowerCase().trim();
+            pantryNames.add(lcn);
+            if (lcn.endsWith('s')) pantryNames.add(lcn.replace(/s$/, ''));
+            else pantryNames.add(lcn + 's');
+        });
     });
 
-    const calculateMatchScore = (recipe: Recipe) => {
+    const calculateMatchScore = (recipe: Recipe, showFlavours: boolean, showSupplements: boolean) => {
         const ings = recipe.ingredients || [];
-        if (ings.length === 0) return 0;
+        if (ings.length === 0) return 1.0; 
+        
         let matches = 0;
+        let requiredTotal = 0;
+
         ings.forEach(ing => {
+            const category = (ing as any).category || '';
+            if (!showFlavours && category === 'flavour') return;
+            if (!showSupplements && category === 'supplements') return;
+
+            requiredTotal++;
+
             const isMatch = (ing.food_item_id && pantryIds.has(ing.food_item_id)) ||
                 (ing.baseIngredient && pantryNames.has(ing.baseIngredient.toLowerCase().trim())) ||
                 (ing.item && pantryNames.has(ing.item.toLowerCase().trim()));
             if (isMatch) matches++;
         });
-        return matches / ings.length;
+        
+        return requiredTotal > 0 ? matches / requiredTotal : 1.0;
     };
 
-    for (let i = 0; i < 50; i++) { // Increased iterations for pantry matching
+    for (let i = 0; i < 50; i++) {
         const b = getRandom(breakfastOpts);
         const l = getRandom(lunchOpts);
         const d = getRandom(dinnerOpts);
@@ -341,6 +471,18 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             if (snackOpts.length > 0) {
                 snacks.push(getRandom(snackOpts));
             }
+        }
+
+        const bMatch = calculateMatchScore(b, showFlavours, showSupplements);
+        const lMatch = calculateMatchScore(l, showFlavours, showSupplements);
+        const dMatch = calculateMatchScore(d, showFlavours, showSupplements);
+        const sMatch = snacks.length ? snacks.reduce((acc, s) => acc + calculateMatchScore(s, showFlavours, showSupplements), 0) / snacks.length : 1.0;
+
+        const currentPantryScore = (bMatch + lMatch + dMatch + (numSnacks > 0 ? sMatch : 0)) / (3 + (numSnacks > 0 ? 1 : 0));
+
+        // If strict pantry is on, ALL recipes must be 100% matched
+        if (strictPantry && (bMatch < 1 || lMatch < 1 || dMatch < 1 || (numSnacks > 0 && sMatch < 1))) {
+            continue;
         }
 
         const totalCalories = b.calories + l.calories + d.calories + snacks.reduce((acc, s) => acc + s.calories, 0);
@@ -373,25 +515,25 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             recipePhytonutrients: planRecipePhytos
         };
 
-        const currentMatchScore = (calculateMatchScore(b) + calculateMatchScore(l) + calculateMatchScore(d) + (snacks.length ? snacks.reduce((acc, s) => acc + calculateMatchScore(s), 0) / snacks.length : 0)) / (3 + (snacks.length ? 1 : 0));
-
         const diff = Math.abs(targetCalories - totalCalories);
         const calScore = 1 - Math.min(1, diff / targetCalories);
 
-        // Multi-objective score: balance calories and pantry matches
-        // Weighting: 60% pantry, 40% calories if pantry is provided
-        const finalScore = settings.pantryItems ? (currentMatchScore * 0.6 + calScore * 0.4) : calScore;
+        const finalScore = settings.pantryItems ? (currentPantryScore * 0.7 + calScore * 0.3) : calScore;
 
         if (finalScore > maxMatchScore) {
             maxMatchScore = finalScore;
             bestPlan = currentPlan;
         }
 
-        // Short circuit if we found a near-perfect plan
-        if (finalScore > 0.95) break;
+        if (finalScore > 0.98) break;
     }
 
-    return bestPlan!;
+    if (!bestPlan) {
+        // Fallback or retry with less strict rules if needed
+        throw new Error('Could not generate a suitable plan with current filters.');
+    }
+
+    return bestPlan;
 };
 
 export interface ShoppingItem {

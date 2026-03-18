@@ -34,6 +34,7 @@ import { RecipeFormDialog } from '@/components/ingredients/recipe-form-dialog';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
+import { inferEquipmentFromRecipe } from '@/lib/utils/equipment-inference';
 
 
 interface RecipeWithIngredients extends Recipe {
@@ -172,26 +173,26 @@ export function RecipesView({
                 setPantryItems(currentPantry);
             }
 
-            // Determine if we need to fetch ingredients for local filtering
             const needsIngredients = filters.pantryMode === 'pantry-only' || 
                                     filters.selectedExclusions.length > 0 || 
-                                    filters.selectedDietType !== 'anything';
+                                    filters.selectedDietType !== 'anything' ||
+                                    filters.selectedEquipment.length > 0;
 
 
-            const { recipes: newItems, count } = await fetchRecipesBridge({
+            const { recipes: fetchedRecipes, count } = await fetchRecipesBridge({
                 searchQuery,
                 selectedTypes,
                 showFavoritesOnly,
-                page: pageNum,
-                pageSize: PAGE_SIZE,
+                page: 0,
+                pageSize: 1000, // Fetch all for local filtering
                 sortField,
                 sortDirection,
                 isMix,
                 includeDetails: needsIngredients
             });
 
-            // LOCAL FILTERING
-            let filteredItems = newItems;
+            // LOCAL FILTERING (for things we can't do easily in Supabase)
+            let filteredItems = [...fetchedRecipes];
 
             // 1. Dietary Preference Filter
             if (filters.selectedDietType && filters.selectedDietType !== 'anything') {
@@ -209,57 +210,84 @@ export function RecipesView({
                 );
             }
 
-
             // 2. Exclusions Filter
             if (filters.selectedExclusions.length > 0) {
+                const searchExclusions = filters.selectedExclusions.map(exc => exc.toLowerCase());
+                
                 filteredItems = filteredItems.filter(r => {
+                    // Check Title and Type first (for things like "Spice Mix")
+                    const titleMatch = searchExclusions.some(exc => (r.title || '').toLowerCase().includes(exc));
+                    const typeMatch = searchExclusions.some(exc => (r.type || '').toLowerCase().includes(exc));
+                    if (titleMatch || typeMatch) return false;
+
                     const recipeIngredients = (r as any).ingredients || [];
                     return !recipeIngredients.some((ing: any) => {
-                        // Check if this ingredient should be ignored (it's a flavour or supplement and the user said it's okay)
                         const category = ing.food_item?.category?.toLowerCase() || '';
                         if (!filters.showFlavours && category === 'flavour') return false;
                         if (!filters.showSupplements && category === 'supplements') return false;
 
                         const name = (ing.item || '').toLowerCase();
-                        return filters.selectedExclusions.some(exc => name.includes(exc.toLowerCase()));
+                        return searchExclusions.some(exc => name.includes(exc));
                     });
                 });
             }
 
-            // 3. Pantry Filter
+            // 3. Equipment Filter
+            if (filters.selectedEquipment.length > 0) {
+                filteredItems = filteredItems.filter(r => {
+                    const inferred = inferEquipmentFromRecipe(
+                        (r as any).ingredients?.map((ing: any) => ({
+                            food_item_name: ing.item,
+                            modifier: ing.modifier,
+                            cooking_state: ing.cooking_state
+                        })) || [],
+                        (r as any).instructions?.map((i: any) => i.step_text) || []
+                    );
+                    
+                    // Recipe is OK if ALL its required equipment is in the selected list
+                    return inferred.every(e => filters.selectedEquipment.includes(e));
+                });
+            }
+
+            // 4. Pantry Filter
             if (filters.pantryMode === 'pantry-only') {
+                const pantryIds = new Set(currentPantry.map(pi => pi.food_item_id || pi.id));
+                const pantryNames = new Set(currentPantry.map(pi => pi.name?.toLowerCase().trim()).filter(Boolean));
+
                 filteredItems = filteredItems.filter(r => {
                     const recipeIngredients = (r as any).ingredients || [];
                     
-                    // A recipe is makeable if all non-optional ingredients are in the pantry
+                    // If no ingredients, it's makeable
+                    if (recipeIngredients.length === 0) return true;
+
                     const missingIngredients = recipeIngredients.filter((ing: any) => {
                         const category = ing.food_item?.category?.toLowerCase() || '';
-                        
-                        // Ignore optional categories if configured
                         if (!filters.showFlavours && category === 'flavour') return false;
                         if (!filters.showSupplements && category === 'supplements') return false;
 
-                        // Check if we have this ingredient in pantry
-                        // Match by food_item_id or name
-                        const inPantry = currentPantry.some(pi => 
-                            (ing.food_item_id && pi.food_item_id === ing.food_item_id) ||
-                            (pi.food_items?.id === ing.food_item_id) ||
-                            (pi.name?.toLowerCase() === ing.item?.toLowerCase())
-                        );
+                        const inPantry = pantryIds.has(ing.food_item_id) || 
+                                       pantryNames.has(ing.item?.toLowerCase().trim());
 
                         return !inPantry;
                     });
-
 
                     return missingIngredients.length === 0;
                 });
             }
 
+            const processedRecipes = filteredItems;
+            setTotalCount(processedRecipes.length);
+
             if (isNewSearch) {
-                setRecipes(filteredItems);
+                // For new search/filter, show the first page
+                setRecipes(processedRecipes.slice(0, PAGE_SIZE));
                 setPage(0);
             } else {
-                setRecipes(prev => [...prev, ...filteredItems]);
+                // For 'Load More', show the next slice
+                const startIdx = (pageNum) * PAGE_SIZE;
+                const endIdx = startIdx + PAGE_SIZE;
+                const nextSlice = processedRecipes.slice(startIdx, endIdx);
+                setRecipes(prev => [...prev, ...nextSlice]);
                 setPage(pageNum);
             }
 

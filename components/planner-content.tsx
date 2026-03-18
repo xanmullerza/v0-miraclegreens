@@ -87,6 +87,7 @@ import { supabase } from '@/lib/supabase';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import Link from 'next/link';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/lib/context/search-context';
@@ -1431,7 +1432,8 @@ export default function MealPlannerContent({
   const [showSummary, setShowSummary] = useState(false);
   const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
   const { searchQuery } = useSearch();
-
+  const { filters } = useRecipeFilter();
+  const [profile, setProfile] = useState<any>({});
   const showFavoritesOnly =
     externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
   const setShowFavoritesOnly =
@@ -1677,6 +1679,12 @@ export default function MealPlannerContent({
         favoritesOnly: showFavoritesOnly,
         pantryItems,
         searchQuery,
+        selectedEquipment: filters.selectedEquipment,
+        selectedExclusions: filters.selectedExclusions,
+        selectedHealthConditions: filters.selectedHealthConditions,
+        showFlavours: filters.showFlavours,
+        showSupplements: filters.showSupplements,
+        strictPantry: filters.pantryMode === 'pantry-only'
       });
       setPlan(newPlan);
       setStep(3);
@@ -1698,6 +1706,12 @@ export default function MealPlannerContent({
         favoritesOnly: showFavoritesOnly,
         pantryItems,
         searchQuery,
+        selectedEquipment: filters.selectedEquipment,
+        selectedExclusions: filters.selectedExclusions,
+        selectedHealthConditions: filters.selectedHealthConditions,
+        showFlavours: filters.showFlavours,
+        showSupplements: filters.showSupplements,
+        strictPantry: filters.pantryMode === 'pantry-only'
       });
       setPlan(newPlan);
     } catch (error) {
@@ -1745,6 +1759,13 @@ export default function MealPlannerContent({
       currentId,
       showFavoritesOnly,
       searchQuery,
+      {
+        equipment: filters.selectedEquipment,
+        exclusions: filters.selectedExclusions,
+        healthConditions: filters.selectedHealthConditions,
+        showFlavours: filters.showFlavours,
+        showSupplements: filters.showSupplements
+      }
     );
     if (result) {
       const { recipe: newRecipe, micronutrients: newMicros } = result;
