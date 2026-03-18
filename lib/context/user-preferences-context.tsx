@@ -187,7 +187,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                                 id: session.user.id,
                                 full_name: session.user.user_metadata?.full_name || "",
                                 avatar_url: session.user.user_metadata?.avatar_url || null
-                            }).catch(err => console.error('Error creating profile:', err));
+                            }).then(({ error }) => {
+                                if (error) console.error('Error creating profile:', error);
+                            });
                         }
                     });
             }
