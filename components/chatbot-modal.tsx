@@ -420,6 +420,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     // Audio recording state
     const [isRecording, setIsRecording] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
+    const [isAdmin, setIsAdmin] = useState(false);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -438,6 +439,24 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Check if user is admin
+    useEffect(() => {
+        const checkAdminStatus = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                    const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase();
+                    setIsAdmin(userEmail === adminEmail && !!adminEmail);
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                setIsAdmin(false);
+            }
+        };
+        checkAdminStatus();
+    }, []);
 
     // Persist messages to localStorage whenever they change (conversation is saved locally)
     useEffect(() => {
@@ -2052,7 +2071,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <Calendar size={120} className="text-blue-500 -rotate-12" />
                             </div>
                             {/* Lock Icon */}
-                            {profile?.role !== 'admin' && (
+                            {!isAdmin && (
                                 <div className="absolute top-3 right-3 z-10 bg-blue-500 rounded-full p-1.5 shadow-lg">
                                     <Lock size={14} className="text-white" />
                                 </div>
@@ -2061,7 +2080,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Planner</h3>
                             </div>
-                            <div className={cn("grid grid-cols-2 gap-6", profile?.role !== 'admin' && "opacity-50 pointer-events-none")}>
+                            <div className={cn("grid grid-cols-2 gap-6", !isAdmin && "opacity-50 pointer-events-none")}>
                                 <button
                                     onClick={() => setChatbotView('planner')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
@@ -2092,7 +2111,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <Package size={120} className="text-purple-500 -rotate-12" />
                             </div>
                             {/* Lock Icon */}
-                            {profile?.role !== 'admin' && (
+                            {!isAdmin && (
                                 <div className="absolute top-3 right-3 z-10 bg-purple-500 rounded-full p-1.5 shadow-lg">
                                     <Lock size={14} className="text-white" />
                                 </div>
@@ -2101,7 +2120,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Widgets</h3>
                             </div>
-                            <div className={cn("grid grid-cols-2 gap-6", profile?.role !== 'admin' && "opacity-50 pointer-events-none")}>
+                            <div className={cn("grid grid-cols-2 gap-6", !isAdmin && "opacity-50 pointer-events-none")}>
                                 <button
                                     onClick={() => setChatbotView('nutridex')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
