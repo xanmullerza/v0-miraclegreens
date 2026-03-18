@@ -14,6 +14,7 @@ import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
 import { SearchProvider } from '@/lib/context/search-context';
 import { ChatbotProvider, useChatbot } from '@/lib/context/chatbot-context';
 import { SplitViewProvider, useSplitView } from '@/lib/context/split-view-context';
+import { RecipeFilterProvider } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 
 interface ParsedRecipe {
@@ -255,7 +256,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <ChatbotProvider>
                 <SearchProvider>
                     <HeaderActionsProvider>
-                        <DashboardLayoutContent>{children}</DashboardLayoutContent>
+                        <RecipeFilterProvider>
+                            <DashboardLayoutContent>{children}</DashboardLayoutContent>
+                        </RecipeFilterProvider>
                     </HeaderActionsProvider>
                 </SearchProvider>
             </ChatbotProvider>

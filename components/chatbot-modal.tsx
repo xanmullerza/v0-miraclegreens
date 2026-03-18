@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -16,6 +16,7 @@ import { ChatbotPlanner } from '@/components/chatbot-planner';
 import { ChatbotNutridexFull } from '@/components/chatbot-nutridex-full';
 import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
 import { ChatbotLifeguardFullIntegration } from '@/components/chatbot-lifeguard-full-integration';
+import { RecipeFilterDialog } from '@/components/recipe/recipe-filter-dialog';
 import ProfilePage from '@/app/(main)/profile/page';
 import { toast } from 'sonner';
 import { HeaderLogo } from '@/components/ui/header-logo';
@@ -421,6 +422,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [isRecording, setIsRecording] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [showFilterDialog, setShowFilterDialog] = useState(false);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -3483,16 +3485,28 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </button>
                     
                     <button
-                        onClick={() => setChatbotView('dashboard')}
+                        onClick={() => {
+                            if (chatbotView === 'all-recipes' || chatbotView === 'my-recipes') {
+                                setShowFilterDialog(true);
+                            } else {
+                                setChatbotView('dashboard');
+                            }
+                        }}
                         className={cn(
                             "w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-95 group",
-                            chatbotView === 'dashboard' 
-                                ? "bg-emerald-500 text-white shadow-emerald-500/40" 
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
+                            (chatbotView === 'all-recipes' || chatbotView === 'my-recipes')
+                                ? "bg-blue-500 text-white shadow-blue-500/40 hover:bg-blue-600"
+                                : chatbotView === 'dashboard'
+                                    ? "bg-emerald-500 text-white shadow-emerald-500/40"
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
                         )}
-                        title="Home"
+                        title={chatbotView === 'all-recipes' || chatbotView === 'my-recipes' ? "Filter Recipes" : "Home"}
                     >
-                        <Home size={24} className={cn(chatbotView === 'dashboard' ? "" : "group-hover:scale-110 transition-transform")} />
+                        {chatbotView === 'all-recipes' || chatbotView === 'my-recipes' ? (
+                            <Filter size={24} className={cn(chatbotView === 'all-recipes' || chatbotView === 'my-recipes' ? "" : "group-hover:scale-110 transition-transform")} />
+                        ) : (
+                            <Home size={24} className={cn(chatbotView === 'dashboard' ? "" : "group-hover:scale-110 transition-transform")} />
+                        )}
                     </button>
 
                     <button
@@ -3504,6 +3518,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </button>
                 </div>
             </div>
+
+            {/* Recipe Filter Dialog */}
+            <RecipeFilterDialog 
+                isOpen={showFilterDialog} 
+                onClose={() => setShowFilterDialog(false)} 
+            />
         </div>
     );
 }
