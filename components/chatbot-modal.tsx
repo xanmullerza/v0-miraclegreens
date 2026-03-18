@@ -602,6 +602,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             setSelectedRecipeId(recipeId);
             setPreviousView('my-recipes');
             setChatbotView('recipe-detail');
+            
+            // Reset recipe creation states so user can import another recipe
+            setSuccessRecipe(null);
+            setIsCreatingRecipe(false);
+            setPastedRecipeContent('');
+            setpastedRecipeURL('');
         } catch (error: any) {
             console.error('Error saving recipe:', error);
             toast.error('Failed to save recipe. Please try again.');
