@@ -52,9 +52,10 @@ export const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 interface MyRecipesViewProps {
     onRecipeClick?: (recipeId: string) => void;
     hideControls?: boolean;
+    isMix?: boolean;
 }
 
-export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipesViewProps = {}) {
+export function MyRecipesView({ onRecipeClick, hideControls = false, isMix = false }: MyRecipesViewProps = {}) {
     const router = useRouter();
     const PAGE_SIZE = 20;
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -143,7 +144,7 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
                 pageSize: 1000,
                 sortField,
                 sortDirection,
-                isMix: false,
+                isMix: isMix,
                 includeDetails: needsIngredients
             });
 
@@ -241,22 +242,21 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
             const userRecipes = filteredItems;
             setTotalCount(userRecipes.length);
 
-
             if (isNewSearch) {
                 // For new search/filter, show the first page
-                setRecipes(userRecipes.slice(0, PAGE_SIZE));
+                const firstSlice = userRecipes.slice(0, PAGE_SIZE);
+                setRecipes(firstSlice);
                 setPage(0);
+                setHasMore(firstSlice.length < userRecipes.length);
             } else {
-                // For pagination - slice the results
+                // For 'Load More', show the next slice
                 const startIdx = pageNum * PAGE_SIZE;
                 const endIdx = startIdx + PAGE_SIZE;
                 const paginatedRecipes = userRecipes.slice(startIdx, endIdx);
                 setRecipes(prev => [...prev, ...paginatedRecipes]);
                 setPage(pageNum);
+                setHasMore(recipes.length + paginatedRecipes.length < userRecipes.length);
             }
-
-            setTotalCount(userRecipes.length);
-            setHasMore((isNewSearch ? userRecipes.length : recipes.length + userRecipes.slice((pageNum) * PAGE_SIZE).length) < userRecipes.length);
         } catch (error) {
             console.error('Error fetching personal recipes:', error);
             toast.error('Failed to load your recipes');
@@ -567,18 +567,27 @@ export function MyRecipesView({ onRecipeClick, hideControls = false }: MyRecipes
                                 ))}
                             </div>
 
-                            {/* Pagination */}
-                            {hasMore && (
-                                <div className="flex justify-center pt-8">
-                                    <Button
-                                        onClick={handleLoadMore}
-                                        disabled={loadingMore}
-                                        className="h-14 px-8 rounded-2xl text-white font-black uppercase tracking-[0.2em] shadow-xl bg-slate-900 hover:bg-slate-800 transition-all"
-                                    >
-                                        {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : "View More Recipes"}
-                                    </Button>
-                                </div>
-                            )}
+                    {/* Pagination */}
+                    {hasMore ? (
+                        <div className="flex justify-center pt-8">
+                            <Button
+                                onClick={handleLoadMore}
+                                disabled={loadingMore}
+                                className={cn(
+                                    "h-14 px-8 rounded-2xl text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all",
+                                    isMix ? "bg-indigo-900 hover:bg-indigo-800" : "bg-slate-900 hover:bg-slate-800"
+                                )}
+                            >
+                                {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : `View More ${isMix ? 'Mixes' : 'Meals'}`}
+                            </Button>
+                        </div>
+                    ) : recipes.length > 0 && (
+                        <div className="flex justify-center pt-8">
+                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                                {totalCount} {totalCount === 1 ? (isMix ? 'mix' : 'meal') : (isMix ? 'mixes' : 'meals')} found
+                             </p>
+                        </div>
+                    )}
                         </div>
                     )}
                 </div>

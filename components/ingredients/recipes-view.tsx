@@ -280,20 +280,19 @@ export function RecipesView({
 
             if (isNewSearch) {
                 // For new search/filter, show the first page
-                setRecipes(processedRecipes.slice(0, PAGE_SIZE));
+                const firstSlice = processedRecipes.slice(0, PAGE_SIZE);
+                setRecipes(firstSlice);
                 setPage(0);
+                setHasMore(firstSlice.length < processedRecipes.length);
             } else {
                 // For 'Load More', show the next slice
-                const startIdx = (pageNum) * PAGE_SIZE;
+                const startIdx = pageNum * PAGE_SIZE;
                 const endIdx = startIdx + PAGE_SIZE;
                 const nextSlice = processedRecipes.slice(startIdx, endIdx);
                 setRecipes(prev => [...prev, ...nextSlice]);
                 setPage(pageNum);
+                setHasMore(recipes.length + nextSlice.length < processedRecipes.length);
             }
-
-            // Note: totalCount might be inaccurate now due to local filtering
-            if (count !== null) setTotalCount(count);
-            setHasMore(count ? (isNewSearch ? filteredItems.length : recipes.length + filteredItems.length) < count : false);
 
         } catch (error) {
             console.error('Error fetching recipes:', error);
@@ -595,7 +594,7 @@ export function RecipesView({
                     </div>
 
                     {/* Pagination */}
-                    {hasMore && (
+                    {hasMore ? (
                         <div className="flex justify-center pt-8">
                             <Button
                                 onClick={handleLoadMore}
@@ -607,6 +606,12 @@ export function RecipesView({
                             >
                                 {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : `View More ${isMix ? 'Mixes' : 'Meals'}`}
                             </Button>
+                        </div>
+                    ) : recipes.length > 0 && (
+                        <div className="flex justify-center pt-8">
+                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                                {totalCount} {totalCount === 1 ? (isMix ? 'mix' : 'meal') : (isMix ? 'mixes' : 'meals')} found
+                             </p>
                         </div>
                     )}
                 </div>
