@@ -316,6 +316,8 @@ const RecipeListItem = ({
   isEaten = false,
   pantryItems = [],
   onRecipeClick,
+  showFlavours = false,
+  showSupplements = false,
 }: {
   recipe: Recipe;
   mealLabel: string;
@@ -325,6 +327,8 @@ const RecipeListItem = ({
   isEaten?: boolean;
   pantryItems?: any[];
   onRecipeClick?: (recipeId: string) => void;
+  showFlavours?: boolean;
+  showSupplements?: boolean;
 }) => {
   const router = useRouter();
 
@@ -335,7 +339,7 @@ const RecipeListItem = ({
     supabase
       .from('ingredients')
       .select(
-        'item, base_ingredient, food_item_id, weight_g, amount, measure_label, is_miracle_product, food_items(name, common_name)',
+        'item, base_ingredient, food_item_id, weight_g, amount, measure_label, is_miracle_product, food_items(name, common_name, category)',
       )
       .eq('recipe_id', recipe.id)
       .then(({ data }) => {
@@ -351,6 +355,7 @@ const RecipeListItem = ({
             measureLabel: i.measure_label,
             // Use the food_items table name instead of the stale ingredient name
             foodName: i.food_items?.common_name || i.food_items?.name || null,
+            category: i.food_items?.category?.toLowerCase() || '',
           })),
         );
       });
@@ -383,6 +388,11 @@ const RecipeListItem = ({
   const missingIngredients: { name: string; food_item_id?: string }[] = [];
 
   recipeIngs.forEach((ing) => {
+    // Check if we should ignore this ingredient category
+    const category = (ing as any).category || '';
+    if (!showFlavours && category === 'flavour') return;
+    if (!showSupplements && category === 'supplements') return;
+
     const displayName = ing.foodName || ing.baseIngredient || ing.item;
     const isMatch =
       (ing.food_item_id && pantryIds.has(ing.food_item_id)) ||
@@ -397,7 +407,15 @@ const RecipeListItem = ({
     }
   });
 
-  const matchScore = recipeIngs.length > 0 ? matchCount / recipeIngs.length : 0;
+  // Total relevant ingredients (excluding filtered ones)
+  const totalRelevant = recipeIngs.filter(ing => {
+    const category = (ing as any).category || '';
+    if (!showFlavours && category === 'flavour') return false;
+    if (!showSupplements && category === 'supplements') return false;
+    return true;
+  }).length;
+
+  const matchScore = totalRelevant > 0 ? matchCount / totalRelevant : 1.0;
   // Deduplicate by food_item_id when available, otherwise by name
   const dedup = (arr: { name: string; food_item_id?: string }[]) => {
     const seen = new Set<string>();
@@ -1433,7 +1451,6 @@ export default function MealPlannerContent({
   const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
   const { searchQuery } = useSearch();
   const { filters } = useRecipeFilter();
-  const [profile, setProfile] = useState<any>({});
   const showFavoritesOnly =
     externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
   const setShowFavoritesOnly =
@@ -2353,6 +2370,8 @@ export default function MealPlannerContent({
                     isEaten={eatenMeals.has('breakfast')}
                     pantryItems={pantryItems}
                     onRecipeClick={onRecipeClick}
+                    showFlavours={filters.showFlavours}
+                    showSupplements={filters.showSupplements}
                   />
                 )}
                 {selectedTypes.map((st) => st.toLowerCase()).includes('lunch') && (
@@ -2365,6 +2384,8 @@ export default function MealPlannerContent({
                     isEaten={eatenMeals.has('lunch')}
                     pantryItems={pantryItems}
                     onRecipeClick={onRecipeClick}
+                    showFlavours={filters.showFlavours}
+                    showSupplements={filters.showSupplements}
                   />
                 )}
                 {selectedTypes.map((st) => st.toLowerCase()).includes('dinner') && (
@@ -2377,6 +2398,8 @@ export default function MealPlannerContent({
                     isEaten={eatenMeals.has('dinner')}
                     pantryItems={pantryItems}
                     onRecipeClick={onRecipeClick}
+                    showFlavours={filters.showFlavours}
+                    showSupplements={filters.showSupplements}
                   />
                 )}
               </div>
