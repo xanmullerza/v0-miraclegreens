@@ -159,7 +159,7 @@ export function RecipeFilterDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden sm:max-h-[90vh] flex flex-col gap-0 border-none sm:border bg-white dark:bg-slate-900 shadow-2xl rounded-t-3xl sm:rounded-2xl top-auto bottom-0 sm:top-[50%] sm:bottom-auto translate-y-0 sm:translate-y-[-50%]">
+      <DialogContent className="z-[200] max-w-2xl w-full p-0 overflow-hidden sm:max-h-[90vh] flex flex-col gap-0 border-none sm:border bg-white dark:bg-slate-900 shadow-2xl rounded-t-3xl sm:rounded-2xl fixed inset-x-0 bottom-0 top-auto translate-x-0 translate-y-0 data-[state=open]:translate-x-0 data-[state=open]:translate-y-0 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:data-[state=open]:-translate-x-1/2 sm:data-[state=open]:-translate-y-1/2">
         {/* Header */}
         <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex items-center justify-between">
           <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center">
