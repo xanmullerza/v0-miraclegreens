@@ -155,9 +155,14 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                     .from('profiles')
                     .select('*')
                     .eq('id', session.user.id)
-                    .single()
+                    .maybeSingle()
                     .then(({ data, error }) => {
-                        if (data && !error) {
+                        if (error) {
+                            console.error('Error fetching profile:', error);
+                            return;
+                        }
+                        
+                        if (data) {
                             const cloudProfile: UserProfile = {
                                 name: data.full_name || "",
                                 nickname: data.nickname || "",
@@ -176,6 +181,13 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                             };
                             setProfileState(cloudProfile);
                             localStorage.setItem("userProfile", JSON.stringify(cloudProfile));
+                        } else {
+                            // Profile doesn't exist yet, create one with defaults
+                            supabase.from('profiles').insert({
+                                id: session.user.id,
+                                full_name: session.user.user_metadata?.full_name || "",
+                                avatar_url: session.user.user_metadata?.avatar_url || null
+                            }).catch(err => console.error('Error creating profile:', err));
                         }
                     });
             }
