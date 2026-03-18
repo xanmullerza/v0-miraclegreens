@@ -1972,7 +1972,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
                         {/* Cookbook Section */}
                         <div className="bg-emerald-500/10 dark:bg-emerald-500/20 rounded-3xl p-6 border border-emerald-500/20 shadow-sm relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Salad size={120} className="text-emerald-500 -rotate-12" />
                             </div>
                             <div className="flex items-center gap-2 mb-6">
@@ -2013,7 +2013,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                         {/* Planner Section */}
                         <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Calendar size={120} className="text-blue-500 -rotate-12" />
                             </div>
                             <div className="flex items-center gap-2 mb-6">
@@ -2047,7 +2047,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                         {/* Widgets Section */}
                         <div className="bg-purple-500/10 dark:bg-purple-500/20 rounded-3xl p-6 border border-purple-500/20 shadow-sm relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Package size={120} className="text-purple-500 -rotate-12" />
                             </div>
                             <div className="flex items-center gap-2 mb-6">
