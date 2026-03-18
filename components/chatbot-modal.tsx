@@ -1754,6 +1754,30 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Recipe Builder - Full Screen */}
                 {showRecipeBuilder && (
                     <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 p-4">
+                        {/* Close Button */}
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">
+                                {recipeStep === 1 ? 'Step 1: Recipe Details' : recipeStep === 2 ? 'Step 2: Ingredients' : 'Step 3: Instructions'}
+                            </h3>
+                            <button
+                                onClick={() => {
+                                    setShowRecipeBuilder(false);
+                                    setRecipeStep(1);
+                                    setRecipeTitle('');
+                                    setRecipeServings(4);
+                                    setRecipePrepTime(30);
+                                    setRecipeCookTime(0);
+                                    setRecipeIngredients([]);
+                                    setRecipeInstructions(['']);
+                                    setRecipeImage('');
+                                }}
+                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-red-500"
+                                title="Close"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+
                         {recipeStep === 1 && (
                             <>
                                 <div>
@@ -3406,7 +3430,21 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Bottom Navigation Footer (Mobile Optimized) */}
                 <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50">
                     <button
-                        onClick={() => window.history.back()}
+                        onClick={() => {
+                            if (showRecipeBuilder) {
+                                setShowRecipeBuilder(false);
+                                setRecipeStep(1);
+                                setRecipeTitle('');
+                                setRecipeServings(4);
+                                setRecipePrepTime(30);
+                                setRecipeCookTime(0);
+                                setRecipeIngredients([]);
+                                setRecipeInstructions(['']);
+                                setRecipeImage('');
+                            } else {
+                                window.history.back();
+                            }
+                        }}
                         className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
                         title="Go Back"
                     >
