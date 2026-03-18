@@ -1742,7 +1742,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Content Area - Messages, Recipe Builder, or Recipe Views */}
                 {/* Recipe Builder - Full Screen */}
                 {showRecipeBuilder && (
-                    <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 p-4">
                         {recipeStep === 1 && (
                             <>
                                 <div>
@@ -1969,7 +1969,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Dashboard Menu - Flattened into sections */}
                 {!showRecipeBuilder && chatbotView === 'dashboard' && (
-                    <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
                         {/* Cookbook Section */}
                         <div className="bg-emerald-500/10 dark:bg-emerald-500/20 rounded-3xl p-6 border border-emerald-500/20 shadow-sm relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
@@ -2090,7 +2090,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Coming Soon Page */}
                 {!showRecipeBuilder && chatbotView === 'comingSoon' && (
-                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="p-6 rounded-xl border border-dashed border-border bg-muted/30 text-center">
                             <h3 className="text-lg font-bold text-foreground">Coming Soon</h3>
                             <p className="mt-2 text-sm text-muted-foreground">This feature is on the way! Stay tuned for updates.</p>
@@ -2107,7 +2107,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Cookbook Menu */}
                 {/* Import Options View */}
                 {!showRecipeBuilder && chatbotView === 'import-options' && (
-                    <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center animate-in fade-in duration-200">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col items-center justify-center animate-in fade-in duration-200">
                         <div className="w-full flex justify-between items-center mb-6">
                             <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Import Methods</h3>
                             <button
@@ -2300,9 +2300,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {/* Cookbook Menu */}
                 {!showRecipeBuilder && chatbotView === 'cookbook' && (
-                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
                                 onClick={() => setChatbotView('dashboard')}
@@ -2347,9 +2346,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {/* Planner Menu */}
                 {!showRecipeBuilder && chatbotView === 'plannerMenu' && (
-                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
                                 onClick={() => setChatbotView('dashboard')}
@@ -2391,9 +2389,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {/* Widgets Menu */}
                 {!showRecipeBuilder && chatbotView === 'widgetsMenu' && (
-                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
                                 onClick={() => setChatbotView('dashboard')}
@@ -2435,9 +2432,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {/* Profile View */}
                 {!showRecipeBuilder && chatbotView === 'profile' && (
-                    <div className="flex-1 overflow-y-auto p-4 animate-in fade-in duration-200">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
                                 onClick={() => setChatbotView('dashboard')}
@@ -2452,7 +2448,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Messages View - Full Screen, Only in chat mode */}
                 {!showRecipeBuilder && chatbotView === 'messages' && !isCreatingRecipe && (
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
                     {messages.map((message) => (
                         <div
                             key={message.id}
@@ -2506,7 +2502,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 )}
 
                 {!showRecipeBuilder && chatbotView === 'messages' && isCreatingRecipe && !successRecipe && (
-                    <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col items-center justify-center">
                         <div className="grid grid-cols-2 gap-3 w-full">
                             {/* Option 1: Manual Creation */}
                             <div className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col h-full relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300">
@@ -2712,9 +2708,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {/* All Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'all-recipes' && (
-                    <div className="flex-1 overflow-y-auto px-2">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar px-2">
                         <RecipesView 
                             onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'all-recipes')}
                             hideControls={true}
@@ -2722,9 +2717,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {/* My Recipes View */}
                 {!showRecipeBuilder && chatbotView === 'my-recipes' && (
-                    <div className="flex-1 overflow-y-auto px-2">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar px-2">
                         <MyRecipesView 
                             onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'my-recipes')}
                             hideControls={true}
@@ -2767,9 +2761,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <ChatbotLifeguardFullIntegration />
                 )}
 
-                {/* Conversation History View */}
-                {!showRecipeBuilder && chatbotView === 'conversation-history' && (
-                    <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                {chatbotView === 'conversation-history' && !showRecipeBuilder && (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
                         {isLoadingHistory ? (
                             <div className="flex items-center justify-center py-12">
                                 <Loader2 size={24} className="animate-spin text-emerald-500" />
