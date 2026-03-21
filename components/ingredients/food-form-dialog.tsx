@@ -70,11 +70,11 @@ export function FoodFormDialog({ onClose, foodIdToEdit }: FoodFormDialogProps) {
     const [editingFoodId, setEditingFoodId] = useState<string | null>(null);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then(({ data: { session } }: any) => {
             setUser(session?.user ?? null);
         });
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
             setUser(session?.user ?? null);
         });
 
