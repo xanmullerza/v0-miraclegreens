@@ -668,7 +668,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
             // Navigate directly to recipe detail page within the modal
             setSelectedRecipeId(savedRecipe.id);
-            setPreviousView('my-recipes');
+            setPreviousView('view-recipes');
             setChatbotView('recipe-detail');
         } catch (error) {
             console.error('Error navigating to recipe:', error);
