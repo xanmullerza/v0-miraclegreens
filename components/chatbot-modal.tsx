@@ -2190,7 +2190,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         {/* Photo Upload Section */}
                         <div className="mb-6">
                             <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
-                            {!successRecipe ? (
+                            {recipeLoading ? (
+                                <div className="bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border border-rose-500/20 flex flex-col h-32 items-center justify-center">
+                                    <Loader2 size={24} className="text-rose-500 animate-spin mb-2" />
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">Extracting recipe...</p>
+                                </div>
+                            ) : !successRecipe ? (
                                 <>
                                     <input
                                         id="photo-upload"
