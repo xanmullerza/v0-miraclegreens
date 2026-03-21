@@ -3177,23 +3177,35 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto custom-scrollbar px-2 flex flex-col">
                         {/* Toggle Section */}
                         <div className="sticky top-0 z-10 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800">
-                            <div className="flex items-center justify-center gap-3">
-                                <span className={cn("text-sm font-semibold transition-colors", !showOnlyMyRecipes ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400")}>All Recipes</span>
-                                <button
-                                    onClick={() => setShowOnlyMyRecipes(!showOnlyMyRecipes)}
-                                    className={cn(
-                                        "relative inline-flex h-7 w-12 items-center rounded-full transition-colors",
-                                        showOnlyMyRecipes ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
-                                    )}
-                                >
-                                    <span
+                            <div className="flex items-center justify-between">
+                                {/* Toggle Controls */}
+                                <div className="flex items-center justify-center gap-3 flex-1">
+                                    <span className={cn("text-sm font-semibold transition-colors", !showOnlyMyRecipes ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400")}>All Recipes</span>
+                                    <button
+                                        onClick={() => setShowOnlyMyRecipes(!showOnlyMyRecipes)}
                                         className={cn(
-                                            "inline-block h-5 w-5 transform rounded-full bg-white transition-transform",
-                                            showOnlyMyRecipes ? "translate-x-6" : "translate-x-1"
+                                            "relative inline-flex h-7 w-12 items-center rounded-full transition-colors",
+                                            showOnlyMyRecipes ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
                                         )}
-                                    />
+                                    >
+                                        <span
+                                            className={cn(
+                                                "inline-block h-5 w-5 transform rounded-full bg-white transition-transform",
+                                                showOnlyMyRecipes ? "translate-x-6" : "translate-x-1"
+                                            )}
+                                        />
+                                    </button>
+                                    <span className={cn("text-sm font-semibold transition-colors", showOnlyMyRecipes ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400")}>My Recipes</span>
+                                </div>
+                                
+                                {/* Filter Button */}
+                                <button
+                                    onClick={() => setShowFilterDialog(true)}
+                                    className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400"
+                                    title="Filter Recipes"
+                                >
+                                    <Filter size={20} />
                                 </button>
-                                <span className={cn("text-sm font-semibold transition-colors", showOnlyMyRecipes ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400")}>My Recipes</span>
                             </div>
                         </div>
                         
@@ -3597,28 +3609,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </button>
                     
                     <button
-                        onClick={() => {
-                            if (chatbotView === 'view-recipes') {
-                                setShowFilterDialog(true);
-                            } else {
-                                setChatbotView('dashboard');
-                            }
-                        }}
+                        onClick={() => setChatbotView('dashboard')}
                         className={cn(
                             "w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-95 group",
-                            (chatbotView === 'view-recipes')
-                                ? "bg-blue-500 text-white shadow-blue-500/40 hover:bg-blue-600"
-                                : chatbotView === 'dashboard'
-                                    ? "bg-emerald-500 text-white shadow-emerald-500/40"
-                                    : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
+                            chatbotView === 'dashboard'
+                                ? "bg-emerald-500 text-white shadow-emerald-500/40"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
                         )}
-                        title={chatbotView === 'view-recipes' ? "Filter Recipes" : "Home"}
+                        title="Home"
                     >
-                        {chatbotView === 'view-recipes' ? (
-                            <Filter size={24} className={cn(chatbotView === 'view-recipes' ? "" : "group-hover:scale-110 transition-transform")} />
-                        ) : (
-                            <Home size={24} className={cn(chatbotView === 'dashboard' ? "" : "group-hover:scale-110 transition-transform")} />
-                        )}
+                        <Home size={24} className="group-hover:scale-110 transition-transform" />
                     </button>
 
                     <button
