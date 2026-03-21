@@ -289,7 +289,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             case 'comparator': return 'Comparator';
             case 'lifeguard': return 'Lifeguard';
             case 'conversation-history': return 'Conversation History';
-            case 'import': return 'Import Recipes';
+            case 'import': return 'Add Recipes';
             case 'import-options': return 'Import Options';
             case 'import-paste-text': return 'Paste Text';
             case 'import-paste-url': return 'Paste a Link';
@@ -2051,7 +2051,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
                                     <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">📖</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Public Recipes</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
                                 </button>
                                 <button
                                     onClick={() => setChatbotView('my-recipes')}
@@ -2065,19 +2065,19 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
                                     <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] transition-all">📥</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Import Recipes</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Add Recipes</span>
                                 </button>
                                 <button
                                     onClick={() => toast('Export is coming soon 👀')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
                                     <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.3)] transition-all">📤</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Export Recipes</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Share Recipes</span>
                                 </button>
                             </div>
                         </div>
 
-                        {/* Planner Section */}
+                        {/* Planner Section */
                         <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group cursor-pointer transition-all hover:border-blue-500/40" onClick={() => toast('🚀 Meal planning features coming soon! We\'re polishing the details to make it perfect for you.')}>
                             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Calendar size={120} className="text-blue-500 -rotate-12" />
@@ -2793,7 +2793,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">📖</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Public Recipes</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
                             </button>
 
                             <button
@@ -2809,7 +2809,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">📥</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Import Recipes</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Add Recipes</span>
                             </button>
 
                             <button
@@ -2817,7 +2817,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">📤</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Export Recipes</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Share Recipes</span>
                             </button>
                         </div>
                     </div>
