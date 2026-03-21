@@ -2222,7 +2222,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         {/* URL Input Section */}
                         <div className="mb-6">
                             <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Paste a Link</h4>
-                            {!successRecipe && (
+                            {!successRecipe ? (
                                 <>
                                     <input
                                         type="url"
@@ -2246,6 +2246,39 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                         )}
                                     </button>
                                 </>
+                            ) : (
+                                <div className="flex flex-col">
+                                    <div className="bg-purple-500/10 dark:bg-purple-500/20 rounded-xl p-3 border border-purple-500/20 mb-3">
+                                        <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{successRecipe.title}</h4>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400">Recipe parsed successfully! Ready to save?</p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleSaveAndViewRecipe(successRecipe)}
+                                        disabled={recipeSaving}
+                                        className="w-full px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-2"
+                                    >
+                                        {recipeSaving ? (
+                                            <>
+                                                <Loader2 size={12} className="animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Save size={12} />
+                                                Save to Library
+                                            </>
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setSuccessRecipe(null);
+                                            setpastedRecipeURL('');
+                                        }}
+                                        className="w-full px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors hover:bg-slate-300 dark:hover:bg-slate-700"
+                                    >
+                                        Try Another
+                                    </button>
+                                </div>
                             )}
                         </div>
 
