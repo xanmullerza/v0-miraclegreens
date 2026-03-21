@@ -2223,7 +2223,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </div>
                             </div>
 
-                            {/* Option 2: Paste URL - FULL WIDTH */}
+                            {/* Option 2: Paste URL - FULL WIDTH - Direct to form */}
                             <div 
                                 onClick={() => setChatbotView('import-paste-url')}
                                 className="bg-purple-500/10 dark:bg-purple-500/5 rounded-2xl p-4 border border-purple-500/20 flex flex-col h-full relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300 cursor-pointer w-full"
