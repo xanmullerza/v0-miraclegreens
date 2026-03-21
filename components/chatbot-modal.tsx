@@ -2177,16 +2177,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Import Options View */}
                 {!showRecipeBuilder && chatbotView === 'import' && (
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
-                        <div className="w-full flex justify-between items-center mb-6">
-                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Import Recipes</h3>
-                            <button
-                                onClick={() => setChatbotView('cookbook')}
-                                className="px-3 py-1.5 rounded-xl text-[10px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-emerald-500 transition-colors uppercase tracking-widest border border-slate-200 dark:border-slate-700"
-                            >
-                                📚 Back
-                            </button>
-                        </div>
-
                         {/* Vertical Stack Layout */}
                         <div className="flex flex-col gap-4 flex-1">
                             {/* Photo Upload Card */}
