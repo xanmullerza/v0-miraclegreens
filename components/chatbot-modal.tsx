@@ -21,6 +21,7 @@ import ProfilePage from '@/app/(main)/profile/page';
 import { toast } from 'sonner';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 
 interface Message {
     id: string;
@@ -225,6 +226,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const router = useRouter();
     const { user, saveRecipe } = useDataPersistence();
     const { profile } = useUserPreferences();
+    const { filters } = useRecipeFilter();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
     const INITIAL_MESSAGES: Message[] = [
@@ -1465,6 +1467,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             await saveRecipe(recipeData, recipeIngredients, recipeInstructions);
             
             toast.success('Recipe saved successfully!');
+            
+            // If in pantry-only mode, show helpful message
+            if (filters.pantryMode === 'pantry-only') {
+                toast.info('💡 Your recipe is saved but hidden in Pantry-Only mode. Add ingredients to your pantry to see it!', {
+                    duration: 5000
+                });
+            }
             
             // Reset form and return to chat
             setShowRecipeBuilder(false);
