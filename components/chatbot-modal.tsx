@@ -265,9 +265,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [pastedRecipeURL, setpastedRecipeURL] = useState('');
     const [videoURL, setVideoURL] = useState('');
     const [isDragging, setIsDragging] = useState(false);
+    const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
     
     // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'all-recipes' | 'my-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video'>('dashboard');
+    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
 
     const getChatbotViewTitle = () => {
@@ -279,8 +280,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             case 'profile': return 'Profile';
             case 'messages': return 'Messages';
             case 'recipe-builder': return 'Create Recipe';
-            case 'all-recipes': return 'All Recipes';
-            case 'my-recipes': return 'My Recipes';
+            case 'view-recipes': return 'View Recipes';
             case 'recipe-detail': return 'Recipe Details';
             case 'shopping': return 'Shopping';
             case 'pantry': return 'Pantry';
@@ -331,15 +331,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 { label: 'Chatbot', view: 'dashboard' },
                 { label: 'Create Recipe', view: 'recipe-builder' },
             ],
-            'all-recipes': [
+            'view-recipes': [
                 { label: 'Chatbot', view: 'dashboard' },
                 { label: 'Cookbook', view: 'cookbook' },
-                { label: 'All Recipes', view: 'all-recipes' },
-            ],
-            'my-recipes': [
-                { label: 'Chatbot', view: 'dashboard' },
-                { label: 'Cookbook', view: 'cookbook' },
-                { label: 'My Recipes', view: 'my-recipes' },
+                { label: 'View Recipes', view: 'view-recipes' },
             ],
             'recipe-detail': [
                 { label: 'Chatbot', view: 'dashboard' },
@@ -401,7 +396,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setChatbotView(view);
     };
 
-    const [previousView, setPreviousView] = useState<'all-recipes' | 'my-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('all-recipes'); // Always reset on refresh
+    const [previousView, setPreviousView] = useState<'view-recipes' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history'>('view-recipes'); // Always reset on refresh
     
     // Conversation history state
     const [conversationHistory, setConversationHistory] = useState<any[]>([]);
@@ -1227,18 +1222,20 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     };
 
     const handleViewAllRecipes = () => {
-        setChatbotView('all-recipes');
+        setChatbotView('view-recipes');
+        setShowOnlyMyRecipes(false);
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };
 
     const handleViewMyRecipes = () => {
-        setChatbotView('my-recipes');
+        setChatbotView('view-recipes');
+        setShowOnlyMyRecipes(true);
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };
 
-    const handleRecipeClick = (recipeId: string, fromView: 'all-recipes' | 'my-recipes' | 'planner') => {
+    const handleRecipeClick = (recipeId: string, fromView: 'view-recipes' | 'planner') => {
         setSelectedRecipeId(recipeId);
         setPreviousView(fromView);
         setChatbotView('recipe-detail');
@@ -2047,18 +2044,14 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <button
-                                    onClick={() => setChatbotView('all-recipes')}
+                                    onClick={() => {
+                                        setChatbotView('view-recipes');
+                                        setShowOnlyMyRecipes(false);
+                                    }}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
                                     <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">�</span>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
-                                </button>
-                                <button
-                                    onClick={() => setChatbotView('my-recipes')}
-                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                                >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.3)] transition-all">👩‍🍳</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">My Recipes</span>
                                 </button>
                                 <button
                                     onClick={() => setChatbotView('import')}
@@ -2789,19 +2782,14 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <button
-                                onClick={() => setChatbotView('all-recipes')}
+                                onClick={() => {
+                                    setChatbotView('view-recipes');
+                                    setShowOnlyMyRecipes(false);
+                                }}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">�</span>
                                 <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
-                            </button>
-
-                            <button
-                                onClick={() => setChatbotView('my-recipes')}
-                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                            >
-                                <span className="text-3xl transition-all">👩‍🍳</span>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">My Recipes</span>
                             </button>
 
                             <button
@@ -3185,21 +3173,42 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {!showRecipeBuilder && chatbotView === 'all-recipes' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar px-2">
-                        <RecipesView 
-                            onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'all-recipes')}
-                            hideControls={true}
-                        />
-                    </div>
-                )}
-
-                {!showRecipeBuilder && chatbotView === 'my-recipes' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar px-2">
-                        <MyRecipesView 
-                            onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'my-recipes')}
-                            hideControls={true}
-                        />
+                {!showRecipeBuilder && chatbotView === 'view-recipes' && (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar px-2 flex flex-col">
+                        {/* Toggle Section */}
+                        <div className="sticky top-0 z-10 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-center gap-3">
+                                <span className={cn("text-sm font-semibold transition-colors", !showOnlyMyRecipes ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400")}>All Recipes</span>
+                                <button
+                                    onClick={() => setShowOnlyMyRecipes(!showOnlyMyRecipes)}
+                                    className={cn(
+                                        "relative inline-flex h-7 w-12 items-center rounded-full transition-colors",
+                                        showOnlyMyRecipes ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
+                                    )}
+                                >
+                                    <span
+                                        className={cn(
+                                            "inline-block h-5 w-5 transform rounded-full bg-white transition-transform",
+                                            showOnlyMyRecipes ? "translate-x-6" : "translate-x-1"
+                                        )}
+                                    />
+                                </button>
+                                <span className={cn("text-sm font-semibold transition-colors", showOnlyMyRecipes ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400")}>My Recipes</span>
+                            </div>
+                        </div>
+                        
+                        {/* Recipes View */}
+                        {!showOnlyMyRecipes ? (
+                            <RecipesView 
+                                onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
+                                hideControls={true}
+                            />
+                        ) : (
+                            <MyRecipesView 
+                                onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
+                                hideControls={true}
+                            />
+                        )}
                     </div>
                 )}
 
@@ -3589,7 +3598,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     
                     <button
                         onClick={() => {
-                            if (chatbotView === 'all-recipes' || chatbotView === 'my-recipes') {
+                            if (chatbotView === 'view-recipes') {
                                 setShowFilterDialog(true);
                             } else {
                                 setChatbotView('dashboard');
@@ -3597,16 +3606,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         }}
                         className={cn(
                             "w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-95 group",
-                            (chatbotView === 'all-recipes' || chatbotView === 'my-recipes')
+                            (chatbotView === 'view-recipes')
                                 ? "bg-blue-500 text-white shadow-blue-500/40 hover:bg-blue-600"
                                 : chatbotView === 'dashboard'
                                     ? "bg-emerald-500 text-white shadow-emerald-500/40"
                                     : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
                         )}
-                        title={chatbotView === 'all-recipes' || chatbotView === 'my-recipes' ? "Filter Recipes" : "Home"}
+                        title={chatbotView === 'view-recipes' ? "Filter Recipes" : "Home"}
                     >
-                        {chatbotView === 'all-recipes' || chatbotView === 'my-recipes' ? (
-                            <Filter size={24} className={cn(chatbotView === 'all-recipes' || chatbotView === 'my-recipes' ? "" : "group-hover:scale-110 transition-transform")} />
+                        {chatbotView === 'view-recipes' ? (
+                            <Filter size={24} className={cn(chatbotView === 'view-recipes' ? "" : "group-hover:scale-110 transition-transform")} />
                         ) : (
                             <Home size={24} className={cn(chatbotView === 'dashboard' ? "" : "group-hover:scale-110 transition-transform")} />
                         )}
