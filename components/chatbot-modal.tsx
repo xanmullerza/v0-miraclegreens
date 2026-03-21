@@ -2191,29 +2191,44 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="mb-6">
                             <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
                             {!successRecipe ? (
-                                <div 
-                                    className={cn(
-                                        "bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border-2 border-dashed flex flex-col h-32 relative overflow-hidden group transition-all duration-300 cursor-pointer",
-                                        isDragging ? "border-rose-500 bg-rose-500/20" : "border-rose-500/20 hover:border-rose-500/40"
-                                    )}
-                                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                                    onDragLeave={() => setIsDragging(false)}
-                                    onDrop={(e) => {
-                                        e.preventDefault();
-                                        const file = e.dataTransfer.files?.[0];
-                                        if (file) {
-                                            processRecipeImage(file);
-                                        }
-                                    }}
-                                    onClick={() => fileInputRef.current?.click()}
-                                >
-                                    <div className="flex items-center justify-center h-full">
-                                        <div className="text-center">
-                                            <Camera size={24} className="text-rose-500 mx-auto mb-2" />
-                                            <p className="text-xs text-slate-600 dark:text-slate-400">Drag & drop or click to upload</p>
+                                <>
+                                    <input
+                                        id="photo-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                processRecipeImage(file);
+                                            }
+                                        }}
+                                        className="hidden"
+                                    />
+                                    <label 
+                                        htmlFor="photo-upload"
+                                        className={cn(
+                                            "bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border-2 border-dashed flex flex-col h-32 relative overflow-hidden group transition-all duration-300 cursor-pointer block",
+                                            isDragging ? "border-rose-500 bg-rose-500/20" : "border-rose-500/20 hover:border-rose-500/40"
+                                        )}
+                                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                        onDragLeave={() => setIsDragging(false)}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            setIsDragging(false);
+                                            const file = e.dataTransfer.files?.[0];
+                                            if (file) {
+                                                processRecipeImage(file);
+                                            }
+                                        }}
+                                    >
+                                        <div className="flex items-center justify-center h-full">
+                                            <div className="text-center">
+                                                <Camera size={24} className="text-rose-500 mx-auto mb-2" />
+                                                <p className="text-xs text-slate-600 dark:text-slate-400">Drag & drop or click to upload</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    </label>
+                                </>
                             ) : (
                                 <div className="flex flex-col">
                                     <div className="bg-rose-500/10 dark:bg-rose-500/20 rounded-xl p-3 border border-rose-500/20 mb-3">
