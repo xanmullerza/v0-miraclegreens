@@ -289,8 +289,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             case 'conversation-history': return 'Conversation History';
             case 'import-options': return 'Import Options';
             case 'import-paste-text': return 'Paste Text';
-            case 'import-paste-url': return 'Paste URL';
-            case 'import-upload-photo': return 'Upload Photo';
+            case 'import-paste-url': return 'Paste a Link';
+            case 'import-upload-photo': return 'Upload a Photo';
             case 'import-voice': return 'Voice Recipe';
             case 'import-video': return 'Video Import';
             case 'comingSoon': return 'Coming Soon';
@@ -2186,80 +2186,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-3 w-full">
-                            {/* Option 1: Manual Entry */}
-                            <div 
-                                onClick={handleManualRecipeCreation}
-                                className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col h-full relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300 cursor-pointer"
-                            >
-                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Pencil size={40} className="text-emerald-500" />
-                                </div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                                        <Pencil size={16} className="text-emerald-500" />
-                                    </div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 1</h4>
-                                </div>
-                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Manual Entry</h3>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
-                                    Add all details yourself using our form.
-                                </p>
-                                <div className="text-center py-2 rounded-xl bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-emerald-600 transition-colors">
-                                    LET&apos;S GO
-                                </div>
-                            </div>
-
-                            {/* Option 2: Paste Text */}
-                            <div 
-                                onClick={() => setChatbotView('import-paste-text')}
-                                className="bg-blue-500/10 dark:bg-blue-500/5 rounded-2xl p-4 border border-blue-500/20 flex flex-col h-full relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 cursor-pointer"
-                            >
-                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <FileText size={40} className="text-blue-500" />
-                                </div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                                        <FileText size={16} className="text-blue-500" />
-                                    </div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 2</h4>
-                                </div>
-                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Paste Text</h3>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
-                                    Paste instructions and we&apos;ll parse them.
-                                </p>
-                                <div className="text-center py-2 rounded-xl bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-blue-600 transition-colors">
-                                    START
-                                </div>
-                            </div>
-
-                            {/* Option 3: Paste URL */}
-                            <div 
-                                onClick={() => setChatbotView('import-paste-url')}
-                                className="bg-purple-500/10 dark:bg-purple-500/5 rounded-2xl p-4 border border-purple-500/20 flex flex-col h-full relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300 cursor-pointer"
-                            >
-                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Link size={40} className="text-purple-500" />
-                                </div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                                        <Link size={16} className="text-purple-500" />
-                                    </div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 3</h4>
-                                </div>
-                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Paste URL</h3>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
-                                    Import automatically from any link.
-                                </p>
-                                <div className="text-center py-2 rounded-xl bg-purple-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-purple-600 transition-colors">
-                                    IMPORT
-                                </div>
-                            </div>
-
-                            {/* Option 4: Photo Upload */}
+                        <div className="space-y-3 w-full">
+                            {/* Option 1: Photo Upload - FULL WIDTH */}
                             <div 
                                 className={cn(
-                                    "bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border-2 border-dashed flex flex-col h-full relative overflow-hidden group transition-all duration-300 cursor-pointer",
+                                    "bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border-2 border-dashed flex flex-col h-full relative overflow-hidden group transition-all duration-300 cursor-pointer w-full",
                                     isDragging ? "border-rose-500 bg-rose-500/20" : "border-rose-500/20 hover:border-rose-500/40"
                                 )}
                                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
@@ -2281,9 +2212,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center">
                                         <Camera size={16} className="text-rose-500" />
                                     </div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 4</h4>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 1</h4>
                                 </div>
-                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Upload Photo</h3>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Upload a Photo</h3>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
                                     Extract recipe from any image.
                                 </p>
@@ -2292,49 +2223,49 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </div>
                             </div>
 
-                            {/* Option 5: Voice Assisted */}
+                            {/* Option 2: Paste URL - FULL WIDTH */}
                             <div 
-                                onClick={() => setChatbotView('import-voice')}
-                                className="bg-amber-500/10 dark:bg-amber-500/5 rounded-2xl p-4 border border-amber-500/20 flex flex-col h-full relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300 cursor-pointer"
+                                onClick={() => setChatbotView('import-paste-url')}
+                                className="bg-purple-500/10 dark:bg-purple-500/5 rounded-2xl p-4 border border-purple-500/20 flex flex-col h-full relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300 cursor-pointer w-full"
                             >
                                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Mic size={40} className="text-amber-500" />
+                                    <Link size={40} className="text-purple-500" />
                                 </div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                                        <Mic size={16} className="text-amber-500" />
+                                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <Link size={16} className="text-purple-500" />
                                     </div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 5</h4>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 2</h4>
                                 </div>
-                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Voice Assisted</h3>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Paste a Link</h3>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
-                                    Describe your recipe by talking.
+                                    Import automatically from any link.
                                 </p>
-                                <div className="text-center py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-amber-600 transition-colors">
-                                    RECORD
+                                <div className="text-center py-2 rounded-xl bg-purple-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-purple-600 transition-colors">
+                                    IMPORT
                                 </div>
                             </div>
 
-                            {/* Option 6: Video Import */}
+                            {/* Option 3: Manual Entry - FULL WIDTH */}
                             <div 
-                                onClick={() => setChatbotView('import-video')}
-                                className="bg-cyan-500/10 dark:bg-cyan-500/5 rounded-2xl p-4 border border-cyan-500/20 flex flex-col h-full relative overflow-hidden group hover:border-cyan-500/40 transition-all duration-300 cursor-pointer"
+                                onClick={handleManualRecipeCreation}
+                                className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col h-full relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300 cursor-pointer w-full"
                             >
                                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Video size={40} className="text-cyan-500" />
+                                    <Pencil size={40} className="text-emerald-500" />
                                 </div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                                        <Video size={16} className="text-cyan-500" />
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                                        <Pencil size={16} className="text-emerald-500" />
                                     </div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 6</h4>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest">Method 3</h4>
                                 </div>
-                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Video Import</h3>
+                                <h3 className="font-black text-slate-900 dark:text-white text-xs mb-1">Create Recipe Manually</h3>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4 flex-1">
-                                    Import from YouTube or TikTok.
+                                    Add all details yourself using our form.
                                 </p>
-                                <div className="text-center py-2 rounded-xl bg-cyan-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-cyan-600 transition-colors">
-                                    WATCH
+                                <div className="text-center py-2 rounded-xl bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest group-hover:bg-emerald-600 transition-colors">
+                                    LET&apos;S GO
                                 </div>
                             </div>
                         </div>
