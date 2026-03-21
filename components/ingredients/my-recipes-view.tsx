@@ -67,7 +67,7 @@ export function MyRecipesView({ onRecipeClick, hideControls = false, isMix = fal
     const { searchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
     const { filters } = useRecipeFilter();
-    const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading } = useDataPersistence();
+    const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading, recipeRefreshVersion } = useDataPersistence();
     const [pantryItems, setPantryItems] = useState<any[]>([]);
 
 
@@ -81,7 +81,7 @@ export function MyRecipesView({ onRecipeClick, hideControls = false, isMix = fal
         if (!authLoading) {
             fetchMyRecipes(0, true);
         }
-    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, user, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements]);
+    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, user, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, recipeRefreshVersion]);
 
     const getPantryItems = async () => {
         try {

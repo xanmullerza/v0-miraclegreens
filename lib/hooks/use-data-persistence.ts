@@ -25,6 +25,7 @@ export interface Recipe {
 export function useDataPersistence() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [recipeRefreshVersion, setRecipeRefreshVersion] = useState(0);
 
     useEffect(() => {
         // Get initial session
@@ -296,6 +297,7 @@ export function useDataPersistence() {
                     }
                 }
 
+                setRecipeRefreshVersion(prev => prev + 1);
                 return { ...recipeData, ingredients, instructions };
             } else {
                 // Save to LocalStorage
@@ -347,6 +349,7 @@ export function useDataPersistence() {
                 }
 
                 localStorage.setItem('local_recipes', JSON.stringify(localRecipes));
+                setRecipeRefreshVersion(prev => prev + 1);
                 return newRecipe;
             }
         } catch (error) {
@@ -414,6 +417,7 @@ export function useDataPersistence() {
         fetchRecipes,
         saveRecipe,
         deleteRecipe,
-        getRecipe
+        getRecipe,
+        recipeRefreshVersion
     };
 }
