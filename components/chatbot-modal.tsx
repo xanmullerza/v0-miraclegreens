@@ -2180,7 +2180,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         {/* Vertical Stack Layout */}
                         <div className="flex flex-col gap-4 flex-1">
                             {/* Photo Upload Card */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-teal-500/10 dark:bg-teal-500/5">
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-teal-500/20 dark:bg-teal-500/10">
                                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
                                 {isLoading ? (
                                     <div className="bg-rose-500/10 dark:bg-rose-500/5 rounded-2xl p-4 border border-rose-500/20 flex flex-col flex-1 items-center justify-center">
@@ -2262,7 +2262,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </div>
 
                             {/* URL Input Card */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-blue-500/10 dark:bg-blue-500/5">
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-blue-500/20 dark:bg-blue-500/10">
                                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Paste a Link</h4>
                                 {!successRecipe ? (
                                     <>
@@ -2325,7 +2325,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </div>
 
                             {/* Manual Entry Card */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-purple-500/10 dark:bg-purple-500/5">
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-purple-500/20 dark:bg-purple-500/10">
                                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Create Manually</h4>
                                 <div className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col flex-1 items-center justify-center group hover:border-emerald-500/40 transition-all duration-300 cursor-pointer"
                                     onClick={handleManualRecipeCreation}>
