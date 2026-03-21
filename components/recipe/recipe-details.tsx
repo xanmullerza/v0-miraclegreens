@@ -835,8 +835,8 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                 <div className="space-y-8">
                     {/* Header Section */}
                     <div className="space-y-3 pt-4">
-                        <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight mb-3 text-center">
-                            <span className="text-emerald-500">{recipe.title}</span>
+                        <h1 className="text-xl font-black tracking-tighter italic leading-tight mb-3 text-center">
+                            <span className="text-emerald-500" style={{textTransform: 'capitalize'}}>{recipe.title.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
                         </h1>
 
                         <div className="flex flex-col lg:flex-row items-center gap-4">
@@ -925,7 +925,7 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <Layers className="text-emerald-500" size={20} />
-                                        <h2 className="text-lg font-black uppercase tracking-wider">Ingredients</h2>
+                                        <h2 className="text-lg font-black tracking-wider">Ingredients</h2>
                                     </div>
                                 </div>
 
@@ -966,7 +966,7 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                 <Card className="p-5 lg:p-8 space-y-6">
                                     <div className="flex items-center gap-3">
                                         <BookOpen className="text-emerald-500" size={20} />
-                                        <h2 className="text-lg font-black uppercase tracking-wider">Instructions</h2>
+                                        <h2 className="text-lg font-black tracking-wider">Instructions</h2>
                                     </div>
                                     <div className="space-y-4">
                                         {instructions.map((inst, i) => (
@@ -1054,8 +1054,8 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                                     {(meal as any).overlapMatch} Shared
                                                 </div>
                                             </div>
-                                            <h4 className="font-black text-[9px] uppercase italic text-slate-900 dark:text-white line-clamp-1">
-                                                {meal.title}
+                                            <h4 className="font-black text-[9px] italic text-slate-900 dark:text-white line-clamp-1" style={{textTransform: 'capitalize'}}>
+                                                {meal.title.toLowerCase().split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                                             </h4>
                                         </a>
                                     ))}

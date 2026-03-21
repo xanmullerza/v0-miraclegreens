@@ -558,8 +558,8 @@ export function MyRecipesView({ onRecipeClick, hideControls = false, isMix = fal
 
                                             {/* Info */}
                                             <div className="flex-1 min-w-0 lg:p-0">
-                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize line-clamp-2">
-                                                    {recipe.title}
+                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight line-clamp-2">
+                                                    {recipe.title.toLowerCase().split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                                                 </h3>
                                             </div>
                                         </div>
