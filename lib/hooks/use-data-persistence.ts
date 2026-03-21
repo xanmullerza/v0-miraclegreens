@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -145,11 +144,15 @@ export function useDataPersistence() {
         }
     };
 
+    const generateId = () => {
+        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    };
+
     const saveRecipe = async (recipe: any, ingredients?: any[], instructions?: any[]) => {
         try {
             if (user) {
                 // SAVE TO CLOUD
-                const recipeId = recipe.id || uuidv4();
+                const recipeId = recipe.id || generateId();
                 const recipeData = {
                     ...recipe,
                     id: recipeId,
@@ -304,7 +307,7 @@ export function useDataPersistence() {
                 const localData = localStorage.getItem('local_recipes');
                 let localRecipes: Recipe[] = localData ? JSON.parse(localData) : [];
 
-                const recipeId = recipe.id || `local-${uuidv4()}`;
+                const recipeId = recipe.id || `local-${generateId()}`;
 
                 // Standardize ingredients for local storage to match cloud structure (include nesting)
                 const servings = recipe.servings || 1;
