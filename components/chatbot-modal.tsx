@@ -1295,7 +1295,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setpastedRecipeURL('');
         setChatbotView('messages');
         setSelectedRecipeId(null);
-        setPreviousView('all-recipes');
+        setPreviousView('view-recipes');
         setShowRecipeBuilder(false);
     };
 
@@ -1333,7 +1333,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setpastedRecipeURL('');
         setChatbotView('messages');
         setSelectedRecipeId(null);
-        setPreviousView('all-recipes');
+        setPreviousView('view-recipes');
         setShowRecipeBuilder(false);
         setRecipeCookTime(0);
     };
