@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -147,7 +148,7 @@ export function useDataPersistence() {
         try {
             if (user) {
                 // SAVE TO CLOUD
-                const recipeId = recipe.id || `recipe-${Date.now()}`;
+                const recipeId = recipe.id || uuidv4();
                 const recipeData = {
                     ...recipe,
                     id: recipeId,
@@ -212,8 +213,7 @@ export function useDataPersistence() {
                     if (ingError) {
                         console.error('Ingredient save error:', ingError);
                         console.error('Attempted data:', ingredientsData);
-                        // Log but don't throw - ingredient issues shouldn't prevent recipe save
-                        // The recipe was already saved successfully
+                        throw new Error(`Failed to save ingredients: ${ingError.message}`);
                     }
                 }
 
@@ -232,7 +232,7 @@ export function useDataPersistence() {
                     const { error: insError } = await supabase.from('instructions').insert(instructionsData);
                     if (insError) {
                         console.error('Instruction save error:', insError);
-                        // Log but don't throw
+                        throw new Error(`Failed to save instructions: ${insError.message}`);
                     }
                 }
 
@@ -302,7 +302,7 @@ export function useDataPersistence() {
                 const localData = localStorage.getItem('local_recipes');
                 let localRecipes: Recipe[] = localData ? JSON.parse(localData) : [];
 
-                const recipeId = recipe.id || `local-${Date.now()}`;
+                const recipeId = recipe.id || `local-${uuidv4()}`;
 
                 // Standardize ingredients for local storage to match cloud structure (include nesting)
                 const servings = recipe.servings || 1;
