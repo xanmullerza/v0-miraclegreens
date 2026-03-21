@@ -2050,7 +2050,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     onClick={() => setChatbotView('all-recipes')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">📖</span>
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">�</span>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
                                 </button>
                                 <button
@@ -2064,14 +2064,14 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     onClick={() => setChatbotView('import')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] transition-all">📥</span>
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] transition-all">✍️</span>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Add Recipes</span>
                                 </button>
                                 <button
                                     onClick={() => toast('Export is coming soon 👀')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.3)] transition-all">📤</span>
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.3)] transition-all">🤝</span>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Share Recipes</span>
                                 </button>
                             </div>
@@ -2792,7 +2792,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 onClick={() => setChatbotView('all-recipes')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
-                                <span className="text-3xl transition-all">📖</span>
+                                <span className="text-3xl transition-all">�</span>
                                 <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
                             </button>
 
@@ -2808,7 +2808,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 onClick={() => setChatbotView('import-options')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
-                                <span className="text-3xl transition-all">📥</span>
+                                <span className="text-3xl transition-all">✍️</span>
                                 <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Add Recipes</span>
                             </button>
 
@@ -2816,7 +2816,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 onClick={() => toast('Export is coming soon 👀')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
-                                <span className="text-3xl transition-all">📤</span>
+                                <span className="text-3xl transition-all">🤝</span>
                                 <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Share Recipes</span>
                             </button>
                         </div>
