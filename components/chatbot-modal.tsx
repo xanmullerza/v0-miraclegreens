@@ -624,7 +624,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             
             // Navigate to the recipe within the modal
             setSelectedRecipeId(recipeId);
-            setPreviousView('my-recipes');
+            setPreviousView('view-recipes');
             setChatbotView('recipe-detail');
             
             // Reset recipe creation states so user can import another recipe
