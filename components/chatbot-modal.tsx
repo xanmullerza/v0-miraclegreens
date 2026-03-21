@@ -2188,7 +2188,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
 
                         {/* 3-Column Grid Layout */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+                        <div className="grid grid-cols-3 gap-4 flex-1">
                             {/* Photo Upload Card */}
                             <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col">
                                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
