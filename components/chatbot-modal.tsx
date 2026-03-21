@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -3622,11 +3622,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </button>
 
                     <button
-                        onClick={() => window.history.forward()}
+                        onClick={() => setChatbotView('messages')}
                         className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
-                        title="Go Forward"
+                        title="Open Chat"
                     >
-                        <ChevronRight size={24} />
+                        <MessageCircle size={24} />
                     </button>
                 </div>
             </div>
