@@ -2077,7 +2077,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </div>
                         </div>
 
-                        {/* Planner Section */
+                        {/* Planner Section */}
                         <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group cursor-pointer transition-all hover:border-blue-500/40" onClick={() => toast('🚀 Meal planning features coming soon! We\'re polishing the details to make it perfect for you.')}>
                             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Calendar size={120} className="text-blue-500 -rotate-12" />
