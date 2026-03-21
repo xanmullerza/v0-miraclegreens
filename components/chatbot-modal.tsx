@@ -2207,9 +2207,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     }}
                                     onClick={() => fileInputRef.current?.click()}
                                 >
-                                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
-                                        <Camera size={40} className="text-rose-500" />
-                                    </div>
                                     <div className="flex items-center justify-center h-full">
                                         <div className="text-center">
                                             <Camera size={24} className="text-rose-500 mx-auto mb-2" />
