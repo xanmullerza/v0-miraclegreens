@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -3379,23 +3379,28 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                             )}
                                         />
                                     </button>
-                                    <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", showOnlyMyRecipes ? "text-indigo-500" : "text-slate-400")}>My</span>
+                                    <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", showOnlyMyRecipes ? "text-indigo-500" : "text-slate-400")}>Mine</span>
                                 </div>
 
-                                <div className="flex-1 text-center">
-                                    <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 truncate">
-                                        {cookbookTab === 'recipes' ? 'All Meals' : cookbookTab === 'remixes' ? 'Edited Meals' : 'Ingredient Mixes'}
-                                    </h3>
-                                </div>
+                                <div className="flex items-center gap-2">
+                                    {/* Sort Button */}
+                                    <button
+                                        onClick={() => toast('Sorting options coming soon!')}
+                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-indigo-500 shrink-0"
+                                        title="Sort Recipes"
+                                    >
+                                        <ArrowDownUp size={18} />
+                                    </button>
 
-                                {/* Filter Button */}
-                                <button
-                                    onClick={() => setShowFilterDialog(true)}
-                                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-emerald-500 shrink-0"
-                                    title="Filter Recipes"
-                                >
-                                    <Filter size={18} />
-                                </button>
+                                    {/* Filter Button */}
+                                    <button
+                                        onClick={() => setShowFilterDialog(true)}
+                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-emerald-500 shrink-0"
+                                        title="Filter Recipes"
+                                    >
+                                        <Filter size={18} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
