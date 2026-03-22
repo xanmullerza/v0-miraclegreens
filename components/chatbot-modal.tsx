@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2 } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
@@ -442,6 +443,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [recipeSaving, setRecipeSaving] = useState(false);
     const [recipeUploading, setRecipeUploading] = useState(false);
     const [recipeStep, setRecipeStep] = useState(1);
+    const [isMix, setIsMix] = useState(false);
+    const [isRemix, setIsRemix] = useState(false);
+    const [cookbookTab, setCookbookTab] = useState<'recipes' | 'remixes' | 'mixes'>('recipes');
     
     // Audio recording state
     const [isRecording, setIsRecording] = useState(false);
@@ -1396,9 +1400,19 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setRecipeIngredients([]);
         setRecipeInstructions(['']);
         setRecipeImage('');
+        setIsMix(false);
+        setIsRemix(false);
     };
 
     const handleRemixRecipe = (recipe: any, ingredientsList?: any[], instructionsList?: any[]) => {
+        setIsRemix(true);
+        setIsMix(recipe.is_mix || false);
+        setChatbotView('messages');
+        setIsCreatingRecipe(true);
+        setShowRecipeBuilder(true);
+        setRecipeTitle(`${recipe.title} (Remix)`);
+        setSelectedRecipeId(null); // Save as new recipe
+        setRecipeStep(1);
         // Use either passed ingredients or joined ingredients from recipe
         const sourceIngredients = ingredientsList || recipe.ingredients || [];
         const sourceInstructions = instructionsList || recipe.instructions || [];
@@ -1559,6 +1573,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 image: recipeImage,
                 source: 'manual',
                 is_favorite: true,
+                is_mix: isMix,
+                is_remix: isRemix,
             };
 
             await saveRecipe(recipeData, recipeIngredients, recipeInstructions);
@@ -1578,7 +1594,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             setMessages(prev => [...prev, {
                 id: Date.now().toString(),
                 type: 'bot',
-                content: `✅ Perfect! I've saved "${recipeTitle}" to your recipe library. You can view it anytime in your My Recipes section!`,
+                content: `✅ Perfect! I've saved "${recipeTitle}" to your collection. You can view it anytime in your ${isMix ? 'Mixes' : isRemix ? 'Remixes' : 'Recipes'} section!`,
                 timestamp: new Date(),
             }]);
         } catch (error: any) {
@@ -1596,6 +1612,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setRecipeImage('');
         setRecipeStep(1);
         setRecipeCookTime(0);
+        setIsMix(false);
+        setIsRemix(false);
     };
 
     const handlePasteRecipeContent = async () => {
@@ -2100,29 +2118,57 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2 mt-4">
+                                {/* Save as Mix Toggle Option */}
+                                <div className="mt-6 p-4 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/5 border border-emerald-500/20 flex items-center justify-between group transition-all duration-300">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                                            <Beaker size={20} className="text-emerald-500" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Save as Mix</h4>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-tight">Combined ingredients used as one</p>
+                                        </div>
+                                    </div>
+                                    <Switch 
+                                        checked={isMix} 
+                                        onCheckedChange={setIsMix} 
+                                        className="data-[state=checked]:bg-emerald-500"
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-2 mt-6">
+                                    {isRemix ? (
+                                        <button
+                                            onClick={handleSaveRecipe}
+                                            disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0}
+                                            className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                                        >
+                                            {recipeSaving ? (
+                                                <Loader2 size={18} className="animate-spin" />
+                                            ) : (
+                                                <Wand2 size={18} />
+                                            )}
+                                            SAVE AS REMIX
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleSaveRecipe}
+                                            disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
+                                            className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                                        >
+                                            {recipeSaving ? (
+                                                <Loader2 size={18} className="animate-spin" />
+                                            ) : (
+                                                <Save size={18} />
+                                            )}
+                                            SAVE PROTOCOL
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => setRecipeStep(3)}
-                                        className="flex-1 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-muted font-bold text-sm uppercase tracking-widest transition-colors"
+                                        className="w-full py-2.5 rounded-xl text-slate-400 hover:text-slate-600 font-bold text-[10px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
                                     >
-                                        ← Back
-                                    </button>
-                                    <button
-                                        onClick={handleSaveRecipe}
-                                        disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
-                                        className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                    >
-                                        {recipeSaving ? (
-                                            <>
-                                                <Loader2 size={14} className="animate-spin" />
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Save size={14} />
-                                                Save Recipe
-                                            </>
-                                        )}
+                                        ← Back to Steps
                                     </button>
                                 </div>
                             </>
@@ -3289,52 +3335,68 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {!showRecipeBuilder && chatbotView === 'view-recipes' && (
                     <div className="flex-1 overflow-y-auto custom-scrollbar px-2 flex flex-col">
-                        {/* Toggle Section */}
+                        {/* Tab Section */}
                         <div className="sticky top-0 z-10 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800">
-                            <div className="flex items-center justify-between">
-                                {/* Toggle Controls */}
-                                <div className="flex items-center justify-center gap-3 flex-1">
-                                    <span className={cn("text-sm font-semibold transition-colors", !showOnlyMyRecipes ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400")}>All Recipes</span>
-                                    <button
-                                        onClick={() => setShowOnlyMyRecipes(!showOnlyMyRecipes)}
-                                        className={cn(
-                                            "relative inline-flex h-7 w-12 items-center rounded-full transition-colors",
-                                            showOnlyMyRecipes ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
-                                        )}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "inline-block h-5 w-5 transform rounded-full bg-white transition-transform",
-                                                showOnlyMyRecipes ? "translate-x-6" : "translate-x-1"
-                                            )}
-                                        />
-                                    </button>
-                                    <span className={cn("text-sm font-semibold transition-colors", showOnlyMyRecipes ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400")}>My Recipes</span>
-                                </div>
-                                
+                            <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 mb-3">
+                                <button 
+                                    onClick={() => setCookbookTab('recipes')} 
+                                    className={cn(
+                                        "flex-1 py-2 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all", 
+                                        cookbookTab === 'recipes' 
+                                            ? "bg-white dark:bg-slate-800 text-emerald-500 shadow-sm" 
+                                            : "text-slate-400 hover:text-slate-600"
+                                    )}
+                                >
+                                    Recipes
+                                </button>
+                                <button 
+                                    onClick={() => setCookbookTab('remixes')} 
+                                    className={cn(
+                                        "flex-1 py-2 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all", 
+                                        cookbookTab === 'remixes' 
+                                            ? "bg-white dark:bg-slate-800 text-indigo-500 shadow-sm" 
+                                            : "text-slate-400 hover:text-slate-600"
+                                    )}
+                                >
+                                    Remixes
+                                </button>
+                                <button 
+                                    onClick={() => setCookbookTab('mixes')} 
+                                    className={cn(
+                                        "flex-1 py-2 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all", 
+                                        cookbookTab === 'mixes' 
+                                            ? "bg-white dark:bg-slate-800 text-amber-500 shadow-sm" 
+                                            : "text-slate-400 hover:text-slate-600"
+                                    )}
+                                >
+                                    Mixes
+                                </button>
+                            </div>
+                            <div className="flex items-center justify-between px-1">
+                                <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
+                                    {cookbookTab === 'recipes' ? 'All Meals' : cookbookTab === 'remixes' ? 'Edited Meals' : 'Ingredient Mixes'}
+                                </h3>
                                 {/* Filter Button */}
                                 <button
                                     onClick={() => setShowFilterDialog(true)}
-                                    className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400"
+                                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-emerald-500"
                                     title="Filter Recipes"
                                 >
-                                    <Filter size={20} />
+                                    <Filter size={18} />
                                 </button>
                             </div>
                         </div>
                         
                         {/* Recipes View */}
-                        {!showOnlyMyRecipes ? (
+                        <div className="flex-1">
                             <RecipesView 
+                                key={cookbookTab}
                                 onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
                                 hideControls={true}
+                                isMix={cookbookTab === 'mixes'}
+                                isRemix={cookbookTab === 'remixes'}
                             />
-                        ) : (
-                            <MyRecipesView 
-                                onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
-                                hideControls={true}
-                            />
-                        )}
+                        </div>
                     </div>
                 )}
 

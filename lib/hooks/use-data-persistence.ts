@@ -19,6 +19,7 @@ export interface Recipe {
     user_id?: string | null;
     is_curated?: boolean;
     is_mix?: boolean;
+    is_remix?: boolean;
 }
 
 export function useDataPersistence() {
@@ -45,23 +46,25 @@ export function useDataPersistence() {
         searchQuery?: string,
         selectedTypes?: string[],
         showFavoritesOnly?: boolean,
-        isMix?: boolean,
         page?: number,
         pageSize?: number,
         sortField?: string,
         sortDirection?: 'asc' | 'desc',
-        includeDetails?: boolean
+        includeDetails?: boolean,
+        isMix?: boolean,
+        isRemix?: boolean
     } = {}) => {
         const {
             searchQuery = '',
             selectedTypes = [],
             showFavoritesOnly = false,
-            isMix = undefined,
             page = 0,
             pageSize = 20,
             sortField = 'title',
             sortDirection = 'asc',
-            includeDetails = false
+            includeDetails = false,
+            isMix = undefined,
+            isRemix = undefined
         } = options;
 
         try {
@@ -99,6 +102,9 @@ export function useDataPersistence() {
 
             if (isMix !== undefined) {
                 query = query.eq('is_mix', isMix);
+            }
+            if (isRemix !== undefined) {
+                query = query.eq('is_remix', isRemix);
             }
 
             // Pagination & Sorting

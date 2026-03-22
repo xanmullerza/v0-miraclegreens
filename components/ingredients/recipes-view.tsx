@@ -61,6 +61,7 @@ interface RecipesViewProps {
     isFilterOpen?: boolean;
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     isMix?: boolean;
+    isRemix?: boolean;
     showAddRecipe?: boolean;
     setShowAddRecipe?: React.Dispatch<React.SetStateAction<boolean>>;
     onRecipeClick?: (recipeId: string) => void;
@@ -75,6 +76,7 @@ export function RecipesView({
     isFilterOpen: externalIsFilterOpen,
     setIsFilterOpen: externalSetIsFilterOpen,
     isMix = false,
+    isRemix = false,
     showAddRecipe = false,
     setShowAddRecipe,
     onRecipeClick
@@ -188,6 +190,7 @@ export function RecipesView({
                 sortField,
                 sortDirection,
                 isMix,
+                isRemix,
                 includeDetails: needsIngredients
             });
 
