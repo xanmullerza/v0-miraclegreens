@@ -3665,11 +3665,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
             {/* Help Pages */}
             {!showRecipeBuilder && chatbotView === 'help-cookbook' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-6">
-                    <div className="max-w-2xl">
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Cookbook Help Guide</h1>
-                        
-                        <div className="space-y-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-3">
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Cookbook Help</h1>
                             <section>
                                 <h2 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-3 flex items-center gap-2">
                                     <span>👀</span> View Recipes
@@ -3721,17 +3718,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <li>• Imported recipes are automatically added to "My Recipes"</li>
                                 </ul>
                             </section>
-                        </div>
-                    </div>
                 </div>
             )}
 
             {!showRecipeBuilder && chatbotView === 'help-planner' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-6">
-                    <div className="max-w-2xl">
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Planner Help Guide</h1>
-                        
-                        <div className="space-y-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-3">
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Planner Help</h1>
                             <section>
                                 <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-2">
                                     <span>🗂️</span> Meal Planner
@@ -3792,17 +3784,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <li>• Compare nutritional totals across different meal plans</li>
                                 </ul>
                             </section>
-                        </div>
-                    </div>
                 </div>
             )}
 
             {!showRecipeBuilder && chatbotView === 'help-widgets' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-6">
-                    <div className="max-w-2xl">
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Widgets Help Guide</h1>
-                        
-                        <div className="space-y-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-3">
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Widgets Help</h1>
                             <section>
                                 <h2 className="text-xl font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-3 flex items-center gap-2">
                                     <span>🧪</span> Nutridex
@@ -3863,8 +3850,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <li>• Combine all three for comprehensive meal planning</li>
                                 </ul>
                             </section>
-                        </div>
-                    </div>
                 </div>
             )}
 
