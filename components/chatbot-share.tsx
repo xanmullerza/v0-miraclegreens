@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Facebook, Send, MessageCircle, Share2, Copy, Check, X, Twitter, Mail } from 'lucide-react';
+import { Facebook, Send, MessageCircle, Copy, Check, X, Twitter, Mail, Instagram, Share2, Plus, MessageSquare, Flame } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +18,7 @@ interface ChatbotShareProps {
 
 export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
     const [copied, setCopied] = useState(false);
+    const [showMore, setShowMore] = useState(false);
 
     const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/dashboard/library/meals/${recipe?.id || ''}` : '';
     const shareText = recipe 
@@ -31,7 +32,7 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const sharePlatforms = [
+    const mainPlatforms = [
         {
             name: 'WhatsApp',
             icon: MessageCircle,
@@ -59,6 +60,30 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
             color: 'bg-black',
             hoverColor: 'hover:bg-slate-900',
             url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`
+        }
+    ];
+
+    const extraPlatforms = [
+        {
+            name: 'Reddit',
+            icon: Flame,
+            color: 'bg-[#FF4500]',
+            hoverColor: 'hover:bg-[#FF5700]',
+            url: `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`
+        },
+        {
+            name: 'Discord',
+            icon: MessageSquare,
+            color: 'bg-[#5865F2]',
+            hoverColor: 'hover:bg-[#4752c4]',
+            url: `https://discord.com/channels/@me` // Note: Discord doesn't have a direct share URL scheme like others, usually copy-paste
+        },
+        {
+            name: 'Instagram',
+            icon: Instagram,
+            color: 'bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888]',
+            hoverColor: 'opacity-90',
+            url: `https://www.instagram.com/` // Custom sharing on IG is also restricted
         },
         {
             name: 'Email',
@@ -71,7 +96,7 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
 
     return (
         <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/20 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
-            <div className="w-full bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-in slide-in-from-bottom duration-300">
+            <div className="w-full bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-in slide-in-from-bottom duration-300 overflow-hidden">
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white">Share Recipe</h3>
@@ -101,24 +126,60 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
                     </div>
                 )}
 
-                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 mb-8">
-                    {sharePlatforms.map((platform) => (
-                        <div key={platform.name} className="flex flex-col items-center gap-2">
-                            <a
-                                href={platform.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={cn(
-                                    "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
-                                    platform.color,
-                                    platform.hoverColor
-                                )}
-                            >
-                                <platform.icon size={20} />
-                            </a>
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
+                <div className="space-y-6 mb-8">
+                    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
+                        {mainPlatforms.map((platform) => (
+                            <div key={platform.name} className="flex flex-col items-center gap-2">
+                                <a
+                                    href={platform.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={cn(
+                                        "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
+                                        platform.color,
+                                        platform.hoverColor
+                                    )}
+                                >
+                                    <platform.icon size={20} />
+                                </a>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
+                            </div>
+                        ))}
+                        
+                        {!showMore && (
+                            <div className="flex flex-col items-center gap-2">
+                                <button
+                                    onClick={() => setShowMore(true)}
+                                    className="w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all transform active:scale-95 shadow-md border border-slate-200 dark:border-slate-700"
+                                >
+                                    <Plus size={20} />
+                                </button>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">More</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {showMore && (
+                        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 animate-in slide-in-from-top-4 duration-300">
+                            {extraPlatforms.map((platform) => (
+                                <div key={platform.name} className="flex flex-col items-center gap-2">
+                                    <a
+                                        href={platform.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={cn(
+                                            "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
+                                            platform.color,
+                                            platform.hoverColor
+                                        )}
+                                    >
+                                        <platform.icon size={20} />
+                                    </a>
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    )}
                 </div>
 
                 <button
