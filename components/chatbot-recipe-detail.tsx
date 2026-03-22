@@ -58,7 +58,7 @@ interface ChatbotRecipeDetailProps {
     recipeId: string;
     onBack: () => void;
     onShare?: (recipe: any) => void;
-    onRemix?: (recipe: any, ingredients: any[]) => void;
+    onRemix?: (recipe: any, ingredients: any[], instructions: any[]) => void;
 }
 
 export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: ChatbotRecipeDetailProps) {
@@ -2524,7 +2524,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
 
                             {/* Remix Button */}
                             <button
-                                onClick={() => recipe && onRemix && onRemix(recipe, ingredients)}
+                                onClick={() => recipe && onRemix && onRemix(recipe, ingredients, instructions)}
                                 className="flex items-center gap-3 p-4 rounded-xl border bg-card border-border text-slate-600 dark:text-slate-400 hover:bg-muted hover:border-emerald-500/30 hover:text-emerald-600 transition-all active:scale-[0.98]"
                             >
                                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-slate-400">

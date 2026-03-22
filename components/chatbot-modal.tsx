@@ -1398,9 +1398,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setRecipeImage('');
     };
 
-    const handleRemixRecipe = (recipe: any, ingredientsList?: any[]) => {
+    const handleRemixRecipe = (recipe: any, ingredientsList?: any[], instructionsList?: any[]) => {
         // Use either passed ingredients or joined ingredients from recipe
         const sourceIngredients = ingredientsList || recipe.ingredients || [];
+        const sourceInstructions = instructionsList || recipe.instructions || [];
         const servings = recipe.servings || 4;
 
         // Pre-fill states for builder
@@ -1457,7 +1458,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         }
 
         // Map instructions
-        const sourceInstructions = recipe.instructions || [];
         if (sourceInstructions && Array.isArray(sourceInstructions)) {
             const sortedInstructions = [...sourceInstructions].sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
             setRecipeInstructions(sortedInstructions.map((ins: any) => typeof ins === 'string' ? ins : (ins.step_text || ins.text)));
