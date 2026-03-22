@@ -1545,7 +1545,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         }
     };
 
-    const handleSaveRecipe = async () => {
+    const handleSaveRecipe = async (forceIsMix?: boolean, forceIsRemix?: boolean) => {
+        const finalIsMix = forceIsMix !== undefined ? forceIsMix : isMix;
+        const finalIsRemix = forceIsRemix !== undefined ? forceIsRemix : isRemix;
+
         if (!recipeTitle || recipeIngredients.length === 0 || recipeInstructions.filter(i => i.trim()).length === 0) {
             toast.error('Please fill in all required fields');
             return;
@@ -1554,10 +1557,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setRecipeSaving(true);
         try {
             const totals = recipeIngredients.reduce((acc, ing) => ({
-                calories: acc.calories + ing.calories,
-                protein: acc.protein + ing.protein,
-                fat: acc.fat + ing.fat,
-                carbs: acc.carbs + ing.carbs,
+                calories: acc.calories + (ing.calories || 0),
+                protein: acc.protein + (ing.protein || 0),
+                fat: acc.fat + (ing.fat || 0),
+                carbs: acc.carbs + (ing.carbs || 0),
             }), { calories: 0, protein: 0, fat: 0, carbs: 0 });
 
             const recipeData = {
@@ -1573,13 +1576,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 image: recipeImage,
                 source: 'manual',
                 is_favorite: true,
-                is_mix: isMix,
-                is_remix: isRemix,
+                is_mix: finalIsMix,
+                is_remix: finalIsRemix,
             };
 
             await saveRecipe(recipeData, recipeIngredients, recipeInstructions);
             
-            toast.success(`"${recipeTitle}" saved to ${isMix ? 'Mixes' : isRemix ? 'Remixes' : 'Recipes'}`);
+            toast.success(`"${recipeTitle}" saved to ${finalIsMix ? 'Mixes' : finalIsRemix ? 'Remixes' : 'Recipes'}`);
             
             // If in pantry-only mode, show helpful message
             if (filters.pantryMode === 'pantry-only') {
@@ -1589,7 +1592,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             }
             
             // Redirect to appropriate tap in cookbook
-            setCookbookTab(isMix ? 'mixes' : isRemix ? 'remixes' : 'recipes');
+            setCookbookTab(finalIsMix ? 'mixes' : finalIsRemix ? 'remixes' : 'recipes');
             setChatbotView('view-recipes');
             setShowRecipeBuilder(false);
             setIsCreatingRecipe(false);
@@ -2119,55 +2122,46 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     </div>
                                 </div>
 
-                                {/* Save as Mix Toggle Option */}
-                                <div className="mt-6 p-4 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/5 border border-emerald-500/20 flex items-center justify-between group transition-all duration-300">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                                            <Beaker size={20} className="text-emerald-500" />
+                                <div className="flex flex-col gap-3 mt-8">
+                                    {/* Primary Save Button */}
+                                    <button
+                                        onClick={() => handleSaveRecipe(false, false)}
+                                        disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
+                                        className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex flex-col items-center justify-center gap-0.5 disabled:opacity-50"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                            <span className="text-[12px]">Save Protocol</span>
                                         </div>
-                                        <div className="text-left">
-                                            <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Save as Mix</h4>
-                                            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-tight">Combined ingredients used as one</p>
-                                        </div>
-                                    </div>
-                                    <Switch 
-                                        checked={isMix} 
-                                        onCheckedChange={setIsMix} 
-                                        className="data-[state=checked]:bg-emerald-500"
-                                    />
-                                </div>
+                                        <span className="text-[8px] opacity-60 font-medium tracking-[0.3em]">Save as Recipe</span>
+                                    </button>
 
-                                <div className="flex flex-col gap-2 mt-6">
-                                    {isRemix ? (
+                                    {/* Secondary Action Buttons */}
+                                    <div className="flex gap-3">
+                                        {/* Remix Button */}
                                         <button
-                                            onClick={handleSaveRecipe}
+                                            onClick={() => handleSaveRecipe(false, true)}
                                             disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0}
-                                            className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                                            className="flex-1 h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex flex-col items-center justify-center gap-1 disabled:opacity-50 border border-indigo-400/30"
                                         >
-                                            {recipeSaving ? (
-                                                <Loader2 size={18} className="animate-spin" />
-                                            ) : (
-                                                <Wand2 size={18} />
-                                            )}
-                                            SAVE AS REMIX
+                                            <Wand2 size={14} className="mb-0.5" />
+                                            <span className="text-[9px]">Save as Remix</span>
                                         </button>
-                                    ) : (
+
+                                        {/* Mix Button */}
                                         <button
-                                            onClick={handleSaveRecipe}
-                                            disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
-                                            className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                                            onClick={() => handleSaveRecipe(true, false)}
+                                            disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0}
+                                            className="flex-1 h-16 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-amber-600/20 flex flex-col items-center justify-center gap-1 disabled:opacity-50 border border-amber-400/30"
                                         >
-                                            {recipeSaving ? (
-                                                <Loader2 size={18} className="animate-spin" />
-                                            ) : (
-                                                <Save size={18} />
-                                            )}
-                                            SAVE PROTOCOL
+                                            <Beaker size={14} className="mb-0.5" />
+                                            <span className="text-[9px]">Save as Mix</span>
                                         </button>
-                                    )}
+                                    </div>
+
                                     <button
                                         onClick={() => setRecipeStep(3)}
-                                        className="w-full py-2.5 rounded-xl text-slate-400 hover:text-slate-600 font-bold text-[10px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                                        className="w-full py-2.5 rounded-xl text-slate-400 hover:text-slate-600 font-bold text-[10px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2 mt-4"
                                     >
                                         ← Back to Steps
                                     </button>
