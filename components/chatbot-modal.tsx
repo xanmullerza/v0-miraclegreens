@@ -1579,7 +1579,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
             await saveRecipe(recipeData, recipeIngredients, recipeInstructions);
             
-            toast.success('Recipe saved successfully!');
+            toast.success(`"${recipeTitle}" saved to ${isMix ? 'Mixes' : isRemix ? 'Remixes' : 'Recipes'}`);
             
             // If in pantry-only mode, show helpful message
             if (filters.pantryMode === 'pantry-only') {
@@ -1588,15 +1588,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 });
             }
             
-            // Reset form and return to chat
+            // Redirect to appropriate tap in cookbook
+            setCookbookTab(isMix ? 'mixes' : isRemix ? 'remixes' : 'recipes');
+            setChatbotView('view-recipes');
             setShowRecipeBuilder(false);
             setIsCreatingRecipe(false);
-            setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                type: 'bot',
-                content: `✅ Perfect! I've saved "${recipeTitle}" to your collection. You can view it anytime in your ${isMix ? 'Mixes' : isRemix ? 'Remixes' : 'Recipes'} section!`,
-                timestamp: new Date(),
-            }]);
+            
+            // Re-trigger a refresh of the recipe library
+            if ((window as any).refreshRecipeLibrary) {
+                (window as any).refreshRecipeLibrary();
+            }
         } catch (error: any) {
             toast.error(`Failed to save: ${error.message}`);
         } finally {
