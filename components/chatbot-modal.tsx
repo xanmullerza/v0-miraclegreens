@@ -2123,13 +2123,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <button
                                         onClick={() => handleSaveRecipe(false, false)}
                                         disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
-                                        className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex flex-col items-center justify-center gap-0.5 disabled:opacity-50"
+                                        className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                                            <span className="text-[12px]">Save Protocol</span>
-                                        </div>
-                                        <span className="text-[8px] opacity-60 font-medium tracking-[0.3em]">Save as Recipe</span>
+                                        {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                        <span className="text-[10px]">Save as Recipe</span>
                                     </button>
 
                                     {/* Secondary Action Buttons */}
