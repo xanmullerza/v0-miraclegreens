@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Home, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -3648,9 +3648,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 ? "bg-emerald-500 text-white shadow-emerald-500/40"
                                 : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
                         )}
-                        title="Home"
+                        title="Grid"
                     >
-                        <Home size={24} className="group-hover:scale-110 transition-transform" />
+                        <Grid2x2 size={24} className="group-hover:scale-110 transition-transform" />
                     </button>
 
                     <button
@@ -3665,7 +3665,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
             {/* Help Pages */}
             {!showRecipeBuilder && chatbotView === 'help-cookbook' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 debug-help-border">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 border-2 border-red-500">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Cookbook Help</h1>
                     <section className="mb-4">
                         <h2 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-2">
@@ -3722,7 +3722,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             )}
 
             {!showRecipeBuilder && chatbotView === 'help-planner' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 debug-help-border">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 border-2 border-red-500">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Planner Help</h1>
                     <section className="mb-4">
                         <h2 className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2">
@@ -3788,7 +3788,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             )}
 
             {!showRecipeBuilder && chatbotView === 'help-widgets' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 debug-help-border">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 border-2 border-red-500">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Widgets Help</h1>
                     <section className="mb-4">
                         <h2 className="text-lg font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-2 flex items-center gap-2">
