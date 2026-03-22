@@ -66,7 +66,6 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
                             text: shareText,
                             url: shareUrl,
                         });
-                        toast.success('Shared successfully!');
                     } catch (err) {
                         console.error('Error sharing:', err);
                     }
