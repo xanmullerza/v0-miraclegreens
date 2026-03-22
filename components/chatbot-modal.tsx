@@ -3665,7 +3665,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
             {/* Help Pages */}
             {!showRecipeBuilder && chatbotView === 'help-cookbook' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 debug-help-border">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Cookbook Help</h1>
                     <section className="mb-4">
                         <h2 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-2">
@@ -3722,7 +3722,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             )}
 
             {!showRecipeBuilder && chatbotView === 'help-planner' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 debug-help-border">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Planner Help</h1>
                     <section className="mb-4">
                         <h2 className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2">
@@ -3788,7 +3788,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             )}
 
             {!showRecipeBuilder && chatbotView === 'help-widgets' && (
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-2 debug-help-border">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Widgets Help</h1>
                     <section className="mb-4">
                         <h2 className="text-lg font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-2 flex items-center gap-2">
