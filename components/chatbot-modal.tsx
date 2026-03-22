@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -2176,37 +2176,24 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Cookbook</h3>
                             </div>
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-4">
                                 <button
                                     onClick={() => {
                                         setChatbotView('view-recipes');
                                         setShowOnlyMyRecipes(false);
                                     }}
-                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group shadow-sm"
                                 >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">�</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
-                                </button>
-                                <button
-                                    onClick={() => setChatbotView('import')}
-                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                                >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] transition-all">✍️</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Add Recipes</span>
-                                </button>
-                                <button
-                                    onClick={() => setChatbotView('export-recipes')}
-                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                                >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.3)] transition-all">🤝</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Share Recipes</span>
-                                </button>
-                                <button
-                                    onClick={() => setChatbotView('help-cookbook')}
-                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
-                                >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all">❓</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Help Guide</span>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                            <Salad size={24} className="text-emerald-600 dark:text-emerald-400 group-hover:text-white" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">View Recipes</h4>
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest">Access your full library</p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight size={20} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                                 </button>
                             </div>
                         </div>
@@ -3382,7 +3369,25 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", showOnlyMyRecipes ? "text-indigo-500" : "text-slate-400")}>Mine</span>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5">
+                                    {/* Add Button */}
+                                    <button
+                                        onClick={() => setChatbotView('import')}
+                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-emerald-500 hover:text-emerald-600 shrink-0"
+                                        title="Add Recipe"
+                                    >
+                                        <Plus size={18} />
+                                    </button>
+
+                                    {/* Help Button */}
+                                    <button
+                                        onClick={() => setChatbotView('help-cookbook')}
+                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-blue-500 hover:text-blue-600 shrink-0"
+                                        title="Cookbook Help"
+                                    >
+                                        <CircleHelp size={18} />
+                                    </button>
+
                                     {/* Sort Button */}
                                     <button
                                         onClick={() => toast('Sorting options coming soon!')}
