@@ -205,7 +205,7 @@ export function useDataPersistence() {
 
                         return {
                             recipe_id: recipeId,
-                            food_item_id: ing.food_item_id && !ing.food_item_id.startsWith('raw-') ? ing.food_item_id : null, 
+                            food_item_id: ing.food_item_id && !ing.food_item_id.startsWith('raw-') && !ing.food_item_id.startsWith('temp-') ? ing.food_item_id : null, 
                             item: itemName,
                             amount: amountStr,
                             weight_g: ing.weight_g / servings,
