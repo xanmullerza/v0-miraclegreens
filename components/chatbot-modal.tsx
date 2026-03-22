@@ -2067,6 +2067,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.3)] transition-all">🤝</span>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-cyan-500 transition-colors">Share Recipes</span>
                                 </button>
+                                <button
+                                    onClick={() => toast.info('📚 Cookbook Help:\n\n• View Recipes: Browse all available recipes or just your own\n• Add Recipes: Import recipes from URLs, photos, or manually create new ones\n• Share Recipes: Coming soon - export your favorite recipes\n\nTip: Use the toggle at the top to switch between all recipes and your personal collection!', { duration: 6000 })}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all">❓</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Help Guide</span>
+                                </button>
                             </div>
                         </div>
 
@@ -2106,6 +2113,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 >
                                     <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.3)] transition-all">🛒</span>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">Shopping</span>
+                                </button>
+                                <button
+                                    onClick={() => toast.info('📚 Planner Help:\n\n• Meal Planner: Plan your meals for the week and organize your shopping\n• Pantry: Track ingredients you have on hand\n• Shopping: Generate a shopping list from your meal plan\n\nTip: Start by adding meals to your planner, then create a shopping list!', { duration: 6000 })}
+                                    className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                                >
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all">❓</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Help Guide</span>
                                 </button>
                             </div>
                         </div>
@@ -2148,11 +2162,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-teal-500 transition-colors">Lifeguard</span>
                                 </button>
                                 <button
-                                    onClick={() => setChatbotView('messages')}
+                                    onClick={() => toast.info('📚 Widgets Help:\n\n• Nutridex: Compare nutrition profiles of foods\n• Comparator: Compare multiple recipes side-by-side\n• Lifeguard: Check for allergens and dietary conflicts\n\nTip: Use these tools to make informed decisions about your meals!', { duration: 6000 })}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
-                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">💬</span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">AI Chat</span>
+                                    <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all">❓</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Help Guide</span>
                                 </button>
                             </div>
                         </div>
