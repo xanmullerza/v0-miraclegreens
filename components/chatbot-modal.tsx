@@ -1993,9 +1993,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                         {recipeStep === 2 && (
                             <>
-                                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                                    Ingredients *
-                                </div>
+                           {/* Heading removed as it is redundant with the step title */}
                                 <IngredientBuilder
                                     ref={builderRef}
                                     ingredients={recipeIngredients}
