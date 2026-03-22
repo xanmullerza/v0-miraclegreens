@@ -1972,7 +1972,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     ref={builderRef}
                                     ingredients={recipeIngredients}
                                     onChange={setRecipeIngredients}
-                                    initialShowPicker={true}
+                                    initialShowPicker={recipeIngredients.length === 0}
                                 />
 
                                 <div className="flex gap-2 mt-4">
