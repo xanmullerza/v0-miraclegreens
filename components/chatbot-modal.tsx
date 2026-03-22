@@ -1398,48 +1398,57 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setRecipeImage('');
     };
 
-    const handleRemixRecipe = (recipe: any) => {
+    const handleRemixRecipe = (recipe: any, ingredientsList?: any[]) => {
+        // Use either passed ingredients or joined ingredients from recipe
+        const sourceIngredients = ingredientsList || recipe.ingredients || [];
+        const servings = recipe.servings || 4;
+
         // Pre-fill states for builder
         setRecipeTitle(`${recipe.title || 'Remix'} 🌈`);
-        setRecipeType(recipe.meal_type || 'dinner');
+        setRecipeType(recipe.meal_type || recipe.type || 'dinner');
         setRecipePrepTime(recipe.prep_time || 30);
         setRecipeCookTime(recipe.cook_time || 0);
-        setRecipeServings(recipe.servings || 4);
+        setRecipeServings(servings);
         setRecipeImage(recipe.image || '');
         
-        // Map ingredients for the builder
-        if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
-            const mapped: RecipeIngredient[] = recipe.ingredients.map((ing: any) => {
-                const food = ing.food_items || {};
-                const weight_g = ing.weight_g || 0;
+        // Map ingredients for the builder - Scale "per serving" to "total"
+        if (sourceIngredients && Array.isArray(sourceIngredients)) {
+            const mapped: RecipeIngredient[] = sourceIngredients.map((ing: any) => {
+                // Handle various join aliases: food_item, food_items, or nested
+                const food = ing.food_item || ing.food_items || {};
+                
+                // DB stores per-serving, Builder needs TOTAL for all servings
+                const weight_g = (ing.weight_g || 0) * servings;
+                const quantity = (ing.quantity || (ing.amount ? parseFloat(ing.amount) : 1)) * servings;
                 const multiplier = weight_g / 100;
                 
                 return {
                     food_item_id: ing.food_item_id || 'temp-id',
-                    food_item_name: food.name || ing.item || 'Unknown',
+                    food_item_name: food.common_name || food.name || ing.item || ing.base_ingredient || 'Unknown',
                     weight_g,
-                    quantity: ing.quantity || (weight_g > 0 ? weight_g : 1),
-                    measure_label: ing.unit || 'g',
+                    quantity,
+                    measure_label: ing.measure_label || ing.unit || 'g',
                     image: food.image,
-                    // Calculate absolute values for this ingredient
+                    // Calculate absolute values for the total batch
                     calories: (food.energy_kcal || 0) * multiplier,
-                    energy_kj: (food.energy_kj || 0) * multiplier,
+                    energy_kj: (food.energy_kj || (food.energy_kcal || 0) * 4.184) * multiplier,
                     protein: (food.protein_g || 0) * multiplier,
                     fat: (food.fat_g || 0) * multiplier,
                     carbs: (food.carbs_g || 0) * multiplier,
                     micronutrients: Object.entries(food.micronutrients || {}).reduce((acc, [k, v]) => {
-                        acc[k] = (v as number) * multiplier;
+                        acc[k] = (Number(v) || 0) * multiplier;
                         return acc;
                     }, {} as Record<string, number>),
                     base_nutrition: {
                         calories: food.energy_kcal || 0,
-                        energy_kj: food.energy_kj || 0,
+                        energy_kj: food.energy_kj || (food.energy_kcal || 0) * 4.184,
                         protein: food.protein_g || 0,
                         fat: food.fat_g || 0,
                         carbs: food.carbs_g || 0,
                         micronutrients: food.micronutrients || {}
                     },
-                    available_measures: food.portions || []
+                    available_measures: food.portions || food.available_measures || [],
+                    modifier: ing.modifier || null
                 };
             });
             setRecipeIngredients(mapped);
@@ -1448,19 +1457,18 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         }
 
         // Map instructions
-        if (recipe.instructions && Array.isArray(recipe.instructions)) {
-            // Sort instructions by step_order if available
-            const sortedInstructions = [...recipe.instructions].sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
-            setRecipeInstructions(sortedInstructions.map((ins: any) => ins.step_text || ins));
+        const sourceInstructions = recipe.instructions || [];
+        if (sourceInstructions && Array.isArray(sourceInstructions)) {
+            const sortedInstructions = [...sourceInstructions].sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
+            setRecipeInstructions(sortedInstructions.map((ins: any) => typeof ins === 'string' ? ins : (ins.step_text || ins.text)));
         } else {
             setRecipeInstructions(['']);
         }
 
         // Switch to builder view
         setIsCreatingRecipe(false);
-        setChatbotView('messages'); // The builder is rendered inside 'messages' view mostly but wait
         setShowRecipeBuilder(true);
-        setRecipeStep(1); // Start at ingredient step to allow adjustments
+        setRecipeStep(1); 
     };
 
     // Recipe builder helper functions
