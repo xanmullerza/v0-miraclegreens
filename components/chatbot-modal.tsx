@@ -1407,11 +1407,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const handleRemixRecipe = (recipe: any, ingredientsList?: any[], instructionsList?: any[]) => {
         setIsRemix(true);
         setIsMix(recipe.is_mix || false);
-        setChatbotView('messages');
         setIsCreatingRecipe(true);
         setShowRecipeBuilder(true);
         setRecipeTitle(`${recipe.title} (Remix)`);
-        setSelectedRecipeId(null); // Save as new recipe
         setRecipeStep(1);
         // Use either passed ingredients or joined ingredients from recipe
         const sourceIngredients = ingredientsList || recipe.ingredients || [];
