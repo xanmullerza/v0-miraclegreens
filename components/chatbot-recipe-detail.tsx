@@ -45,19 +45,19 @@ function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: ()
 
     if (confirming) {
         return (
-            <div className="flex flex-col items-center justify-center p-6 rounded-2xl border bg-rose-600 border-rose-500 text-white animate-in zoom-in-95 duration-200 text-center gap-3 shadow-xl shadow-rose-600/20">
-                <p className="font-black text-[10px] uppercase tracking-widest leading-tight">Are you sure?</p>
+            <div className="flex flex-col items-center justify-center p-4 rounded-2xl border bg-rose-600 border-rose-500 text-white animate-in zoom-in-95 duration-200 text-center gap-3 shadow-xl shadow-rose-600/20">
+                <p className="font-black text-[9px] uppercase tracking-widest leading-tight">Delete?</p>
                 <div className="flex gap-2 w-full">
                     <button 
                         onClick={handleDelete}
                         disabled={deleting}
-                        className="flex-1 py-2 bg-white text-rose-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center"
+                        className="flex-1 py-1.5 bg-white text-rose-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center"
                     >
-                        {deleting ? <Loader2 size={12} className="animate-spin" /> : 'Yes'}
+                        {deleting ? <Loader2 size={10} className="animate-spin" /> : 'Yes'}
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); setConfirming(false); }}
-                        className="flex-1 py-2 bg-rose-700/50 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-colors"
+                        className="flex-1 py-1.5 bg-rose-700/50 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-colors"
                     >
                         No
                     </button>
@@ -69,15 +69,12 @@ function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: ()
     return (
         <button
             onClick={handleDelete}
-            className="w-full flex flex-col items-center justify-center p-6 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-500/30 hover:text-rose-600 transition-all active:scale-95 text-center gap-3 group"
+            className="w-full flex flex-col items-center justify-center p-4 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-500/30 hover:text-rose-600 transition-all active:scale-95 text-center gap-3 group"
         >
-            <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-rose-500 transition-all">
-                <Trash2 size={20} />
+            <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-rose-500 transition-all">
+                <Trash2 size={18} />
             </div>
-            <div className="space-y-0.5">
-                <p className="font-black text-[10px] uppercase tracking-widest leading-none">Delete</p>
-                <p className="text-[8px] font-medium opacity-60 uppercase tracking-tighter line-clamp-1">Remove recipe</p>
-            </div>
+            <p className="font-black text-[9px] uppercase tracking-widest leading-none">Delete</p>
         </button>
     );
 }
@@ -2558,7 +2555,6 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                 <ShoppingBasket size={16} />
                                 Recipe Management
                             </h3>
-                            <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Actions and organization</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
@@ -2566,72 +2562,54 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                             <button
                                 onClick={toggleFavorite}
                                 className={cn(
-                                    "flex flex-col items-center justify-center p-6 rounded-2xl border transition-all active:scale-95 text-center gap-3 group",
+                                    "flex flex-col items-center justify-center p-4 rounded-2xl border transition-all active:scale-95 text-center gap-3 group",
                                     recipe.is_favorite 
                                         ? "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400" 
                                         : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
                                 )}
                             >
                                 <div className={cn(
-                                    "w-12 h-12 rounded-full flex items-center justify-center transition-all group-hover:scale-110",
+                                    "w-10 h-10 rounded-full flex items-center justify-center transition-all group-hover:scale-110",
                                     recipe.is_favorite ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm"
                                 )}>
-                                    <Heart size={20} className={recipe.is_favorite ? "fill-current" : ""} />
+                                    <Heart size={18} className={recipe.is_favorite ? "fill-current" : ""} />
                                 </div>
-                                <div className="space-y-0.5">
-                                    <p className="font-black text-[10px] uppercase tracking-widest leading-none">
-                                        {recipe.is_favorite ? 'Favourited' : 'Favourite'}
-                                    </p>
-                                    <p className="text-[8px] font-medium opacity-60 uppercase tracking-tighter line-clamp-1">Quick access</p>
-                                </div>
+                                <p className="font-black text-[9px] uppercase tracking-widest leading-none">
+                                    {recipe.is_favorite ? 'Favourited' : 'Favourite'}
+                                </p>
                             </button>
 
                             {/* Share Button */}
                             <button
                                 onClick={() => recipe ? (onShare ? onShare(recipe) : setShowShareDialog(true)) : null}
-                                className="flex flex-col items-center justify-center p-6 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-cyan-500/30 hover:text-cyan-600 transition-all active:scale-95 text-center gap-3 group"
+                                className="flex flex-col items-center justify-center p-4 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-cyan-500/30 hover:text-cyan-600 transition-all active:scale-95 text-center gap-3 group"
                             >
-                                <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-cyan-500 transition-all">
-                                    <Share2 size={20} />
+                                <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-cyan-500 transition-all">
+                                    <Share2 size={18} />
                                 </div>
-                                <div className="space-y-0.5">
-                                    <p className="font-black text-[10px] uppercase tracking-widest leading-none">Share</p>
-                                    <p className="text-[8px] font-medium opacity-60 uppercase tracking-tighter line-clamp-1">Send to friends</p>
-                                </div>
+                                <p className="font-black text-[9px] uppercase tracking-widest leading-none">Share</p>
                             </button>
 
                             {/* Edit/Remix Button */}
                             <button
                                 onClick={() => recipe && onRemix && onRemix(recipe, ingredients, instructions)}
-                                className="flex flex-col items-center justify-center p-6 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-500/30 hover:text-emerald-600 transition-all active:scale-95 text-center gap-3 group"
+                                className="flex flex-col items-center justify-center p-4 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-500/30 hover:text-emerald-600 transition-all active:scale-95 text-center gap-3 group"
                             >
-                                <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-emerald-500 transition-all">
-                                    <Wand2 size={20} />
+                                <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-emerald-500 transition-all">
+                                    <Wand2 size={18} />
                                 </div>
-                                <div className="space-y-0.5">
-                                    <p className="font-black text-[10px] uppercase tracking-widest leading-none">Edit</p>
-                                    <p className="text-[8px] font-medium opacity-60 uppercase tracking-tighter line-clamp-1">Adjust recipe</p>
-                                </div>
+                                <p className="font-black text-[9px] uppercase tracking-widest leading-none">Edit</p>
                             </button>
 
                             {/* Delete Button */}
                             <div className="relative">
-                                {!recipe.id.startsWith('local-') || recipe.id.startsWith('local-') ? (
-                                    <DeleteButton 
-                                        recipeId={recipe.id} 
-                                        onDeleted={() => {
-                                            toast.success('Recipe deleted successfully');
-                                            onBack();
-                                        }} 
-                                    />
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center p-6 rounded-2xl border bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-300 opacity-50 cursor-not-allowed text-center gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
-                                            <Trash2 size={20} />
-                                        </div>
-                                        <p className="font-black text-[10px] uppercase tracking-widest leading-none">Delete</p>
-                                    </div>
-                                )}
+                                <DeleteButton 
+                                    recipeId={recipe.id} 
+                                    onDeleted={() => {
+                                        toast.success('Recipe deleted successfully');
+                                        onBack();
+                                    }} 
+                                />
                             </div>
                         </div>
                     </div>
