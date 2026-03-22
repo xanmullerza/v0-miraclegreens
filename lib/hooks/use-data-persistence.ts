@@ -103,9 +103,6 @@ export function useDataPersistence() {
             if (isMix !== undefined) {
                 query = query.eq('is_mix', isMix);
             }
-            if (isRemix !== undefined) {
-                query = query.eq('is_remix', isRemix);
-            }
 
             // Pagination & Sorting
             query = query.order(sortField, { ascending: sortDirection === 'asc' });

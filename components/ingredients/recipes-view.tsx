@@ -195,8 +195,19 @@ export function RecipesView({
             });
 
             // LOCAL FILTERING (for things we can't do easily in Supabase)
-            let filteredItems = [...fetchedRecipes];
-
+            let filteredItems = fetchedRecipes.filter(r => {
+                // Handle missing is_remix/is_mix fields gracefully
+                if (isRemix !== undefined) {
+                    const rIsRemix = !!(r as any).is_remix;
+                    if (rIsRemix !== isRemix) return false;
+                }
+                if (isMix !== undefined) {
+                    const rIsMix = !!(r as any).is_mix;
+                    if (rIsMix !== isMix) return false;
+                }
+                return true;
+            });
+            
             // 1. Dietary Preference Filter
             if (filters.selectedDietType && filters.selectedDietType !== 'anything') {
                 filteredItems = filteredItems.filter(r => 
