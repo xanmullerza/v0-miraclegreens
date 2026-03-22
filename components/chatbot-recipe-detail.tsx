@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2 } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2, Wand2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -58,9 +58,10 @@ interface ChatbotRecipeDetailProps {
     recipeId: string;
     onBack: () => void;
     onShare?: (recipe: any) => void;
+    onRemix?: (recipe: any) => void;
 }
 
-export function ChatbotRecipeDetail({ recipeId, onBack, onShare }: ChatbotRecipeDetailProps) {
+export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: ChatbotRecipeDetailProps) {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
@@ -2518,6 +2519,20 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare }: ChatbotRecipe
                                 <div className="text-left">
                                     <p className="font-bold text-sm">Share Recipe</p>
                                     <p className="text-[10px] opacity-70">Send this recipe to friends or family</p>
+                                </div>
+                            </button>
+
+                            {/* Remix Button */}
+                            <button
+                                onClick={() => recipe && onRemix && onRemix(recipe)}
+                                className="flex items-center gap-3 p-4 rounded-xl border bg-card border-border text-slate-600 dark:text-slate-400 hover:bg-muted hover:border-emerald-500/30 hover:text-emerald-600 transition-all active:scale-[0.98]"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-slate-400">
+                                    <Wand2 size={20} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-sm">Remix Recipe</p>
+                                    <p className="text-[10px] opacity-70">Add/remove ingredients or adjust portions</p>
                                 </div>
                             </button>
                         </div>

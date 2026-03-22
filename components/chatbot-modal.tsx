@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -1396,6 +1396,71 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setRecipeIngredients([]);
         setRecipeInstructions(['']);
         setRecipeImage('');
+    };
+
+    const handleRemixRecipe = (recipe: any) => {
+        // Pre-fill states for builder
+        setRecipeTitle(`${recipe.title || 'Remix'} 🌈`);
+        setRecipeType(recipe.meal_type || 'dinner');
+        setRecipePrepTime(recipe.prep_time || 30);
+        setRecipeCookTime(recipe.cook_time || 0);
+        setRecipeServings(recipe.servings || 4);
+        setRecipeImage(recipe.image || '');
+        
+        // Map ingredients for the builder
+        if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
+            const mapped: RecipeIngredient[] = recipe.ingredients.map((ing: any) => {
+                const food = ing.food_items || {};
+                const weight_g = ing.weight_g || 0;
+                const multiplier = weight_g / 100;
+                
+                return {
+                    food_item_id: ing.food_item_id || 'temp-id',
+                    food_item_name: food.name || ing.item || 'Unknown',
+                    weight_g,
+                    quantity: ing.quantity || (weight_g > 0 ? weight_g : 1),
+                    measure_label: ing.unit || 'g',
+                    image: food.image,
+                    // Calculate absolute values for this ingredient
+                    calories: (food.energy_kcal || 0) * multiplier,
+                    energy_kj: (food.energy_kj || 0) * multiplier,
+                    protein: (food.protein_g || 0) * multiplier,
+                    fat: (food.fat_g || 0) * multiplier,
+                    carbs: (food.carbs_g || 0) * multiplier,
+                    micronutrients: Object.entries(food.micronutrients || {}).reduce((acc, [k, v]) => {
+                        acc[k] = (v as number) * multiplier;
+                        return acc;
+                    }, {} as Record<string, number>),
+                    base_nutrition: {
+                        calories: food.energy_kcal || 0,
+                        energy_kj: food.energy_kj || 0,
+                        protein: food.protein_g || 0,
+                        fat: food.fat_g || 0,
+                        carbs: food.carbs_g || 0,
+                        micronutrients: food.micronutrients || {}
+                    },
+                    available_measures: food.portions || []
+                };
+            });
+            setRecipeIngredients(mapped);
+        } else {
+            setRecipeIngredients([]);
+        }
+
+        // Map instructions
+        if (recipe.instructions && Array.isArray(recipe.instructions)) {
+            // Sort instructions by step_order if available
+            const sortedInstructions = [...recipe.instructions].sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
+            setRecipeInstructions(sortedInstructions.map((ins: any) => ins.step_text || ins));
+        } else {
+            setRecipeInstructions(['']);
+        }
+
+        // Switch to builder view
+        setIsCreatingRecipe(false);
+        setChatbotView('messages'); // The builder is rendered inside 'messages' view mostly but wait
+        setShowRecipeBuilder(true);
+        setRecipeStep(1); // Start at ingredient step to allow adjustments
     };
 
     // Recipe builder helper functions
@@ -3267,7 +3332,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Recipe Detail View */}
                 {!showRecipeBuilder && chatbotView === 'recipe-detail' && selectedRecipeId && (
-                    <ChatbotRecipeDetail recipeId={selectedRecipeId} onBack={handleBackFromRecipeDetail} />
+                    <ChatbotRecipeDetail 
+                        recipeId={selectedRecipeId} 
+                        onBack={handleBackFromRecipeDetail} 
+                        onRemix={handleRemixRecipe}
+                    />
                 )}
 
                 {/* Shopping View */}
