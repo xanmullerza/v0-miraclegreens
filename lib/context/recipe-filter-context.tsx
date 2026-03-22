@@ -11,6 +11,8 @@ export interface RecipeFilterState {
   pantryMode: 'all' | 'pantry-only'; // 'all' = show all but mark missing, 'pantry-only' = hide missing
   showFlavours: boolean;
   showSupplements: boolean;
+  selectedDifficulty: string[];
+  selectedTags: string[];
 }
 
 interface RecipeFilterContextType {
@@ -39,6 +41,8 @@ export function RecipeFilterProvider({
     pantryMode: 'all',
     showFlavours: false,
     showSupplements: false,
+    selectedDifficulty: [],
+    selectedTags: [],
   });
 
   // Sync with profile changes
@@ -63,6 +67,8 @@ export function RecipeFilterProvider({
           pantryMode: parsed.pantryMode || 'all',
           showFlavours: parsed.showFlavours || false,
           showSupplements: parsed.showSupplements || false,
+          selectedDifficulty: parsed.selectedDifficulty || [],
+          selectedTags: parsed.selectedTags || [],
         }));
       } catch (e) {
         console.error('Failed to load recipe filters from localStorage', e);
@@ -79,6 +85,8 @@ export function RecipeFilterProvider({
         pantryMode: filters.pantryMode,
         showFlavours: filters.showFlavours,
         showSupplements: filters.showSupplements,
+        selectedDifficulty: filters.selectedDifficulty,
+        selectedTags: filters.selectedTags,
       })
     );
   }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements]);
@@ -99,6 +107,8 @@ export function RecipeFilterProvider({
       pantryMode: 'all',
       showFlavours: false,
       showSupplements: false,
+      selectedDifficulty: [],
+      selectedTags: [],
     });
   };
 
@@ -107,7 +117,9 @@ export function RecipeFilterProvider({
     filters.selectedExclusions.length > 0 ||
     filters.selectedHealthConditions.length > 0 ||
     filters.pantryMode === 'pantry-only' ||
-    filters.showFlavours;
+    filters.showFlavours ||
+    filters.selectedDifficulty.length > 0 ||
+    filters.selectedTags.length > 0;
 
   return (
     <RecipeFilterContext.Provider

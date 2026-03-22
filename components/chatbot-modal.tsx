@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2 } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2, Clock, ChefHat } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -452,6 +452,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [recordingTime, setRecordingTime] = useState(0);
     const [isAdmin, setIsAdmin] = useState(false);
     const [showFilterDialog, setShowFilterDialog] = useState(false);
+    const [sortField, setSortField] = useState<string>('title');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [showSortOptions, setShowSortOptions] = useState(false);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -3389,13 +3392,63 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     </button>
 
                                     {/* Sort Button */}
-                                    <button
-                                        onClick={() => toast('Sorting options coming soon!')}
-                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-indigo-500 shrink-0"
-                                        title="Sort Recipes"
-                                    >
-                                        <ArrowDownUp size={18} />
-                                    </button>
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setShowSortOptions(!showSortOptions)}
+                                            className={cn(
+                                                "p-1.5 rounded-lg transition-colors flex items-center gap-1",
+                                                showSortOptions 
+                                                    ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" 
+                                                    : "hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500"
+                                            )}
+                                            title="Sort Recipes"
+                                        >
+                                            <ArrowDownUp size={18} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
+                                                {sortField === 'title' ? 'A-Z' : sortField === 'prep_time' ? 'Time' : sortField === 'calories' ? 'Cal' : 'Diff'}
+                                            </span>
+                                        </button>
+
+                                        {showSortOptions && (
+                                            <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] p-1 animate-in fade-in zoom-in-95 duration-100">
+                                                {[
+                                                    { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
+                                                    { id: 'prep_time', label: 'Prep Time', icon: <Clock size={14} /> },
+                                                    { id: 'difficulty', label: 'Difficulty', icon: <ChefHat size={14} /> },
+                                                    { id: 'calories', label: 'Calories', icon: <Salad size={14} /> },
+                                                ].map((opt) => (
+                                                    <button
+                                                        key={opt.id}
+                                                        onClick={() => {
+                                                            if (sortField === opt.id) {
+                                                                setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+                                                            } else {
+                                                                setSortField(opt.id);
+                                                                setSortDirection('asc');
+                                                            }
+                                                            setShowSortOptions(false);
+                                                        }}
+                                                        className={cn(
+                                                            "w-full text-left px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center justify-between transition-colors",
+                                                            sortField === opt.id
+                                                                ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600"
+                                                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                        )}
+                                                    >
+                                                        <span className="flex items-center gap-2">
+                                                            {opt.icon}
+                                                            {opt.label}
+                                                        </span>
+                                                        {sortField === opt.id && (
+                                                            <span className="text-[10px]">
+                                                                {sortDirection === 'asc' ? '↑' : '↓'}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
 
                                     {/* Filter Button */}
                                     <button
@@ -3418,6 +3471,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 isMix={cookbookTab === 'mixes'}
                                 isRemix={cookbookTab === 'remixes'}
                                 onlyMyRecipes={showOnlyMyRecipes}
+                                sortField={sortField}
+                                sortDirection={sortDirection}
                             />
                         </div>
                     </div>

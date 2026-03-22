@@ -63,6 +63,10 @@ const EXCLUSION_OPTIONS = [
   'Corn',
 ];
 
+const DIFFICULTY_OPTIONS = ['Easy', 'Medium', 'Hard'];
+
+const PREDEFINED_TAGS = ['#Quick', '#Budget', '#Keto', '#Vegan', '#Vegetarian', '#Gluten-Free', '#BatchCook'];
+
 export function RecipeFilterDialog({
   isOpen,
   onClose,
@@ -79,7 +83,9 @@ export function RecipeFilterDialog({
     exclusions: true,
     health: true,
     pantry: true,
-    extras: false,
+    extras: true,
+    difficulty: true,
+    tags: true,
   });
 
   useEffect(() => {
@@ -135,6 +141,26 @@ export function RecipeFilterDialog({
     }));
   };
 
+  const handleDifficultyToggle = (difficulty: string) => {
+    const updated = localFilters.selectedDifficulty.includes(difficulty)
+      ? localFilters.selectedDifficulty.filter((d) => d !== difficulty)
+      : [...localFilters.selectedDifficulty, difficulty];
+    setLocalFilters((prev) => ({
+      ...prev,
+      selectedDifficulty: updated,
+    }));
+  };
+
+  const handleTagToggle = (tag: string) => {
+    const updated = localFilters.selectedTags.includes(tag)
+      ? localFilters.selectedTags.filter((t) => t !== tag)
+      : [...localFilters.selectedTags, tag];
+    setLocalFilters((prev) => ({
+      ...prev,
+      selectedTags: updated,
+    }));
+  };
+
   const handleSave = async () => {
     const profileUpdates: any = {};
 
@@ -178,6 +204,8 @@ export function RecipeFilterDialog({
       pantryMode: 'all',
       showFlavours: false,
       showSupplements: false,
+      selectedDifficulty: [],
+      selectedTags: [],
     });
     toast.info('Filters reset to profile defaults');
   };
@@ -519,6 +547,82 @@ export function RecipeFilterDialog({
           </div>
         )}
       </div>
+      {/* Difficulty Section */}
+      <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+        <button
+          onClick={() => handleToggleSection('difficulty' as any)}
+          className="w-full px-4 py-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+        >
+          <h3 className="font-semibold text-slate-900 dark:text-white">
+            Difficulty ({localFilters.selectedDifficulty.length})
+          </h3>
+          {(expandedSections as any).difficulty ? (
+            <ChevronUp className="w-5 h-5" />
+          ) : (
+            <ChevronDown className="w-5 h-5" />
+          )}
+        </button>
+        {(expandedSections as any).difficulty && (
+          <div className="p-4 bg-white dark:bg-slate-900 grid grid-cols-3 gap-2">
+            {DIFFICULTY_OPTIONS.map((diff) => (
+              <label
+                key={diff}
+                className={cn(
+                  "flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-all text-[10px] font-black uppercase tracking-tight",
+                  localFilters.selectedDifficulty.includes(diff)
+                    ? "bg-indigo-500 border-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                    : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-indigo-300"
+                )}
+              >
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={localFilters.selectedDifficulty.includes(diff)}
+                  onChange={() => handleDifficultyToggle(diff)}
+                />
+                {diff}
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Tags Section */}
+      <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+        <button
+          onClick={() => handleToggleSection('tags' as any)}
+          className="w-full px-4 py-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+        >
+          <h3 className="font-semibold text-slate-900 dark:text-white">
+            Tags ({localFilters.selectedTags.length})
+          </h3>
+          {(expandedSections as any).tags ? (
+            <ChevronUp className="w-5 h-5" />
+          ) : (
+            <ChevronDown className="w-5 h-5" />
+          )}
+        </button>
+        {(expandedSections as any).tags && (
+          <div className="p-4 bg-white dark:bg-slate-900 space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {PREDEFINED_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => handleTagToggle(tag)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all",
+                    localFilters.selectedTags.includes(tag)
+                      ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                      : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-emerald-300"
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -545,7 +649,9 @@ export function RecipeFilterDialog({
         filters.selectedExclusions.length +
         filters.selectedHealthConditions.length +
         (filters.pantryMode === 'pantry-only' ? 1 : 0) +
-        (filters.showFlavours ? 1 : 0)}
+        (filters.showFlavours ? 1 : 0) +
+        filters.selectedDifficulty.length +
+        filters.selectedTags.length}
     </span>
   );
 

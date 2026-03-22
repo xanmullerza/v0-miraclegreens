@@ -66,6 +66,8 @@ interface RecipesViewProps {
     showAddRecipe?: boolean;
     setShowAddRecipe?: React.Dispatch<React.SetStateAction<boolean>>;
     onRecipeClick?: (recipeId: string) => void;
+    sortField?: string;
+    sortDirection?: 'asc' | 'desc';
 }
 
 export function RecipesView({
@@ -81,7 +83,9 @@ export function RecipesView({
     onlyMyRecipes = false,
     showAddRecipe = false,
     setShowAddRecipe,
-    onRecipeClick
+    onRecipeClick,
+    sortField: externalSortField,
+    sortDirection: externalSortDirection
 }: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
@@ -111,8 +115,11 @@ export function RecipesView({
     const isFilterOpen = externalIsFilterOpen !== undefined ? externalIsFilterOpen : localIsFilterOpen;
     const setIsFilterOpen = externalSetIsFilterOpen !== undefined ? externalSetIsFilterOpen : setLocalIsFilterOpen;
 
-    const [sortField, setSortField] = useState<string>('title');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [localSortField, setLocalSortField] = useState<string>('title');
+    const [localSortDirection, setLocalSortDirection] = useState<'asc' | 'desc'>('asc');
+    
+    const sortField = externalSortField !== undefined ? externalSortField : localSortField;
+    const sortDirection = externalSortDirection !== undefined ? externalSortDirection : localSortDirection;
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
@@ -165,8 +172,8 @@ export function RecipesView({
         }
     };
 
-    const fetchRecipes = async (pageNum: number, isNewSearch = false) => {
-        if (pageNum === 0) setLoading(true);
+    const fetchRecipes = async (pageToLoad: number, isNewSearch = false) => {
+        if (pageToLoad === 0) setLoading(true);
         else setLoadingMore(true);
 
         try {
@@ -300,7 +307,54 @@ export function RecipesView({
                 });
             }
 
-            const processedRecipes = filteredItems;
+            // 5. Difficulty Filter
+            if (filters.selectedDifficulty && filters.selectedDifficulty.length > 0) {
+                filteredItems = filteredItems.filter(r => 
+                    r.difficulty && filters.selectedDifficulty.includes(r.difficulty)
+                );
+            }
+
+            // 6. Tags Filter
+            if (filters.selectedTags && filters.selectedTags.length > 0) {
+                filteredItems = filteredItems.filter(r => 
+                    r.tags && filters.selectedTags.some(tag => r.tags.includes(tag))
+                );
+            }
+
+            // --- LOCAL SORTING ---
+            const difficultyOrder: Record<string, number> = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+            
+            let sortedItems = [...filteredItems].sort((a, b) => {
+                let valA: any, valB: any;
+                
+                switch (sortField) {
+                    case 'title':
+                        valA = (a.title || '').toLowerCase();
+                        valB = (b.title || '').toLowerCase();
+                        break;
+                    case 'prep_time':
+                        valA = a.prep_time || 0;
+                        valB = b.prep_time || 0;
+                        break;
+                    case 'difficulty':
+                        valA = difficultyOrder[a.difficulty || 'Medium'] || 2;
+                        valB = difficultyOrder[b.difficulty || 'Medium'] || 2;
+                        break;
+                    case 'calories':
+                        valA = a.calories || 0;
+                        valB = b.calories || 0;
+                        break;
+                    default:
+                        valA = (a.title || '').toLowerCase();
+                        valB = (b.title || '').toLowerCase();
+                }
+
+                if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const processedRecipes = sortedItems;
             setTotalCount(processedRecipes.length);
 
             if (isNewSearch) {
@@ -311,11 +365,11 @@ export function RecipesView({
                 setHasMore(firstSlice.length < processedRecipes.length);
             } else {
                 // For 'Load More', show the next slice
-                const startIdx = pageNum * PAGE_SIZE;
+                const startIdx = pageToLoad * PAGE_SIZE;
                 const endIdx = startIdx + PAGE_SIZE;
                 const nextSlice = processedRecipes.slice(startIdx, endIdx);
-                setRecipes(prev => [...prev, ...nextSlice]);
-                setPage(pageNum);
+                setRecipes((prev: Recipe[]) => [...prev, ...nextSlice]);
+                setPage(pageToLoad);
                 setHasMore(recipes.length + nextSlice.length < processedRecipes.length);
             }
 
@@ -330,10 +384,10 @@ export function RecipesView({
 
     const handleSort = (field: string) => {
         if (sortField === field) {
-            setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+            setLocalSortDirection((prev: 'asc' | 'desc') => prev === 'asc' ? 'desc' : 'asc');
         } else {
-            setSortField(field);
-            setSortDirection('asc');
+            setLocalSortField(field);
+            setLocalSortDirection('asc');
         }
     };
 
@@ -351,7 +405,7 @@ export function RecipesView({
                 is_favorite: newStatus
             });
 
-            setRecipes(prev => prev.map(r =>
+            setRecipes((prev: Recipe[]) => prev.map(r =>
                 r.id === recipe.id ? { ...r, is_favorite: newStatus } : r
             ));
             toast.success(newStatus ? 'Added to collections' : 'Removed from collections');

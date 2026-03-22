@@ -16,6 +16,8 @@ export interface Recipe {
     image: string | null;
     is_favorite: boolean;
     diet: string[];
+    tags: string[];
+    difficulty: 'Easy' | 'Medium' | 'Hard';
     user_id?: string | null;
     is_curated?: boolean;
     is_mix?: boolean;
@@ -160,7 +162,9 @@ export function useDataPersistence() {
                     ...recipe,
                     id: recipeId,
                     user_id: user.id,
-                    is_curated: false
+                    is_curated: false,
+                    tags: recipe.tags || [],
+                    difficulty: recipe.difficulty || 'Medium'
                 };
 
                 // 1. Save main recipe
@@ -344,7 +348,9 @@ export function useDataPersistence() {
                     ingredients: mappedIngredients,
                     instructions: mappedInstructions,
                     is_favorite: recipe.is_favorite ?? false,
-                    is_mix: recipe.is_mix ?? false
+                    is_mix: recipe.is_mix ?? false,
+                    tags: recipe.tags || [],
+                    difficulty: recipe.difficulty || 'Medium'
                 } as Recipe;
 
                 const existingIndex = localRecipes.findIndex(r => r.id === recipeId);
