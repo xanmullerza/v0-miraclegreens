@@ -932,24 +932,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare }: ChatbotRecipe
                 <h2 className="text-base font-semibold text-slate-900 dark:text-white flex-1 text-center px-2 truncate">
                     {recipe.title}
                 </h2>
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={() => recipe ? (onShare ? onShare(recipe) : setShowShareDialog(true)) : null}
-                        className="p-1.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-cyan-500"
-                        title="Share Recipe"
-                    >
-                        <Share2 size={18} />
-                    </button>
-                    <button
-                        onClick={toggleFavorite}
-                        className="p-1.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-rose-500"
-                    >
-                        <Heart
-                            size={18}
-                            className={recipe.is_favorite ? 'fill-rose-500 text-rose-500' : ''}
-                        />
-                    </button>
-                </div>
+                <div className="w-9" /> {/* Spacer to balance back button */}
             </div>
 
             {/* Share Dialog Overlay */}
@@ -2489,8 +2472,55 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare }: ChatbotRecipe
                 )}
 
                 {activeSection === 'management' && (
-                    <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-                        <p className="text-sm">Management options</p>
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="pb-2">
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-blue-500 italic flex items-center gap-2">
+                                <ShoppingBasket size={16} />
+                                Recipe Management
+                            </h3>
+                            <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Actions and organization</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3">
+                            {/* Favorite Toggle */}
+                            <button
+                                onClick={toggleFavorite}
+                                className={cn(
+                                    "flex items-center justify-between p-4 rounded-xl border transition-all active:scale-[0.98]",
+                                    recipe.is_favorite 
+                                        ? "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400" 
+                                        : "bg-card border-border text-slate-600 dark:text-slate-400 hover:bg-muted"
+                                )}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={cn(
+                                        "w-10 h-10 rounded-full flex items-center justify-center",
+                                        recipe.is_favorite ? "bg-rose-500 text-white" : "bg-muted text-slate-400"
+                                    )}>
+                                        <Heart size={20} className={recipe.is_favorite ? "fill-current" : ""} />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-bold text-sm">{recipe.is_favorite ? 'Added to Favourites' : 'Add to Favourites'}</p>
+                                        <p className="text-[10px] opacity-70">{recipe.is_favorite ? 'Quick access in your cookbook' : 'Save this recipe for quick access'}</p>
+                                    </div>
+                                </div>
+                                <Check size={16} className={cn("transition-opacity", recipe.is_favorite ? "opacity-100" : "opacity-0")} />
+                            </button>
+
+                            {/* Share Button */}
+                            <button
+                                onClick={() => recipe ? (onShare ? onShare(recipe) : setShowShareDialog(true)) : null}
+                                className="flex items-center gap-3 p-4 rounded-xl border bg-card border-border text-slate-600 dark:text-slate-400 hover:bg-muted hover:border-cyan-500/30 hover:text-cyan-600 transition-all active:scale-[0.98]"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-slate-400">
+                                    <Share2 size={20} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-sm">Share Recipe</p>
+                                    <p className="text-[10px] opacity-70">Send this recipe to friends or family</p>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
