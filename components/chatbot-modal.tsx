@@ -17,6 +17,8 @@ import { ChatbotNutridexFull } from '@/components/chatbot-nutridex-full';
 import { ChatbotComparatorFull } from '@/components/chatbot-comparator-full';
 import { ChatbotLifeguardFullIntegration } from '@/components/chatbot-lifeguard-full-integration';
 import { ChatbotHelpSection } from '@/components/chatbot-help-section';
+import { ChatbotExport } from '@/components/chatbot-export';
+import { ChatbotShare } from '@/components/chatbot-share';
 import { RecipeFilterDialog } from '@/components/recipe/recipe-filter-dialog';
 import ProfilePage from '@/app/(main)/profile/page';
 import { toast } from 'sonner';
@@ -269,7 +271,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
     
     // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets'>('dashboard');
+    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
 
     const getChatbotViewTitle = () => {
@@ -297,6 +299,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             case 'import-upload-photo': return 'Upload a Photo';
             case 'import-voice': return 'Voice Recipe';
             case 'import-video': return 'Video Import';
+            case 'export-recipes': return 'Export Recipes';
             case 'help-cookbook': return 'Cookbook Help';
             case 'help-planner': return 'Planner Help';
             case 'help-widgets': return 'Widgets Help';
@@ -379,6 +382,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 { label: 'Chatbot', view: 'dashboard' },
                 { label: 'Messages', view: 'messages' },
                 { label: 'Conversations', view: 'conversation-history' },
+            ],
+            'export-recipes': [
+                { label: 'Chatbot', view: 'dashboard' },
+                { label: 'Cookbook', view: 'cookbook' },
+                { label: 'Export', view: 'export-recipes' },
             ],
             'help-cookbook': [
                 { label: 'Chatbot', view: 'dashboard' },
@@ -2080,7 +2088,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors">Add Recipes</span>
                                 </button>
                                 <button
-                                    onClick={() => toast('Export is coming soon 👀')}
+                                    onClick={() => setChatbotView('export-recipes')}
                                     className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                                 >
                                     <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.3)] transition-all">🤝</span>
@@ -3615,6 +3623,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </button>
                     </div>
                 </div>
+                )}
+
+                {/* Export View */}
+                {!showRecipeBuilder && chatbotView === 'export-recipes' && (
+                    <ChatbotExport onBack={() => setChatbotView('cookbook')} />
                 )}
 
                 {/* Help Pages */}

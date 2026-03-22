@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { ChatbotShare } from './chatbot-share';
 
 interface Recipe {
     id: string;
@@ -56,15 +57,17 @@ interface Instruction {
 interface ChatbotRecipeDetailProps {
     recipeId: string;
     onBack: () => void;
+    onShare?: (recipe: any) => void;
 }
 
-export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailProps) {
+export function ChatbotRecipeDetail({ recipeId, onBack, onShare }: ChatbotRecipeDetailProps) {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
     const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
+    const [showShareDialog, setShowShareDialog] = useState(false);
 
     // Smart Match State
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
@@ -929,16 +932,33 @@ export function ChatbotRecipeDetail({ recipeId, onBack }: ChatbotRecipeDetailPro
                 <h2 className="text-base font-semibold text-slate-900 dark:text-white flex-1 text-center px-2 truncate">
                     {recipe.title}
                 </h2>
-                <button
-                    onClick={toggleFavorite}
-                    className="p-1.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-rose-500"
-                >
-                    <Heart
-                        size={18}
-                        className={recipe.is_favorite ? 'fill-rose-500 text-rose-500' : ''}
-                    />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => recipe ? (onShare ? onShare(recipe) : setShowShareDialog(true)) : null}
+                        className="p-1.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-cyan-500"
+                        title="Share Recipe"
+                    >
+                        <Share2 size={18} />
+                    </button>
+                    <button
+                        onClick={toggleFavorite}
+                        className="p-1.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-rose-500"
+                    >
+                        <Heart
+                            size={18}
+                            className={recipe.is_favorite ? 'fill-rose-500 text-rose-500' : ''}
+                        />
+                    </button>
+                </div>
             </div>
+
+            {/* Share Dialog Overlay */}
+            {showShareDialog && recipe && (
+                <ChatbotShare
+                    recipe={recipe}
+                    onClose={() => setShowShareDialog(false)}
+                />
+            )}
 
             {/* Recipe Content */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">

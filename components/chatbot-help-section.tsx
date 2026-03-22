@@ -55,12 +55,15 @@ function CookbookHelp() {
                     <span>🤝</span> Share Recipes
                 </h2>
                 <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
-                    Share your favorite recipes with friends and family.
+                    Share your favorite recipes with friends and family via Facebook, Instagram, WhatsApp, and Telegram.
                 </p>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                        🚀 This feature is coming soon! You&apos;ll be able to export recipes and share them with others in multiple formats.
-                    </p>
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 space-y-1">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">How to use:</p>
+                    <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 ml-4">
+                        <li>• Click the &quot;Share Recipes&quot; button in the Cookbook dashboard</li>
+                        <li>• Or click the share icon while viewing any recipe detail</li>
+                        <li>• Select your preferred platform to share the recipe link</li>
+                    </ul>
                 </div>
             </section>
 
