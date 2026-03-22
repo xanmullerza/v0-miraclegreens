@@ -17,6 +17,7 @@ export default function MealsPage() {
     const { searchQuery, setSearchQuery } = useSearch();
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [cookbookTab, setCookbookTab] = useState<'recipes' | 'remixes' | 'mixes'>('recipes');
+    const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
 
     useEffect(() => () => setSearchQuery(''), [setSearchQuery]);
 
@@ -43,7 +44,7 @@ export default function MealsPage() {
                         idleTitle="Recipes"
                     />
 
-                    <div className="flex bg-slate-100 dark:bg-slate-900/50 backdrop-blur-xl rounded-2xl p-1.5 max-w-lg mx-auto mb-12 border border-slate-200 dark:border-slate-800 shadow-lg">
+                    <div className="flex bg-slate-100 dark:bg-slate-900/50 backdrop-blur-xl rounded-2xl p-1.5 max-w-lg mx-auto mb-6 border border-slate-200 dark:border-slate-800 shadow-lg">
                         <button 
                             onClick={() => setCookbookTab('recipes')} 
                             className={cn(
@@ -87,12 +88,33 @@ export default function MealsPage() {
                             </div>
                         </button>
                     </div>
+
+                    {/* Ownership Toggle */}
+                    <div className="flex items-center justify-center gap-4 mb-12">
+                        <span className={cn("text-xs font-black uppercase tracking-widest transition-colors", !showOnlyMyRecipes ? "text-emerald-500" : "text-slate-400")}>Show All Recipes</span>
+                        <button
+                            onClick={() => setShowOnlyMyRecipes(!showOnlyMyRecipes)}
+                            className={cn(
+                                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                                showOnlyMyRecipes ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
+                            )}
+                        >
+                            <span
+                                className={cn(
+                                    "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                                    showOnlyMyRecipes ? "translate-x-6" : "translate-x-1"
+                                )}
+                            />
+                        </button>
+                        <span className={cn("text-xs font-black uppercase tracking-widest transition-colors", showOnlyMyRecipes ? "text-indigo-500" : "text-slate-400")}>My Recipes Only</span>
+                    </div>
  
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                         <RecipesView 
-                            key={cookbookTab}
+                            key={`${cookbookTab}-${showOnlyMyRecipes}`}
                             isMix={cookbookTab === 'mixes'}
                             isRemix={cookbookTab === 'remixes'}
+                            onlyMyRecipes={showOnlyMyRecipes}
                         />
                     </div>
                 </div>

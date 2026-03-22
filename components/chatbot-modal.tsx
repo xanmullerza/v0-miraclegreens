@@ -3336,8 +3336,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {!showRecipeBuilder && chatbotView === 'view-recipes' && (
                     <div className="flex-1 overflow-y-auto custom-scrollbar px-2 flex flex-col">
                         {/* Tab Section */}
-                        <div className="sticky top-0 z-10 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800">
-                            <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 mb-3">
+                        <div className="sticky top-0 z-10 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800 space-y-4">
+                            <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1">
                                 <button 
                                     onClick={() => setCookbookTab('recipes')} 
                                     className={cn(
@@ -3372,14 +3372,38 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     Mixes
                                 </button>
                             </div>
-                            <div className="flex items-center justify-between px-1">
-                                <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
-                                    {cookbookTab === 'recipes' ? 'All Meals' : cookbookTab === 'remixes' ? 'Edited Meals' : 'Ingredient Mixes'}
-                                </h3>
+
+                            {/* Ownership Toggle and Filter */}
+                            <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-3 bg-slate-100/50 dark:bg-slate-900/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0">
+                                    <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", !showOnlyMyRecipes ? "text-emerald-500" : "text-slate-400")}>All</span>
+                                    <button
+                                        onClick={() => setShowOnlyMyRecipes(!showOnlyMyRecipes)}
+                                        className={cn(
+                                            "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
+                                            showOnlyMyRecipes ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
+                                        )}
+                                    >
+                                        <span
+                                            className={cn(
+                                                "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform",
+                                                showOnlyMyRecipes ? "translate-x-4.5" : "translate-x-1"
+                                            )}
+                                        />
+                                    </button>
+                                    <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", showOnlyMyRecipes ? "text-indigo-500" : "text-slate-400")}>My</span>
+                                </div>
+
+                                <div className="flex-1 text-center">
+                                    <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 truncate">
+                                        {cookbookTab === 'recipes' ? 'All Meals' : cookbookTab === 'remixes' ? 'Edited Meals' : 'Ingredient Mixes'}
+                                    </h3>
+                                </div>
+
                                 {/* Filter Button */}
                                 <button
                                     onClick={() => setShowFilterDialog(true)}
-                                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-emerald-500"
+                                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-emerald-500 shrink-0"
                                     title="Filter Recipes"
                                 >
                                     <Filter size={18} />
@@ -3390,11 +3414,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         {/* Recipes View */}
                         <div className="flex-1">
                             <RecipesView 
-                                key={cookbookTab}
+                                key={`${cookbookTab}-${showOnlyMyRecipes}`}
                                 onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
                                 hideControls={true}
                                 isMix={cookbookTab === 'mixes'}
                                 isRemix={cookbookTab === 'remixes'}
+                                onlyMyRecipes={showOnlyMyRecipes}
                             />
                         </div>
                     </div>

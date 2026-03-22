@@ -62,6 +62,7 @@ interface RecipesViewProps {
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     isMix?: boolean;
     isRemix?: boolean;
+    onlyMyRecipes?: boolean;
     showAddRecipe?: boolean;
     setShowAddRecipe?: React.Dispatch<React.SetStateAction<boolean>>;
     onRecipeClick?: (recipeId: string) => void;
@@ -77,6 +78,7 @@ export function RecipesView({
     setIsFilterOpen: externalSetIsFilterOpen,
     isMix = false,
     isRemix = false,
+    onlyMyRecipes = false,
     showAddRecipe = false,
     setShowAddRecipe,
     onRecipeClick
@@ -196,6 +198,15 @@ export function RecipesView({
 
             // LOCAL FILTERING (for things we can't do easily in Supabase)
             let filteredItems = fetchedRecipes.filter(r => {
+                // Ownership check first if onlyMyRecipes is active
+                if (onlyMyRecipes) {
+                    if (user) {
+                        return r.user_id === user.id && !r.is_curated;
+                    } else {
+                        return r.id.toString().startsWith('local-') || !r.user_id;
+                    }
+                }
+                
                 // Handle missing is_remix/is_mix fields gracefully
                 if (isRemix !== undefined) {
                     const rIsRemix = !!(r as any).is_remix;
