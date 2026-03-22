@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, Suspense, useImperativeHandle, forwardRef } from 'react';
 import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight, Beaker } from 'lucide-react';
@@ -1486,13 +1486,14 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                 ingredients.length > 0 && (
                     <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
                         <div className="flex justify-center items-center gap-4 mb-4">
-                            <Button variant="outline" size="sm" onClick={() => setShowDetailedNutrients(!showDetailedNutrients)} className="gap-2 min-w-[200px] font-bold text-[10px] uppercase tracking-widest h-10 rounded-xl">
-                                {showDetailedNutrients ? (
-                                    <>Collapse Report <ChevronDown className="h-4 w-4 rotate-180" /></>
-                                ) : (
-                                    <>Expand Nutrient Report <ChevronDown className="h-4 w-4" /></>
-                                )}
-                            </Button>
+                             {/* Hide nutrient report button as requested */}
+                             {/* <Button variant="outline" size="sm" onClick={() => setShowDetailedNutrients(!showDetailedNutrients)} className="gap-2 min-w-[200px] font-bold text-[10px] uppercase tracking-widest h-10 rounded-xl">
+                                 {showDetailedNutrients ? (
+                                     <>Collapse Report <ChevronDown className="h-4 w-4 rotate-180" /></>
+                                 ) : (
+                                     <>Expand Nutrient Report <ChevronDown className="h-4 w-4" /></>
+                                 )}
+                             </Button> */}
                             {onNext && (
                                 <Button
                                     onClick={onNext}
