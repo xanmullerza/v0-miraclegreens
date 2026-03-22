@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Facebook, Send, MessageCircle, Share2, Copy, Check, X } from 'lucide-react';
+import { Facebook, Send, MessageCircle, Share2, Copy, Check, X, Twitter, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -54,25 +54,18 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
             url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
         },
         {
-            name: 'Web Share',
-            icon: Share2,
-            color: 'bg-slate-800',
+            name: 'X',
+            icon: Twitter,
+            color: 'bg-black',
             hoverColor: 'hover:bg-slate-900',
-            action: async () => {
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: recipe?.title || 'Miracle Greens',
-                            text: shareText,
-                            url: shareUrl,
-                        });
-                    } catch (err) {
-                        console.error('Error sharing:', err);
-                    }
-                } else {
-                    handleCopyLink();
-                }
-            }
+            url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`
+        },
+        {
+            name: 'Email',
+            icon: Mail,
+            color: 'bg-slate-600',
+            hoverColor: 'hover:bg-slate-700',
+            url: `mailto:?subject=${encodeURIComponent(recipe?.title || 'Shared Recipe')}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`
         }
     ];
 
@@ -108,34 +101,21 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
                     </div>
                 )}
 
-                <div className="grid grid-cols-4 gap-4 mb-8">
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 mb-8">
                     {sharePlatforms.map((platform) => (
                         <div key={platform.name} className="flex flex-col items-center gap-2">
-                            {platform.url ? (
-                                <a
-                                    href={platform.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
-                                        platform.color,
-                                        platform.hoverColor
-                                    )}
-                                >
-                                    <platform.icon size={20} />
-                                </a>
-                            ) : (
-                                <button
-                                    onClick={platform.action}
-                                    className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
-                                        platform.color,
-                                        platform.hoverColor
-                                    )}
-                                >
-                                    <platform.icon size={20} />
-                                </button>
-                            )}
+                            <a
+                                href={platform.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={cn(
+                                    "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
+                                    platform.color,
+                                    platform.hoverColor
+                                )}
+                            >
+                                <platform.icon size={20} />
+                            </a>
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
                         </div>
                     ))}
