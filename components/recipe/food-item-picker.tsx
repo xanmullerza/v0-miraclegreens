@@ -33,6 +33,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [sourceFilter, setSourceFilter] = useState<'all' | 'usda' | 'local'>('all');
+    const [hasInitialResults] = useState(!!initialResults && initialResults.length > 0);
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -46,7 +47,17 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
         return () => subscription.unsubscribe();
     }, []);
 
+    // Update results when Smart Match advances to next ingredient
     useEffect(() => {
+        if (hasInitialResults && initialResults && initialResults.length > 0) {
+            setResults(initialResults);
+        }
+    }, [initialResults, hasInitialResults]);
+
+    useEffect(() => {
+        // Skip auto-search if we have pre-loaded results (Smart Match mode)
+        if (hasInitialResults) return;
+
         const searchFoodItems = async () => {
             if (searchQuery.length < 2) {
                 setResults([]);
@@ -69,7 +80,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
 
         const debounce = setTimeout(searchFoodItems, 300);
         return () => clearTimeout(debounce);
-    }, [searchQuery]);
+    }, [searchQuery, hasInitialResults]);
 
     const handleSelectItem = async (item: FoodItemMatch) => {
         setLoading(true);
@@ -147,7 +158,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                         <div className="flex items-center gap-2">
                             <Database className="w-5 h-5 text-violet-500" />
                             <h2 className="text-lg font-black uppercase tracking-tighter text-foreground italic">
-                                Food Database (USDA + Local)
+                                {hasInitialResults ? `Matching: ${initialSearchQuery}` : 'Food Database (USDA + Local)'}
                             </h2>
                         </div>
                         <button
@@ -327,7 +338,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                             <div className="flex items-center gap-2">
                                 <Database className="w-5 h-5 text-violet-500" />
                                 <h2 className="text-xl font-black uppercase tracking-tighter text-foreground italic">
-                                    Food Database (USDA + Local)
+                                    {hasInitialResults ? `Matching: ${initialSearchQuery}` : 'Food Database (USDA + Local)'}
                                 </h2>
                             </div>
                             <button
