@@ -205,16 +205,15 @@ export function RecipesView({
 
             // LOCAL FILTERING (for things we can't do easily in Supabase)
             let filteredItems = fetchedRecipes.filter(r => {
-                // Ownership check first if onlyMyRecipes is active
+                // 1. Ownership check
                 if (onlyMyRecipes) {
-                    if (user) {
-                        return r.user_id === user.id && !r.is_curated;
-                    } else {
-                        return r.id.toString().startsWith('local-') || !r.user_id;
-                    }
+                    const isMine = user 
+                        ? (r.user_id === user.id && !r.is_curated)
+                        : (r.id.toString().startsWith('local-') || !r.user_id);
+                    if (!isMine) return false;
                 }
                 
-                // Handle missing is_remix/is_mix fields gracefully
+                // 2. Tab filtering (Remixes, Mixes, or base Recipes)
                 if (isRemix !== undefined) {
                     const rIsRemix = !!(r as any).is_remix;
                     if (rIsRemix !== isRemix) return false;
