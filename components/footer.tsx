@@ -1,30 +1,63 @@
 ﻿'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { Home, Grid2x2, MessageCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useChatbot } from '@/lib/context/chatbot-context';
 
 export function Footer() {
+  const router = useRouter();
   const pathname = usePathname();
+  const { setIsChatbotOpen } = useChatbot();
 
-  // Hide footer on foods page, library/widgets page and individual widget pages
+  // Hide footer on specific pages
   if (pathname === '/foods' || pathname.startsWith('/foods/') || pathname === '/dashboard/library/widgets' || pathname === '/dashboard/widgets/comparator' || pathname === '/dashboard/widgets/nutridex' || pathname === '/dashboard/widgets/lifeguard' || pathname.startsWith('/dashboard/widgets/nutridex/')) {
     return null;
   }
 
-  // Global copyright and legal info footer
+  const isHome = pathname === '/' || pathname === '/home';
+
+  // Mobile bottom navigation bar
   return (
-    <footer id="contact" className="fixed bottom-0 left-0 right-0 z-40 px-2 sm:px-4 flex md:hidden justify-center pointer-events-none animate-in slide-in-from-bottom-4 duration-700">
-      <div className="pointer-events-auto w-full max-w-[900px]">
-        <div className="py-4 px-6 bg-white dark:bg-slate-900 border-x border-t border-slate-200 dark:border-slate-800 rounded-t-[2rem] shadow-xl backdrop-blur-sm text-center">
-          <div className="flex flex-wrap justify-center items-center gap-4 text-[10px] uppercase font-bold tracking-widest opacity-70 dark:opacity-60 text-slate-900 dark:text-slate-100">
-            <span>© 2026 Vitala. All rights reserved.</span>
-            <span className="w-1 h-1 rounded-full bg-current opacity-30 hidden sm:block"></span>
-            <Link href="/privacy" className="hover:text-emerald-500 transition-all">Privacy Policy</Link>
-            <span className="w-1 h-1 rounded-full bg-current opacity-30 hidden sm:block"></span>
-            <Link href="/terms" className="hover:text-emerald-500 transition-all">Terms of Service</Link>
-            <span className="w-1 h-1 rounded-full bg-current opacity-30 hidden sm:block"></span>
-            <Link href="/support" className="hover:text-emerald-500 transition-all">Support</Link>
-          </div>
+    <footer id="contact" className="fixed bottom-0 left-0 right-0 z-40 flex md:hidden justify-center pointer-events-none">
+      <div className="pointer-events-auto w-full">
+        <div className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between shrink-0">
+          {/* Home Button */}
+          <button
+            onClick={() => router.push('/')}
+            className={cn(
+              "p-3 rounded-2xl transition-all active:scale-90",
+              isHome
+                ? "text-emerald-500"
+                : "text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+            )}
+            title="Home"
+          >
+            <Home size={24} />
+          </button>
+
+          {/* Grid (Dashboard) Button */}
+          <button
+            onClick={() => router.push('/dashboard')}
+            className={cn(
+              "w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-95 group",
+              pathname.startsWith('/dashboard')
+                ? "bg-emerald-500 text-white shadow-emerald-500/40"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
+            )}
+            title="Dashboard"
+          >
+            <Grid2x2 size={24} className="group-hover:scale-110 transition-transform" />
+          </button>
+
+          {/* Chat Button */}
+          <button
+            onClick={() => setIsChatbotOpen(true)}
+            className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
+            title="Chat"
+          >
+            <MessageCircle size={24} />
+          </button>
         </div>
       </div>
     </footer>
