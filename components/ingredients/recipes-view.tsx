@@ -24,7 +24,6 @@ import {
     DropdownMenuCheckboxItem
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -702,16 +701,19 @@ export function RecipesView({
                     {/* Pagination */}
                     {hasMore ? (
                         <div className="flex justify-center pt-8">
-                            <Button
+                            <button
                                 onClick={handleLoadMore}
                                 disabled={loadingMore}
                                 className={cn(
-                                    "h-14 px-8 rounded-2xl text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all",
-                                    isMix ? "bg-indigo-900 hover:bg-indigo-800" : "bg-slate-900 hover:bg-slate-800"
+                                    "h-12 px-8 rounded-full border flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-40",
+                                    isMix 
+                                        ? "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-500 hover:border-indigo-400 hover:text-indigo-600"
+                                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-500 hover:border-blue-400 hover:text-blue-600"
                                 )}
                             >
-                                {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : `View More ${isMix ? 'Mixes' : 'Meals'}`}
-                            </Button>
+                                {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <ChevronDown size={14} />}
+                                Load More
+                            </button>
                         </div>
                     ) : recipes.length > 0 && (
                         <div className="flex justify-center pt-8">
