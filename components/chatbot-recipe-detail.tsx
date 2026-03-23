@@ -81,7 +81,7 @@ function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: ()
 import { supabase } from '@/lib/supabase';
 import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
+import { searchFoodItem, searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatbotShare } from './chatbot-share';
@@ -606,63 +606,43 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
             const newMatches: Record<string, any> = {};
             const newFlipped: Record<string, boolean> = {};
 
-
-            // Search helper: tries name then common_name
-            const searchFood = async (term: string) => {
-                const { data: nameData, error: nameError } = await supabase
-                    .from('food_items')
-                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g, portions')
-                    .ilike('name', `%${term}%`)
-                    .limit(3);
-                
-                if (!nameError && nameData && nameData.length > 0) return nameData;
-                
-                const { data: commonData, error: commonError } = await supabase
-                    .from('food_items')
-                    .select('id, name, common_name, energy_kcal, protein_g, carbs_g, fat_g, portions')
-                    .ilike('common_name', `%${term}%`)
-                    .limit(3);
-                
-                if (!commonError && commonData && commonData.length > 0) return commonData;
-                return null;
-            };
-
             for (const ing of ingredients) {
                 const searchTermRaw = ing.base_ingredient || ing.item;
                 const searchTerm = extractCoreName(searchTermRaw);
                 
                 if (!searchTerm || searchTerm.length < 2) continue;
 
-                // Tiered search: try specific term first, then de-pluralized, then single-word fallback
-                let matchData = await searchFood(searchTerm);
+                // Use unified search (USDA + local with dedup and USDA prioritized)
+                let matchData = await searchFoodItem(searchTerm);
                 
                 // If no match, try de-pluralized version (e.g. "chicken thighs" -> "chicken thigh")
-                if (!matchData) {
+                if (!matchData || matchData.length === 0) {
                     const singular = dePluralize(searchTerm);
                     if (singular !== searchTerm) {
-                        matchData = await searchFood(singular);
+                        matchData = await searchFoodItem(singular);
                     }
                 }
                 
-                // If still no match, try just the last word (e.g. "cherry tomatoes" -> "tomatoes" -> "tomato")
-                if (!matchData && searchTerm.includes(' ')) {
+                // If still no match, try just the last word (e.g. "cherry tomatoes" -> "tomato")
+                if ((!matchData || matchData.length === 0) && searchTerm.includes(' ')) {
                     const words = searchTerm.split(' ');
-                    // Try each word from longest combo to shortest
                     for (let w = words.length - 1; w >= 0; w--) {
                         const subTerm = words.slice(w).join(' ');
-                        matchData = await searchFood(subTerm);
-                        if (!matchData) {
+                        matchData = await searchFoodItem(subTerm);
+                        if (!matchData || matchData.length === 0) {
                             const subSingular = dePluralize(subTerm);
-                            if (subSingular !== subTerm) matchData = await searchFood(subSingular);
+                            if (subSingular !== subTerm) matchData = await searchFoodItem(subSingular);
                         }
-                        if (matchData) break;
+                        if (matchData && matchData.length > 0) break;
                     }
                 }
 
+                // Auto-select top result (already USDA-first from searchFoodItem)
                 if (matchData && matchData.length > 0) {
                     const match = matchData[0];
                     newMatches[ing.id] = match;
                     newFlipped[ing.id] = true; // Auto-flip to show the match
+                    console.log(`[Smart Match] Auto-selected "${match.name}" (source: ${match.source}) for "${searchTerm}"`);
                 }
             }
 

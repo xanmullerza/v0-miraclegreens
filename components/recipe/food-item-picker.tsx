@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Search, X, Database, Loader2, Sparkles } from 'lucide-react';
-import { searchUSDAFood, getUSDAFoodDetails, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
+import { searchFoodItem, getUSDAFoodDetails, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 
 interface FoodItem {
     id: string;
@@ -28,11 +28,8 @@ interface FoodItemPickerProps {
 
 export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmin = false, inline = false }: FoodItemPickerProps) {
     const [searchQuery, setSearchQuery] = useState('');
-    const [results, setResults] = useState<FoodItem[]>([]);
-    const [usdaResults, setUsdaResults] = useState<FoodItemMatch[]>([]);
+    const [results, setResults] = useState<FoodItemMatch[]>([]);
     const [loading, setLoading] = useState(false);
-    const [searchingUSDA, setSearchingUSDA] = useState(false);
-    const [view, setView] = useState<'local' | 'usda'>('local');
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
@@ -47,61 +44,52 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
         return () => subscription.unsubscribe();
     }, []);
 
-
-    // Initialize view based on mode
-    useEffect(() => {
-        if (mode === 'usda-only') {
-            setView('usda');
-        }
-    }, [mode]);
-
     useEffect(() => {
         const searchFoodItems = async () => {
             if (searchQuery.length < 2) {
                 setResults([]);
-                setUsdaResults([]);
                 return;
             }
 
-            if (view === 'local') {
-                setLoading(true);
-                const { data, error } = await supabase
-                    .from('food_items')
-                    .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj, micronutrients, portions, image')
-                    .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
-                    .limit(20);
-
-                if (!error && data) {
-                    setResults(data);
-                }
+            setLoading(true);
+            try {
+                // Use unified search that returns both USDA and local results
+                // USDA results come first due to sorting in searchFoodItem
+                const matches = await searchFoodItem(searchQuery);
+                setResults(matches);
+            } catch (err) {
+                console.error('Unified Search Error:', err);
+                setResults([]);
+            } finally {
                 setLoading(false);
-            } else if (view === 'usda') {
-                // Trigger USDA search automatically if in usda view (and usda-only mode)
-                handleUSDASearch();
             }
         };
 
         const debounce = setTimeout(searchFoodItems, 300);
         return () => clearTimeout(debounce);
-    }, [searchQuery, view]); // Added view dependency
+    }, [searchQuery]);
 
-    const handleUSDASearch = async () => {
-        if (searchQuery.length < 2) return;
-        setSearchingUSDA(true);
-        setView('usda');
-        try {
-            const matches = await searchUSDAFood(searchQuery);
-            setUsdaResults(matches);
-        } catch (err) {
-            console.error('USDA Search Error:', err);
-        } finally {
-            setSearchingUSDA(false);
-        }
-    };
-
-    const handleSelectUSDA = async (item: FoodItemMatch) => {
+    const handleSelectItem = async (item: FoodItemMatch) => {
         setLoading(true);
         try {
+            // If it's a local item (already in DB), use it directly
+            if (item.source === 'local' && item.id) {
+                onSelect({
+                    id: item.id,
+                    name: item.name,
+                    energy_kcal: item.energy_kcal,
+                    energy_kj: item.energy_kj,
+                    protein_g: item.protein_g,
+                    fat_g: item.fat_g,
+                    carbs_g: item.carbs_g,
+                    micronutrients: item.micronutrients || {},
+                    portions: item.portions || []
+                });
+                onClose();
+                return;
+            }
+
+            // If it's a USDA item, get full details and sync to local
             // Get full details (measures + comprehensive micros) from USDA details endpoint
             const { portions, micronutrients } = item.fdcId ? await getUSDAFoodDetails(item.fdcId) : { portions: [], micronutrients: {} };
 
@@ -140,8 +128,8 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                 onClose();
             }
         } catch (err) {
-            console.error('Error syncing USDA item:', err);
-            alert('Failed to import item from USDA database.');
+            console.error('Error selecting item:', err);
+            alert('Failed to select item from database.');
         } finally {
             setLoading(false);
         }
@@ -157,7 +145,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                         <div className="flex items-center gap-2">
                             <Database className="w-5 h-5 text-violet-500" />
                             <h2 className="text-lg font-black uppercase tracking-tighter text-foreground italic">
-                                {view === 'local' ? 'Clinical Registry' : 'USDA Global Database'}
+                                Food Database (USDA + Local)
                             </h2>
                         </div>
                         <button
@@ -177,157 +165,94 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                 placeholder="Search (e.g., chicken breast, olive oil)..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && view === 'usda' && handleUSDASearch()}
                                 className="w-full pl-10 pr-4 py-3 border-2 border-slate-100 dark:border-slate-800 bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-muted-foreground transition-all"
                                 autoFocus
                             />
                         </div>
-
-                        {isAdmin && (
-                            <div className="flex gap-2">
-                                {mode === 'all' && (
-                                    <button
-                                        onClick={() => setView('local')}
-                                        className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${view === 'local'
-                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                                            }`}
-                                    >
-                                        Local Registry
-                                    </button>
-                                )}
-                                <button
-                                    onClick={handleUSDASearch}
-                                    className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${view === 'usda'
-                                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
-                                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-violet-600'
-                                        }`}
-                                >
-                                    <Sparkles className="w-4 h-4" />
-                                    {mode === 'all' ? 'USDA Intelligence' : 'Search USDA Database'}
-                                </button>
-                            </div>
-                        )}
                     </div>
 
                     {/* Results */}
                     <div className="flex-1 overflow-y-auto p-4 bg-slate-50/50 dark:bg-slate-900/10">
-                        {(loading || searchingUSDA) && (
+                        {loading && (
                             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3">
                                 <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
-                                <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Querying Database...</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Searching Databases...</span>
                             </div>
                         )}
 
-                        {!loading && !searchingUSDA && view === 'local' && (
+                        {!loading && (
                             <>
                                 {searchQuery.length < 2 ? (
                                     <div className="text-center py-12 text-muted-foreground text-[10px] font-bold uppercase tracking-widest opacity-40">
-                                        Type at least 2 characters to search local items
+                                        Type at least 2 characters to search
                                     </div>
                                 ) : results.length === 0 ? (
-                                    <div className="text-center py-12 space-y-4">
-                                        <div className="text-muted-foreground italic text-sm">No local results for "{searchQuery}"</div>
-                                        {isAdmin && (
-                                            <button
-                                                onClick={handleUSDASearch}
-                                                className="text-violet-600 font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2 mx-auto"
-                                            >
-                                                <Database className="w-4 h-4" /> Switch to USDA Intelligence?
-                                            </button>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="space-y-2">
-                                        {results.map((item) => (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => {
-                                                    onSelect(item);
-                                                    onClose();
-                                                }}
-                                                className="w-full text-left p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-950/20 hover:border-emerald-500 transition-all group shadow-sm"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
-                                                        {item.image ? (
-                                                            <img src={item.image} alt="" className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <Database size={16} className="text-muted-foreground opacity-40" />
-                                                        )}
-                                                    </div>
-                                                    <div className="flex flex-col flex-1 min-w-0">
-                                                        <div className="font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 capitalize truncate">
-                                                            {item.common_name || item.name}
-                                                        </div>
-                                                        {item.common_name && (
-                                                            <div className="text-[10px] text-muted-foreground opacity-60 truncate">
-                                                                Original: {item.name}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="text-xs text-muted-foreground mt-1 flex gap-2">
-                                                    <span>{Math.round(item.energy_kcal)} kcal</span>
-                                                    <span>•</span>
-                                                    <span>P: {item.protein_g?.toFixed(1)}g</span>
-                                                    <span>F: {item.fat_g?.toFixed(1)}g</span>
-                                                    <span>C: {item.carbs_g?.toFixed(1)}g</span>
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        )}
-
-                        {!loading && !searchingUSDA && view === 'usda' && (
-                            <>
-                                {usdaResults.length === 0 ? (
                                     <div className="text-center py-12 text-muted-foreground">
-                                        {searchQuery ? `No global results found for "${searchQuery}"` : 'Enter a search term above'}
+                                        {`No results found for "${searchQuery}"`}
                                     </div>
                                 ) : (
                                     <div className="space-y-2">
-                                        <div className="text-[10px] font-black uppercase tracking-widest text-violet-600 mb-2 px-1 opacity-50 italic">Global Results (Click to Import)</div>
-                                        {usdaResults.map((item, idx) => {
-                                            // Determine badge color based on data type
-                                            const dataType = (item as any).dataType || 'Unknown';
-                                            const getTypeStyle = () => {
-                                                if (dataType.includes('SR Legacy') || dataType.includes('Foundation')) {
-                                                    return 'border-green-300 text-green-600 bg-green-50 dark:bg-green-900/20';
+                                        {results.map((item, idx) => {
+                                            // Determine badge styling based on source
+                                            const isUSDA = item.source === 'usda';
+                                            const dataType = isUSDA ? (item as any).dataType || 'USDA' : 'Local';
+                                            
+                                            const getSourceStyle = () => {
+                                                if (isUSDA) {
+                                                    if (dataType.includes('SR Legacy') || dataType.includes('Foundation')) {
+                                                        return 'border-green-300 text-green-600 bg-green-50 dark:bg-green-900/20';
+                                                    }
+                                                    if (dataType.includes('Survey')) {
+                                                        return 'border-amber-300 text-amber-600 bg-amber-50 dark:bg-amber-900/20';
+                                                    }
+                                                    if (dataType.includes('Branded')) {
+                                                        return 'border-gray-300 text-gray-500 bg-gray-50 dark:bg-gray-800/20';
+                                                    }
+                                                    return 'border-violet-300 text-violet-600 bg-violet-50 dark:bg-violet-900/20';
                                                 }
-                                                if (dataType.includes('Survey')) {
-                                                    return 'border-amber-300 text-amber-600 bg-amber-50 dark:bg-amber-900/20';
-                                                }
-                                                if (dataType.includes('Branded')) {
-                                                    return 'border-gray-300 text-gray-500 bg-gray-50 dark:bg-gray-800/20';
-                                                }
-                                                return 'border-blue-200 text-blue-600';
+                                                return 'border-emerald-300 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20';
                                             };
-                                            const getTypeLabel = () => {
-                                                if (dataType.includes('SR Legacy')) return 'Raw';
-                                                if (dataType.includes('Foundation')) return 'Foundation';
-                                                if (dataType.includes('Survey')) return 'Survey';
+
+                                            const getSourceLabel = () => {
+                                                if (!isUSDA) return 'Local';
+                                                if (dataType.includes('SR Legacy')) return 'USDA Raw';
+                                                if (dataType.includes('Foundation')) return 'USDA Found';
+                                                if (dataType.includes('Survey')) return 'USDA Survey';
                                                 if (dataType.includes('Branded')) return 'Branded';
                                                 return 'USDA';
                                             };
 
                                             return (
                                                 <button
-                                                    key={item.fdcId || idx}
-                                                    onClick={() => handleSelectUSDA(item)}
+                                                    key={`${item.source}-${item.id || item.fdcId || idx}`}
+                                                    onClick={() => handleSelectItem(item)}
                                                     className="w-full text-left p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl hover:bg-violet-50 dark:hover:bg-violet-950/20 hover:border-violet-500 transition-all group shadow-sm"
                                                 >
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <div className="font-bold text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-400 flex-1">
-                                                            {item.name}
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
+                                                            {item.image ? (
+                                                                <img src={item.image} alt="" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <Database size={16} className="text-muted-foreground opacity-40" />
+                                                            )}
                                                         </div>
-                                                        <Badge variant="outline" className={`text-[8px] py-0 h-4 uppercase shrink-0 ${getTypeStyle()}`}>
-                                                            {getTypeLabel()}
-                                                        </Badge>
+                                                        <div className="flex flex-col flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="font-bold text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-400 flex-1 truncate">
+                                                                    {item.name}
+                                                                </div>
+                                                                <span className={`text-[8px] py-1 px-2 rounded-full font-black uppercase shrink-0 border ${getSourceStyle()}`}>
+                                                                    {getSourceLabel()}
+                                                                </span>
+                                                            </div>
+                                                            {item.common_name && (
+                                                                <div className="text-[10px] text-muted-foreground opacity-60 truncate">
+                                                                    {item.common_name}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="text-xs text-muted-foreground mt-1 flex gap-2">
+                                                    <div className="text-xs text-muted-foreground mt-2 flex gap-2">
                                                         <span>{Math.round(item.energy_kcal)} kcal</span>
                                                         <span>•</span>
                                                         <span>P: {item.protein_g?.toFixed(1)}g</span>
@@ -346,7 +271,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                     {/* Footer Tip */}
                     <div className="p-3 bg-muted/20 border-t border-border text-center">
                         <p className="text-[10px] text-muted-foreground italic">
-                            Selecting a global item will automatically save it to your local library for future use.
+                            Selecting a USDA item will automatically save it to your local library for future use.
                         </p>
                     </div>
                 </div>
@@ -359,7 +284,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                             <div className="flex items-center gap-2">
                                 <Database className="w-5 h-5 text-violet-500" />
                                 <h2 className="text-xl font-black uppercase tracking-tighter text-foreground italic">
-                                    {view === 'local' ? 'Clinical Registry' : 'USDA Global Database'}
+                                    Food Database (USDA + Local)
                                 </h2>
                             </div>
                             <button
@@ -379,157 +304,94 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                     placeholder="Search (e.g., chicken breast, olive oil)..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && view === 'usda' && handleUSDASearch()}
                                     className="w-full pl-10 pr-4 py-3 border-2 border-slate-100 dark:border-slate-800 bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-muted-foreground transition-all"
                                     autoFocus
                                 />
                             </div>
-
-                            {isAdmin && (
-                                <div className="flex gap-2">
-                                    {mode === 'all' && (
-                                        <button
-                                            onClick={() => setView('local')}
-                                            className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${view === 'local'
-                                                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                                                }`}
-                                        >
-                                            Local Registry
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={handleUSDASearch}
-                                        className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${view === 'usda'
-                                            ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
-                                            : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-violet-600'
-                                            }`}
-                                    >
-                                        <Sparkles className="w-4 h-4" />
-                                        {mode === 'all' ? 'USDA Intelligence' : 'Search USDA Database'}
-                                    </button>
-                                </div>
-                            )}
                         </div>
 
                         {/* Results */}
                         <div className="flex-1 overflow-y-auto p-4 bg-slate-50/50 dark:bg-slate-900/10">
-                            {(loading || searchingUSDA) && (
+                            {loading && (
                                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3">
                                     <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Querying Database...</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Searching Databases...</span>
                                 </div>
                             )}
 
-                            {!loading && !searchingUSDA && view === 'local' && (
+                            {!loading && (
                                 <>
                                     {searchQuery.length < 2 ? (
                                         <div className="text-center py-12 text-muted-foreground text-[10px] font-bold uppercase tracking-widest opacity-40">
-                                            Type at least 2 characters to search local items
+                                            Type at least 2 characters to search
                                         </div>
                                     ) : results.length === 0 ? (
-                                        <div className="text-center py-12 space-y-4">
-                                            <div className="text-muted-foreground italic text-sm">No local results for "{searchQuery}"</div>
-                                            {isAdmin && (
-                                                <button
-                                                    onClick={handleUSDASearch}
-                                                    className="text-violet-600 font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2 mx-auto"
-                                                >
-                                                    <Database className="w-4 h-4" /> Switch to USDA Intelligence?
-                                                </button>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2">
-                                            {results.map((item) => (
-                                                <button
-                                                    key={item.id}
-                                                    onClick={() => {
-                                                        onSelect(item);
-                                                        onClose();
-                                                    }}
-                                                    className="w-full text-left p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-950/20 hover:border-emerald-500 transition-all group shadow-sm"
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
-                                                            {item.image ? (
-                                                                <img src={item.image} alt="" className="w-full h-full object-cover" />
-                                                            ) : (
-                                                                <Database size={16} className="text-muted-foreground opacity-40" />
-                                                            )}
-                                                        </div>
-                                                        <div className="flex flex-col flex-1 min-w-0">
-                                                            <div className="font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 capitalize truncate">
-                                                                {item.common_name || item.name}
-                                                            </div>
-                                                            {item.common_name && (
-                                                                <div className="text-[10px] text-muted-foreground opacity-60 truncate">
-                                                                    Original: {item.name}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground mt-1 flex gap-2">
-                                                        <span>{Math.round(item.energy_kcal)} kcal</span>
-                                                        <span>•</span>
-                                                        <span>P: {item.protein_g?.toFixed(1)}g</span>
-                                                        <span>F: {item.fat_g?.toFixed(1)}g</span>
-                                                        <span>C: {item.carbs_g?.toFixed(1)}g</span>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </>
-                            )}
-
-                            {!loading && !searchingUSDA && view === 'usda' && (
-                                <>
-                                    {usdaResults.length === 0 ? (
                                         <div className="text-center py-12 text-muted-foreground">
-                                            {searchQuery ? `No global results found for "${searchQuery}"` : 'Enter a search term above'}
+                                            {`No results found for "${searchQuery}"`}
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
-                                            <div className="text-[10px] font-black uppercase tracking-widest text-violet-600 mb-2 px-1 opacity-50 italic">Global Results (Click to Import)</div>
-                                            {usdaResults.map((item, idx) => {
-                                                // Determine badge color based on data type
-                                                const dataType = (item as any).dataType || 'Unknown';
-                                                const getTypeStyle = () => {
-                                                    if (dataType.includes('SR Legacy') || dataType.includes('Foundation')) {
-                                                        return 'border-green-300 text-green-600 bg-green-50 dark:bg-green-900/20';
+                                            {results.map((item, idx) => {
+                                                // Determine badge styling based on source
+                                                const isUSDA = item.source === 'usda';
+                                                const dataType = isUSDA ? (item as any).dataType || 'USDA' : 'Local';
+                                                
+                                                const getSourceStyle = () => {
+                                                    if (isUSDA) {
+                                                        if (dataType.includes('SR Legacy') || dataType.includes('Foundation')) {
+                                                            return 'border-green-300 text-green-600 bg-green-50 dark:bg-green-900/20';
+                                                        }
+                                                        if (dataType.includes('Survey')) {
+                                                            return 'border-amber-300 text-amber-600 bg-amber-50 dark:bg-amber-900/20';
+                                                        }
+                                                        if (dataType.includes('Branded')) {
+                                                            return 'border-gray-300 text-gray-500 bg-gray-50 dark:bg-gray-800/20';
+                                                        }
+                                                        return 'border-violet-300 text-violet-600 bg-violet-50 dark:bg-violet-900/20';
                                                     }
-                                                    if (dataType.includes('Survey')) {
-                                                        return 'border-amber-300 text-amber-600 bg-amber-50 dark:bg-amber-900/20';
-                                                    }
-                                                    if (dataType.includes('Branded')) {
-                                                        return 'border-gray-300 text-gray-500 bg-gray-50 dark:bg-gray-800/20';
-                                                    }
-                                                    return 'border-blue-200 text-blue-600';
+                                                    return 'border-emerald-300 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20';
                                                 };
-                                                const getTypeLabel = () => {
-                                                    if (dataType.includes('SR Legacy')) return 'Raw';
-                                                    if (dataType.includes('Foundation')) return 'Foundation';
-                                                    if (dataType.includes('Survey')) return 'Survey';
+
+                                                const getSourceLabel = () => {
+                                                    if (!isUSDA) return 'Local';
+                                                    if (dataType.includes('SR Legacy')) return 'USDA Raw';
+                                                    if (dataType.includes('Foundation')) return 'USDA Found';
+                                                    if (dataType.includes('Survey')) return 'USDA Survey';
                                                     if (dataType.includes('Branded')) return 'Branded';
                                                     return 'USDA';
                                                 };
 
                                                 return (
                                                     <button
-                                                        key={item.fdcId || idx}
-                                                        onClick={() => handleSelectUSDA(item)}
+                                                        key={`${item.source}-${item.id || item.fdcId || idx}`}
+                                                        onClick={() => handleSelectItem(item)}
                                                         className="w-full text-left p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl hover:bg-violet-50 dark:hover:bg-violet-950/20 hover:border-violet-500 transition-all group shadow-sm"
                                                     >
-                                                        <div className="flex items-start justify-between gap-2">
-                                                            <div className="font-bold text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-400 flex-1">
-                                                                {item.name}
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
+                                                                {item.image ? (
+                                                                    <img src={item.image} alt="" className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <Database size={16} className="text-muted-foreground opacity-40" />
+                                                                )}
                                                             </div>
-                                                            <Badge variant="outline" className={`text-[8px] py-0 h-4 uppercase shrink-0 ${getTypeStyle()}`}>
-                                                                {getTypeLabel()}
-                                                            </Badge>
+                                                            <div className="flex flex-col flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="font-bold text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-400 flex-1 truncate">
+                                                                        {item.name}
+                                                                    </div>
+                                                                    <span className={`text-[8px] py-1 px-2 rounded-full font-black uppercase shrink-0 border ${getSourceStyle()}`}>
+                                                                        {getSourceLabel()}
+                                                                    </span>
+                                                                </div>
+                                                                {item.common_name && (
+                                                                    <div className="text-[10px] text-muted-foreground opacity-60 truncate">
+                                                                        {item.common_name}
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="text-xs text-muted-foreground mt-1 flex gap-2">
+                                                        <div className="text-xs text-muted-foreground mt-2 flex gap-2">
                                                             <span>{Math.round(item.energy_kcal)} kcal</span>
                                                             <span>•</span>
                                                             <span>P: {item.protein_g?.toFixed(1)}g</span>
@@ -548,7 +410,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                         {/* Footer Tip */}
                         <div className="p-3 bg-muted/20 border-t border-border text-center">
                             <p className="text-[10px] text-muted-foreground italic">
-                                Selecting a global item will automatically save it to your local library for future use.
+                                Selecting a USDA item will automatically save it to your local library for future use.
                             </p>
                         </div>
                     </div>

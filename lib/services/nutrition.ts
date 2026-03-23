@@ -583,3 +583,60 @@ export async function syncToLocal(
 
     return itemData.id;
 }
+
+/**
+ * Unified food item search: parallel USDA + local queries with deduplication.
+ * USDA results come first (more complete nutrition data).
+ * Returns both sources with source badges.
+ * 
+ * Deduplication: If a local item matches a USDA item by name similarity,
+ * only the USDA item is returned (as it's more complete).
+ */
+export async function searchFoodItem(query: string): Promise<FoodItemMatch[]> {
+    if (!query || query.trim().length < 2) return [];
+
+    // Run parallel searches
+    const [usdaResults, localResults] = await Promise.all([
+        searchUSDAFood(query),
+        searchLocalFood(query)
+    ]);
+
+    console.log(`[Unified Search] Query: "${query}" | USDA: ${usdaResults.length} | Local: ${localResults.length}`);
+
+    // Deduplication: Create a map of USDA item names (normalized) for quick lookup
+    const usdaNameMap = new Map<string, FoodItemMatch>();
+    usdaResults.forEach(item => {
+        const normalized = item.name.toLowerCase().trim();
+        usdaNameMap.set(normalized, item);
+    });
+
+    // Filter out local items that have an exact or very similar USDA match
+    const dedupedLocal = localResults.filter(localItem => {
+        const normalizedLocal = localItem.name.toLowerCase().trim();
+        
+        // Check for exact match or very similar name (for plural variations)
+        const hasUSDAMatch = usdaNameMap.has(normalizedLocal) ||
+            usdaResults.some(usda => {
+                const normalizedUSDA = usda.name.toLowerCase().trim();
+                // Simple similarity: if names are identical after removing trailing 's' or plural forms
+                if (normalizedUSDA === normalizedLocal) return true;
+                // Allow variations like "apple" vs "apples"
+                const singularLocal = singularize(normalizedLocal);
+                const singularUSDA = singularize(normalizedUSDA);
+                if (singularLocal === singularUSDA && singularLocal.length >= 4) return true;
+                return false;
+            });
+
+        return !hasUSDAMatch;
+    });
+
+    // Combine: USDA first, then deduplicated local results
+    const combined = [
+        ...usdaResults,
+        ...dedupedLocal
+    ];
+
+    console.log(`[Unified Search] After dedup: ${combined.length} results`);
+
+    return combined;
+}

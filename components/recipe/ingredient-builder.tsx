@@ -9,7 +9,7 @@ import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
 import { findSpiceFactor, isSpice, getSpiceMeasures, getSpiceStates } from '@/lib/utils/spice-conversion';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { parseIngredientsOnly } from '@/lib/utils/recipe-parser';
-import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
+import { searchFoodItem, searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -136,13 +136,9 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
 
         setInlineSearchLoading(true);
         try {
-            if (inlineSearchView === 'local') {
-                const results = await searchLocalFood(query);
-                setInlineSearchResults(results);
-            } else {
-                const results = await searchUSDAFood(query);
-                setInlineSearchResults(results);
-            }
+            // Use unified search that returns both USDA and local results
+            const results = await searchFoodItem(query);
+            setInlineSearchResults(results);
         } catch (err) {
             console.error("Inline search error:", err);
             setInlineSearchResults([]);
@@ -454,76 +450,24 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
                 let coreName = parenIndex !== -1 ? rawItem.substring(0, parenIndex).trim() : rawItem;
                 coreName = coreName.replace(/[*,;:]+\s*$/, '').trim();
 
-                // 2. Search Local Registry
-                let localMatches = await searchLocalFood(coreName);
+                // 2. Unified Search (USDA + Local, with USDA prioritized)
+                let matches = await searchFoodItem(coreName);
 
-                // Fallback: If no local results for core name, try full item
-                if (localMatches.length === 0 && coreName !== rawItem) {
-                    localMatches = await searchLocalFood(rawItem);
+                // Fallback: If no results for core name, try full item
+                if (matches.length === 0 && coreName !== rawItem) {
+                    matches = await searchFoodItem(rawItem);
                 }
 
-                if (localMatches.length > 0) {
-                    item.matches = localMatches;
+                if (matches.length > 0) {
+                    item.matches = matches;
 
-                    // Smart Selection (Scoring) for the default choice
-                    const queryWords = coreName.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
-                    let bestMatch = localMatches[0];
-                    let maxMatches = -1;
+                    // Auto-select top result (already sorted USDA-first by searchFoodItem)
+                    item.selectedMatch = matches[0];
+                    item.status = 'matched';
 
-                    const singularCore = coreName.split(/\s+/).map(w => w.length > 2 ? w.toLowerCase().replace(/ies$/, 'y').replace(/e?s$/, '') : w.toLowerCase()).join(' ');
-
-                    for (const cand of localMatches) {
-                        const candName = cand.name.toLowerCase();
-                        const singularCand = candName.split(/\s+/).map(w => w.length > 2 ? w.replace(/ies$/, 'y').replace(/e?s$/, '') : w).join(' ');
-
-                        let matches = 0;
-                        queryWords.forEach((word: string) => {
-                            const sWord = word.length > 2 ? word.replace(/ies$/, 'y').replace(/e?s$/, '') : word;
-                            if (candName.includes(word) || candName.includes(sWord) || singularCand.includes(sWord)) matches++;
-                        });
-
-                        // Bonus for exact core name match or starting with it
-                        if (candName.startsWith(coreName.toLowerCase()) || candName.startsWith(singularCore)) matches += 2;
-                        if (candName === coreName.toLowerCase() || candName === singularCore) matches += 5;
-
-                        if (matches > maxMatches) {
-                            maxMatches = matches;
-                            bestMatch = cand;
-                        }
-                    }
-
-                    // Strict threshold for auto-selection
-                    const reqScore = Math.min(3, queryWords.length || 1);
-                    if (maxMatches >= reqScore) {
-                        item.selectedMatch = bestMatch;
-                        item.status = 'matched';
-                    } else {
-                        // Weak match, trigger fallback
-                        localMatches = [];
-                    }
-                }
-
-                if (localMatches.length === 0) {
-                    if (isAdmin) {
-                        // NEW: AUTO FALLBACK TO GLOBAL (USDA)
-                        item.status = 'searching-usda';
-                        setPendingIngredients([...updatedPending]);
-
-                        let globalMatches = await searchUSDAFood(coreName);
-                        if (globalMatches.length === 0 && coreName !== rawItem) {
-                            globalMatches = await searchUSDAFood(rawItem);
-                        }
-
-                        if (globalMatches.length > 0) {
-                            item.matches = globalMatches;
-                            item.status = 'matched';
-                            item.selectedMatch = globalMatches[0];
-                        } else {
-                            item.status = 'no-match-local';
-                        }
-                    } else {
-                        item.status = 'no-match-local';
-                    }
+                    console.log(`[Magic Parse] Auto-selected "${matches[0].name}" (source: ${matches[0].source}) for "${coreName}"`);
+                } else {
+                    item.status = 'no-match';
                 }
 
                 setPendingIngredients([...updatedPending]);
@@ -546,17 +490,18 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
         let coreName = parenIndex !== -1 ? rawItem.substring(0, parenIndex).trim() : rawItem;
         coreName = coreName.replace(/[,;:]\s*$/, '').trim();
 
-        let globalMatches = await searchUSDAFood(coreName);
-        if (globalMatches.length === 0 && coreName !== rawItem) {
-            globalMatches = await searchUSDAFood(rawItem);
+        // Use unified search (includes both USDA and local)
+        let matches = await searchFoodItem(coreName);
+        if (matches.length === 0 && coreName !== rawItem) {
+            matches = await searchFoodItem(rawItem);
         }
 
         const newUpdated = [...pendingIngredients];
         const newItem = newUpdated[index];
-        newItem.matches = globalMatches;
-        newItem.status = globalMatches.length > 0 ? 'matched' : 'no-match-global';
-        if (globalMatches.length > 0) {
-            newItem.selectedMatch = globalMatches[0];
+        newItem.matches = matches;
+        newItem.status = matches.length > 0 ? 'matched' : 'no-match-global';
+        if (matches.length > 0) {
+            newItem.selectedMatch = matches[0];
         }
         setPendingIngredients(newUpdated);
     };
@@ -860,8 +805,8 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
             const baseName = (ing.food_item_name || '').split(',')[0].trim();
 
             try {
-                // Broad search for the base name
-                const matches = await searchLocalFood(baseName);
+                // Broad search for the base name using unified search (USDA + local)
+                const matches = await searchFoodItem(baseName);
 
                 const directMatch = matches.find((m: any) => {
                     const itemName = m.name.toLowerCase();
@@ -895,7 +840,7 @@ const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientB
 
                     // Similar to the detail page, we swap the food item data
                     // We need to fetch full details (portions) to do the weight recalculation
-                    const details = directMatch.portions?.length ? directMatch : await searchLocalFood(directMatch.name).then(res => res[0]);
+                    const details = directMatch.portions?.length ? directMatch : (await searchFoodItem(directMatch.name))[0];
 
                     if (details) {
                         let newWeight = ing.weight_g;

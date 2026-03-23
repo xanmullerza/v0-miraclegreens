@@ -7,7 +7,7 @@ import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredi
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database, Calendar } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
-import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
+import { searchFoodItem, searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -234,20 +234,24 @@ export default function RecipeBuilderPage() {
                 const searchQuery = itemName.replace(/[,;:]\s*$/, '').trim();
                 let match = null;
 
-                const localResults = await searchLocalFood(searchQuery);
-                if (localResults.length > 0) {
-                    match = localResults[0];
-                } else {
-                    const usdaResults = await searchUSDAFood(searchQuery);
-                    if (usdaResults.length > 0) {
-                        const usdaMatch = usdaResults[0];
-                        const measuresArr = usdaMatch.fdcId ? await getUSDAMeasures(usdaMatch.fdcId) : [];
-                        const localId = await syncToLocal(usdaMatch, measuresArr, currentUser?.id, isAdmin);
+                // Use unified search (USDA + local with USDA prioritized)
+                const allResults = await searchFoodItem(searchQuery);
+                
+                if (allResults.length > 0) {
+                    const foundMatch = allResults[0];
+                    
+                    // If it's a local item, use it directly
+                    if (foundMatch.source === 'local') {
+                        match = foundMatch;
+                    } else {
+                        // If it's USDA, sync to local for future use
+                        const measuresArr = foundMatch.fdcId ? await getUSDAMeasures(foundMatch.fdcId) : [];
+                        const localId = await syncToLocal(foundMatch, measuresArr, currentUser?.id, isAdmin);
 
                         if (localId) {
-                            match = { ...usdaMatch, id: localId, source: 'local' };
+                            match = { ...foundMatch, id: localId, source: 'local' };
                         } else {
-                            match = usdaMatch;
+                            match = foundMatch;
                         }
                     }
                 }
