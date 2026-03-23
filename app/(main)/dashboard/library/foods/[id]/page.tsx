@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -1118,7 +1118,7 @@ export default function FoodDetailsPage() {
                                 {foodRecipes.map(recipe => (
                                     <button
                                         key={recipe.id}
-                                        onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
+                                        onClick={() => router.push(`/recipes/${recipe.id}`)}
                                         className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-400/50 hover:bg-amber-50/30 dark:hover:bg-amber-900/10 transition-all text-left group"
                                     >
                                         <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">

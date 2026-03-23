@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams, useSearchParams, usePathname } from 'next/navigation';
@@ -600,7 +600,7 @@ export default function RecipeDetailsPage() {
         } catch (error) {
             console.error('Error fetching recipe:', error);
             toast.error('Failed to load mix details');
-            router.push('/dashboard/library/mixes');
+            router.back();
         } finally {
             setLoading(false);
         }
@@ -1309,7 +1309,7 @@ export default function RecipeDetailsPage() {
             try {
                 await deleteRecipe(recipe.id);
                 toast.success("Mix deleted successfully");
-                router.push('/dashboard/library/mixes');
+                router.push('/dashboard/library/meals');
             } catch (error) {
                 toast.error("Failed to delete mix");
             }
@@ -1318,7 +1318,7 @@ export default function RecipeDetailsPage() {
 
     const handleEdit = () => {
         if (!recipe) return;
-        router.push(`/dashboard/library/mixes/new?edit=${recipe.id}`);
+        router.push(`/dashboard/library/meals/new?edit=${recipe.id}`);
     };
 
     if (loading) {
