@@ -19,16 +19,17 @@ interface FoodItem {
 
 interface FoodItemPickerProps {
     onSelect: (foodItem: FoodItem) => void;
-
     onClose: () => void;
     mode?: 'all' | 'usda-only';
     isAdmin?: boolean;
     inline?: boolean;
+    initialSearchQuery?: string;
+    initialResults?: any[];
 }
 
-export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmin = false, inline = false }: FoodItemPickerProps) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [results, setResults] = useState<FoodItemMatch[]>([]);
+export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmin = false, inline = false, initialSearchQuery = '', initialResults }: FoodItemPickerProps) {
+    const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+    const [results, setResults] = useState<FoodItemMatch[]>(initialResults || []);
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [sourceFilter, setSourceFilter] = useState<'all' | 'usda' | 'local'>('all');

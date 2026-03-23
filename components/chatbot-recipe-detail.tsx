@@ -85,6 +85,7 @@ import { searchFoodItem, searchUSDAFood, getUSDAFoodDetails } from '@/lib/servic
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatbotShare } from './chatbot-share';
+import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 interface Recipe {
     id: string;
@@ -179,6 +180,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
     const [mineralThreshold, setMineralThreshold] = useState<50 | 75 | 100>(75);
     const [waterSolubleThreshold, setWaterSolubleThreshold] = useState<50 | 75 | 100>(75);
     const [storedVitaminThreshold, setStoredVitaminThreshold] = useState<50 | 75 | 100>(75);
+
+    // Smart Match Picker State
+    const [showSmartMatchPicker, setShowSmartMatchPicker] = useState(false);
+    const [smartMatchPickerIngredientIdx, setSmartMatchPickerIngredientIdx] = useState<number>(0);
+    const [smartMatchPickerResults, setSmartMatchPickerResults] = useState<any[]>([]);
+    const [smartMatchQueue, setSmartMatchQueue] = useState<Array<{idx: number, ingredient: Ingredient, results: any[]}>>([]);
 
     // User preferences and RDA
     const { profile, nutrientDisplayMode } = useUserPreferences();
@@ -603,10 +610,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
         toast.loading("Analyzing ingredients with Smart Match...", { id: 'smart-match' });
 
         try {
-            const newMatches: Record<string, any> = {};
-            const newFlipped: Record<string, boolean> = {};
+            const queue: Array<{idx: number, ingredient: Ingredient, results: any[]}> = [];
 
-            for (const ing of ingredients) {
+            for (let idx = 0; idx < ingredients.length; idx++) {
+                const ing = ingredients[idx];
                 const searchTermRaw = ing.base_ingredient || ing.item;
                 const searchTerm = extractCoreName(searchTermRaw);
                 
@@ -637,26 +644,55 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                     }
                 }
 
-                // Auto-select top result (already USDA-first from searchFoodItem)
+                // Queue results to show in picker modal (preserving USDA-first order from searchFoodItem)
                 if (matchData && matchData.length > 0) {
-                    const match = matchData[0];
-                    newMatches[ing.id] = match;
-                    newFlipped[ing.id] = true; // Auto-flip to show the match
-                    console.log(`[Smart Match] Auto-selected "${match.name}" (source: ${match.source}) for "${searchTerm}"`);
+                    queue.push({ idx, ingredient: ing, results: matchData });
+                    console.log(`[Smart Match] Found ${matchData.length} results for "${searchTerm}" - showing picker`);
                 }
             }
 
-            const matchCount = Object.keys(newMatches).length;
-            if (matchCount > 0) {
-                setMatchedIngredients(newMatches);
-                setFlippedCards(newFlipped);
-                toast.success(`Smart Match found ${matchCount} corresponding food items!`, { id: 'smart-match' });
+            if (queue.length > 0) {
+                setSmartMatchQueue(queue);
+                // Show the first ingredient's results in the picker
+                const firstInQueue = queue[0];
+                setSmartMatchPickerIngredientIdx(0);
+                setSmartMatchPickerResults(firstInQueue.results);
+                setShowSmartMatchPicker(true);
+                toast.success(`Smart Match: Select matches for ${queue.length} ingredients`, { id: 'smart-match' });
             } else {
                 toast.error("Smart Match couldn't find any direct mappings. You may need to add these items to your database.", { id: 'smart-match' });
             }
 
         } finally {
             setSmartMatchRunning(false);
+        }
+    };
+
+    const handleSmartMatchPickerSelect = async (foodItem: any) => {
+        if (smartMatchQueue.length === 0) return;
+
+        const currentItem = smartMatchQueue[smartMatchPickerIngredientIdx];
+        const newMatches = { ...matchedIngredients };
+        const newFlipped = { ...flippedCards };
+
+        newMatches[currentItem.ingredient.id] = foodItem;
+        newFlipped[currentItem.ingredient.id] = true;
+
+        // Move to next in queue or close picker
+        const nextIdx = smartMatchPickerIngredientIdx + 1;
+        if (nextIdx < smartMatchQueue.length) {
+            const nextItem = smartMatchQueue[nextIdx];
+            setSmartMatchPickerIngredientIdx(nextIdx);
+            setSmartMatchPickerResults(nextItem.results);
+            setMatchedIngredients(newMatches);
+            setFlippedCards(newFlipped);
+            toast.success(`✓ Matched "${foodItem.name}" - showing next ingredient`, { duration: 2000 });
+        } else {
+            setMatchedIngredients(newMatches);
+            setFlippedCards(newFlipped);
+            setShowSmartMatchPicker(false);
+            setSmartMatchQueue([]);
+            toast.success(`Smart Match completed! All ${smartMatchQueue.length} ingredients matched.`, { id: 'smart-match' });
         }
     };
 
@@ -1006,6 +1042,22 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                 <ChatbotShare
                     recipe={recipe}
                     onClose={() => setShowShareDialog(false)}
+                />
+            )}
+
+            {/* Smart Match Picker Modal */}
+            {showSmartMatchPicker && smartMatchQueue.length > 0 && (
+                <FoodItemPicker
+                    onSelect={handleSmartMatchPickerSelect}
+                    onClose={() => {
+                        setShowSmartMatchPicker(false);
+                        setSmartMatchQueue([]);
+                    }}
+                    mode="all"
+                    isAdmin={false}
+                    inline={false}
+                    initialSearchQuery={smartMatchQueue[smartMatchPickerIngredientIdx]?.ingredient?.base_ingredient || smartMatchQueue[smartMatchPickerIngredientIdx]?.ingredient?.item || ''}
+                    initialResults={smartMatchPickerResults}
                 />
             )}
 
