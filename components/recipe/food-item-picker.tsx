@@ -69,6 +69,13 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
         }
     }, [initialResults, hasInitialResults]);
 
+    // Auto-update search query when Smart Match advances to next ingredient
+    useEffect(() => {
+        if (hasInitialResults && initialSearchQuery) {
+            setSearchQuery(initialSearchQuery);
+        }
+    }, [initialSearchQuery, hasInitialResults]);
+
     useEffect(() => {
         const searchFoodItems = async () => {
             if (searchQuery.length < 2) {
