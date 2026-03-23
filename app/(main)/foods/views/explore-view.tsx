@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Loader2, Check, Beef, Filter, ChevronDown, Leaf, X } from 'lucide-react';
+import { Loader2, Check, Beef, Filter, ChevronDown, Leaf, X, Search } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
@@ -22,9 +22,11 @@ const PAGE_SIZE = 20;
 interface ExploreViewProps {
     showAddFood?: boolean;
     setShowAddFood?: Dispatch<SetStateAction<boolean>>;
+    searchQuery?: string;
+    onSearchChange?: (query: string) => void;
 }
 
-export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreViewProps) {
+export function ExploreView({ showAddFood = false, setShowAddFood, searchQuery: externalSearchQuery, onSearchChange }: ExploreViewProps) {
     const { energyUnit } = useUserPreferences();
     const { searchQuery } = useSearch();
 
@@ -37,6 +39,9 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
 
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+    // Use external searchQuery if provided, otherwise use internal from useSearch
+    const effectiveSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
 
     // Auth — getSession bootstraps authReady for SSR/HttpOnly-cookie configs where
     // onAuthStateChange may not fire INITIAL_SESSION. A resolved flag prevents the
@@ -151,7 +156,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
     // eslint-disable-next-line react-hooks/exhaustive-deps -- searchQuery intentionally omitted; the search effect owns it
     useEffect(() => {
         if (!authReady) return;
-        fetchFoods(1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
+        fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
     }, [authReady, showFavoritesOnly, selectedCategories, user, fetchFoods]);
 
     // Debounced fetch on search change
@@ -160,10 +165,10 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
         if (!authReady) return;
         if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
         searchTimerRef.current = setTimeout(() => {
-            fetchFoods(1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
+            fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
         }, 400);
         return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
-    }, [searchQuery, authReady, fetchFoods]);
+    }, [effectiveSearchQuery, authReady, fetchFoods]);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -176,7 +181,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                         {/* Sticky Header */}
                         <div className="border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-100 dark:bg-slate-900/80 rounded-t-[2rem]">
                             {/* Mobile filter bar */}
-                            <div className="flex md:hidden items-center justify-between px-4 py-2">
+                            <div className="flex md:hidden items-center justify-between gap-2 px-4 py-2">
                                 <Sheet>
                                     <SheetTrigger asChild>
                                         <button className={cn(
@@ -242,11 +247,29 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                         </div>
                                     </SheetContent>
                                 </Sheet>
+
+                                {/* Mobile Search Input */}
+                                <div className="flex-1 relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                                    <input
+                                        type="text"
+                                        value={externalSearchQuery ?? ''}
+                                        onChange={(e) => onSearchChange?.(e.target.value)}
+                                        placeholder="Search..."
+                                        className={cn(
+                                            "w-full h-8 pl-9 pr-4 rounded-lg border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                            "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                            "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                            "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                        )}
+                                    />
+                                </div>
                             </div>
 
                             {/* Desktop header row */}
-                            <div className="hidden md:grid md:grid-cols-[60px_1fr_auto] gap-3 md:gap-4 md:items-center md:px-10 py-1 w-full">
-                                <div className="flex items-center justify-center">
+                            <div className="hidden md:flex md:items-center gap-3 md:gap-4 md:px-10 py-3 w-full border-b border-slate-200 dark:border-slate-800">
+                                <div className="flex items-center gap-3">
+                                    {/* Filter Button */}
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button className={cn(
@@ -296,9 +319,26 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                             </div>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
+
+                                    {/* Search Input */}
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                                        <input
+                                            type="text"
+                                            value={externalSearchQuery ?? ''}
+                                            onChange={(e) => onSearchChange?.(e.target.value)}
+                                            placeholder="Search foods..."
+                                            className={cn(
+                                                "w-64 h-8 pl-9 pr-4 rounded-lg border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                                "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                                "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                                "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                            )}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Nutrition</div>
+
+                                <div className="ml-auto text-[9px] font-black uppercase tracking-widest text-slate-400">Nutrition</div>
                             </div>
                         </div>
 
@@ -317,7 +357,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                         <Leaf size={22} className="opacity-20" />
                                     </div>
                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                        {(showFavoritesOnly || selectedCategories.length > 0 || searchQuery)
+                                        {(showFavoritesOnly || selectedCategories.length > 0 || effectiveSearchQuery)
                                             ? 'No foods match your filters'
                                             : 'No foods found'}
                                     </p>
