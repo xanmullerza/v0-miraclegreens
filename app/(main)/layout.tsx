@@ -63,7 +63,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
     // Determine widths based on resize mode
     const getContentWidth = () => {
-        if (pathname === '/') return 'w-full';
+        if (pathname === '/home') return 'w-full';
         if (!isDesktop) return 'w-full';
         switch (resizeMode) {
             case 'equal': return 'w-1/2';
@@ -122,7 +122,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     return (
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
             {/* Unified Header & Nav - Spans both panels */}
-            {pathname !== '/' && (
+            {pathname !== '/home' && (
                 <>
                     {/* Header - Centered */}
                     <div suppressHydrationWarning className="z-40 bg-background">
@@ -167,24 +167,24 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 <div className={cn(
                     "flex flex-col transition-all duration-300 ease-in-out overflow-hidden",
                     getContentWidth(),
-                    pathname === '/' ? 'w-full' : ''
+                    pathname === '/home' ? 'w-full' : ''
                 )}>
                     {/* Main Content */}
                     <main className="flex-1 overflow-y-auto bg-background custom-scrollbar">
                         <div className={cn(
                             "px-2 sm:px-4 flex justify-center",
-                            pathname !== '/' && "py-4"
+                            pathname !== '/home' && "py-4"
                         )}>
                             <div className="w-full max-w-[900px]">
                                 {children}
                             </div>
                         </div>
-                        {pathname !== '/' && <Footer />}
+                        {pathname !== '/home' && <Footer />}
                     </main>
                 </div>
 
                 {/* Divider + Resize Button */}
-                {pathname !== '/' && !isMobile && resizeMode !== 'content-only' && (
+                {pathname !== '/home' && !isMobile && resizeMode !== 'content-only' && (
                     <>
                         <div className="w-px bg-slate-200 dark:bg-slate-800" />
                         <button
@@ -198,7 +198,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 )}
 
                 {/* Chat Area - Desktop only (mobile uses overlay button) */}
-                {pathname !== '/' && !isMobile && (
+                {pathname !== '/home' && !isMobile && (
                     <div className={cn(
                         "flex flex-col transition-all duration-300 ease-in-out overflow-hidden border-l border-slate-200 dark:border-slate-800 relative",
                         getChatWidth()
