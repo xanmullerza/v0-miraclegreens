@@ -83,16 +83,7 @@ export function RecipeFilterDialog({
   const [tagSearchQuery, setTagSearchQuery] = useState('');
   const [allSystemTags, setAllSystemTags] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    cookingSetup: true,
-    dietary: true,
-    exclusions: true,
-    health: true,
-    pantry: true,
-    extras: true,
-    difficulty: true,
-    tags: true,
-  });
+  const [expandedSection, setExpandedSection] = useState<string | null>('cookingSetup');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -114,11 +105,8 @@ export function RecipeFilterDialog({
     }
   }, [filters, isOpen]);
 
-  const handleToggleSection = (section: SectionKey) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+  const handleToggleSection = (section: string) => {
+    setExpandedSection((prev) => (prev === section ? null : section));
   };
 
   const selectedInCategory = (items: string[]) =>
@@ -234,13 +222,13 @@ export function RecipeFilterDialog({
           <h3 className="font-semibold text-slate-900 dark:text-white">
             Cooking Setup ({localFilters.selectedEquipment.length})
           </h3>
-          {expandedSections.cookingSetup ? (
+          {expandedSection === 'cookingSetup' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {expandedSections.cookingSetup && (
+        {expandedSection === 'cookingSetup' && (
           <div className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
             {EQUIPMENT_CATEGORIES.map((category) => {
               const selectedCount = selectedInCategory(category.items);
@@ -311,13 +299,13 @@ export function RecipeFilterDialog({
           <h3 className="font-semibold text-slate-900 dark:text-white">
             Diet Type
           </h3>
-          {expandedSections.dietary ? (
+          {expandedSection === 'dietary' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {expandedSections.dietary && (
+        {expandedSection === 'dietary' && (
           <div className="p-4 bg-white dark:bg-slate-900 space-y-2">
             {DIET_OPTIONS.map((diet) => (
               <label
@@ -359,13 +347,13 @@ export function RecipeFilterDialog({
             Allergies & Exclusions ({localFilters.selectedExclusions.length}
             )
           </h3>
-          {expandedSections.exclusions ? (
+          {expandedSection === 'exclusions' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {expandedSections.exclusions && (
+        {expandedSection === 'exclusions' && (
           <div className="p-4 bg-white dark:bg-slate-900">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
               {EXCLUSION_OPTIONS.map((exc) => (
@@ -400,13 +388,13 @@ export function RecipeFilterDialog({
             Health Conditions ({localFilters.selectedHealthConditions.length}
             )
           </h3>
-          {expandedSections.health ? (
+          {expandedSection === 'health' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {expandedSections.health && (
+        {expandedSection === 'health' && (
           <div className="p-4 bg-white dark:bg-slate-900">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
               {HEALTH_CONDITIONS.map((condition) => (
@@ -444,13 +432,13 @@ export function RecipeFilterDialog({
           <h3 className="font-semibold text-slate-900 dark:text-white">
             Pantry Filtering
           </h3>
-          {expandedSections.pantry ? (
+          {expandedSection === 'pantry' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {expandedSections.pantry && (
+        {expandedSection === 'pantry' && (
           <div className="p-4 bg-white dark:bg-slate-900 space-y-3">
             <label className="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition">
               <input
@@ -511,13 +499,13 @@ export function RecipeFilterDialog({
           <h3 className="font-semibold text-slate-900 dark:text-white">
             Optional Items
           </h3>
-          {expandedSections.extras ? (
+          {expandedSection === 'extras' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {expandedSections.extras && (
+        {expandedSection === 'extras' && (
           <div className="p-4 bg-white dark:bg-slate-900 space-y-4">
             <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
               <div>
@@ -569,13 +557,13 @@ export function RecipeFilterDialog({
           <h3 className="font-semibold text-slate-900 dark:text-white">
             Difficulty ({localFilters.selectedDifficulty.length})
           </h3>
-          {(expandedSections as any).difficulty ? (
+          {expandedSection === 'difficulty' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {(expandedSections as any).difficulty && (
+        {expandedSection === 'difficulty' && (
           <div className="p-4 bg-white dark:bg-slate-900 grid grid-cols-3 gap-2">
             {DIFFICULTY_OPTIONS.map((diff) => (
               <label
@@ -609,13 +597,13 @@ export function RecipeFilterDialog({
           <h3 className="font-semibold text-slate-900 dark:text-white">
             Tags ({localFilters.selectedTags.length})
           </h3>
-          {(expandedSections as any).tags ? (
+          {expandedSection === 'tags' ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
           )}
         </button>
-        {(expandedSections as any).tags && (
+        {expandedSection === 'tags' && (
           <div className="p-4 bg-white dark:bg-slate-900 space-y-4">
             {/* Tag Search Input */}
             <div className="relative">
