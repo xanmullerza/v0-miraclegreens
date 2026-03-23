@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
+import { useChatbot } from '@/lib/context/chatbot-context';
 
 interface Message {
     id: string;
