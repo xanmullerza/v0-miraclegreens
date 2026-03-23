@@ -657,9 +657,9 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                                 <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-1">Energy (kcal)</label>
                                 <input
                                     type="number"
-                                    value={manualNutrition.energy_kcal}
-                                    onChange={(e) => setManualNutrition({...manualNutrition, energy_kcal: parseFloat(e.target.value) || 0})}
-                                    placeholder="0"
+                                    value={manualNutrition.energy_kcal === 0 ? '' : manualNutrition.energy_kcal}
+                                    onChange={(e) => setManualNutrition({...manualNutrition, energy_kcal: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0})}
+                                    placeholder="Enter kcal"
                                     className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                                 />
                             </div>
@@ -670,8 +670,8 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                                     <input
                                         type="number"
                                         step="0.1"
-                                        value={manualNutrition.protein_g}
-                                        onChange={(e) => setManualNutrition({...manualNutrition, protein_g: parseFloat(e.target.value) || 0})}
+                                        value={manualNutrition.protein_g === 0 ? '' : manualNutrition.protein_g}
+                                        onChange={(e) => setManualNutrition({...manualNutrition, protein_g: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0})}
                                         placeholder="0"
                                         className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                                     />
@@ -681,8 +681,8 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                                     <input
                                         type="number"
                                         step="0.1"
-                                        value={manualNutrition.fat_g}
-                                        onChange={(e) => setManualNutrition({...manualNutrition, fat_g: parseFloat(e.target.value) || 0})}
+                                        value={manualNutrition.fat_g === 0 ? '' : manualNutrition.fat_g}
+                                        onChange={(e) => setManualNutrition({...manualNutrition, fat_g: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0})}
                                         placeholder="0"
                                         className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                                     />
@@ -692,8 +692,8 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                                     <input
                                         type="number"
                                         step="0.1"
-                                        value={manualNutrition.carbs_g}
-                                        onChange={(e) => setManualNutrition({...manualNutrition, carbs_g: parseFloat(e.target.value) || 0})}
+                                        value={manualNutrition.carbs_g === 0 ? '' : manualNutrition.carbs_g}
+                                        onChange={(e) => setManualNutrition({...manualNutrition, carbs_g: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0})}
                                         placeholder="0"
                                         className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                                     />
