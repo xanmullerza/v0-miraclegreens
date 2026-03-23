@@ -696,6 +696,21 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
         }
     };
 
+    const handleSmartMatchSkip = () => {
+        // Move to next ingredient without matching
+        const nextIdx = smartMatchPickerIngredientIdx + 1;
+        if (nextIdx < smartMatchQueue.length) {
+            const nextItem = smartMatchQueue[nextIdx];
+            setSmartMatchPickerIngredientIdx(nextIdx);
+            setSmartMatchPickerResults(nextItem.results);
+            toast.info(`Skipped "${smartMatchQueue[smartMatchPickerIngredientIdx].ingredient.base_ingredient || smartMatchQueue[smartMatchPickerIngredientIdx].ingredient.item}" - showing next ingredient`, { duration: 2000 });
+        } else {
+            setShowSmartMatchPicker(false);
+            setSmartMatchQueue([]);
+            toast.info(`Smart Match ended - ${Object.keys(matchedIngredients).length} ingredients matched.`, { id: 'smart-match' });
+        }
+    };
+
     const finalizeRecipeNutrition = async () => {
         if (!recipe) return;
         
@@ -1049,6 +1064,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
             {showSmartMatchPicker && smartMatchQueue.length > 0 && (
                 <FoodItemPicker
                     onSelect={handleSmartMatchPickerSelect}
+                    onSkip={handleSmartMatchSkip}
                     onClose={() => {
                         setShowSmartMatchPicker(false);
                         setSmartMatchQueue([]);

@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Search, X, Database, Loader2, Sparkles } from 'lucide-react';
+import { Search, X, Database, Loader2, Sparkles, Plus, SkipForward } from 'lucide-react';
 import { searchFoodItem, getUSDAFoodDetails, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 
 interface FoodItem {
@@ -20,6 +20,7 @@ interface FoodItem {
 interface FoodItemPickerProps {
     onSelect: (foodItem: FoodItem) => void;
     onClose: () => void;
+    onSkip?: () => void;
     mode?: 'all' | 'usda-only';
     isAdmin?: boolean;
     inline?: boolean;
@@ -27,13 +28,22 @@ interface FoodItemPickerProps {
     initialResults?: any[];
 }
 
-export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmin = false, inline = false, initialSearchQuery = '', initialResults }: FoodItemPickerProps) {
+export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all', isAdmin = false, inline = false, initialSearchQuery = '', initialResults }: FoodItemPickerProps) {
     const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
     const [results, setResults] = useState<FoodItemMatch[]>(initialResults || []);
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [sourceFilter, setSourceFilter] = useState<'all' | 'usda' | 'local'>('all');
     const [hasInitialResults] = useState(!!initialResults && initialResults.length > 0);
+    
+    // Manual entry state
+    const [showManualEntry, setShowManualEntry] = useState(false);
+    const [manualNutrition, setManualNutrition] = useState<Record<string, number>>({
+        energy_kcal: 0,
+        protein_g: 0,
+        fat_g: 0,
+        carbs_g: 0
+    });
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -156,6 +166,70 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
         }
     };
 
+    const handleManualEntrySubmit = async () => {
+        if (!initialSearchQuery) return;
+        
+        setLoading(true);
+        try {
+            const user_session = await supabase.auth.getSession();
+            const userId = user_session.data.session?.user?.id;
+
+            // Create manual food item
+            const manualItem = {
+                name: initialSearchQuery,
+                common_name: null,
+                source: 'manual',
+                category: 'Manual Entry',
+                energy_kcal: manualNutrition.energy_kcal || 0,
+                energy_kj: (manualNutrition.energy_kcal || 0) * 4.184,
+                protein_g: manualNutrition.protein_g || 0,
+                carbs_g: manualNutrition.carbs_g || 0,
+                fat_g: manualNutrition.fat_g || 0,
+                micronutrients: {},
+                portions: [{ label: '100g', weight_g: 100 }],
+                user_id: userId,
+                is_curated: false
+            };
+
+            // Insert into database
+            const { data: insertedFood, error } = await supabase
+                .from('food_items')
+                .insert(manualItem)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            onSelect({
+                id: insertedFood.id,
+                name: manualItem.name,
+                energy_kcal: manualItem.energy_kcal,
+                energy_kj: manualItem.energy_kj,
+                protein_g: manualItem.protein_g,
+                fat_g: manualItem.fat_g,
+                carbs_g: manualItem.carbs_g,
+                micronutrients: manualItem.micronutrients,
+                portions: manualItem.portions
+            });
+
+            setShowManualEntry(false);
+            setManualNutrition({ energy_kcal: 0, protein_g: 0, fat_g: 0, carbs_g: 0 });
+        } catch (err) {
+            console.error('Error creating manual entry:', err);
+            alert('Failed to create manual entry.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSkip = () => {
+        if (onSkip) {
+            onSkip();
+        }
+        setManualNutrition({ energy_kcal: 0, protein_g: 0, fat_g: 0, carbs_g: 0 });
+        setShowManualEntry(false);
+    };
+
     return (
         <>
             {inline ? (
@@ -224,6 +298,26 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                 Local DB
                             </button>
                         </div>
+
+                        {/* Action Buttons (Smart Match Mode) */}
+                        {hasInitialResults && (
+                            <div className="flex gap-2 pt-2">
+                                <button
+                                    onClick={() => setShowManualEntry(true)}
+                                    className="flex-1 h-9 text-[9px] font-black uppercase tracking-widest rounded-lg bg-orange-500/10 text-orange-600 border border-orange-300 hover:bg-orange-500/20 transition-all flex items-center justify-center gap-1.5"
+                                >
+                                    <Plus size={12} />
+                                    Manual Entry
+                                </button>
+                                <button
+                                    onClick={handleSkip}
+                                    className="flex-1 h-9 text-[9px] font-black uppercase tracking-widest rounded-lg bg-slate-500/10 text-slate-600 border border-slate-300 hover:bg-slate-500/20 transition-all flex items-center justify-center gap-1.5"
+                                >
+                                    <SkipForward size={12} />
+                                    Skip
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Results */}
@@ -404,6 +498,26 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                     Local DB
                                 </button>
                             </div>
+
+                            {/* Action Buttons (Smart Match Mode) */}
+                            {hasInitialResults && (
+                                <div className="flex gap-2 pt-2">
+                                    <button
+                                        onClick={() => setShowManualEntry(true)}
+                                        className="flex-1 h-9 text-[9px] font-black uppercase tracking-widest rounded-lg bg-orange-500/10 text-orange-600 border border-orange-300 hover:bg-orange-500/20 transition-all flex items-center justify-center gap-1.5"
+                                    >
+                                        <Plus size={12} />
+                                        Manual Entry
+                                    </button>
+                                    <button
+                                        onClick={handleSkip}
+                                        className="flex-1 h-9 text-[9px] font-black uppercase tracking-widest rounded-lg bg-slate-500/10 text-slate-600 border border-slate-300 hover:bg-slate-500/20 transition-all flex items-center justify-center gap-1.5"
+                                    >
+                                        <SkipForward size={12} />
+                                        Skip
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {/* Results */}
@@ -515,6 +629,98 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                             <p className="text-[10px] text-muted-foreground italic">
                                 Selecting a USDA item will automatically save it to your local library for future use.
                             </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Manual Entry Modal */}
+            {showManualEntry && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[10000] p-4">
+                    <div className="bg-background border border-border rounded-2xl shadow-2xl max-w-md w-full flex flex-col animate-in fade-in zoom-in-95 duration-300">
+                        {/* Header */}
+                        <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
+                            <h3 className="text-lg font-black uppercase tracking-tighter text-foreground italic">
+                                Manual Entry: {initialSearchQuery}
+                            </h3>
+                            <button
+                                onClick={() => setShowManualEntry(false)}
+                                className="p-2 hover:bg-muted text-muted-foreground rounded-full transition"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Form */}
+                        <div className="p-4 space-y-3 flex-1 overflow-y-auto">
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-1">Energy (kcal)</label>
+                                <input
+                                    type="number"
+                                    value={manualNutrition.energy_kcal}
+                                    onChange={(e) => setManualNutrition({...manualNutrition, energy_kcal: parseFloat(e.target.value) || 0})}
+                                    placeholder="0"
+                                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-1">Protein (g)</label>
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        value={manualNutrition.protein_g}
+                                        onChange={(e) => setManualNutrition({...manualNutrition, protein_g: parseFloat(e.target.value) || 0})}
+                                        placeholder="0"
+                                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-1">Fat (g)</label>
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        value={manualNutrition.fat_g}
+                                        onChange={(e) => setManualNutrition({...manualNutrition, fat_g: parseFloat(e.target.value) || 0})}
+                                        placeholder="0"
+                                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-1">Carbs (g)</label>
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        value={manualNutrition.carbs_g}
+                                        onChange={(e) => setManualNutrition({...manualNutrition, carbs_g: parseFloat(e.target.value) || 0})}
+                                        placeholder="0"
+                                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
+                                    />
+                                </div>
+                            </div>
+
+                            <p className="text-[10px] text-muted-foreground italic">
+                                Enter nutrition values per 100g. These will be normalized.
+                            </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="p-4 border-t border-border flex gap-2">
+                            <button
+                                onClick={() => setShowManualEntry(false)}
+                                className="flex-1 px-4 py-2 text-sm font-bold uppercase tracking-widest rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleManualEntrySubmit}
+                                disabled={loading}
+                                className="flex-1 px-4 py-2 text-sm font-bold uppercase tracking-widest rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                Save Entry
+                            </button>
                         </div>
                     </div>
                 </div>
