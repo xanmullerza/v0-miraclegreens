@@ -31,6 +31,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
     const [results, setResults] = useState<FoodItemMatch[]>([]);
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const [sourceFilter, setSourceFilter] = useState<'all' | 'usda' | 'local'>('all');
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -157,7 +158,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                     </div>
 
                     {/* Search Input */}
-                    <div className="p-4 border-b border-border space-y-4">
+                    <div className="p-4 border-b border-border space-y-3">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                             <input
@@ -168,6 +169,40 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                 className="w-full pl-10 pr-4 py-3 border-2 border-slate-100 dark:border-slate-800 bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-muted-foreground transition-all"
                                 autoFocus
                             />
+                        </div>
+
+                        {/* Source Toggle Buttons */}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setSourceFilter('all')}
+                                className={`flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                                    sourceFilter === 'all'
+                                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
+                                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                }`}
+                            >
+                                All Sources
+                            </button>
+                            <button
+                                onClick={() => setSourceFilter('usda')}
+                                className={`flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                                    sourceFilter === 'usda'
+                                        ? 'bg-green-600 text-white shadow-lg shadow-green-500/20'
+                                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                }`}
+                            >
+                                USDA
+                            </button>
+                            <button
+                                onClick={() => setSourceFilter('local')}
+                                className={`flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                                    sourceFilter === 'local'
+                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                }`}
+                            >
+                                Local DB
+                            </button>
                         </div>
                     </div>
 
@@ -192,7 +227,14 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                     </div>
                                 ) : (
                                     <div className="space-y-2">
-                                        {results.map((item, idx) => {
+                                        {results
+                                            .filter(item => {
+                                                if (sourceFilter === 'all') return true;
+                                                if (sourceFilter === 'usda') return item.source === 'usda';
+                                                if (sourceFilter === 'local') return item.source === 'local';
+                                                return true;
+                                            })
+                                            .map((item, idx) => {
                                             // Determine badge styling based on source
                                             const isUSDA = item.source === 'usda';
                                             const dataType = isUSDA ? (item as any).dataType || 'USDA' : 'Local';
@@ -296,7 +338,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                         </div>
 
                         {/* Search Input */}
-                        <div className="p-4 border-b border-border space-y-4">
+                        <div className="p-4 border-b border-border space-y-3">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                                 <input
@@ -307,6 +349,40 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                     className="w-full pl-10 pr-4 py-3 border-2 border-slate-100 dark:border-slate-800 bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-muted-foreground transition-all"
                                     autoFocus
                                 />
+                            </div>
+
+                            {/* Source Toggle Buttons */}
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setSourceFilter('all')}
+                                    className={`flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                                        sourceFilter === 'all'
+                                            ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
+                                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                    }`}
+                                >
+                                    All Sources
+                                </button>
+                                <button
+                                    onClick={() => setSourceFilter('usda')}
+                                    className={`flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                                        sourceFilter === 'usda'
+                                            ? 'bg-green-600 text-white shadow-lg shadow-green-500/20'
+                                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                    }`}
+                                >
+                                    USDA
+                                </button>
+                                <button
+                                    onClick={() => setSourceFilter('local')}
+                                    className={`flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                                        sourceFilter === 'local'
+                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                    }`}
+                                >
+                                    Local DB
+                                </button>
                             </div>
                         </div>
 
@@ -331,7 +407,14 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
-                                            {results.map((item, idx) => {
+                                            {results
+                                                .filter(item => {
+                                                    if (sourceFilter === 'all') return true;
+                                                    if (sourceFilter === 'usda') return item.source === 'usda';
+                                                    if (sourceFilter === 'local') return item.source === 'local';
+                                                    return true;
+                                                })
+                                                .map((item, idx) => {
                                                 // Determine badge styling based on source
                                                 const isUSDA = item.source === 'usda';
                                                 const dataType = isUSDA ? (item as any).dataType || 'USDA' : 'Local';
