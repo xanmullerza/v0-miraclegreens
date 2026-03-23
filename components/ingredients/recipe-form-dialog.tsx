@@ -56,7 +56,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
     const [isMix, setIsMix] = useState(initialIsMix);
     const [instructions, setInstructions] = useState<string[]>(
         initialData?.instructions_text 
-            ? initialData.instructions_text.split('\n').filter(i => i.trim())
+            ? initialData.instructions_text.split('\n').filter(i => i?.trim?.())
             : ['']
     );
     const [image, setImage] = useState(initialData?.image || '');
@@ -89,7 +89,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
     };
 
     const handleParseRecipeURL = async () => {
-        if (!recipeUrl.trim()) {
+        if (!recipeUrl?.trim?.()) {
             toast.error('Please enter a recipe URL');
             return;
         }
@@ -122,7 +122,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
                 setInstructions(
                     (data.recipe.instructions_text || '')
                         .split('\n')
-                        .filter((i: string) => i.trim())
+                        .filter((i: string) => i?.trim?.())
                         .filter((i: string) => i) || ['']
                 );
 
@@ -222,7 +222,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
     const handleRemoveInstruction = (index: number) => setInstructions(instructions.filter((_, i) => i !== index));
 
     const handleSave = async () => {
-        if (!title || ingredients.length === 0 || instructions.filter(i => i.trim()).length === 0) {
+        if (!title || ingredients.length === 0 || instructions.filter(i => i?.trim?.()).length === 0) {
             toast.error('Please fill in all required fields');
             return;
         }
