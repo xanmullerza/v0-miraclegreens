@@ -240,7 +240,7 @@ const RecipeCard = ({
   return (
     <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
       <Link
-        href={`/dashboard/library/meals/${recipe.id}`}
+        href={`/dashboard/library/recipes/${recipe.id}`}
         className="absolute inset-x-0 top-0 bottom-[140px] z-10"
       />
       <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
@@ -285,7 +285,7 @@ const RecipeCard = ({
             {Number(recipe.carbs * (recipe.servings || 1)).toFixed(1)}g
           </span>
         </div>
-        <Link href={`/dashboard/library/meals/${recipe.id}`} className="mt-auto block w-full">
+        <Link href={`/dashboard/library/recipes/${recipe.id}`} className="mt-auto block w-full">
           <button className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group/btn">
             View Full Recipe{' '}
             <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
@@ -475,7 +475,7 @@ const RecipeListItem = ({
   }, [liveIngs]);
   return (
     <div
-      onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/dashboard/library/meals/${recipe.id}`)}
+      onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/dashboard/library/recipes/${recipe.id}`)}
       className={cn(
         'group relative rounded-2xl border hover:shadow-lg transition-all cursor-pointer overflow-hidden p-1 lg:p-0',
         isEaten

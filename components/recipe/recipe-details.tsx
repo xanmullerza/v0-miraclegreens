@@ -1039,7 +1039,7 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                     {relatedRecipes.map((meal) => (
                                         <a
                                             key={meal.id}
-                                            href={`/dashboard/library/meals/${meal.id}`}
+                                            href={`/dashboard/library/recipes/${meal.id}`}
                                             className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-sm shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
                                         >
                                             <div className="w-full aspect-square rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-transform duration-700 relative">

@@ -428,7 +428,7 @@ export function RecipesView({
 
     const handleEdit = (e: React.MouseEvent, recipeId: string) => {
         e.stopPropagation();
-        router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/${recipeId}`);
+        router.push(`/dashboard/library/recipes/${recipeId}`);
     };
 
     return (
@@ -640,7 +640,7 @@ export function RecipesView({
                                     if (onRecipeClick) {
                                         onRecipeClick(recipe.id);
                                     } else {
-                                        router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/${recipe.id}`);
+                                        router.push(`/dashboard/library/recipes/${recipe.id}`);
                                     }
                                 }}
                                 className={cn(

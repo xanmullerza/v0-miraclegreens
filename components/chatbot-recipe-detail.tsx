@@ -2533,7 +2533,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                         {relatedRecipes.map((meal) => (
                                             <a
                                                 key={meal.id}
-                                                href={`/dashboard/library/meals/${meal.id}`}
+                                                href={`/dashboard/library/recipes/${meal.id}`}
                                                 className="group flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:border-emerald-500/30 hover:bg-muted transition-all"
                                             >
                                                 <div className="w-16 h-16 rounded-md overflow-hidden bg-muted border border-border flex-shrink-0">

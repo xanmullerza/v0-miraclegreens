@@ -126,7 +126,7 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
     const handleViewRecipe = () => {
         if (savedRecipeId) {
             onClose();
-            router.push(`/dashboard/library/my-recipes/${savedRecipeId}`);
+            router.push(`/dashboard/library/recipes/${savedRecipeId}`);
         }
     };
 
