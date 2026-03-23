@@ -55,12 +55,14 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
     }, [initialResults, hasInitialResults]);
 
     useEffect(() => {
-        // Skip auto-search if we have pre-loaded results (Smart Match mode)
-        if (hasInitialResults) return;
-
         const searchFoodItems = async () => {
             if (searchQuery.length < 2) {
-                setResults([]);
+                // In Smart Match mode, revert to initial results if query is cleared
+                if (hasInitialResults && initialResults) {
+                    setResults(initialResults);
+                } else {
+                    setResults([]);
+                }
                 return;
             }
 
@@ -80,7 +82,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
 
         const debounce = setTimeout(searchFoodItems, 300);
         return () => clearTimeout(debounce);
-    }, [searchQuery, hasInitialResults]);
+    }, [searchQuery, hasInitialResults, initialResults]);
 
     const handleSelectItem = async (item: FoodItemMatch) => {
         setLoading(true);
