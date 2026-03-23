@@ -2,6 +2,7 @@
 import { supabase } from '@/lib/supabase';
 import { Search, X, Database, Loader2, Sparkles, Plus, SkipForward } from 'lucide-react';
 import { searchFoodItem, getUSDAFoodDetails, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface FoodItem {
     id: string;
@@ -36,8 +37,12 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
     const [sourceFilter, setSourceFilter] = useState<'all' | 'usda' | 'local'>('all');
     const [hasInitialResults] = useState(!!initialResults && initialResults.length > 0);
     
+    // User preferences
+    const { energyUnit } = useUserPreferences();
+    
     // Manual entry state
     const [showManualEntry, setShowManualEntry] = useState(false);
+    const [energyInputUnit, setEnergyInputUnit] = useState<'kcal' | 'kJ'>(energyUnit);
     const [manualNutrition, setManualNutrition] = useState<Record<string, number>>({
         energy_kcal: 0,
         protein_g: 0,
@@ -174,14 +179,19 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
             const user_session = await supabase.auth.getSession();
             const userId = user_session.data.session?.user?.id;
 
+            // Convert energy to kcal for storage if user entered kJ
+            const energyKcal = energyInputUnit === 'kJ' 
+                ? (manualNutrition.energy_kcal || 0) / 4.184
+                : (manualNutrition.energy_kcal || 0);
+
             // Create manual food item
             const manualItem = {
                 name: initialSearchQuery,
                 common_name: null,
                 source: 'manual',
                 category: 'Manual Entry',
-                energy_kcal: manualNutrition.energy_kcal || 0,
-                energy_kj: (manualNutrition.energy_kcal || 0) * 4.184,
+                energy_kcal: energyKcal,
+                energy_kj: energyKcal * 4.184,
                 protein_g: manualNutrition.protein_g || 0,
                 carbs_g: manualNutrition.carbs_g || 0,
                 fat_g: manualNutrition.fat_g || 0,
@@ -214,6 +224,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
 
             setShowManualEntry(false);
             setManualNutrition({ energy_kcal: 0, protein_g: 0, fat_g: 0, carbs_g: 0 });
+            setEnergyInputUnit(energyUnit);
         } catch (err) {
             console.error('Error creating manual entry:', err);
             alert('Failed to create manual entry.');
@@ -654,14 +665,28 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                         {/* Form */}
                         <div className="p-4 space-y-3 flex-1 overflow-y-auto">
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-1">Energy (kcal)</label>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Energy ({energyInputUnit})</label>
+                                    <button
+                                        onClick={() => setEnergyInputUnit(energyInputUnit === 'kcal' ? 'kJ' : 'kcal')}
+                                        className="text-[10px] font-bold uppercase tracking-widest rounded px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all"
+                                    >
+                                        Switch to {energyInputUnit === 'kcal' ? 'kJ' : 'kcal'}
+                                    </button>
+                                </div>
                                 <input
                                     type="number"
                                     value={manualNutrition.energy_kcal === 0 ? '' : manualNutrition.energy_kcal}
                                     onChange={(e) => setManualNutrition({...manualNutrition, energy_kcal: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0})}
-                                    placeholder="Enter kcal"
+                                    placeholder={`Enter ${energyInputUnit}`}
                                     className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                                 />
+                                {energyInputUnit === 'kcal' && manualNutrition.energy_kcal > 0 && (
+                                    <p className="text-[10px] text-muted-foreground mt-1">≈ {(manualNutrition.energy_kcal * 4.184).toFixed(0)} kJ</p>
+                                )}
+                                {energyInputUnit === 'kJ' && manualNutrition.energy_kcal > 0 && (
+                                    <p className="text-[10px] text-muted-foreground mt-1">≈ {(manualNutrition.energy_kcal / 4.184).toFixed(0)} kcal</p>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-3 gap-2">
@@ -701,7 +726,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                             </div>
 
                             <p className="text-[10px] text-muted-foreground italic">
-                                Enter nutrition values per 100g. These will be normalized.
+                                Enter values per 100g. Energy in {energyInputUnit} (will convert automatically). Click "Switch to {energyInputUnit === 'kcal' ? 'kJ' : 'kcal'}" to change units.
                             </p>
                         </div>
 
