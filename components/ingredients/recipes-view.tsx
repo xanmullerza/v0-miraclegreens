@@ -12,7 +12,8 @@ import {
     Pencil,
     Trash2,
     CheckSquare,
-    Square
+    Square,
+    Search
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -68,6 +69,8 @@ interface RecipesViewProps {
     onRecipeClick?: (recipeId: string) => void;
     sortField?: string;
     sortDirection?: 'asc' | 'desc';
+    searchQuery?: string;
+    onSearchChange?: (query: string) => void;
 }
 
 export function RecipesView({
@@ -85,7 +88,9 @@ export function RecipesView({
     setShowAddRecipe,
     onRecipeClick,
     sortField: externalSortField,
-    sortDirection: externalSortDirection
+    sortDirection: externalSortDirection,
+    searchQuery: externalSearchQuery,
+    onSearchChange
 }: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
@@ -120,6 +125,10 @@ export function RecipesView({
     
     const sortField = externalSortField !== undefined ? externalSortField : localSortField;
     const sortDirection = externalSortDirection !== undefined ? externalSortDirection : localSortDirection;
+    
+    // Use external searchQuery if provided, otherwise use internal from useSearch
+    const effectiveSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
+    
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
@@ -135,7 +144,7 @@ export function RecipesView({
         if (!authLoading) {
             fetchRecipes(0, true);
         }
-    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty]);
+    }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty]);
 
     // Fetch pantry items when needed
     const getPantryItems = async () => {
@@ -191,7 +200,7 @@ export function RecipesView({
 
 
             const { recipes: fetchedRecipes, count } = await fetchRecipesBridge({
-                searchQuery,
+                searchQuery: effectiveSearchQuery,
                 selectedTypes,
                 showFavoritesOnly,
                 page: 0,
@@ -608,6 +617,25 @@ export function RecipesView({
                                     </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>
+                        </div>
+                    </div>
+
+                    {/* Search Input */}
+                    <div className="flex-1 md:flex-none relative">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                            <input
+                                type="text"
+                                value={externalSearchQuery ?? ''}
+                                onChange={(e) => onSearchChange?.(e.target.value)}
+                                placeholder="Search recipes..."
+                                className={cn(
+                                    "w-full md:w-64 h-8 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                    "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                    "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                    "focus:bg-white dark:focus:bg-slate-800 focus:border-blue-400 dark:focus:border-blue-600 focus:ring-0"
+                                )}
+                            />
                         </div>
                     </div>
                 </div>
