@@ -1,4 +1,4 @@
-﻿import { Shield, Zap, Brain, Heart, Leaf, Sparkles, Bone } from 'lucide-react';
+import { Shield, Zap, Brain, Heart, Leaf, Sparkles, Bone } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -97,7 +97,7 @@ export function WhyVitala() {
 
 				{/* <div className="flex justify-center mt-8">
 					<Button asChild size="lg" className="px-8">
-						<Link href="/browse">Find Out More</Link>
+						<Link href="/about-us">Find Out More</Link>
 					</Button>
 				</div> */}
 

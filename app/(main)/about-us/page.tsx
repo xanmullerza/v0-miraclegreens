@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
@@ -6,18 +6,18 @@ import { cn } from '@/lib/utils';
 import { Info, Shield, HelpCircle, BookOpen, Globe, Scale, Mail, MessageCircle, Phone } from 'lucide-react';
 
 const tabs = [
-    { id: 'about', label: 'About Us', icon: Info },
+    { id: 'mission', label: 'Mission', icon: Info },
     { id: 'privacy', label: 'Privacy', icon: Shield },
     { id: 'support', label: 'Support', icon: HelpCircle },
     { id: 'terms', label: 'Terms', icon: BookOpen },
 ];
 
 export default function BrowsePage() {
-    const [activeTab, setActiveTab] = useState('about');
+    const [activeTab, setActiveTab] = useState('mission');
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'about':
+            case 'mission':
                 return (
                     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <section className="text-center max-w-2xl mx-auto space-y-4">
@@ -337,7 +337,7 @@ export default function BrowsePage() {
                             className={cn(
                                 "flex items-center gap-2 px-3 md:px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
                                 activeTab === tab.id
-                                    ? tab.id === 'about'
+                                    ? tab.id === 'mission'
                                         ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
                                         : tab.id === 'privacy'
                                         ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"

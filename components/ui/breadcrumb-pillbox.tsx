@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -21,7 +21,7 @@ const segmentIconMap: Record<string, React.ComponentType<{ size?: number; classN
     meals: Utensils,
     profile: User,
     settings: Settings,
-    browse: Globe,
+    'about-us': Globe,
 };
 
 interface BreadcrumbPillboxProps {
@@ -120,14 +120,14 @@ export function BreadcrumbPillbox({
             )}>
                 {/* Left side - Toggle Button (Browse <-> Home) */}
                 <Link
-                    href={pathname.includes('/browse') ? '/dashboard' : '/browse'}
+                    href={pathname.includes('/about-us') ? '/dashboard' : '/about-us'}
                     className={cn(
                         "flex transition-all duration-500 h-12 w-12 border-r border-slate-200 dark:border-slate-800 mr-2 items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:outline-none",
                         isSearchExpanded ? "w-0 opacity-0 overflow-hidden" : "flex-shrink-0"
                     )}
-                    title={pathname.includes('/browse') ? 'Home' : 'Browse'}
+                    title={pathname.includes('/about-us') ? 'Home' : 'About Us'}
                 >
-                    {pathname.includes('/browse') ? <Home size={18} /> : <Globe size={18} />}
+                    {pathname.includes('/about-us') ? <Home size={18} /> : <Globe size={18} />}
                 </Link>
 
                 {/* Center - Breadcrumb or Search Input */}
