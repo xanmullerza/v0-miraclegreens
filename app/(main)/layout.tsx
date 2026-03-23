@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle, ArrowLeft } from 'lucide-react';
+import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle, ArrowLeft, Home, ChefHat, Leaf, Beaker } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { ChatbotModal } from '@/components/chatbot-modal';
@@ -96,28 +96,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         return 'Toggle View';
     };
 
-    const getBreadcrumbs = () => {
-        const segments = pathname.split('/').filter(Boolean);
-        const humanize = (segment: string) => {
-            if (segment === 'dashboard') return 'Dashboard';
-            if (segment === 'library') return 'Library';
-            if (segment === 'meal-o-matic') return 'Meal-o-Matic';
-            if (segment === 'home') return 'Home';
-            return segment
-                .split('-')
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-        };
-
-        return segments.map((segment, index) => (
-            <span key={`${segment}-${index}`} className="flex items-center gap-1">
-                {index > 0 && <span className="text-slate-300 dark:text-slate-600">/</span>}
-                <span className="font-semibold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest whitespace-nowrap">
-                    {humanize(segment)}
-                </span>
-            </span>
-        ));
-    };
+    const navItems = [
+        { label: 'Home', path: '/', icon: Home },
+        { label: 'Recipes', path: '/recipes', icon: ChefHat },
+        { label: 'Foods', path: '/foods', icon: Leaf },
+        { label: 'Nutrients', path: '/dashboard/widgets/nutridex', icon: Beaker },
+    ];
 
     return (
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
@@ -141,22 +125,31 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         </div>
                     </div>
 
-                    {/* Breadcrumb Bar - Spans Full Width (Mobile Only) */}
-                    <div className="flex lg:hidden items-center gap-3 px-4 py-2 border-b border-border shrink-0 bg-background/80 backdrop-blur-sm">
-                        <button
-                            onClick={() => router.back()}
-                            className="p-1 hover:bg-accent rounded-lg transition-colors text-muted-foreground"
-                            title="Back"
-                        >
-                            <ArrowLeft size={14} />
-                        </button>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Zum</span>
-                            <span className="text-border">/</span>
-                            <div className="flex items-center gap-2">
-                                {getBreadcrumbs()}
-                            </div>
-                        </div>
+                    {/* Navigation Bar - Full Width */}
+                    <div className="flex items-center gap-2 px-4 py-3 border-b border-border shrink-0 bg-background/80 backdrop-blur-sm overflow-x-auto">
+                        {navItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = pathname === item.path || 
+                                           (item.path === '/' && pathname === '/home') ||
+                                           (item.path === '/' && pathname === '/');
+                            
+                            return (
+                                <button
+                                    key={item.path}
+                                    onClick={() => router.push(item.path)}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap text-[10px] font-black uppercase tracking-widest transition-all shrink-0",
+                                        isActive
+                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                                            : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                                    )}
+                                    title={item.label}
+                                >
+                                    <Icon size={14} />
+                                    <span className="hidden sm:inline">{item.label}</span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </>
             )}
