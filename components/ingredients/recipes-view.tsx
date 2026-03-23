@@ -283,7 +283,7 @@ export function RecipesView({
             // 4. Pantry Filter
             if (filters.pantryMode === 'pantry-only') {
                 const pantryIds = new Set(currentPantry.map(pi => pi.food_item_id || pi.id));
-                const pantryNames = new Set(currentPantry.map(pi => pi.name?.toLowerCase().trim()).filter(Boolean));
+                const pantryNames = new Set(currentPantry.map(pi => (pi.name || '').toLowerCase().trim()).filter(Boolean));
 
                 filteredItems = filteredItems.filter(r => {
                     const recipeIngredients = (r as any).ingredients || [];
@@ -297,7 +297,7 @@ export function RecipesView({
                         if (!filters.showSupplements && category === 'supplements') return false;
 
                         const inPantry = pantryIds.has(ing.food_item_id) || 
-                                       pantryNames.has(ing.item?.toLowerCase().trim());
+                                       pantryNames.has((ing.item || '').toLowerCase().trim());
 
                         return !inPantry;
                     });
