@@ -744,7 +744,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 }]);
 
                 // Call n8n webhook with recipe-url content type
-                const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -867,7 +867,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             const userId = user?.id || 'anonymous';
 
             // Call n8n webhook
-            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1003,7 +1003,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             formData.append('contentType', 'audio');
 
             // Call n8n webhook to transcribe audio
-            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 body: formData
             });
@@ -1047,7 +1047,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
             // Now send the transcribed text to get a bot response
             try {
-                const chatResponse = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+                const chatResponse = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1143,7 +1143,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             formData.append('contentType', 'image');
 
             // Call n8n webhook
-            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 body: formData
             });
@@ -1646,7 +1646,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             }]);
 
             // Call n8n webhook to parse the recipe content
-            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1775,7 +1775,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             }]);
 
             // Call n8n webhook to parse the recipe URL
-            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

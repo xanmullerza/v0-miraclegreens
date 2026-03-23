@@ -100,7 +100,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
             const userId = user?.id || 'anonymous';
 
             // Call n8n webhook to parse recipe
-            const response = await fetch('https://vitalagreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
