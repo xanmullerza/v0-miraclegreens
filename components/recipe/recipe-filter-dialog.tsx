@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, RotateCcw, Save, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, RotateCcw, Save, ChevronDown, ChevronUp, Search, Tag, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { EQUIPMENT_CATEGORIES } from '@/lib/utils/equipment-inference';
 
 import {
@@ -74,8 +77,11 @@ export function RecipeFilterDialog({
   const { filters, updateFilter, resetToProfile, hasActiveFilters } =
     useRecipeFilter();
   const { profile, updateProfile } = useUserPreferences();
+  const { fetchAllTags } = useDataPersistence();
 
   const [localFilters, setLocalFilters] = useState(filters);
+  const [tagSearchQuery, setTagSearchQuery] = useState('');
+  const [allSystemTags, setAllSystemTags] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     cookingSetup: true,
@@ -99,6 +105,13 @@ export function RecipeFilterDialog({
 
   useEffect(() => {
     setLocalFilters(filters);
+    if (isOpen) {
+      fetchAllTags().then(tags => {
+        // Merge predefined with system tags and deduplicate
+        const merged = Array.from(new Set([...PREDEFINED_TAGS, ...tags])).sort();
+        setAllSystemTags(merged);
+      });
+    }
   }, [filters, isOpen]);
 
   const handleToggleSection = (section: SectionKey) => {
@@ -604,21 +617,79 @@ export function RecipeFilterDialog({
         </button>
         {(expandedSections as any).tags && (
           <div className="p-4 bg-white dark:bg-slate-900 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {PREDEFINED_TAGS.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => handleTagToggle(tag)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all",
-                    localFilters.selectedTags.includes(tag)
-                      ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                      : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-emerald-300"
-                  )}
-                >
-                  {tag}
-                </button>
-              ))}
+            {/* Tag Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Search or add custom tags..."
+                value={tagSearchQuery}
+                onChange={(e) => setTagSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && tagSearchQuery.trim()) {
+                    e.preventDefault();
+                    const newTag = tagSearchQuery.trim().startsWith('#') ? tagSearchQuery.trim() : `#${tagSearchQuery.trim()}`;
+                    if (!localFilters.selectedTags.includes(newTag)) {
+                      handleTagToggle(newTag);
+                    }
+                    setTagSearchQuery('');
+                  }
+                }}
+                className="pl-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 h-10 text-[11px] font-bold uppercase tracking-widest placeholder:lowercase placeholder:font-normal"
+              />
+            </div>
+
+            {/* Selected Tags Display */}
+            {localFilters.selectedTags.length > 0 && (
+              <div className="flex flex-wrap gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                {localFilters.selectedTags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5"
+                  >
+                    {tag}
+                    <button onClick={() => handleTagToggle(tag)} className="hover:text-emerald-800 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* Suggestions List */}
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Suggestions</p>
+              <div className="flex flex-wrap gap-2">
+                {allSystemTags
+                  .filter(tag => 
+                    !localFilters.selectedTags.includes(tag) && 
+                    tag.toLowerCase().includes(tagSearchQuery.toLowerCase())
+                  )
+                  .slice(0, 12)
+                  .map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => handleTagToggle(tag)}
+                      className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 hover:border-emerald-300 hover:text-emerald-500 transition-all flex items-center gap-1.5"
+                    >
+                      <Plus className="w-3 h-3" />
+                      {tag}
+                    </button>
+                  ))}
+                {tagSearchQuery.trim() && !allSystemTags.some(t => t.toLowerCase() === tagSearchQuery.toLowerCase().trim()) && (
+                   <button
+                    onClick={() => {
+                      const newTag = tagSearchQuery.trim().startsWith('#') ? tagSearchQuery.trim() : `#${tagSearchQuery.trim()}`;
+                      handleTagToggle(newTag);
+                      setTagSearchQuery('');
+                    }}
+                    className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-dashed border-emerald-500/50 bg-emerald-500/5 text-emerald-600 hover:bg-emerald-500/10 transition-all flex items-center gap-1.5"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Add "{tagSearchQuery.trim().startsWith('#') ? tagSearchQuery.trim() : `#${tagSearchQuery.trim()}`}"
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}

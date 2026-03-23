@@ -423,6 +423,29 @@ export function useDataPersistence() {
         }
     };
 
+    const fetchAllTags = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('recipes')
+                .select('tags');
+
+            if (error) throw error;
+
+            // Flatten and deduplicate tags
+            const uniqueTags = new Set<string>();
+            data?.forEach(r => {
+                if (r.tags && Array.isArray(r.tags)) {
+                    r.tags.forEach(tag => uniqueTags.add(tag));
+                }
+            });
+
+            return Array.from(uniqueTags).sort();
+        } catch (error) {
+            console.error('Error in useDataPersistence.fetchAllTags:', error);
+            return [];
+        }
+    };
+
     return {
         user,
         loading,
@@ -430,6 +453,7 @@ export function useDataPersistence() {
         saveRecipe,
         deleteRecipe,
         getRecipe,
+        fetchAllTags,
         recipeRefreshVersion
     };
 }
