@@ -98,7 +98,10 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                     micronutrients: item.micronutrients || {},
                     portions: item.portions || []
                 });
-                onClose();
+                // Only close if NOT in Smart Match mode
+                if (!hasInitialResults) {
+                    onClose();
+                }
                 return;
             }
 
@@ -138,7 +141,10 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
                     micronutrients: detailedItem.micronutrients,
                     portions: uniquePortions
                 });
-                onClose();
+                // Only close if NOT in Smart Match mode
+                if (!hasInitialResults) {
+                    onClose();
+                }
             }
         } catch (err) {
             console.error('Error selecting item:', err);
