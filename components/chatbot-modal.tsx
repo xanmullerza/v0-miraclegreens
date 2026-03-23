@@ -231,6 +231,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const { user, saveRecipe } = useDataPersistence();
     const { profile } = useUserPreferences();
     const { filters } = useRecipeFilter();
+    const { chatbotView, setChatbotView } = useChatbot();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
     const INITIAL_MESSAGES: Message[] = [
@@ -270,9 +271,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [videoURL, setVideoURL] = useState('');
     const [isDragging, setIsDragging] = useState(false);
     const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
-    
-    // Chatbot view state - ALWAYS reset to 'dashboard' on refresh (new session)
-    const [chatbotView, setChatbotView] = useState<'dashboard' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes'>('dashboard');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
 
     const getChatbotViewTitle = () => {

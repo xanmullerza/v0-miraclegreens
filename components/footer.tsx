@@ -8,7 +8,7 @@ import { useChatbot } from '@/lib/context/chatbot-context';
 export function Footer() {
   const router = useRouter();
   const pathname = usePathname();
-  const { setIsChatbotOpen } = useChatbot();
+  const { setIsChatbotOpen, setChatbotView } = useChatbot();
 
   // Hide footer on specific pages
   if (pathname === '/foods' || pathname.startsWith('/foods/') || pathname === '/dashboard/library/widgets' || pathname === '/dashboard/widgets/comparator' || pathname === '/dashboard/widgets/nutridex' || pathname === '/dashboard/widgets/lifeguard' || pathname.startsWith('/dashboard/widgets/nutridex/')) {
@@ -36,23 +36,27 @@ export function Footer() {
             <Home size={24} />
           </button>
 
-          {/* Grid (Dashboard) Button */}
+          {/* Grid (Apps/Dashboard) Button - Shows app grid: cookbook, planner, widgets */}
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={() => {
+              setIsChatbotOpen(true);
+              setChatbotView('dashboard');
+            }}
             className={cn(
               "w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-95 group",
-              pathname.startsWith('/dashboard')
-                ? "bg-emerald-500 text-white shadow-emerald-500/40"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
+              "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
             )}
-            title="Dashboard"
+            title="Apps Grid"
           >
             <Grid2x2 size={24} className="group-hover:scale-110 transition-transform" />
           </button>
 
-          {/* Chat Button */}
+          {/* Chat Button - Opens chatbot conversation */}
           <button
-            onClick={() => setIsChatbotOpen(true)}
+            onClick={() => {
+              setIsChatbotOpen(true);
+              setChatbotView('messages');
+            }}
             className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
             title="Chat"
           >
