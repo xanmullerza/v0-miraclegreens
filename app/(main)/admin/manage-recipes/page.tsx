@@ -210,7 +210,7 @@ export default function ManageRecipesPage() {
 
                             <div className="flex gap-2 mt-auto">
                                 <Button
-                                    onClick={() => router.push(`/recipes/${recipe.id}/edit`)}
+                                    onClick={() => router.push(`/dashboard/library/meals/new?edit=${recipe.id}`)}
                                     className="flex-1 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-black uppercase tracking-widest text-[10px] h-10 gap-2"
                                 >
                                     <Edit2 size={12} />

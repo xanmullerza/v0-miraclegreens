@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -283,9 +283,13 @@ function UserRecipeBuilder() {
                 id: editingRecipeId || undefined
             };
 
-            await saveRecipe(recipeData, ingredients, instructions);
+            const saved = await saveRecipe(recipeData, ingredients, instructions);
             toast.success(`${isMix ? 'Mix' : 'Protocol'} saved successfully!`);
-            router.push(`/dashboard/library/${isMix ? 'mixes' : 'recipes'}`);
+            if (saved?.id) {
+                router.push(`/recipes/${saved.id}`);
+            } else {
+                router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}`);
+            }
         } catch (error: any) {
             toast.error(`Failed to save: ${error.message}`);
         } finally {
