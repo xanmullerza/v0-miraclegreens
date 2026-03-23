@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2, Clock, ChefHat } from 'lucide-react';
+import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2, Clock, ChefHat, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -3867,13 +3867,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 setRecipeInstructions(['']);
                                 setRecipeImage('');
                             } else {
-                                window.history.back();
+                                router.push('/');
                             }
                         }}
                         className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
-                        title="Go Back"
+                        title="Go Home"
                     >
-                        <ChevronLeft size={24} />
+                        <Home size={24} />
                     </button>
                     
                     <button
