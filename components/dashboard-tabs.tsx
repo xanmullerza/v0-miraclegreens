@@ -42,10 +42,10 @@ const TAB_CONFIG: TopTab[] = [
         color: 'text-muted-foreground',
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
-        defaultHref: '/dashboard/library/foods',
-        matchPaths: ['/dashboard/library/foods', '/dashboard/library/meals', '/dashboard/library/widgets'],
+        defaultHref: '/foods',
+        matchPaths: ['/foods', '/dashboard/library/meals', '/dashboard/library/widgets'],
         subtabs: [
-            { id: 'foods', label: 'Foods', href: '/dashboard/library/foods', icon: Leaf },
+            { id: 'foods', label: 'Foods', href: '/foods', icon: Leaf },
             { id: 'meals', label: 'Meals', href: '/dashboard/library/meals', icon: ChefHat },
             { id: 'widgets', label: 'Widgets', href: '/dashboard/library/widgets', icon: LayoutGrid },
         ],

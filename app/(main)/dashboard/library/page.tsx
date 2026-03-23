@@ -7,7 +7,7 @@ export default function IngredientsPage() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace("/dashboard/library/foods");
+        router.replace("/foods");
     }, [router]);
 
     return null;

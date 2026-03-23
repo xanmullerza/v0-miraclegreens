@@ -7,7 +7,7 @@ export function Footer() {
   const pathname = usePathname();
 
   // Hide footer on foods page, library/widgets page and individual widget pages
-  if (pathname === '/dashboard/library/foods' || pathname === '/dashboard/library/widgets' || pathname === '/dashboard/widgets/comparator' || pathname === '/dashboard/widgets/nutridex' || pathname === '/dashboard/widgets/lifeguard' || pathname.startsWith('/dashboard/widgets/nutridex/')) {
+  if (pathname === '/foods' || pathname.startsWith('/foods/') || pathname === '/dashboard/library/widgets' || pathname === '/dashboard/widgets/comparator' || pathname === '/dashboard/widgets/nutridex' || pathname === '/dashboard/widgets/lifeguard' || pathname.startsWith('/dashboard/widgets/nutridex/')) {
     return null;
   }
 

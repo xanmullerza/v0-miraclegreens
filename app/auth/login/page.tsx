@@ -188,7 +188,7 @@ function LoginContent() {
                         </Link>
 
                         <Link
-                            href="/dashboard/library/foods"
+                            href="/foods"
                             className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-rose-500/50 hover:bg-rose-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-rose-500/10"
                         >
                             <div className="w-12 h-12 shrink-0 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover/nudge:scale-110 transition-transform duration-500">
