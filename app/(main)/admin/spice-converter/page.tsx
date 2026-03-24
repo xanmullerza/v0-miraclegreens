@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { LabView } from '@/app/(main)/foods/views/lab-view';
+import { LabView } from '@/components/ingredients/lab-view';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminSpiceConverter() {

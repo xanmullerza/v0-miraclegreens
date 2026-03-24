@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
-import { CompareView } from '../../../foods/views/compare-view';
+import { CompareView } from '@/components/ingredients/compare-view';
 import { PageContainer } from '@/components/ui/page-container';
 
 export default function CompareFoodsPage() {
