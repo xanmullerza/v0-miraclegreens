@@ -713,73 +713,92 @@ export async function parseBBCGoodFood(url: string): Promise<any> {
 
         // Extract cook time - try multiple patterns for different BBC layouts
         let cook_time = 0;
-        // Try patterns: "Cook: 55 mins", "cook time 55 mins", "cooking time:", etc.
-        let cookMatch = html.match(/cook(?:ing)?[\s:]*time[\s:]*([\d.]+)\s*(?:hrs?|h\s|hours?)?[\s]*([\d.]+)?\s*mins?/i);
+        // Pattern 1: "Cook: 55 mins" or "Cook:55mins" (BBC recent format)
+        let cookMatch = html.match(/Cook:\s*(\d+)\s*(?:min|minute)s?/i);
         if (!cookMatch) {
-            // Try simpler: "Cook: 55 mins"
-            cookMatch = html.match(/>\s*Cook[\s:]*\s*([^\n<]+(?:mins?|hours?))/i);
+            // Pattern 2: "cook time 55 mins"
+            cookMatch = html.match(/cook\s+time[\s:]*(\d+)\s*(?:hrs?|hours?|min|minute)s?/i);
         }
         if (!cookMatch) {
-            // Try data attributes or aria labels
-            cookMatch = html.match(/data-cook[\s:]*"?([\d.]+)/i);
+            // Pattern 3: "cooking: 55 mins" 
+            cookMatch = html.match(/cooking[\s:]*(\d+)\s*(?:hrs?|hours?|min|minute)s?/i);
         }
         if (!cookMatch) {
-            // Try text content: "55 mins cooking time"
-            cookMatch = html.match(/([\d.]+)\s*(?:mins?|hours?)\s*(?:cook|cooking)/i);
+            // Pattern 4: Look for pattern where hours and minutes are separate
+            cookMatch = html.match(/Cook:\s*(\d+)\s*(?:hrs?|hours?)\s*(?:and\s+)?(\d+)\s*(?:min|minute)s?/i);
         }
         
         if (cookMatch) {
             if (cookMatch[2]) {
-                // Format: "1 hr 30 mins"
+                // Format: "1 hr 30 mins" -> convert to total minutes
                 cook_time = Math.round(parseInt(cookMatch[1], 10) * 60 + parseInt(cookMatch[2], 10));
             } else if (cookMatch[1]) {
-                // Check if it contains "hour" or "hr"
+                // Check if the full match contains "hour" or "hr"
                 const fullMatch = cookMatch[0].toLowerCase();
                 if (fullMatch.includes('hour') || fullMatch.includes('hr')) {
                     cook_time = Math.round(parseInt(cookMatch[1], 10) * 60);
                 } else {
-                    // Format: "30 mins"
+                    // Format: "55 mins"
                     cook_time = Math.round(parseInt(cookMatch[1], 10));
                 }
             }
         }
+        
+        console.log('🍳 Cook time extraction:', { cookMatch: cookMatch ? cookMatch[0] : 'no match', cook_time });
 
         // Calculate total "ready in" time (prep + cook)
         const readyInTime = prep_time + cook_time;
 
         // Extract difficulty - try multiple patterns
         let difficulty: string | undefined;
-        // Pattern 1: "Difficulty:" label format
-        let difficultyMatch = html.match(/difficulty[\s:]*([^<\n,]+)/i);
-        // Pattern 2: difficulty as button/span content
+        // Pattern 1: Direct text match for Easy/Medium/Hard (BBC common format)
+        let difficultyMatch = html.match(/(Easy|Medium|Hard|Very\s+Easy|Very\s+Hard)/i);
+        // Pattern 2: "Difficulty:" label format
+        if (!difficultyMatch) {
+            difficultyMatch = html.match(/difficulty[\s:]*([^<\n,]+)/i);
+        }
+        // Pattern 3: difficulty as button/span content
         if (!difficultyMatch) {
             difficultyMatch = html.match(/<button[^>]*>([Ee]asy|[Mm]edium|[Hh]ard|[Vv]ery\s+[Ee]asy|[Vv]ery\s+[Hh]ard)<\/button>/i);
         }
-        // Pattern 3: difficulty in data attributes
+        // Pattern 4: difficulty in data attributes
         if (!difficultyMatch) {
             difficultyMatch = html.match(/data-difficulty="([^"]+)"/i);
-        }
-        // Pattern 4: difficulty in aria-label
-        if (!difficultyMatch) {
-            difficultyMatch = html.match(/difficulty.*?([Ee]asy|[Mm]edium|[Hh]ard|[Vv]ery\s+[Ee]asy|[Vv]ery\s+[Hh]ard)/i);
         }
         if (difficultyMatch) {
             difficulty = difficultyMatch[1].trim().charAt(0).toUpperCase() + difficultyMatch[1].trim().slice(1).toLowerCase();
         }
+        console.log('📊 Difficulty extraction:', { difficultyMatch: difficultyMatch ? difficultyMatch[1] : 'no match', difficulty });
 
         // Extract tags - try multiple patterns
         let tags: string[] = [];
         
-        // Pattern 1: Look for badge/tag spans
-        let tagMatches = html.matchAll(/<span[^>]*class="[^"]*(?:tag|badge|label|pill)[^"]*"[^>]*>([^<]+)<\/span>/gi);
-        for (const match of tagMatches) {
-            const tag = match[1].trim();
-            if (tag && tag.length > 0 && tag.toLowerCase() !== 'save recipe') {
+        // Pattern 1: Look for common BBC recipe properties/badges
+        // Common ones: Freezable, Vegetarian, Vegan, Egg-free, Nut-free, Dairy-free, Gluten-free, Healthy, etc.
+        const commonTags = [
+            'Freezable', 'Vegetarian', 'Vegan', 'Egg-free', 'Nut-free', 'Dairy-free', 'Gluten-free',
+            'Healthy', 'Quick', 'Easy', 'Budget-friendly', 'Family-friendly', 'One-pot', 'Batch-cooked',
+            'Low-calorie', 'Low-fat', 'High-protein', 'Easily doubled'
+        ];
+        
+        for (const tag of commonTags) {
+            if (new RegExp(tag, 'i').test(html)) {
                 tags.push(tag);
             }
         }
         
-        // Pattern 2: Look in data attributes
+        // Pattern 2: Look for badge/tag spans if pattern 1 didn't find much
+        if (tags.length === 0) {
+            let tagMatches = html.matchAll(/<span[^>]*class="[^"]*(?:tag|badge|label|pill)[^"]*"[^>]*>([^<]+)<\/span>/gi);
+            for (const match of tagMatches) {
+                const tag = match[1].trim();
+                if (tag && tag.length > 0 && tag.toLowerCase() !== 'save recipe') {
+                    tags.push(tag);
+                }
+            }
+        }
+        
+        // Pattern 3: Look in data attributes
         if (tags.length === 0) {
             tagMatches = html.matchAll(/data-tag="([^"]+)"/gi);
             for (const match of tagMatches) {
@@ -790,19 +809,7 @@ export async function parseBBCGoodFood(url: string): Promise<any> {
             }
         }
         
-        // Pattern 3: Look for recipe properties/characteristics (common BBC patterns)
-        if (tags.length === 0) {
-            const tagsSection = html.match(/(?:recipes|properties|characteristics)[^<]*(?:<[^>]*>[^<]+<\/[^>]*>)*[\s\S]*?(?=<\/section>|<\/div>|<\/article>)/i);
-            if (tagsSection) {
-                const tagPatterns = tagsSection[0].match(/([A-Z][a-z\s\-]+?)(?:<\/|&|$)/g) || [];
-                for (const tag of tagPatterns) {
-                    const cleaned = tag.replace(/[<\/>&#;]/g, '').trim();
-                    if (cleaned && cleaned.length > 2 && cleaned.length < 50) {
-                        tags.push(cleaned);
-                    }
-                }
-            }
-        }
+        console.log('🏷️  Tags extraction:', { tags, foundCount: tags.length });
 
         // Extract ingredients
         let ingredientsText = '';
