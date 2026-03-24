@@ -135,12 +135,14 @@ interface Instruction {
 
 interface ChatbotRecipeDetailProps {
     recipeId: string;
-    onBack: () => void;
+    onBack?: () => void;
     onShare?: (recipe: any) => void;
     onRemix?: (recipe: any, ingredients: any[], instructions: any[]) => void;
+    // For standalone page mode (optional)
+    isStandalone?: boolean;
 }
 
-export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: ChatbotRecipeDetailProps) {
+export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStandalone = false }: ChatbotRecipeDetailProps) {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
@@ -1062,12 +1064,14 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
         return (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 p-4">
                 <p className="text-slate-500 text-center">Recipe not found</p>
-                <button
-                    onClick={onBack}
-                    className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-sm hover:bg-slate-200 dark:hover:bg-slate-700"
-                >
-                    Go Back
-                </button>
+                {onBack && (
+                    <button
+                        onClick={onBack}
+                        className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-sm hover:bg-slate-200 dark:hover:bg-slate-700"
+                    >
+                        Go Back
+                    </button>
+                )}
             </div>
         );
     }
@@ -1076,13 +1080,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
         <div className="flex-1 overflow-y-auto flex flex-col bg-white dark:bg-slate-900">
             {/* Header with back button */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                <button
-                    onClick={onBack}
-                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
-                    title="Back"
-                >
-                    <ArrowLeft size={18} />
-                </button>
+                {onBack ? (
+                    <button
+                        onClick={onBack}
+                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                        title="Back"
+                    >
+                        <ArrowLeft size={18} />
+                    </button>
+                ) : (
+                    <div className="w-9" />
+                )}
                 <h2 className="text-base font-semibold text-slate-900 dark:text-white flex-1 text-center px-2 truncate">
                     {recipe.title}
                 </h2>
@@ -2752,7 +2760,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                     recipeId={recipe.id} 
                                     onDeleted={() => {
                                         toast.success('Recipe deleted successfully');
-                                        onBack();
+                                        if (onBack) onBack();
                                     }} 
                                 />
                             </div>
