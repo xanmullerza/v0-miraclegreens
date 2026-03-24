@@ -1201,56 +1201,58 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                 {/* Content Sections */}
                 {activeSection === 'recipe' && (
                     <>
-                        {/* Nutritional Info */}
-                        <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/30 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                            <div className="flex items-center justify-between mb-3">
-                                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                                    Nutritional Info ({nutritionViewMode === 'per-serving' ? `per serving (1 of ${recipe.servings})` : `total (${recipe.servings} servings)`})
-                                </p>
-                                <div className="flex bg-slate-100 dark:bg-slate-800 rounded-md p-0.5 border border-slate-200 dark:border-slate-700 gap-0.5">
-                                    <button 
-                                        onClick={() => setNutritionViewMode('per-serving')}
-                                        className={cn(
-                                            "px-2 py-0.5 text-[7px] font-bold uppercase tracking-widest rounded transition-all",
-                                            nutritionViewMode === 'per-serving' 
-                                                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                                                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                                        )}
-                                    >
-                                        Per Serving
-                                    </button>
-                                    <button 
-                                        onClick={() => setNutritionViewMode('total')}
-                                        className={cn(
-                                            "px-2 py-0.5 text-[7px] font-bold uppercase tracking-widest rounded transition-all",
-                                            nutritionViewMode === 'total' 
-                                                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                                                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                                        )}
-                                    >
-                                        Total
-                                    </button>
+                        {/* Nutritional Info - Only show if smart match has populated nutrition data */}
+                        {calculatedNutrition.calories > 0 || calculatedNutrition.protein > 0 || calculatedNutrition.fat > 0 || calculatedNutrition.carbs > 0 ? (
+                            <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/30 rounded-lg p-4 border border-slate-200 dark:border-slate-700 animate-in fade-in duration-300">
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                        Nutritional Info ({nutritionViewMode === 'per-serving' ? `per serving (1 of ${recipe.servings})` : `total (${recipe.servings} servings)`})
+                                    </p>
+                                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-md p-0.5 border border-slate-200 dark:border-slate-700 gap-0.5">
+                                        <button 
+                                            onClick={() => setNutritionViewMode('per-serving')}
+                                            className={cn(
+                                                "px-2 py-0.5 text-[7px] font-bold uppercase tracking-widest rounded transition-all",
+                                                nutritionViewMode === 'per-serving' 
+                                                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                            )}
+                                        >
+                                            Per Serving
+                                        </button>
+                                        <button 
+                                            onClick={() => setNutritionViewMode('total')}
+                                            className={cn(
+                                                "px-2 py-0.5 text-[7px] font-bold uppercase tracking-widest rounded transition-all",
+                                                nutritionViewMode === 'total' 
+                                                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                            )}
+                                        >
+                                            Total
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-4 gap-3">
+                                    <div>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Calories</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.calories / recipe.servings : calculatedNutrition.calories))} kcal</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Protein</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.protein / recipe.servings : calculatedNutrition.protein) * 10) / 10}g</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Fat</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.fat / recipe.servings : calculatedNutrition.fat) * 10) / 10}g</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Carbs</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.carbs / recipe.servings : calculatedNutrition.carbs) * 10) / 10}g</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-4 gap-3">
-                                <div>
-                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Calories</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.calories / recipe.servings : calculatedNutrition.calories))} kcal</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Protein</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.protein / recipe.servings : calculatedNutrition.protein) * 10) / 10}g</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Fat</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.fat / recipe.servings : calculatedNutrition.fat) * 10) / 10}g</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Carbs</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.carbs / recipe.servings : calculatedNutrition.carbs) * 10) / 10}g</p>
-                                </div>
-                            </div>
-                        </div>
+                        ) : null}
 
                         {/* Diet Labels */}
                         {recipe.diet && recipe.diet.length > 0 && (
