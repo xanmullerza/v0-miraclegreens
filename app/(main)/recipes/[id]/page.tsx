@@ -1400,11 +1400,11 @@ export default function RecipeDetailsPage() {
                         <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                             {/* Stat Widgets */}
                             <div className="flex items-center gap-4 flex-wrap">
-                                {/* Prep Time - plain text */}
+                            {/* Ready In Time - plain text (prep + cook) */}
                                 <div className="flex items-center gap-1.5">
                                     <Clock size={14} className="text-emerald-500/50" />
-                                    <span className="text-sm font-black italic text-slate-900 dark:text-white">{recipe.prep_time}</span>
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">min</span>
+                                    <span className="text-sm font-black italic text-slate-900 dark:text-white">{recipe.prep_time + (recipe.cook_time || 0)}</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">ready in</span>
                                 </div>
 
                                 <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />

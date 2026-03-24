@@ -1158,9 +1158,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                 {activeSection === 'recipe' && (
                     <div className="grid grid-cols-2 gap-2">
                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Prep Time</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Ready in</p>
                             <p className="text-sm font-bold text-slate-900 dark:text-white">
-                                {recipe.prep_time > 0 ? `${recipe.prep_time} min` : '-'}
+                                {recipe.prep_time + (recipe.cook_time || 0) > 0 
+                                    ? `${recipe.prep_time + (recipe.cook_time || 0)} min` 
+                                    : '-'}
                             </p>
                         </div>
                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">

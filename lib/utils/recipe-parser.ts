@@ -14,6 +14,10 @@ export interface ParsedRecipe {
     title: string;
     servings: number;
     prepTime: number;
+    cookTime?: number;
+    readyInTime?: number; // Total prep + cook time
+    difficulty?: string; // e.g., "Easy", "Medium", "Hard"
+    tags?: string[]; // e.g., ["Freezable", "Vegetarian"]
     ingredients: ParsedIngredient[];
     instructions: string[];
 }
@@ -663,6 +667,162 @@ export async function parseYourTestSiteRecipe(url: string): Promise<any> {
 }
 
 /**
+ * BBC Good Food recipe parser
+ * Fetches and parses recipe data from bbcgoodfood.com
+ * Extracts: title, servings, prep time, cook time, difficulty, tags, ingredients, instructions
+ */
+export async function parseBBCGoodFood(url: string): Promise<any> {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch recipe: ${response.status}`);
+        }
+
+        const html = await response.text();
+
+        // Extract title
+        const titleMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
+        const title = titleMatch ? titleMatch[1].trim() : 'Recipe';
+
+        // Extract image URL
+        const imageMatch = html.match(/<img[^>]*src="([^"]*recipe[^"]*|[^"]*food[^"]*)"/i) || 
+                           html.match(/<img[^>]*src="([^"]+)"[^>]*>/i);
+        const image_url = imageMatch ? imageMatch[1] : undefined;
+
+        // Extract servings - look for "Serves" pattern
+        let servings = 1;
+        const servesMatch = html.match(/serves?\s+(\d+)/i);
+        if (servesMatch) {
+            servings = parseInt(servesMatch[1], 10);
+        }
+
+        // Extract prep time - look for "Prep:" or "prep time" patterns (in minutes)
+        let prep_time = 0;
+        const prepMatch = html.match(/prep[\s:]*([\d.]+)\s*(?:hrs?|h\s|hours?)?[\s]*([\d.]+)?\s*mins?/i) ||
+                          html.match(/prep[\s:]*([\d.]+)\s*mins?/i) ||
+                          html.match(/prep\s*time[\s:]*([\d.]+)/i);
+        if (prepMatch) {
+            if (prepMatch[2]) {
+                // Format: "1 hr 30 mins"
+                prep_time = Math.round(parseInt(prepMatch[1], 10) * 60 + parseInt(prepMatch[2], 10));
+            } else {
+                // Format: "30 mins"
+                prep_time = Math.round(parseInt(prepMatch[1], 10));
+            }
+        }
+
+        // Extract cook time - look for "Cook:" or "cook time" patterns (in minutes)
+        let cook_time = 0;
+        const cookMatch = html.match(/cook[\s:]*([\d.]+)\s*(?:hrs?|h\s|hours?)?[\s]*([\d.]+)?\s*mins?/i) ||
+                          html.match(/cook[\s:]*([\d.]+)\s*mins?/i) ||
+                          html.match(/cook\s*time[\s:]*([\d.]+)/i);
+        if (cookMatch) {
+            if (cookMatch[2]) {
+                // Format: "1 hr 30 mins"
+                cook_time = Math.round(parseInt(cookMatch[1], 10) * 60 + parseInt(cookMatch[2], 10));
+            } else {
+                // Format: "30 mins"
+                cook_time = Math.round(parseInt(cookMatch[1], 10));
+            }
+        }
+
+        // Calculate total "ready in" time (prep + cook)
+        const readyInTime = prep_time + cook_time;
+
+        // Extract difficulty - look for "Difficulty:" or difficulty-related patterns
+        let difficulty: string | undefined;
+        const difficultyMatch = html.match(/difficulty[\s:]*([^<\n]+)/i);
+        if (difficultyMatch) {
+            difficulty = difficultyMatch[1].trim();
+        }
+
+        // Extract tags - look for badge/tag elements
+        let tags: string[] = [];
+        // Match common tag HTML patterns
+        const tagMatches = html.matchAll(/<span[^>]*class="[^"]*tag[^"]*"[^>]*>([^<]+)<\/span>/gi);
+        for (const match of tagMatches) {
+            const tag = match[1].trim();
+            if (tag && tag.length > 0) {
+                tags.push(tag);
+            }
+        }
+        // Also try to find tags in badge-like elements
+        if (tags.length === 0) {
+            const badgeMatches = html.matchAll(/<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)<\/span>/gi);
+            for (const match of badgeMatches) {
+                const tag = match[1].trim();
+                if (tag && tag.length > 0 && !tag.toLowerCase().includes('save')) {
+                    tags.push(tag);
+                }
+            }
+        }
+
+        // Extract ingredients
+        let ingredientsText = '';
+        // Look for ingredients section
+        const ingredientsMatch = html.match(/ingredients?[^<]*<[^>]*>([\s\S]*?)(?=instructions?|method|<\/section>|<\/article>)/i);
+        if (ingredientsMatch) {
+            const ingredientsHTML = ingredientsMatch[1];
+            // Extract list items or divs containing ingredients
+            const ingredientDivs = ingredientsHTML.match(/<li[^>]*>([^<]+)<\/li>/gi) || 
+                                   ingredientsHTML.match(/<div[^>]*>([^<]+)<\/div>/gi) || [];
+            const ingredientLines: string[] = [];
+            ingredientDivs.forEach(divHTML => {
+                const textMatch = divHTML.match(/>([^<]+)</i);
+                if (textMatch) {
+                    const text = textMatch[1].trim();
+                    if (text.length > 0) {
+                        ingredientLines.push(text);
+                    }
+                }
+            });
+            ingredientsText = ingredientLines.join('\n');
+        }
+
+        // Extract instructions
+        let instructionsText = '';
+        // Look for instructions/method section
+        const instructionsMatch = html.match(/(?:instructions?|method)[^<]*<[^>]*>([\s\S]*?)(?=<\/section>|<\/article>)/i);
+        if (instructionsMatch) {
+            const instructionsHTML = instructionsMatch[1];
+            // Extract list items or divs containing instructions
+            const instructionDivs = instructionsHTML.match(/<li[^>]*>([^<]+)<\/li>/gi) || 
+                                    instructionsHTML.match(/<div[^>]*>([^<]+)<\/div>/gi) || [];
+            const instructionLines: string[] = [];
+            instructionDivs.forEach((divHTML) => {
+                const textMatch = divHTML.match(/>([^<]+)</i);
+                if (textMatch) {
+                    let text = textMatch[1].trim();
+                    // Remove step numbers if present
+                    text = text.replace(/^Step \d+[:\s]+/, '').replace(/^\d+[.\s]+/, '');
+                    if (text.length > 0) {
+                        instructionLines.push(text);
+                    }
+                }
+            });
+            instructionsText = instructionLines.join('\n');
+        }
+
+        return {
+            title: title || 'Recipe',
+            ingredients_text: ingredientsText.length > 0 ? ingredientsText : 'No ingredients found',
+            instructions_text: instructionsText.length > 0 ? instructionsText : 'No instructions found',
+            servings: servings,
+            prep_time: prep_time,
+            cook_time: cook_time,
+            ready_in_time: readyInTime, // Total time for UI display
+            difficulty: difficulty,
+            tags: tags.length > 0 ? tags : [],
+            source_url: url,
+            image_url: image_url
+        };
+    } catch (error) {
+        console.error('Error parsing BBC Good Food recipe:', error);
+        throw error;
+    }
+}
+
+/**
  * Router function to determine which parser to use based on URL domain
  * Returns recipe in chatbot-modal format (text-based ingredients/instructions)
  */
@@ -670,12 +830,13 @@ export async function parseRecipeFromURL(url: string): Promise<any> {
     const urlObj = new URL(url);
     const domain = urlObj.hostname.toLowerCase();
 
+    if (domain.includes('bbcgoodfood.com')) {
+        return parseBBCGoodFood(url);
+    }
+
     if (domain.includes('yourtestsite.xyz')) {
         return parseYourTestSiteRecipe(url);
     }
-
-    // Add more domain-specific parsers here following the same pattern
-    // if (domain.includes('bbcgoodfood.com')) { return parseBBCGoodFood(url); }
 
     throw new Error(`Recipe parsing not yet supported for domain: ${domain}`);
 }

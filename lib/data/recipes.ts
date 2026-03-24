@@ -25,6 +25,9 @@ export interface Recipe {
     diet: DietType[];
     image: string;
     prepTime: number; // in minutes
+    cookTime?: number; // in minutes
+    difficulty?: string; // e.g., "Easy", "Medium", "Hard"
+    tags?: string[]; // e.g., ["Freezable", "Vegetarian"]
     ingredients: Ingredient[];
     instructions: string[];
     servings?: number;
