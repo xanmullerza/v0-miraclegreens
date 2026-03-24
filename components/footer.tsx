@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
 import { Home, Grid2x2, MessageCircle } from 'lucide-react';
@@ -10,10 +10,6 @@ export function Footer() {
   const pathname = usePathname();
   const { setIsChatbotOpen, setChatbotView } = useChatbot();
 
-  // Hide footer on specific pages
-  if (pathname === '/foods' || pathname.startsWith('/foods/') || pathname === '/dashboard/library/widgets' || pathname === '/dashboard/widgets/comparator' || pathname === '/dashboard/widgets/nutridex' || pathname === '/dashboard/widgets/lifeguard' || pathname.startsWith('/dashboard/widgets/nutridex/')) {
-    return null;
-  }
 
   const isHome = pathname === '/' || pathname === '/home';
 
