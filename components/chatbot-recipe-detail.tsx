@@ -198,6 +198,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
         fetchRecipeDetails();
     }, [recipeId]);
 
+    // Auto-transition to Step 2 once all ingredients are decided
+    useEffect(() => {
+        if (mappingStep === 'FOOD_MATCH' && ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id])) {
+            setMappingStep('PORTION_MATCH');
+        }
+    }, [ingredients, acceptedMatches, skippedIngredients, mappingStep]);
+
     const fetchRecipeDetails = async () => {
         try {
             setLoading(true);
@@ -2358,19 +2365,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                     </div>
                 )}
 
-                {/* Step 1 Check: Are we ready to proceed to Portion Match Step 2? */}
-                {mappingStep === 'FOOD_MATCH' && ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id]) && (
-                    <div className="mt-6 flex justify-end">
-                        <button 
-                            onClick={() => setMappingStep('PORTION_MATCH')}
-                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-sm shadow-indigo-500/20 transition-all flex items-center gap-2"
-                        >
-                            Verify Portions & Nutrition <ArrowLeft className="rotate-180" size={16} />
-                        </button>
-                    </div>
-                )}
-
-                {/* Step 2: PORTION MATCHING */}
+                {/* Step 2: PORTION MATCHING (Auto-transitions when all ingredients decided) */}
                 {mappingStep === 'PORTION_MATCH' && (
                     <div className="mt-8 border-t border-border pt-6">
                         <div className="flex items-center justify-between mb-4 mt-2">
