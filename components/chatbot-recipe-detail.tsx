@@ -2159,8 +2159,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                                     <div className={cn(
                                                         "absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl p-3 flex items-center justify-between border transition-colors",
                                                         isAccepted ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800" :
-                                                        isSkipped && isFlavoring ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800" :
-                                                        isSkipped && !isFlavoring ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800" :
+                                                        isSkipped && isFlavoring ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800" :
+                                                        isSkipped && !isFlavoring ? "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800" :
                                                         isMatched && !isAccepted ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" :
                                                         "bg-card border-border"
                                                     )}>
@@ -2168,11 +2168,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                                             <div className={cn(
                                                                 "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm",
                                                                 isAccepted ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600" :
-                                                                isSkipped && isFlavoring ? "bg-blue-100 dark:bg-blue-900/50 text-blue-600" :
-                                                                isSkipped && !isFlavoring ? "bg-amber-100 dark:bg-amber-900/50 text-amber-600" :
+                                                                isSkipped && isFlavoring ? "bg-amber-100 dark:bg-amber-900/50 text-amber-600" :
+                                                                isSkipped && !isFlavoring ? "bg-rose-100 dark:bg-rose-900/50 text-rose-600" :
                                                                 "bg-muted text-muted-foreground"
                                                             )}>
-                                                                {isSkipped ? <X size={18} /> : isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
+                                                                {isSkipped && isFlavoring ? <Flame size={18} /> : isSkipped && !isFlavoring ? <X size={18} /> : isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
                                                             </div>
                                                             <div>
                                                                 <div className="flex items-center gap-2 mb-1">
