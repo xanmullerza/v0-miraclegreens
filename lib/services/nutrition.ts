@@ -79,15 +79,8 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
     // If "Ground Cumin" yields nothing, try name containing BOTH "Ground" AND "Cumin"
     // (This handles "Cumin, Ground" in the DB)
     if (!data || data.length === 0) {
-        const words = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+        const words = cleanQuery.split(/\s+/).filter(w => w.length >= 2); // Allow 2+ char words
         if (words.length > 1) {
-            let chain = supabase.from('food_items').select('*');
-            words.forEach(w => {
-                chain = chain.or(`name.ilike.%${w}%,common_name.ilike.%${w}%`);
-            });
-            // Note: In Postgrest, chaining multiple .or() or .ilike() usually results in AND or OR depending on implementation.
-            // For true AND word search, we use multiple filters on 'name'.
-
             let andChain = supabase.from('food_items').select('*');
             words.forEach(w => {
                 // Postgrest allows multiple filters on same column to be ANDed
@@ -102,8 +95,9 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
     // 4. Last Resort: Longest Word Search
     // If "Olive Oil" still fails, try just "Olive" (or whichever word is longest/most specific)
     if (!data || data.length === 0) {
-        const words = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+        const words = cleanQuery.split(/\s+/);
         if (words.length > 0) {
+            // Use the longest word (most specific/meaningful) regardless of length
             const longestWord = words.sort((a, b) => b.length - a.length)[0];
             const { data: lwData } = await supabase
                 .from('food_items')
