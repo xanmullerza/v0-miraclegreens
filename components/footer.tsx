@@ -17,7 +17,7 @@ export function Footer() {
 
   // Mobile bottom navigation bar
   return (
-    <footer id="contact" className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none">
+    <footer id="contact" className="fixed bottom-0 left-0 right-0 z-40 lg:hidden flex justify-center pointer-events-none">
       <div className="pointer-events-auto w-full">
         <div className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between shrink-0">
           {/* Split View Toggle for Desktop/Widescreen */}
