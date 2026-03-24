@@ -116,6 +116,9 @@ interface Recipe {
     fat: number;
     carbs: number;
     prep_time: number;
+    cook_time?: number;
+    difficulty?: string;
+    tags?: string[];
     servings: number;
     image: string | null;
     is_favorite: boolean;

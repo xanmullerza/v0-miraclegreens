@@ -10,6 +10,9 @@ interface ParsedRecipe {
     instructions_text: string;
     servings?: number;
     prep_time?: number;
+    cook_time?: number;
+    difficulty?: string;
+    tags?: string[];
     source_url: string;
     image_url?: string;
 }
