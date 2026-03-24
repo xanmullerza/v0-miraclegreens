@@ -442,7 +442,7 @@ export function RecipesView({
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* List Container */}
-            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
                 {showAddRecipe && setShowAddRecipe ? (
                     /* Recipe Form - replaces list when adding */
                     <RecipeFormDialog
@@ -453,9 +453,8 @@ export function RecipesView({
                 ) : (
                 <>
             {/* Controls Row */}
-            {/* Controls Row */}
             {!hideControls && (
-                <div className="border-b border-slate-200 dark:border-slate-800">
+                <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-[2rem]">
                     {/* Mobile Filter & Search Bar (md:hidden) */}
                     <div className="flex md:hidden items-center gap-2 px-4 py-3">
                         {/* Mobile Drawer Filter */}
