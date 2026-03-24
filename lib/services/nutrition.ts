@@ -651,12 +651,22 @@ export function isFlavoringIngredient(food: FoodItemMatch): boolean {
     // Fallback: check ingredient name for common flavoring keywords
     const name = (food.name || "").toLowerCase();
     const flavoringKeywords = [
-        'spice', 'herb', 'seasoning', 'vanilla', 'cinnamon', 'clove', 'nutmeg', 
-        'cardamom', 'cumin', 'oregano', 'basil', 'mint', 'paprika', 'pepper', 
-        'saffron', 'turmeric', 'ginger', 'garlic', 'onion powder', 'garlic powder',
-        'thyme', 'rosemary', 'sage', 'bay leaf', 'cilantro', 'parsley', 'dill',
-        'chives', 'anise', 'fennel', 'mustard seed', 'peppercorn', 'allspice',
-        'chili', 'cayenne', 'extract', 'flavoring', 'flavouring', 'essence'
+        // Generic
+        'spice', 'herb', 'seasoning', 'extract', 'flavoring', 'flavouring', 'essence', 'scent',
+        // Spices & Seeds
+        'vanilla', 'cinnamon', 'clove', 'nutmeg', 'cardamom', 'cumin', 'coriander', 'caraway',
+        'fennel', 'anise', 'allspice', 'peppercorn', 'mustard seed', 'fenugreek',
+        // Garden herbs
+        'oregano', 'basil', 'mint', 'thyme', 'rosemary', 'sage', 'dill', 'parsley', 
+        'cilantro', 'coriander leaf', 'chives', 'tarragon', 'marjoram', 'oregano',
+        // Peppers & hot
+        'pepper', 'paprika', 'chili', 'cayenne', 'red pepper', 'black pepper', 'white pepper',
+        // Aromatics
+        'ginger', 'garlic', 'onion powder', 'garlic powder', 'shallot',
+        // Bay & leaves
+        'bay leaf', 'bay',
+        // Color/flavor agents (minimal nutrition)
+        'saffron', 'turmeric', 'food coloring', 'food colour'
     ];
 
     return flavoringKeywords.some(keyword => name.includes(keyword));

@@ -598,6 +598,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
     };
 
     const processAcceptIngredient = (ing: Ingredient, matchedItem: any) => {
+        // Check if this is a flavoring ingredient - warn user
+        if (isFlavoringIngredient({ name: ing.base_ingredient || ing.item } as any)) {
+            toast.warning(`Tip: "${ing.base_ingredient || ing.item}" is a flavoring and won't significantly impact nutrition calculations.`, { duration: 2000 });
+        }
+        
         // In Step 1, we just securely accept the food match. Portion mapping happens in Step 2.
         setMatchedIngredients(prev => ({ ...prev, [ing.id]: matchedItem }));
         setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
@@ -612,6 +617,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
 
         try {
             const queue: Array<{idx: number, ingredient: Ingredient, results: any[]}> = [];
+            const skippedFlavorings: string[] = [];
 
             for (let idx = 0; idx < ingredients.length; idx++) {
                 const ing = ingredients[idx];
@@ -623,6 +629,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                 // Check if this ingredient is a flavoring (spice, herb, etc.) - auto-skip if it is
                 if (isFlavoringIngredient({ name: searchTermRaw } as any)) {
                     setSkippedIngredients(prev => ({ ...prev, [ing.id]: true }));
+                    skippedFlavorings.push(searchTermRaw);
+                    console.log(`[Smart Match] Auto-skipped flavoring: ${searchTermRaw}`);
                     continue;
                 }
 
@@ -665,7 +673,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                 setSmartMatchPickerIngredientIdx(0);
                 setSmartMatchPickerResults(firstInQueue.results);
                 setShowSmartMatchPicker(true);
-                toast.success(`Smart Match: Select matches for ${queue.length} ingredients`, { id: 'smart-match' });
+                const flavorMsg = skippedFlavorings.length > 0 ? ` (${skippedFlavorings.length} flavorings auto-skipped)` : '';
+                toast.success(`Smart Match: Select matches for ${queue.length} ingredients${flavorMsg}`, { id: 'smart-match' });
+            } else if (skippedFlavorings.length > 0) {
+                setShowSmartMatchPicker(false);
+                setSmartMatchQueue([]);
+                toast.success(`Smart Match: ${skippedFlavorings.length} flavorings were auto-skipped. All non-flavor ingredients processed!`, { id: 'smart-match', duration: 3000 });
             } else {
                 toast.error("Smart Match couldn't find any direct mappings. You may need to add these items to your database.", { id: 'smart-match' });
             }
@@ -2019,6 +2032,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                     const isFlipped = !!flippedCards[ing.id];
                                     const isAccepted = !!acceptedMatches[ing.id];
                                     const isSkipped = !!skippedIngredients[ing.id];
+                                    const isFlavoring = isFlavoringIngredient({ name: ing.base_ingredient || ing.item } as any);
                                     const isUsdaExpanded = !!usdaExpanded[ing.id];
                                     const isUsdaLoading = !!usdaLoading[ing.id];
                                     const ingUsdaResults = usdaResults[ing.id] || [];
@@ -2147,9 +2161,16 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                                                 {isSkipped ? <X size={18} /> : isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
                                                             </div>
                                                             <div>
-                                                                <p className="text-sm font-bold text-foreground capitalize truncate max-w-[180px]">
-                                                                    {cleanIngredientDisplay(ing.base_ingredient || ing.item)}
-                                                                </p>
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <p className="text-sm font-bold text-foreground capitalize truncate max-w-[120px]">
+                                                                        {cleanIngredientDisplay(ing.base_ingredient || ing.item)}
+                                                                    </p>
+                                                                    {isFlavoring && (
+                                                                        <span className="text-[8px] h-4 px-1.5 py-0 rounded-full border bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 font-bold uppercase tracking-wider">
+                                                                            Flavor
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                                 <p className="text-xs text-muted-foreground font-medium">
                                                                     {(ing.amount?.includes('0.25') && (ing.base_ingredient || ing.item)?.match(/^\d/)) ? '' : ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
                                                                 </p>
