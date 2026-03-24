@@ -711,18 +711,36 @@ export async function parseBBCGoodFood(url: string): Promise<any> {
             }
         }
 
-        // Extract cook time - look for "Cook:" or "cook time" patterns (in minutes)
+        // Extract cook time - try multiple patterns for different BBC layouts
         let cook_time = 0;
-        const cookMatch = html.match(/cook[\s:]*([\d.]+)\s*(?:hrs?|h\s|hours?)?[\s]*([\d.]+)?\s*mins?/i) ||
-                          html.match(/cook[\s:]*([\d.]+)\s*mins?/i) ||
-                          html.match(/cook\s*time[\s:]*([\d.]+)/i);
+        // Try patterns: "Cook: 55 mins", "cook time 55 mins", "cooking time:", etc.
+        let cookMatch = html.match(/cook(?:ing)?[\s:]*time[\s:]*([\d.]+)\s*(?:hrs?|h\s|hours?)?[\s]*([\d.]+)?\s*mins?/i);
+        if (!cookMatch) {
+            // Try simpler: "Cook: 55 mins"
+            cookMatch = html.match(/>\s*Cook[\s:]*\s*([^\n<]+(?:mins?|hours?))/i);
+        }
+        if (!cookMatch) {
+            // Try data attributes or aria labels
+            cookMatch = html.match(/data-cook[\s:]*"?([\d.]+)/i);
+        }
+        if (!cookMatch) {
+            // Try text content: "55 mins cooking time"
+            cookMatch = html.match(/([\d.]+)\s*(?:mins?|hours?)\s*(?:cook|cooking)/i);
+        }
+        
         if (cookMatch) {
             if (cookMatch[2]) {
                 // Format: "1 hr 30 mins"
                 cook_time = Math.round(parseInt(cookMatch[1], 10) * 60 + parseInt(cookMatch[2], 10));
-            } else {
-                // Format: "30 mins"
-                cook_time = Math.round(parseInt(cookMatch[1], 10));
+            } else if (cookMatch[1]) {
+                // Check if it contains "hour" or "hr"
+                const fullMatch = cookMatch[0].toLowerCase();
+                if (fullMatch.includes('hour') || fullMatch.includes('hr')) {
+                    cook_time = Math.round(parseInt(cookMatch[1], 10) * 60);
+                } else {
+                    // Format: "30 mins"
+                    cook_time = Math.round(parseInt(cookMatch[1], 10));
+                }
             }
         }
 

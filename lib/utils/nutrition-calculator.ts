@@ -340,7 +340,23 @@ export function calculateRecipeNutrition(
         cooking_state?: CookingState;
     }>
 ): CalculatedNutrition {
-    return ingredients.reduce(
+    // Filter out ingredients with no food_item data (imported recipes may not have linked nutrition)
+    const validIngredients = ingredients.filter(ing => ing && ing.food_item);
+    
+    if (validIngredients.length === 0) {
+        // Return empty nutrition if no valid ingredients
+        return {
+            calories: 0,
+            energy_kj: 0,
+            protein: 0,
+            fat: 0,
+            carbs: 0,
+            micronutrients: {},
+            phytonutrients: {}
+        };
+    }
+
+    return validIngredients.reduce(
         (total, ing) => {
             const nutrition = calculateNutrition(ing.food_item, ing.weight_g, ing.cooking_state);
 
