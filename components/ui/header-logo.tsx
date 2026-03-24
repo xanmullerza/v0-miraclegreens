@@ -143,21 +143,7 @@ export function HeaderLogo({
                     </div>
                 </button>
 
-                {/* View Ratio Control (Desktop Only) */}
-                {!isMobile && (
-                    <button
-                        onClick={toggleResize}
-                        className={cn(
-                            "flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
-                            resizeMode === 'equal' && "text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50",
-                            resizeMode === 'content-focus' && "text-cyan-500 hover:bg-cyan-500/5",
-                            resizeMode === 'dashboard-only' && "text-emerald-500 hover:bg-emerald-50/5"
-                        )}
-                        title={getResizeTooltip()}
-                    >
-                        {getResizeIcon()}
-                    </button>
-                )}
+
 
                 {/* Profile Button */}
                 <div className="flex flex-shrink-0 border-l border-border h-full overflow-hidden">
