@@ -4,14 +4,16 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Home, Grid2x2, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/lib/context/chatbot-context';
+import { useSplitView } from '@/lib/context/split-view-context';
 
 export function Footer() {
   const router = useRouter();
   const pathname = usePathname();
   const { setIsChatbotOpen, setChatbotView } = useChatbot();
+  const { setResizeMode } = useSplitView();
 
 
-  const isHome = pathname === '/dashboard';
+  const isHome = pathname === '/dashboard' || pathname === '/' || pathname === '/about-us';
 
   // Mobile bottom navigation bar
   return (
@@ -20,7 +22,10 @@ export function Footer() {
         <div className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between shrink-0">
           {/* Home Button */}
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={() => {
+              setResizeMode('content-focus');
+              router.push('/');
+            }}
             className={cn(
               "p-3 rounded-2xl transition-all active:scale-90",
               isHome
