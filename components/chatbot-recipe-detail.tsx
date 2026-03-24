@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2, Wand2, Trash2, Tag, ChevronRight, Plus } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2, Wand2, Trash2, Tag, ChevronRight, Plus, RotateCcw } from 'lucide-react';
 
 function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: () => void }) {
     const [confirming, setConfirming] = useState(false);
@@ -154,6 +154,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
     const [matchedIngredients, setMatchedIngredients] = useState<Record<string, any>>({});
     const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+    const [skippedIngredients, setSkippedIngredients] = useState<Record<string, boolean>>({});
     const [acceptedMatches, setAcceptedMatches] = useState<Record<string, boolean>>({});
     // USDA Phase 2 State
     const [usdaResults, setUsdaResults] = useState<Record<string, any[]>>({});
@@ -697,17 +698,29 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
     };
 
     const handleSmartMatchSkip = () => {
+        // Mark current ingredient as skipped
+        const currentItem = smartMatchQueue[smartMatchPickerIngredientIdx];
+        const newSkipped = { ...skippedIngredients, [currentItem.ingredient.id]: true };
+        setSkippedIngredients(newSkipped);
+
         // Move to next ingredient without matching
         const nextIdx = smartMatchPickerIngredientIdx + 1;
+        const currentIngreqName = currentItem.ingredient.base_ingredient || currentItem.ingredient.item;
+        
         if (nextIdx < smartMatchQueue.length) {
             const nextItem = smartMatchQueue[nextIdx];
             setSmartMatchPickerIngredientIdx(nextIdx);
             setSmartMatchPickerResults(nextItem.results);
-            toast.info(`Skipped "${smartMatchQueue[smartMatchPickerIngredientIdx].ingredient.base_ingredient || smartMatchQueue[smartMatchPickerIngredientIdx].ingredient.item}" - showing next ingredient`, { duration: 2000 });
+            toast.info(`⊘ Skipped "${currentIngreqName}" - showing next ingredient`, { duration: 2000 });
         } else {
+            // All ingredients processed - check if any are not matched
+            const unmatchedCount = smartMatchQueue.filter(q => !matchedIngredients[q.ingredient.id]).length;
+            const matchedCount = Object.keys(matchedIngredients).length;
+            const skippedCount = Object.keys(newSkipped).length;
+            
             setShowSmartMatchPicker(false);
             setSmartMatchQueue([]);
-            toast.info(`Smart Match ended - ${Object.keys(matchedIngredients).length} ingredients matched.`, { id: 'smart-match' });
+            toast.success(`Smart Match completed: ${matchedCount} matched, ${skippedCount} skipped`, { id: 'smart-match', duration: 3000 });
         }
     };
 
@@ -1994,6 +2007,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                     const isMatched = !!matchedIngredients[ing.id];
                                     const isFlipped = !!flippedCards[ing.id];
                                     const isAccepted = !!acceptedMatches[ing.id];
+                                    const isSkipped = !!skippedIngredients[ing.id];
                                     const isUsdaExpanded = !!usdaExpanded[ing.id];
                                     const isUsdaLoading = !!usdaLoading[ing.id];
                                     const ingUsdaResults = usdaResults[ing.id] || [];
@@ -2107,6 +2121,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                                     {/* Front (Original Ingredient) */}
                                                     <div className={cn(
                                                         "absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl p-3 flex items-center justify-between border transition-colors",
+                                                        isSkipped ? "bg-rose-50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-800" :
                                                         isMatched && !isAccepted ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" :
                                                         isAccepted ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800" :
                                                         "bg-card border-border"
@@ -2114,10 +2129,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                                         <div className="flex items-center gap-3">
                                                             <div className={cn(
                                                                 "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm",
+                                                                isSkipped ? "bg-rose-100 dark:bg-rose-900/50 text-rose-600" :
                                                                 isAccepted ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600" :
                                                                 "bg-muted text-muted-foreground"
                                                             )}>
-                                                                {isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
+                                                                {isSkipped ? <X size={18} /> : isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-bold text-foreground capitalize truncate max-w-[180px]">
@@ -2139,8 +2155,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                                                     <RefreshCw size={16} />
                                                                 </button>
                                                             )}
-                                                            {/* USDA Search button - show on unmatched, non-accepted ingredients */}
-                                                            {!isMatched && !isAccepted && (
+                                                            {/* USDA Search button - show on unmatched, non-accepted, non-skipped ingredients */}
+                                                            {!isMatched && !isAccepted && !isSkipped && (
                                                                 <button
                                                                     onClick={handleUsdaSearch}
                                                                     disabled={isUsdaLoading}
@@ -2149,6 +2165,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                                                                 >
                                                                     {isUsdaLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
                                                                     USDA
+                                                                </button>
+                                                            )}
+                                                            {/* Unskip button - show on skipped ingredients */}
+                                                            {isSkipped && (
+                                                                <button
+                                                                    onClick={() => setSkippedIngredients(prev => { const u = { ...prev }; delete u[ing.id]; return u; })}
+                                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500 transition-all"
+                                                                    title="Restore this ingredient"
+                                                                >
+                                                                    <RotateCcw size={12} />
+                                                                    RESTORE
                                                                 </button>
                                                             )}
                                                         </div>
