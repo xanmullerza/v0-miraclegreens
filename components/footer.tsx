@@ -11,7 +11,7 @@ export function Footer() {
   const { setIsChatbotOpen, setChatbotView } = useChatbot();
 
 
-  const isHome = pathname === '/' || pathname === '/home';
+  const isHome = pathname === '/dashboard';
 
   // Mobile bottom navigation bar
   return (
@@ -20,7 +20,7 @@ export function Footer() {
         <div className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between shrink-0">
           {/* Home Button */}
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/dashboard')}
             className={cn(
               "p-3 rounded-2xl transition-all active:scale-90",
               isHome

@@ -81,15 +81,13 @@ export function HeaderLogo({
                 {/* Navigation Items */}
                 <div className="flex items-center h-full divide-x divide-border mr-1 border-l border-border">
                     {[
-                        { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
+                        { label: 'Home', path: '/dashboard', icon: Home, color: 'text-emerald-500' },
                         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
                         { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
                         { label: 'Nutrients', path: '/dashboard/widgets/nutridex', icon: Beaker, color: 'text-emerald-500' },
                     ].map((item) => {
                         const Icon = item.icon;
-                        const isActive = pathname === item.path || 
-                                       (item.path === '/' && pathname === '/home') ||
-                                       (item.path === '/' && pathname === '/');
+                        const isActive = pathname === item.path;
                         
                         return (
                             <Link
