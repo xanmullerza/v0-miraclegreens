@@ -71,7 +71,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         switch (resizeMode) {
             case 'equal': return 'w-1/2';
             case 'content-focus': return 'w-2/3';
-            case 'content-only': return 'w-full';
+            case 'dashboard-only': return 'w-0';
             default: return 'w-1/2';
         }
     };
@@ -80,7 +80,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         switch (resizeMode) {
             case 'equal': return 'w-1/2';
             case 'content-focus': return 'w-1/3';
-            case 'content-only': return 'w-0';
+            case 'dashboard-only': return 'w-full';
             default: return 'w-1/2';
         }
     };
@@ -88,14 +88,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const getResizeIcon = () => {
         if (resizeMode === 'equal') return <Computer size={18} />;
         if (resizeMode === 'content-focus') return <TabletSmartphone size={18} />;
-        if (resizeMode === 'content-only') return <Smartphone size={18} />;
+        if (resizeMode === 'dashboard-only') return <Smartphone size={18} />;
         return <Computer size={18} />;
     };
 
     const getResizeTooltip = () => {
         if (resizeMode === 'content-focus') return 'Equal Split (50/50)';
-        if (resizeMode === 'equal') return 'Content Only (Hide Chat)';
-        if (resizeMode === 'content-only') return 'Focus Content (70/30)';
+        if (resizeMode === 'equal') return 'Full Dashboard View';
+        if (resizeMode === 'dashboard-only') return 'Focus Content (70/30)';
         return 'Toggle View';
     };
 
@@ -148,7 +148,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 </div>
 
                 {/* Divider + Resize Button */}
-                {pathname !== '/dashboard' && !isMobile && resizeMode !== 'content-only' && (
+                {pathname !== '/dashboard' && !isMobile && resizeMode !== 'dashboard-only' && (
                     <>
                         <div className="w-px bg-slate-200 dark:bg-slate-800" />
                         <button
@@ -173,7 +173,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         />
                         
                         {/* Mobile Resize Button (should not appear on mobile since compartment hidden) */}
-                        {resizeMode !== 'content-only' && (
+                        {resizeMode !== 'dashboard-only' && (
                             <button
                                 onClick={toggleResize}
                                 className="lg:hidden absolute top-20 right-4 z-30 flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400"

@@ -39,14 +39,14 @@ export function HeaderLogo({
     const getResizeIcon = () => {
         if (resizeMode === 'equal') return <Computer size={18} />;
         if (resizeMode === 'content-focus') return <TabletSmartphone size={18} />;
-        if (resizeMode === 'content-only') return <Smartphone size={18} />;
+        if (resizeMode === 'dashboard-only') return <Smartphone size={18} />;
         return <Computer size={18} />;
     };
 
     const getResizeTooltip = () => {
         if (resizeMode === 'content-focus') return 'Equal Split (50/50)';
-        if (resizeMode === 'equal') return 'Content Only (Hide Chat)';
-        if (resizeMode === 'content-only') return 'Focus Content (70/30)';
+        if (resizeMode === 'equal') return 'Full Dashboard View';
+        if (resizeMode === 'dashboard-only') return 'Focus Content (70/30)';
         return 'Toggle View';
     };
 
@@ -146,7 +146,7 @@ export function HeaderLogo({
                             "flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
                             resizeMode === 'equal' && "text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50",
                             resizeMode === 'content-focus' && "text-cyan-500 hover:bg-cyan-500/5",
-                            resizeMode === 'content-only' && "text-emerald-500 hover:bg-emerald-50/5"
+                            resizeMode === 'dashboard-only' && "text-emerald-500 hover:bg-emerald-50/5"
                         )}
                         title={getResizeTooltip()}
                     >

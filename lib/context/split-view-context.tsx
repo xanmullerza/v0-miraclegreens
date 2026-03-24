@@ -2,7 +2,7 @@
 
 import React, { ReactNode, createContext, useContext, useState, useEffect } from 'react';
 
-type ResizeMode = 'equal' | 'content-focus' | 'content-only';
+type ResizeMode = 'equal' | 'content-focus' | 'dashboard-only';
 
 interface SplitViewContextType {
     resizeMode: ResizeMode;
@@ -19,7 +19,7 @@ export function SplitViewProvider({ children }: { children: ReactNode }) {
     // Load saved resize mode on mount
     useEffect(() => {
         const saved = localStorage.getItem('app-split-mode') as ResizeMode | null;
-        if (saved && ['equal', 'content-focus', 'content-only'].includes(saved)) {
+        if (saved && ['equal', 'content-focus', 'dashboard-only'].includes(saved)) {
             setResizeMode(saved);
         }
         setIsMounted(true);
@@ -35,7 +35,7 @@ export function SplitViewProvider({ children }: { children: ReactNode }) {
     const toggleResize = () => {
         setResizeMode(prev => {
             if (prev === 'content-focus') return 'equal';
-            if (prev === 'equal') return 'content-only';
+            if (prev === 'equal') return 'dashboard-only';
             return 'content-focus';
         });
     };
