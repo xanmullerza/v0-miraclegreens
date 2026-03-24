@@ -20,21 +20,20 @@ export function Footer() {
     <footer id="contact" className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none">
       <div className="pointer-events-auto w-full">
         <div className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between shrink-0">
-          {/* Home Button */}
+          {/* Split View Toggle for Desktop/Widescreen */}
           <button
-            onClick={() => {
-              setResizeMode('content-focus');
-              router.push('/');
-            }}
+            onClick={toggleResize}
             className={cn(
-              "p-3 rounded-2xl transition-all active:scale-90",
-              isHome
-                ? "text-emerald-500"
-                : "text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              "p-3 rounded-2xl transition-all active:scale-95 group flex",
+              "text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800",
+              resizeMode === 'equal' && "text-amber-500",
+              resizeMode === 'dashboard-only' && "text-emerald-500"
             )}
-            title="Home"
+            title="Split View"
           >
-            <Home size={24} />
+            {resizeMode === 'equal' && <Computer size={24} />}
+            {resizeMode === 'content-focus' && <TabletSmartphone size={24} />}
+            {resizeMode === 'dashboard-only' && <Smartphone size={24} />}
           </button>
 
           {/* Grid (Apps/Dashboard) Button - Shows app grid: cookbook, planner, widgets */}
@@ -52,21 +51,6 @@ export function Footer() {
             <Grid2x2 size={24} className="group-hover:scale-110 transition-transform" />
           </button>
 
-          {/* Split View Toggle for Desktop/Widescreen */}
-          <button
-            onClick={toggleResize}
-            className={cn(
-              "w-12 h-12 hidden lg:flex items-center justify-center rounded-2xl transition-all active:scale-95 group",
-              "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5",
-              resizeMode === 'equal' && "text-amber-500",
-              resizeMode === 'dashboard-only' && "text-emerald-500"
-            )}
-            title="Split View"
-          >
-            {resizeMode === 'equal' && <Computer size={24} />}
-            {resizeMode === 'content-focus' && <TabletSmartphone size={24} />}
-            {resizeMode === 'dashboard-only' && <Smartphone size={24} />}
-          </button>
 
           {/* Chat Button - Opens chatbot conversation */}
           <button

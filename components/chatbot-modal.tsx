@@ -3872,24 +3872,20 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Bottom Navigation Footer (Mobile Optimized) */}
                 <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50">
+                    {/* Split View Toggle for Desktop/Widescreen */}
                     <button
-                        onClick={() => {
-                            if (chatbotView === 'messages' || chatbotView === 'dashboard') {
-                                setRecipeTitle('');
-                                setRecipeServings(0);
-                                setRecipePrepTime(0);
-                                setRecipeCookTime(0);
-                                setRecipeIngredients([]);
-                                setRecipeInstructions(['']);
-                                setRecipeImage('');
-                            }
-                            setResizeMode('content-focus');
-                            router.push('/');
-                        }}
-                        className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
-                        title="Go Home"
+                        onClick={toggleResize}
+                        className={cn(
+                            "p-3 rounded-2xl transition-all active:scale-95 group",
+                            "text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800",
+                            resizeMode === 'equal' && "text-amber-500",
+                            resizeMode === 'dashboard-only' && "text-emerald-500"
+                        )}
+                        title="Split View"
                     >
-                        <Home size={24} />
+                        {resizeMode === 'equal' && <Computer size={24} />}
+                        {resizeMode === 'content-focus' && <TabletSmartphone size={24} />}
+                        {resizeMode === 'dashboard-only' && <Smartphone size={24} />}
                     </button>
                     
                     <button
@@ -3905,21 +3901,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <Grid2x2 size={24} className="group-hover:scale-110 transition-transform" />
                     </button>
 
-                    {/* Split View Toggle for Desktop/Widescreen */}
-                    <button
-                        onClick={toggleResize}
-                        className={cn(
-                            "w-12 h-12 hidden lg:flex items-center justify-center rounded-2xl transition-all active:scale-95 group",
-                            "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5",
-                            resizeMode === 'equal' && "text-amber-500",
-                            resizeMode === 'dashboard-only' && "text-emerald-500"
-                        )}
-                        title="Split View"
-                    >
-                        {resizeMode === 'equal' && <Computer size={24} />}
-                        {resizeMode === 'content-focus' && <TabletSmartphone size={24} />}
-                        {resizeMode === 'dashboard-only' && <Smartphone size={24} />}
-                    </button>
+
 
                     <button
                         onClick={() => setChatbotView('messages')}
