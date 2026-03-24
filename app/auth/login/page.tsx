@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,7 @@ function LoginContent() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const redirectTo = searchParams.get('from') || '/dashboard/meal-o-matic/planner';
+    const redirectTo = searchParams.get('from') || '/about-us';
 
     const handleLogin = async () => {
         setLoading(true);
