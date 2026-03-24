@@ -789,7 +789,7 @@ export async function parseBBCGoodFood(url: string): Promise<any> {
         
         // Pattern 2: Look for badge/tag spans if pattern 1 didn't find much
         if (tags.length === 0) {
-            let tagMatches = html.matchAll(/<span[^>]*class="[^"]*(?:tag|badge|label|pill)[^"]*"[^>]*>([^<]+)<\/span>/gi);
+            const tagMatches = html.matchAll(/<span[^>]*class="[^"]*(?:tag|badge|label|pill)[^"]*"[^>]*>([^<]+)<\/span>/gi);
             for (const match of tagMatches) {
                 const tag = match[1].trim();
                 if (tag && tag.length > 0 && tag.toLowerCase() !== 'save recipe') {
@@ -800,8 +800,8 @@ export async function parseBBCGoodFood(url: string): Promise<any> {
         
         // Pattern 3: Look in data attributes
         if (tags.length === 0) {
-            tagMatches = html.matchAll(/data-tag="([^"]+)"/gi);
-            for (const match of tagMatches) {
+            const tagMatches2 = html.matchAll(/data-tag="([^"]+)"/gi);
+            for (const match of tagMatches2) {
                 const tag = match[1].trim();
                 if (tag && tag.length > 0) {
                     tags.push(tag);
