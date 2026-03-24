@@ -729,30 +729,59 @@ export async function parseBBCGoodFood(url: string): Promise<any> {
         // Calculate total "ready in" time (prep + cook)
         const readyInTime = prep_time + cook_time;
 
-        // Extract difficulty - look for "Difficulty:" or difficulty-related patterns
+        // Extract difficulty - try multiple patterns
         let difficulty: string | undefined;
-        const difficultyMatch = html.match(/difficulty[\s:]*([^<\n]+)/i);
+        // Pattern 1: "Difficulty:" label format
+        let difficultyMatch = html.match(/difficulty[\s:]*([^<\n,]+)/i);
+        // Pattern 2: difficulty as button/span content
+        if (!difficultyMatch) {
+            difficultyMatch = html.match(/<button[^>]*>([Ee]asy|[Mm]edium|[Hh]ard|[Vv]ery\s+[Ee]asy|[Vv]ery\s+[Hh]ard)<\/button>/i);
+        }
+        // Pattern 3: difficulty in data attributes
+        if (!difficultyMatch) {
+            difficultyMatch = html.match(/data-difficulty="([^"]+)"/i);
+        }
+        // Pattern 4: difficulty in aria-label
+        if (!difficultyMatch) {
+            difficultyMatch = html.match(/difficulty.*?([Ee]asy|[Mm]edium|[Hh]ard|[Vv]ery\s+[Ee]asy|[Vv]ery\s+[Hh]ard)/i);
+        }
         if (difficultyMatch) {
-            difficulty = difficultyMatch[1].trim();
+            difficulty = difficultyMatch[1].trim().charAt(0).toUpperCase() + difficultyMatch[1].trim().slice(1).toLowerCase();
         }
 
-        // Extract tags - look for badge/tag elements
+        // Extract tags - try multiple patterns
         let tags: string[] = [];
-        // Match common tag HTML patterns
-        const tagMatches = html.matchAll(/<span[^>]*class="[^"]*tag[^"]*"[^>]*>([^<]+)<\/span>/gi);
+        
+        // Pattern 1: Look for badge/tag spans
+        let tagMatches = html.matchAll(/<span[^>]*class="[^"]*(?:tag|badge|label|pill)[^"]*"[^>]*>([^<]+)<\/span>/gi);
         for (const match of tagMatches) {
             const tag = match[1].trim();
-            if (tag && tag.length > 0) {
+            if (tag && tag.length > 0 && tag.toLowerCase() !== 'save recipe') {
                 tags.push(tag);
             }
         }
-        // Also try to find tags in badge-like elements
+        
+        // Pattern 2: Look in data attributes
         if (tags.length === 0) {
-            const badgeMatches = html.matchAll(/<span[^>]*class="[^"]*badge[^"]*"[^>]*>([^<]+)<\/span>/gi);
-            for (const match of badgeMatches) {
+            tagMatches = html.matchAll(/data-tag="([^"]+)"/gi);
+            for (const match of tagMatches) {
                 const tag = match[1].trim();
-                if (tag && tag.length > 0 && !tag.toLowerCase().includes('save')) {
+                if (tag && tag.length > 0) {
                     tags.push(tag);
+                }
+            }
+        }
+        
+        // Pattern 3: Look for recipe properties/characteristics (common BBC patterns)
+        if (tags.length === 0) {
+            const tagsSection = html.match(/(?:recipes|properties|characteristics)[^<]*(?:<[^>]*>([^<]+)<\/[^>]*>)*(.+?)(?=<\/section>|<\/div>|<\/article>)/is);
+            if (tagsSection) {
+                const tagPatterns = tagsSection[0].match(/([A-Z][a-z\s\-]+?)(?:<\/|&|$)/g) || [];
+                for (const tag of tagPatterns) {
+                    const cleaned = tag.replace(/[<\/>&#;]/g, '').trim();
+                    if (cleaned && cleaned.length > 2 && cleaned.length < 50) {
+                        tags.push(cleaned);
+                    }
                 }
             }
         }

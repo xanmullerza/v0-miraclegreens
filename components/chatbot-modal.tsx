@@ -653,6 +653,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 source: recipe.source_url
             };
 
+            // DEBUG: Log what we're about to save
+            console.log('📋 Recipe data to save:', {
+                title: recipeDataToSave.title,
+                prep_time: recipeDataToSave.prep_time,
+                cook_time: recipeDataToSave.cook_time,
+                difficulty: recipeDataToSave.difficulty,
+                tags: recipeDataToSave.tags,
+                sourceUrl: recipe.source_url
+            });
+
             // Save the recipe
             const result = await saveRecipe(recipeDataToSave, ingredientsList, instructionsList);
             const recipeId = result?.id || `recipe-${Date.now()}`;

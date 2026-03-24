@@ -163,9 +163,19 @@ export function useDataPersistence() {
                     id: recipeId,
                     user_id: user.id,
                     is_curated: false,
-                    tags: recipe.tags || [],
-                    difficulty: recipe.difficulty || 'Medium'
+                    // Only set defaults if NOT provided
+                    tags: recipe.tags !== undefined ? recipe.tags : [],
+                    difficulty: recipe.difficulty !== undefined ? recipe.difficulty : 'Medium'
                 };
+
+                // DEBUG: Log what we're saving to database
+                console.log('💾 Saving to database:', {
+                    title: recipeData.title,
+                    prep_time: recipeData.prep_time,
+                    cook_time: recipeData.cook_time,
+                    difficulty: recipeData.difficulty,
+                    tags: recipeData.tags
+                });
 
                 // 1. Save main recipe
                 const { error: recipeError } = await supabase
