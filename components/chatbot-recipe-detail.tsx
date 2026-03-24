@@ -727,8 +727,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
     const finalizeRecipeNutrition = async () => {
         if (!recipe) return;
         
-        // 1. Check if all ingredients are saved in step 2
-        const allSaved = ingredients.every(ing => stepTwoSaved[ing.id]);
+        // 1. Check if all ingredients are saved in step 2 or skipped
+        const allSaved = ingredients.every(ing => stepTwoSaved[ing.id] || skippedIngredients[ing.id]);
         if (!allSaved) {
             toast.error("Please accept/save all ingredient portions before finalizing.");
             return;
@@ -2313,7 +2313,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                 )}
 
                 {/* Step 1 Check: Are we ready to proceed to Portion Match Step 2? */}
-                {mappingStep === 'FOOD_MATCH' && ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id]) && (
+                {mappingStep === 'FOOD_MATCH' && ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id]) && (
                     <div className="mt-6 flex justify-end">
                         <button 
                             onClick={() => setMappingStep('PORTION_MATCH')}
@@ -2557,7 +2557,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                         </div>
 
                         {/* Final Step Action */}
-                        {ingredients.every(ing => stepTwoSaved[ing.id]) && (
+                        {ingredients.every(ing => stepTwoSaved[ing.id] || skippedIngredients[ing.id]) && (
                             <div className="mt-8 p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800/50 flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 shadow-sm">
                                     <Sparkles size={24} className="fill-current" />
