@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon } from 'lucide-react';
+import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Beaker } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 import { useChatbot } from '@/lib/context/chatbot-context';
@@ -78,6 +78,38 @@ export function HeaderLogo({
 
             {/* Right Group - Theme Toggle, View Ratio, Profile */}
             <div className="flex justify-end items-center h-full">
+                {/* Navigation Items (Desktop Only) */}
+                <div className="hidden lg:flex items-center h-full divide-x divide-border mr-1 border-l border-border">
+                    {[
+                        { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
+                        { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
+                        { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
+                        { label: 'Nutrients', path: '/dashboard/widgets/nutridex', icon: Beaker, color: 'text-emerald-500' },
+                    ].map((item) => {
+                        const Icon = item.icon;
+                        const isActive = pathname === item.path || 
+                                       (item.path === '/' && pathname === '/home') ||
+                                       (item.path === '/' && pathname === '/');
+                        
+                        return (
+                            <Link
+                                key={item.path}
+                                href={item.path}
+                                className={cn(
+                                    "flex items-center gap-2 px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
+                                    isActive
+                                        ? "bg-slate-900 dark:bg-slate-800 text-white"
+                                        : "text-muted-foreground hover:bg-muted dark:hover:bg-slate-800/50 hover:text-emerald-500 active:scale-95"
+                                )}
+                                title={item.label}
+                            >
+                                <Icon size={14} className={isActive ? item.color : ''} />
+                                <span>{item.label}</span>
+                            </Link>
+                        );
+                    })}
+                </div>
+
                 {/* Theme Toggle */}
                 <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
