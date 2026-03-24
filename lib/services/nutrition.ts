@@ -5,6 +5,7 @@ export interface FoodItemMatch {
     id?: string;
     name: string;
     common_name?: string;
+    category?: string | null;
     image?: string | null; // some searches include an image URL
     energy_kcal: number;
     energy_kj: number;
@@ -119,6 +120,7 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         id: item.id,
         name: item.name,
         common_name: item.common_name,
+        category: item.category || null,
         image: item.image || null,
         energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
         energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
@@ -365,6 +367,7 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
             return {
                 fdcId: food.fdcId,
                 name: food.description,
+                category: null,
                 dataType: food.dataType, // Include for display/sorting
                 energy_kcal: energyKcal,
                 energy_kj: energyKj,
@@ -630,13 +633,37 @@ export async function searchFoodItem(query: string): Promise<FoodItemMatch[]> {
         return !hasUSDAMatch;
     });
 
-    // Combine: USDA first, then deduplicated local results
+    // Combine: Local results first (prefer local DB), then deduplicated USDA results
     const combined = [
-        ...usdaResults,
-        ...dedupedLocal
+        ...dedupedLocal,
+        ...usdaResults
     ];
 
     console.log(`[Unified Search] After dedup: ${combined.length} results`);
 
     return combined;
+}
+
+/**
+ * Detects if an ingredient is a flavoring (spice, herb, seasoning, etc.)
+ * These contribute minimal nutrition and are used in tiny amounts.
+ */
+export function isFlavoringIngredient(food: FoodItemMatch): boolean {
+    // Check category field from local DB
+    if (food.category && food.category.toLowerCase() === 'flavour') {
+        return true;
+    }
+
+    // Fallback: check ingredient name for common flavoring keywords
+    const name = (food.name || "").toLowerCase();
+    const flavoringKeywords = [
+        'spice', 'herb', 'seasoning', 'vanilla', 'cinnamon', 'clove', 'nutmeg', 
+        'cardamom', 'cumin', 'oregano', 'basil', 'mint', 'paprika', 'pepper', 
+        'saffron', 'turmeric', 'ginger', 'garlic', 'onion powder', 'garlic powder',
+        'thyme', 'rosemary', 'sage', 'bay leaf', 'cilantro', 'parsley', 'dill',
+        'chives', 'anise', 'fennel', 'mustard seed', 'peppercorn', 'allspice',
+        'chili', 'cayenne', 'extract', 'flavoring', 'flavouring', 'essence'
+    ];
+
+    return flavoringKeywords.some(keyword => name.includes(keyword));
 }

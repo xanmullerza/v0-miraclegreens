@@ -81,7 +81,7 @@ function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: ()
 import { supabase } from '@/lib/supabase';
 import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { searchFoodItem, searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
+import { searchFoodItem, searchUSDAFood, getUSDAFoodDetails, isFlavoringIngredient } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ChatbotShare } from './chatbot-share';
@@ -620,7 +620,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                 
                 if (!searchTerm || searchTerm.length < 2) continue;
 
-                // Use unified search (USDA + local with dedup and USDA prioritized)
+                // Check if this ingredient is a flavoring (spice, herb, etc.) - auto-skip if it is
+                if (isFlavoringIngredient({ name: searchTermRaw } as any)) {
+                    setSkippedIngredients(prev => ({ ...prev, [ing.id]: true }));
+                    continue;
+                }
+
+                // Use unified search (USDA + local with dedup and local prioritized)
                 let matchData = await searchFoodItem(searchTerm);
                 
                 // If no match, try de-pluralized version (e.g. "chicken thighs" -> "chicken thigh")
