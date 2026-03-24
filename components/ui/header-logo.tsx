@@ -78,8 +78,8 @@ export function HeaderLogo({
 
             {/* Right Group - Theme Toggle, View Ratio, Profile */}
             <div className="flex justify-end items-center h-full">
-                {/* Navigation Items (Desktop Only) */}
-                <div className="hidden lg:flex items-center h-full divide-x divide-border mr-1 border-l border-border">
+                {/* Navigation Items */}
+                <div className="flex items-center h-full divide-x divide-border mr-1 border-l border-border">
                     {[
                         { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
                         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
@@ -96,7 +96,7 @@ export function HeaderLogo({
                                 key={item.path}
                                 href={item.path}
                                 className={cn(
-                                    "flex items-center gap-2 px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
+                                    "flex items-center gap-2 px-3 sm:px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
                                     isActive
                                         ? "bg-slate-900 dark:bg-slate-800 text-white"
                                         : "text-muted-foreground hover:bg-muted dark:hover:bg-slate-800/50 hover:text-emerald-500 active:scale-95"
@@ -104,16 +104,16 @@ export function HeaderLogo({
                                 title={item.label}
                             >
                                 <Icon size={14} className={isActive ? item.color : ''} />
-                                <span>{item.label}</span>
+                                <span className="hidden md:inline">{item.label}</span>
                             </Link>
                         );
                     })}
                 </div>
 
-                {/* Theme Toggle */}
+                {/* Theme Toggle (Desktop Only) */}
                 <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    className="flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50 active:scale-95"
+                    className="hidden lg:flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50 active:scale-95"
                     title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
                 >
                     <div className="relative w-[18px] h-[18px] flex items-center justify-center">
@@ -140,38 +140,15 @@ export function HeaderLogo({
                     </div>
                 </button>
 
-                {/* View Ratio Control */}
-                {isMobile ? (
-                    <div className="flex border-l border-border items-center flex-shrink-0 h-full">
-                        <button
-                            onClick={() => setIsChatbotOpen(false)}
-                            className={cn(
-                                "flex h-12 w-10 items-center justify-center transition-all focus:outline-none active:scale-95 border-r border-border/50",
-                                !isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-slate-800/50"
-                            )}
-                            title="Show Content Pane"
-                        >
-                            <Globe size={18} />
-                        </button>
-                        <button
-                            onClick={() => setIsChatbotOpen(true)}
-                            className={cn(
-                                "flex h-12 w-10 items-center justify-center transition-all focus:outline-none active:scale-95",
-                                isChatbotOpen ? "text-emerald-500 bg-emerald-500/5" : "text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-slate-800/50"
-                            )}
-                            title="Show Chatbot Pane"
-                        >
-                            <LayoutGrid size={18} />
-                        </button>
-                    </div>
-                ) : (
+                {/* View Ratio Control (Desktop Only) */}
+                {!isMobile && (
                     <button
                         onClick={toggleResize}
                         className={cn(
                             "flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none flex-shrink-0 active:scale-95",
                             resizeMode === 'equal' && "text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50",
                             resizeMode === 'content-focus' && "text-cyan-500 hover:bg-cyan-500/5",
-                            resizeMode === 'content-only' && "text-emerald-500 hover:bg-emerald-500/5"
+                            resizeMode === 'content-only' && "text-emerald-500 hover:bg-emerald-50/5"
                         )}
                         title={getResizeTooltip()}
                     >
