@@ -758,6 +758,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
             if (fetchErr) throw fetchErr;
 
             updatedIngs?.forEach(ing => {
+                // Skip ingredients that were intentionally skipped
+                if (skippedIngredients[ing.id]) {
+                    return;
+                }
+                
                 const food = ing.food_items;
                 const weight = ing.weight_g || 0;
                 
@@ -2343,8 +2348,27 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix }: Chat
                             Review the automatically mapped portions. If a portion couldn't be accurately identified, select the relevant unit below.
                         </p>
                         
+                        {Object.keys(skippedIngredients).length > 0 && (
+                            <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-900/10 rounded-xl border border-rose-200 dark:border-rose-800/50 flex items-start gap-3">
+                                <X size={16} className="flex-shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
+                                <div className="flex-1 text-sm">
+                                    <p className="font-semibold text-rose-900 dark:text-rose-200 mb-1">Skipped Ingredients</p>
+                                    <p className="text-rose-700 dark:text-rose-300 text-xs">
+                                        The following {Object.keys(skippedIngredients).length} ingredient{Object.keys(skippedIngredients).length !== 1 ? 's' : ''} will be excluded from final nutrition calculation:
+                                    </p>
+                                    <div className="mt-2 space-y-1">
+                                        {ingredients.filter(ing => skippedIngredients[ing.id]).map(ing => (
+                                            <p key={ing.id} className="text-xs text-rose-700 dark:text-rose-300">
+                                                • {cleanIngredientDisplay(ing.base_ingredient || ing.item)} ({ing.amount})
+                                            </p>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
                         <div className="grid gap-4">
-                            {ingredients.map((ing) => {
+                            {ingredients.filter(ing => !skippedIngredients[ing.id]).map((ing) => {
                                 const originalDetails = parseRecipeAmount(ing.amount, ing.item);
                                 const servings = recipe?.servings || 1;
                                 const dbItem = matchedIngredients[ing.id];
