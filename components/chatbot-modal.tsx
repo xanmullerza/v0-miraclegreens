@@ -43,6 +43,8 @@ interface ParsedRecipe {
     servings?: number;
     prep_time?: number;
     cook_time?: number;
+    difficulty?: string;
+    tags?: string[];
     source_url: string;
     image_url?: string;
 }
@@ -638,6 +640,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 servings: recipe.servings || 4,
                 prep_time: recipe.prep_time || 30,
                 cook_time: recipe.cook_time || 0,
+                difficulty: recipe.difficulty || 'Medium',
+                tags: recipe.tags || [],
                 image: recipe.image_url,
                 is_favorite: true,
                 is_mix: false,
