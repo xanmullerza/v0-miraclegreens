@@ -555,14 +555,37 @@ export default function RecipeDetailsPage() {
                     .eq('id', id)
                     .single();
 
-                if (recipeError) throw recipeError;
+                if (recipeError) {
+                    console.error('Recipe fetch error:', recipeError);
+                    throw recipeError;
+                }
 
-                const { data: ingData, error: ingError } = await supabase
-                    .from('ingredients')
-                    .select('*, food_item:food_items(*)')
-                    .eq('recipe_id', id);
+                // Try to fetch ingredients with relationship, fall back if it fails
+                let ingData: any[] | null = null;
+                let ingError: any = null;
+                
+                try {
+                    const result = await supabase
+                        .from('ingredients')
+                        .select('*, food_item:food_items(*)')
+                        .eq('recipe_id', id);
+                    ingData = result.data;
+                    ingError = result.error;
+                } catch (e) {
+                    // If relationship join fails, try without it
+                    console.warn('Ingredients with relationship join failed, trying without:', e);
+                    const result = await supabase
+                        .from('ingredients')
+                        .select('*')
+                        .eq('recipe_id', id);
+                    ingData = result.data;
+                    ingError = result.error;
+                }
 
-                if (ingError) throw ingError;
+                if (ingError) {
+                    console.error('Ingredients fetch error:', ingError);
+                    throw ingError;
+                }
 
                 const fetchedIngredients = ingData || [];
                 setIngredients(fetchedIngredients);
@@ -597,11 +620,17 @@ export default function RecipeDetailsPage() {
                     .eq('recipe_id', id)
                     .order('step_order', { ascending: true });
 
-                if (insError) throw insError;
+                if (insError) {
+                    console.error('Instructions fetch error:', insError);
+                    throw insError;
+                }
                 setInstructions(insData || []);
             }
         } catch (error) {
             console.error('Error fetching recipe:', error);
+            if (error instanceof Error) {
+                console.error('Error details:', error.message);
+            }
             toast.error('Failed to load mix details');
             router.back();
         } finally {
