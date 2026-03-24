@@ -1461,6 +1461,34 @@ export default function RecipeDetailsPage() {
 
                                 <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
 
+                                {/* Difficulty */}
+                                <div className="flex items-center gap-1">
+                                    <span className="text-sm font-black italic text-slate-900 dark:text-white">{recipe.difficulty || 'Medium'}</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">difficulty</span>
+                                </div>
+
+                                <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
+
+                                {/* Tags */}
+                                <div className="flex items-center gap-1.5">
+                                    {recipe.tags && recipe.tags.length > 0 ? (
+                                        <div className="flex gap-1.5 -ml-0.5">
+                                            {recipe.tags.slice(0, 2).map((tag, idx) => (
+                                                <span key={idx} className="text-[8px] px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-black uppercase tracking-tighter">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                            {recipe.tags.length > 2 && (
+                                                <span className="text-[8px] px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-black">+{recipe.tags.length - 2}</span>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">No tags</span>
+                                    )}
+                                </div>
+
+                                <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
+
                                 {/* Weight - plain text */}
                                 <span className="text-sm font-black italic text-emerald-500">{totalWeight.toFixed(0)}</span>
                                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 -ml-2.5">g</span>

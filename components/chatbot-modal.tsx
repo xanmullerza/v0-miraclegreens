@@ -1840,6 +1840,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     servings: recipe.servings || 4,
                     prep_time: recipe.prep_time || recipe.prepTime || 30,
                     cook_time: recipe.cook_time || recipe.cookTime || 0,
+                    difficulty: recipe.difficulty || undefined,
+                    tags: recipe.tags || [],
                     source_url: pastedRecipeURL,
                     image_url: recipe.image_url || recipe.image || undefined,
                 };
