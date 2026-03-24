@@ -774,7 +774,7 @@ export async function parseBBCGoodFood(url: string): Promise<any> {
         
         // Pattern 3: Look for recipe properties/characteristics (common BBC patterns)
         if (tags.length === 0) {
-            const tagsSection = html.match(/(?:recipes|properties|characteristics)[^<]*(?:<[^>]*>([^<]+)<\/[^>]*>)*(.+?)(?=<\/section>|<\/div>|<\/article>)/is);
+            const tagsSection = html.match(/(?:recipes|properties|characteristics)[^<]*(?:<[^>]*>[^<]+<\/[^>]*>)*[\s\S]*?(?=<\/section>|<\/div>|<\/article>)/i);
             if (tagsSection) {
                 const tagPatterns = tagsSection[0].match(/([A-Z][a-z\s\-]+?)(?:<\/|&|$)/g) || [];
                 for (const tag of tagPatterns) {
