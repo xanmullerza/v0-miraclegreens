@@ -54,50 +54,8 @@ export function HeaderLogo({
         <div suppressHydrationWarning className={cn(
             "grid grid-cols-3 items-center bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12"
         )}>
-            {/* Left - Breadcrumbs (Desktop Only) */}
+            {/* Left - Logo Area */}
             <div className="flex h-full w-full items-center px-4 overflow-hidden">
-                <div className="hidden lg:flex items-center gap-2">
-                    {(() => {
-                        const segments = pathname.split('/').filter(Boolean);
-                        const humanize = (segment: string) => {
-                            if (segment === 'dashboard') return 'Dashboard';
-                            if (segment === 'library') return 'Library';
-                            if (segment === 'meal-o-matic') return 'Meal-o-Matic';
-                            if (segment === 'home') return 'Home';
-                            return segment
-                                .split('-')
-                                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                                .join(' ');
-                        };
-
-                        return segments.map((segment, index) => {
-                            const href = '/' + segments.slice(0, index + 1).join('/');
-                            const isLast = index === segments.length - 1;
-
-                            return (
-                                <React.Fragment key={`${segment}-${index}`}>
-                                    {index > 0 && <span className="text-border dark:text-slate-800">/</span>}
-                                    {isLast ? (
-                                        <span className="font-semibold text-slate-900 dark:text-white text-[10px] uppercase tracking-widest whitespace-nowrap">
-                                            {humanize(segment)}
-                                        </span>
-                                    ) : (
-                                        <Link 
-                                            href={href}
-                                            className="font-semibold text-muted-foreground hover:text-emerald-500 dark:hover:text-emerald-400 text-[10px] uppercase tracking-widest whitespace-nowrap transition-colors"
-                                        >
-                                            {humanize(segment)}
-                                        </Link>
-                                    )}
-                                </React.Fragment>
-                            );
-                        });
-                    })()}
-                </div>
-            </div>
-
-            {/* Center - Logo Area */}
-            <div className="flex justify-center w-full h-full">
                 <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-all active:scale-[0.98]">
                     <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-emerald-400/30 flex-shrink-0 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)]">
                         <Leaf size={16} className="text-white" />
@@ -114,6 +72,9 @@ export function HeaderLogo({
                     </div>
                 </Link>
             </div>
+
+            {/* Empty Center Column */}
+            <div className="flex justify-center w-full h-full" />
 
             {/* Right Group - Theme Toggle, View Ratio, Profile */}
             <div className="flex justify-end items-center h-full">
