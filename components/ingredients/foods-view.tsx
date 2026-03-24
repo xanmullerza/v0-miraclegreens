@@ -1,497 +1,434 @@
-﻿'use client';
+'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search } from 'lucide-react';
+import type { User } from '@supabase/supabase-js';
+
+import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
-import {
-    Search,
-    X,
-    Plus,
-    Activity,
-    Beef,
-    Zap,
-    Droplet,
-    Gem,
-    Battery,
-    Heart,
-    Info,
-    ArrowRight,
-    Star,
-    Share2,
-    Calendar,
-    ChevronRight,
-    Library,
-    Edit2,
-    Camera,
-    Upload,
-    Save,
-    Loader2,
-    Wheat,
-    Filter,
-    Check,
-    ChevronDown,
-    Scale,
-    ChefHat,
-    Globe,
-    Beaker,
-    ShoppingBasket
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { cn, formatFoodName } from '@/lib/utils';
-import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
-import { useRDA } from '@/hooks/use-rda';
-import { useSearch, SearchResult } from '@/lib/context/search-context';
+import { useSearch } from '@/lib/context/search-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 
-interface FoodItem {
-    id: string;
-    name: string;
-    common_name: string;
-    energy_kcal: number;
-    energy_kj: number;
-    protein_g: number;
-    carbs_g: number;
-    fat_g: number;
-    image: string | null;
-    micronutrients: Record<string, number>;
-    is_favorite?: boolean;
-    is_in_pantry?: boolean;
-    category?: string;
-    quantity?: string;
-}
-
-export const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements'];
+const PAGE_SIZE = 20;
 
 interface FoodsViewProps {
-    showFavoritesOnly?: boolean;
-    setShowFavoritesOnly?: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedCategories?: string[];
-    setSelectedCategories?: React.Dispatch<React.SetStateAction<string[]>>;
+    showAddFood?: boolean;
+    setShowAddFood?: Dispatch<SetStateAction<boolean>>;
+    searchQuery?: string;
+    onSearchChange?: (query: string) => void;
     hideControls?: boolean;
 }
 
-export function FoodsView({
-    showFavoritesOnly: externalShowFavoritesOnly,
-    setShowFavoritesOnly: externalSetShowFavoritesOnly,
-    selectedCategories: externalSelectedCategories,
-    setSelectedCategories: externalSetSelectedCategories,
+export function FoodsView({ 
+    showAddFood = false, 
+    setShowAddFood, 
+    searchQuery: externalSearchQuery, 
+    onSearchChange,
     hideControls = false
 }: FoodsViewProps) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const { setResults, setIsLoading: setGlobalLoading, registerResultClickHandler } = useSearch();
+    const { energyUnit } = useUserPreferences();
+    const { searchQuery } = useSearch();
 
-    const PAGE_SIZE = 20;
     const [foods, setFoods] = useState<FoodItem[]>([]);
-    const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [page, setPage] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-    const { searchQuery, setSearchQuery } = useSearch();
-    const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>(CATEGORIES);
-    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const [authReady, setAuthReady] = useState(false);
 
-    const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
-    const setSelectedCategories = externalSetSelectedCategories !== undefined ? externalSetSelectedCategories : setLocalSelectedCategories;
-    const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
-    const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [sortField, setSortField] = useState<string>('common_name');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-    const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+    // Use external searchQuery if provided, otherwise use internal from useSearch
+    const effectiveSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
 
-    // Initial load and filter/search changes
+    // Auth logic
     useEffect(() => {
-        const init = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user?.email) setCurrentUserEmail(user.email);
-            fetchFoods(0, true);
-        };
-        init();
-    }, [searchQuery, selectedCategories, showFavoritesOnly, sortField, sortDirection]);
+        let resolvedViaGetSession = false;
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            resolvedViaGetSession = true;
+            setUser(session?.user ?? null);
+            setAuthReady(true);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'INITIAL_SESSION' && resolvedViaGetSession) return;
+            setUser(session?.user ?? null);
+            setAuthReady(true);
+        });
+        return () => subscription.unsubscribe();
+    }, []);
 
-    const fetchFoods = async (pageNum: number, isNewSearch = false) => {
-        if (pageNum === 0) setLoading(true);
-        else setLoadingMore(true);
-
+    // Single fetch function
+    const fetchFoods = useCallback(async (
+        pageNum: number,
+        opts: { q: string; favOnly: boolean; cats: string[]; currentUser: User | null },
+        isNewSearch = false,
+    ) => {
+        setLoading(true);
         try {
-            let query = supabase
-                .from('food_items')
-                .select('*', { count: 'exact' })
-                .order(sortField, { ascending: sortDirection === 'asc' });
+            let query = supabase.from('food_items').select('*', { count: 'exact' });
 
-            if (searchQuery.trim()) {
-                query = query.or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`);
+            if (opts.currentUser) {
+                query = query.or(`is_curated.eq.true,user_id.eq.${opts.currentUser.id}`);
+            } else {
+                query = query.eq('is_curated', true);
             }
-
-            if (selectedCategories.length < CATEGORIES.length) {
-                query = query.in('category', selectedCategories);
+            if (opts.q) {
+                query = query.or(`name.ilike.%${opts.q}%,common_name.ilike.%${opts.q}%`);
             }
-
-            if (showFavoritesOnly) {
+            if (opts.favOnly) {
                 query = query.eq('is_favorite', true);
             }
+            if (opts.cats.length > 0 && opts.cats.length < CATEGORIES.length) {
+                query = query.in('category', opts.cats);
+            }
 
-            const from = pageNum * PAGE_SIZE;
-            const to = from + PAGE_SIZE - 1;
-            query = query.range(from, to);
+            const from = (pageNum - 1) * PAGE_SIZE;
+            query = query.range(from, from + PAGE_SIZE - 1).order('name', { ascending: true });
 
             const { data, error, count } = await query;
             if (error) throw error;
 
-            if (count !== null) setTotalCount(count);
+            let fetchedItems = (data ?? []) as FoodItem[];
+            const dbTotal = count ?? 0;
+            const dbFetched = fetchedItems.length;
 
-            const newItems = data || [];
-
-            // Merge in locally-stored quantities (persists without login)
-            try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');
-                if (savedQuantities) {
-                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
-                    newItems.forEach(item => {
-                        if (quantities[item.id]) {
-                            item.quantity = quantities[item.id];
-                            item.is_in_pantry = true;
+            // Prepend local (guest) foods
+            if (!opts.currentUser) {
+                try {
+                    const raw = localStorage.getItem('local_foods');
+                    if (raw) {
+                        let localFoods: FoodItem[] = JSON.parse(raw);
+                        if (opts.q.trim()) {
+                            localFoods = localFoods.filter(f =>
+                                f.name.toLowerCase().includes(opts.q.toLowerCase()) ||
+                                (f.common_name && f.common_name.toLowerCase().includes(opts.q.toLowerCase()))
+                            );
                         }
-                    });
-                }
-            } catch (e) {
-                console.error('Failed to load saved quantities', e);
+                        if (opts.favOnly) localFoods = localFoods.filter(f => f.is_favorite);
+                        if (opts.cats.length > 0 && opts.cats.length < CATEGORIES.length) {
+                            localFoods = localFoods.filter(f => f.category && opts.cats.includes(f.category));
+                        }
+                        if (isNewSearch) fetchedItems = [...localFoods, ...fetchedItems];
+                    }
+                } catch { /* ignore */ }
             }
+
+            // Merge locally-stored pantry quantities
+            try {
+                const raw = localStorage.getItem('pantry_quantities');
+                if (raw) {
+                    const quantities: Record<string, string> = JSON.parse(raw);
+                    fetchedItems = fetchedItems.map(item =>
+                        quantities[item.id]
+                            ? { ...item, quantity: quantities[item.id], is_in_pantry: true }
+                            : item
+                    );
+                }
+            } catch { /* ignore */ }
 
             if (isNewSearch) {
-                setFoods(newItems);
-                setPage(0);
+                setFoods(fetchedItems);
+                setPage(1);
             } else {
-                setFoods(prev => [...prev, ...newItems]);
+                setFoods(prev => {
+                    const existingIds = new Set(prev.map(f => f.id));
+                    return [...prev, ...fetchedItems.filter(f => !existingIds.has(f.id))];
+                });
                 setPage(pageNum);
             }
-
-            setHasMore(count ? (isNewSearch ? newItems.length : foods.length + newItems.length) < count : false);
+            setHasMore(from + dbFetched < dbTotal);
         } catch (error) {
-            console.error('Error fetching foods:', error);
-            toast.error(`Failed to load ingredient library`);
+            console.error(error);
+            toast.error('Failed to load foods');
         } finally {
             setLoading(false);
-            setLoadingMore(false);
         }
-    };
+    }, []);
 
-    const handleSort = (field: string) => {
-        if (sortField === field) {
-            setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
-    };
+    // Initial fetch
+    useEffect(() => {
+        if (!authReady) return;
+        fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
+    }, [authReady, showFavoritesOnly, selectedCategories, user, fetchFoods]);
 
-    const handleLoadMore = () => {
-        if (!loadingMore && hasMore) {
-            fetchFoods(page + 1);
-        }
-    };
-
-    const toggleFavorite = async (item: FoodItem, e?: React.MouseEvent) => {
-        e?.stopPropagation();
-        try {
-            const newStatus = !item.is_favorite;
-            const { error } = await supabase
-                .from('food_items')
-                .update({ is_favorite: newStatus } as any)
-                .eq('id', item.id);
-
-            if (error) throw error;
-            setFoods(prev => prev.map(f => f.id === item.id ? { ...f, is_favorite: newStatus } : f));
-            toast.success(newStatus ? 'Added to collections' : 'Removed from collections');
-        } catch (error: any) {
-            toast.error(`Failed to update favorite`);
-        }
-    };
-
-    const togglePantry = async (item: FoodItem, e?: React.MouseEvent) => {
-        e?.stopPropagation();
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
-            const newStatus = !item.is_in_pantry;
-
-            if (admin) {
-                const { error } = await supabase
-                    .from('food_items')
-                    .update({ is_in_pantry: newStatus } as any)
-                    .eq('id', item.id);
-                if (error) throw error;
-            } else if (user) {
-                if (newStatus) {
-                    // Add to per-user pantry_items
-                    const { data: existing } = await supabase
-                        .from('pantry_items')
-                        .select('id')
-                        .eq('user_id', user.id)
-                        .eq('food_item_id', item.id)
-                        .maybeSingle();
-                    if (!existing) {
-                        await supabase.from('pantry_items').insert({
-                            user_id: user.id,
-                            name: item.common_name || item.name,
-                            quantity: '1',
-                            food_item_id: item.id
-                        });
-                    }
-                } else {
-                    // Remove from per-user pantry_items
-                    await supabase.from('pantry_items').delete().eq('user_id', user.id).eq('food_item_id', item.id);
-                }
-            }
-
-            setFoods(prev => prev.map(f => f.id === item.id ? { ...f, is_in_pantry: newStatus } : f));
-            toast.success(newStatus ? 'Added to My Pantry' : 'Removed from My Pantry');
-        } catch (error: any) {
-            toast.error(`Failed to update pantry`);
-        }
-    };
+    // Debounced search
+    const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        if (!authReady) return;
+        if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+        searchTimerRef.current = setTimeout(() => {
+            fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
+        }, 400);
+        return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
+    }, [effectiveSearchQuery, authReady, fetchFoods]);
 
     return (
-        <div className="space-y-6">
-            {/* Controls Row */}
-            {!hideControls && (
-                <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-                    <div className="flex items-center gap-4">
-                        {/* Favorites Switch Toggle */}
-                        <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0 shadow-sm">
-                            <Globe
-                                size={18}
-                                className={cn(
-                                    "transition-all cursor-pointer",
-                                    !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
-                                )}
-                                onClick={() => setShowFavoritesOnly(false)}
-                            />
-                            <Switch
-                                id="favorites-mode"
-                                checked={showFavoritesOnly}
-                                onCheckedChange={setShowFavoritesOnly}
-                                className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
-                            />
-                            <Heart
-                                size={18}
-                                className={cn(
-                                    "transition-all cursor-pointer",
-                                    showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
-                                )}
-                                onClick={() => setShowFavoritesOnly(true)}
-                            />
-                        </div>
-
-                        {/* Category Filter */}
-                        <div className="relative">
-                            <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14 shadow-sm w-fit transition-all duration-500">
-                                <button
-                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                    className={cn(
-                                        "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300 shrink-0",
-                                        isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    )}
-                                >
-                                    <Filter size={18} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter Groups</span>
-                                    <ChevronDown size={14} className={cn("transition-transform duration-300", isFilterOpen && "rotate-180")} />
-                                </button>
-
-                                <div className="w-px h-6 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0" />
-
-                                <div className={cn("flex items-center gap-1 transition-all duration-500 ease-in-out overflow-hidden", isFilterOpen ? "max-w-[1000px] opacity-100 px-1" : "max-w-0 opacity-0 px-0")}>
-                                    {CATEGORIES.map(category => {
-                                        const isActive = selectedCategories.includes(category);
-                                        return (
-                                            <button
-                                                key={category}
-                                                onClick={() => isActive
-                                                    ? setSelectedCategories(prev => prev.filter(c => c !== category))
-                                                    : setSelectedCategories(prev => [...prev, category])
-                                                }
-                                                className={cn(
-                                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                                    isActive
-                                                        ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
-                                                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+        <div className="space-y-8 animate-in fade-in duration-500">
+            {/* List Container */}
+            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
+                {showAddFood && setShowAddFood ? (
+                    <FoodFormDialog onClose={() => setShowAddFood(false)} />
+                ) : (
+                    <>
+                        {/* Sticky Header */}
+                        {!hideControls && (
+                            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-[2rem]">
+                                {/* Mobile filter bar */}
+                                <div className="flex md:hidden items-center justify-between gap-2 px-4 py-3">
+                                    <Sheet>
+                                        <SheetTrigger asChild>
+                                            <button className={cn(
+                                                'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
+                                                (showFavoritesOnly || selectedCategories.length > 0)
+                                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                    : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
+                                            )}>
+                                                <Filter size={11} />
+                                                Filter
+                                                {(showFavoritesOnly || selectedCategories.length > 0) && (
+                                                    <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
+                                                        {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                                                    </span>
                                                 )}
-                                            >
-                                                {category}
                                             </button>
-                                        );
-                                    })}
+                                        </SheetTrigger>
+                                        <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
+                                            <SheetHeader className="mb-4">
+                                                <div className="flex items-center justify-between">
+                                                    {(showFavoritesOnly || selectedCategories.length > 0) && (
+                                                        <button
+                                                            onClick={() => { setShowFavoritesOnly(false); setSelectedCategories([]); }}
+                                                            className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
+                                                        >
+                                                            Clear all
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </SheetHeader>
+
+                                            <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favourites only</span>
+                                                <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
+                                            </div>
+
+                                            <div className="mt-4">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Category</span>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {CATEGORIES.map(cat => {
+                                                        const active = selectedCategories.includes(cat);
+                                                        return (
+                                                            <button
+                                                                key={cat}
+                                                                onClick={() => {
+                                                                    if (active) setSelectedCategories(prev => prev.filter(c => c !== cat));
+                                                                    else setSelectedCategories(prev => [...prev, cat]);
+                                                                }}
+                                                                className={cn(
+                                                                    'h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all',
+                                                                    active
+                                                                        ? 'bg-emerald-500 border-emerald-500 text-white'
+                                                                        : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                                                )}
+                                                            >
+                                                                {cat}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </SheetContent>
+                                    </Sheet>
+
+                                    <div className="flex-1 relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                                        <input
+                                            type="text"
+                                            value={externalSearchQuery ?? ''}
+                                            onChange={(e) => onSearchChange?.(e.target.value)}
+                                            placeholder="Search ingredients..."
+                                            className={cn(
+                                                "w-full h-9 pl-9 pr-4 rounded-full border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                                "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                                "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                                "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                            )}
+                                        />
+                                    </div>
                                 </div>
 
-                                {!isFilterOpen && (
-                                    <div className="px-4 whitespace-nowrap">
-                                        <span className="text-[10px] font-bold text-slate-400 italic">
-                                            {selectedCategories.length === CATEGORIES.length ? "All Ingredients" : `${selectedCategories.length} Categories Selected`}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                                {/* Desktop header row */}
+                                <div className="hidden md:flex md:items-center gap-4 px-10 py-4 w-full">
+                                    <div className="flex items-center gap-4">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button className={cn(
+                                                    'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
+                                                    (showFavoritesOnly || selectedCategories.length > 0)
+                                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                        : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                                )}>
+                                                    <Filter size={13} />
+                                                    Filter
+                                                    {(selectedCategories.length > 0 || showFavoritesOnly) && (
+                                                        <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
+                                                            {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 shadow-2xl">
+                                                <div className="px-2 py-1.5">
+                                                    <div className="flex items-center justify-between py-2">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favourites Only</span>
+                                                        <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
+                                                    </div>
+                                                </div>
+                                                <DropdownMenuSeparator className="bg-slate-200 dark:bg-slate-800" />
+                                                <div className="px-2">
+                                                    <div className="flex items-center justify-between py-2">
+                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-0">Categories</DropdownMenuLabel>
+                                                        {selectedCategories.length > 0 && (
+                                                            <button onClick={() => setSelectedCategories([])} className="text-[9px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors">Clear</button>
+                                                        )}
+                                                    </div>
+                                                    <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
+                                                        {CATEGORIES.map(category => (
+                                                            <DropdownMenuCheckboxItem
+                                                                key={category}
+                                                                checked={selectedCategories.includes(category)}
+                                                                onCheckedChange={(checked) => {
+                                                                    if (checked) setSelectedCategories(prev => [...prev, category]);
+                                                                    else setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                                }}
+                                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
+                                                            >
+                                                                {category}
+                                                            </DropdownMenuCheckboxItem>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
 
-                    <Button
-                        onClick={() => router.push('/admin/add-food')}
-                        className="h-14 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-emerald-500/10"
-                    >
-                        <Plus size={18} />
-                        Add Ingredient
-                    </Button>
-                </div>
-            )}
-
-            {/* Main Content Area */}
-            {loading ? (
-                <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
-                    <Loader2 className="animate-spin text-emerald-500" size={32} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Searching...</p>
-                </div>
-            ) : foods.length === 0 ? (
-                <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
-                    <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
-                        <Library size={32} />
-                    </div>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        {showFavoritesOnly ? "No Favorites Yet" : "No ingredients found."}
-                    </p>
-                    <p className="text-sm text-slate-500 text-center max-w-xs">
-                        Try adjusting your filters or search to find what you're looking for.
-                    </p>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {/* List Header */}
-                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_120px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('image')}>
-                            <Camera size={14} className={cn(sortField === 'image' && "text-emerald-500")} />
-                        </div>
-                        <div className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('common_name')}>
-                            <Info size={14} className={cn(sortField === 'common_name' && "text-emerald-500")} />
-                            <span>Name</span>
-                        </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('energy_kcal')}>
-                            <Zap size={14} className="text-emerald-500" /> ENERGY
-                        </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('carbs_g')}>
-                            <Wheat size={14} className="text-amber-500" /> CARBS
-                        </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('fat_g')}>
-                            <Droplet size={14} className="text-amber-900" /> FAT
-                        </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('protein_g')}>
-                            <Beef size={14} className="text-rose-500" /> PROTEIN
-                        </div>
-                        <div className="flex justify-end lg:justify-center items-center gap-1.5">
-                            <Activity size={14} className="text-slate-400" /> CONTROL
-                        </div>
-                    </div>
-
-                    {/* Food Items List */}
-                    <div className="space-y-3">
-                        {foods.map((food) => (
-                            <div
-                                key={food.id}
-                                onClick={() => router.push(`/foods/${food.id}`)}
-                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
-                            >
-                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_120px] gap-4 lg:items-center lg:px-8">
-                                    {/* Thumbnail */}
-                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
-                                        {food.image ? (
-                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                <Beef size={24} className="opacity-20" />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Info */}
-                                    <div className="p-3 lg:p-0">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                            {formatFoodName(food.common_name || food.name)}
-                                        </h3>
-                                        <div className="flex flex-wrap gap-2 mt-1.5">
-                                            {/* Quantity badge - always visible if present */}
-                                            {food.quantity && (
-                                                <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
-                                                    {food.quantity}
-                                                </Badge>
-                                            )}
-                                            {/* Category badge - desktop only */}
-                                            {food.category && (
-                                                <Badge className="hidden lg:inline-flex bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest font-black">
-                                                    {food.category}
-                                                </Badge>
-                                            )}
+                                        <div className="relative">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                                            <input
+                                                type="text"
+                                                value={externalSearchQuery ?? ''}
+                                                onChange={(e) => onSearchChange?.(e.target.value)}
+                                                placeholder="Search ingredients..."
+                                                className={cn(
+                                                    "w-64 h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                                    "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                                    "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                                    "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                                )}
+                                            />
                                         </div>
                                     </div>
 
-                                    {/* Stats (Desktop View) */}
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{Math.round(food.energy_kcal)}</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{food.carbs_g.toFixed(1)}</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{food.fat_g.toFixed(1)}</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{food.protein_g.toFixed(1)}</div>
-
-                                    {/* Action Buttons */}
-                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
-                                        <button
-                                            onClick={(e) => togglePantry(food, e)}
-                                            className={cn(
-                                                "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                food.is_in_pantry
-                                                    ? "bg-emerald-600 text-white border-emerald-700 shadow-md shadow-emerald-600/20"
-                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
-                                            )}
-                                        >
-                                            <ShoppingBasket size={14} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => toggleFavorite(food, e)}
-                                            className={cn(
-                                                "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                food.is_favorite
-                                                    ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20"
-                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
-                                            )}
-                                        >
-                                            <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
-                                        </button>
-                                        <button className="w-8 h-8 rounded-full flex items-center justify-center border bg-emerald-500 text-white shadow-lg shadow-emerald-500/10">
-                                            <ArrowRight size={14} />
-                                        </button>
-                                    </div>
+                                    <div className="ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Ingredients Library</div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        )}
 
-                    {/* Pagination */}
-                    {hasMore && (
-                        <div className="flex justify-center pt-8">
-                            <Button
-                                onClick={handleLoadMore}
-                                disabled={loadingMore}
-                                className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
-                            >
-                                {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : "Load More Samples"}
-                            </Button>
+                        {/* List */}
+                        <div className="space-y-2 p-4">
+                            {loading && foods.length === 0 && (
+                                <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
+                                    <Loader2 size={24} className="animate-spin text-emerald-500" />
+                                    <p className="text-[10px] font-black uppercase tracking-widest">Loading Library...</p>
+                                </div>
+                            )}
+
+                            {!loading && foods.length === 0 && (
+                                <div className="py-16 text-center">
+                                    <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
+                                        <Leaf size={22} className="opacity-20" />
+                                    </div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                        {(showFavoritesOnly || selectedCategories.length > 0 || effectiveSearchQuery)
+                                            ? 'No ingredients match your filters'
+                                            : 'Library is empty'}
+                                    </p>
+                                </div>
+                            )}
+
+                            {foods.map((food) => (
+                                <Link
+                                    key={food.id}
+                                    href={`/foods/${food.id}`}
+                                    className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                                >
+                                    <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
+                                        <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
+                                            {food.image ? (
+                                                <Image src={food.image} alt={food.name} fill className="object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                    <Beef size={24} className="opacity-10" />
+                                                </div>
+                                            )}
+                                            {food.is_in_pantry && (
+                                                <div className="absolute top-1 right-1 bg-emerald-500 text-white rounded-full p-0.5 shadow-md">
+                                                    <Check size={8} strokeWidth={4} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
+                                                {formatFoodName(food.common_name || food.name)}
+                                            </h3>
+                                            <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
+                                                <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                                <span className="text-slate-300 text-[8px]">•</span>
+                                                <span className="text-amber-500">{food.carbs_g.toFixed(0)}g C</span>
+                                                <span className="text-slate-300 text-[8px]">•</span>
+                                                <span className="text-rose-500">{food.fat_g.toFixed(0)}g F</span>
+                                                <span className="text-slate-300 text-[8px]">•</span>
+                                                <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="hidden lg:flex items-center justify-end gap-3">
+                                            <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{food.carbs_g.toFixed(1)}g</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
                         </div>
-                    )}
+                    </>
+                )}
+            </div>
+
+            {hasMore && (
+                <div className="flex justify-center pt-4 pb-8">
+                    <button
+                        onClick={() => fetchFoods(page + 1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user })}
+                        disabled={loading}
+                        className="h-12 px-8 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-emerald-400 hover:text-emerald-600 transition-all disabled:opacity-40 shadow-xl"
+                    >
+                        {loading ? <Loader2 size={14} className="animate-spin" /> : <ChevronDown size={14} />}
+                        Load More
+                    </button>
                 </div>
             )}
         </div>
     );
 }
-

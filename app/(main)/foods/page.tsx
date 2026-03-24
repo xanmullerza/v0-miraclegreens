@@ -1,8 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
-import { ExploreView } from './views/explore-view';
+import { FoodsView } from '@/components/ingredients/foods-view';
 import { useSearch } from '@/lib/context/search-context';
 
 export default function IngredientsPage() {
@@ -16,7 +16,7 @@ export default function IngredientsPage() {
         <PageContainer maxWidth="max-w-7xl">
             <div className="space-y-6 animate-in fade-in duration-500">
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    <ExploreView searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+                    <FoodsView searchQuery={searchQuery} onSearchChange={setSearchQuery} />
                 </div>
             </div>
         </PageContainer>
