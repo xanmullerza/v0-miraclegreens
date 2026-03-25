@@ -4,7 +4,7 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import {
     Search, ChevronLeft, ChevronRight, ChevronDown, Activity, Zap, Gem,
-    Battery, Droplet, Lightbulb, UtensilsCrossed, Leaf, Dna, Sparkles, Beaker
+    Battery, Droplet, Lightbulb, UtensilsCrossed, Leaf, Dna, Sparkles, Beaker, BookOpen
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -475,18 +475,17 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
 
         return (
             <div key={node.id}>
-                <button
-                    onClick={() => {
-                        if (node.isParent) toggleParent(node.id);
-                        if (!isGroupHeader) selectNutrient(node);
-                    }}
+                <div
                     className={cn(
                         "w-full text-left flex items-center gap-3 py-3 px-4 rounded-xl transition-all group",
                         node.isParent
-                            ? cn("border-l-[3px]", theme.parentBorder, theme.parentBg, "hover:shadow-md")
+                            ? cn("border-l-[3px]", theme.parentBorder, theme.parentBg, "hover:shadow-md cursor-pointer")
                             : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-[3px] border-l-transparent",
                         depth > 0 && "ml-4"
                     )}
+                    onClick={() => {
+                        if (node.isParent) toggleParent(node.id);
+                    }}
                 >
                     {/* Expand chevron for parents */}
                     {node.isParent ? (
@@ -524,14 +523,24 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                         </span>
                     )}
 
-                    {/* Navigate chevron for clickable items */}
-                    {!isGroupHeader && (
-                        <ChevronRight
-                            size={12}
-                            className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 transition-colors shrink-0"
-                        />
+                    {/* Learn Button for clickable items */}
+                    {!isGroupHeader && !node.isParent && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                selectNutrient(node);
+                            }}
+                            title={`Learn about ${node.label}`}
+                            className={cn(
+                                "flex-shrink-0 p-1.5 rounded-md transition-colors",
+                                theme.text,
+                                "hover:bg-black/5 dark:hover:bg-white/10"
+                            )}
+                        >
+                            <BookOpen size={16} />
+                        </button>
                     )}
-                </button>
+                </div>
 
                 {/* Children (expanded) */}
                 {node.isParent && isExpanded && node.children && (
