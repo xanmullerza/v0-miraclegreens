@@ -116,22 +116,17 @@ export function HeaderLogo({
                 {/* Navigation Items */}
                 <div className="flex items-center h-full divide-x divide-border mr-1 border-l border-border">
                     {[
-                        { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
                         { label: 'Privacy', path: '/privacy', icon: Shield, color: 'text-slate-500' },
                         { label: 'Support', path: '/support', icon: HelpCircle, color: 'text-slate-500' },
                         { label: 'Terms', path: '/terms', icon: BookOpen, color: 'text-slate-500' },
                     ].map((item) => {
                         const Icon = item.icon;
-                        const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');
-                        const isActive = isHomeRedirect || pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
+                        const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
                         
                         return (
                             <Link
                                 key={item.path}
                                 href={item.path}
-                                onClick={() => {
-                                    if (item.label === 'Home') setResizeMode('content-focus');
-                                }}
                                 className={cn(
                                     "flex items-center gap-2 px-3 sm:px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
                                     isActive
