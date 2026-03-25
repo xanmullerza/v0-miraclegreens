@@ -297,7 +297,7 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
     );
 
     // UI state
-    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['macronutrients']));
+    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
     const [selectedNutrient, setSelectedNutrient] = useState<NutrientNode | null>(null);
     const [topFoods, setTopFoods] = useState<FoodRanking[]>([]);
