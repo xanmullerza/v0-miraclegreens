@@ -171,6 +171,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
         nutrients: [
             {
                 id: 'Vitamin A', label: 'Vitamin A', unit: 'µg', isParent: true,
+                theme: 'orange',
                 children: [
                     { id: 'Retinol', label: 'Retinol', unit: 'µg' },
                     { id: 'Beta-carotene', label: 'Beta-carotene', unit: 'µg' },
@@ -180,6 +181,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
             },
             {
                 id: 'Vitamin E', label: 'Vitamin E', unit: 'mg', isParent: true,
+                theme: 'pink',
                 children: [
                     { id: 'Alpha-tocopherol', label: 'Alpha-tocopherol', unit: 'mg' },
                     { id: 'Beta-tocopherol', label: 'Beta-tocopherol', unit: 'mg' },
@@ -187,11 +189,12 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                     { id: 'Gamma-tocopherol', label: 'Gamma-tocopherol', unit: 'mg' },
                 ]
             },
-            { id: 'Vitamin C', label: 'Vitamin C', unit: 'mg' },
-            { id: 'Vitamin D', label: 'Vitamin D', unit: 'µg' },
-            { id: 'Vitamin K', label: 'Vitamin K', unit: 'µg' },
+            { id: 'Vitamin C', label: 'Vitamin C', unit: 'mg', theme: 'sky' },
+            { id: 'Vitamin D', label: 'Vitamin D', unit: 'µg', theme: 'amber' },
+            { id: 'Vitamin K', label: 'Vitamin K', unit: 'µg', theme: 'rose' },
             {
                 id: '_b_vitamins', label: 'B Vitamins', unit: '', isParent: true,
+                theme: 'purple',
                 children: [
                     { id: 'B1 (Thiamine)', label: 'B1 (Thiamine)', unit: 'mg' },
                     { id: 'B2 (Riboflavin)', label: 'B2 (Riboflavin)', unit: 'mg' },
@@ -202,7 +205,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                     { id: 'B12 (Cobalamin)', label: 'B12 (Cobalamin)', unit: 'µg' },
                 ]
             },
-            { id: 'Choline', label: 'Choline', unit: 'mg' },
+            { id: 'Choline', label: 'Choline', unit: 'mg', theme: 'teal' },
         ]
     },
 ];
