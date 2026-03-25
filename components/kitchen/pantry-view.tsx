@@ -603,8 +603,8 @@ export function PantryView({
     const filteredFoods = foods.filter(food => {
         const matchesSearch = (food.common_name || food.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
             food.name.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFavorites = !showFavoritesOnly || food.is_favorite;
-        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(food.category || 'General');
+        const matchesFavorites = !externalShowFavoritesOnly || food.is_favorite;
+        const matchesCategory = !externalSelectedCategories || externalSelectedCategories.length === 0 || externalSelectedCategories.includes(food.category || 'General');
 
         return matchesSearch && matchesFavorites && matchesCategory;
     });
