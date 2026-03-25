@@ -924,22 +924,6 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                     {!selectedNutrient && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             
-                            {/* Title area (non-compact) */}
-                            {!compact && !heroQuery && (
-                                <div className="flex items-center gap-4 px-2 mb-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-sm border border-emerald-500/10">
-                                        <Activity size={24} />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">
-                                            Nutridex
-                                        </h2>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-                                            Complete nutrient reference &amp; profile targets
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
 
                             {/* Accordion List */}
                             <div className="space-y-4">
@@ -1023,26 +1007,7 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                 </div>
             </div>
 
-            {/* Info Card (Outside the main container) */}
-            {!selectedNutrient && !compact && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-                    <div className="w-full max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 p-10 flex flex-col md:flex-row items-center gap-10 shadow-xl overflow-hidden relative group">
-                        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors duration-700" />
-                        <div className="w-20 h-20 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 shadow-lg border border-blue-500/10">
-                            <Sparkles size={40} />
-                        </div>
-                        <div className="space-y-5 flex-1 relative z-10">
-                            <div className="space-y-2">
-                                <h4 className="font-black text-[11px] uppercase tracking-[0.4em] text-blue-500/70">Biological Framework</h4>
-                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">Profile-Aware Intelligence</h3>
-                            </div>
-                            <p className="text-base font-bold text-slate-500 dark:text-slate-400 leading-relaxed italic border-l-4 border-blue-500/20 pl-8">
-                                &quot;The targets shown above are custom-calculated based on your age, gender, and activity levels. Tap any nutrient to discover life-enhancing benefits, deficiency warnings, and the best whole-food sources.&quot;
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
+
         </div>
     );
 }
