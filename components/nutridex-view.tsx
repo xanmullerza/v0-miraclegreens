@@ -87,8 +87,6 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                 id: 'Fat', label: 'Fat', unit: 'g', isParent: true,
                 theme: 'rose',
                 children: [
-                    { id: 'Saturated Fat', label: 'Saturated Fat', unit: 'g', theme: 'orange' },
-                    { id: 'Monounsaturated Fat', label: 'Monounsaturated Fat', unit: 'g', theme: 'amber' },
                     {
                         id: 'Polyunsaturated Fat', label: 'Polyunsaturated Fat', unit: 'g', isParent: true,
                         theme: 'teal',
@@ -97,6 +95,8 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                             { id: 'Omega-6', label: 'Omega-6', unit: 'g' },
                         ]
                     },
+                    { id: 'Saturated Fat', label: 'Saturated Fat', unit: 'g', theme: 'orange' },
+                    { id: 'Monounsaturated Fat', label: 'Monounsaturated Fat', unit: 'g', theme: 'amber' },
                     { id: 'Trans Fat', label: 'Trans Fat', unit: 'g', theme: 'sky' },
                     { id: 'Cholesterol', label: 'Cholesterol', unit: 'mg', theme: 'violet' },
                     { id: 'Phytosterol', label: 'Phytosterol', unit: 'mg', theme: 'emerald' },
