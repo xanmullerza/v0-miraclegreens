@@ -63,6 +63,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePantry } from '@/hooks/use-pantry';
+import { useShoppingList } from '@/hooks/use-shopping-list';
+import {
+    mergeQuantityStrings,
+    stripZeroEntries,
+    buildQuantityString
+} from '@/components/pantry/pantry-types';
 import { PageContainer } from '@/components/ui/page-container';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -95,6 +102,9 @@ interface FoodItem {
 export default function FoodDetailsPage() {
     const router = useRouter();
     const { id } = useParams();
+    const { quantities, updateQuantity, addToPantry: dbAddToPantry } = usePantry();
+    const { addItem: addShoppingListItem } = useShoppingList();
+
     const [food, setFood] = useState<FoodItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
@@ -297,18 +307,9 @@ export default function FoodDetailsPage() {
 
             const fetchedFood = data;
 
-            // Merge in locally-stored quantities (persists without login)
-            try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');
-                if (savedQuantities && fetchedFood) {
-                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
-                    if (quantities[fetchedFood.id]) {
-                        fetchedFood.quantity = quantities[fetchedFood.id];
-                        fetchedFood.is_in_pantry = true;
-                    }
-                }
-            } catch (e) {
-                console.error('Failed to load saved quantities', e);
+            if (fetchedFood && quantities[fetchedFood.id]) {
+                fetchedFood.quantity = quantities[fetchedFood.id];
+                fetchedFood.is_in_pantry = true;
             }
 
             setFood(fetchedFood);
@@ -369,159 +370,33 @@ export default function FoodDetailsPage() {
     const handleQuickAdd = async () => {
         if (!food) return;
 
-        // Build quantity string — use portion label if a portion is selected
-        const quantityString = selectedPortion
-            ? `${quickAddQty} ${selectedPortion.label} (${selectedPortion.weight_g}g)`
-            : quickAddWeight
-                ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}`
-                : quickAddQty;
+        const quantityString = buildQuantityString(quickAddQty, selectedPortion, quickAddWeight, quickAddUnit);
 
         if (quickAddMode === 'pantry') {
             try {
-                // Merge with existing stock instead of overwriting
-                const saved = localStorage.getItem('pantry_quantities');
-                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                const existing = quantities[food.id] || food.quantity || '';
-
-                // Simple merge: append with " + " separator, stripping zero entries
-                const existingEntries = existing
-                    .split(/\s*\+\s*/)
-                    .map((s: string) => s.trim())
-                    .filter((s: string) => {
-                        if (!s) return false;
-                        const m = s.match(/^(\d+(?:\.\d+)?)/);
-                        return m ? parseFloat(m[1]) > 0 : true;
-                    });
-
-                // Check if incoming matches an existing entry (same label + weight)
-                const incomingLabeled = quantityString.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                const incomingX = quantityString.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
-
-                let merged = false;
-                if (incomingLabeled) {
-                    const incQty = parseFloat(incomingLabeled[1]);
-                    const incLabel = incomingLabeled[2];
-                    const incWeight = incomingLabeled[3];
-                    // Check for gram/kilogram entries that should consolidate by total weight
-                    const isIncWeight = /^(gram|kilogram)s?$/i.test(incLabel);
-                    if (isIncWeight) {
-                        let totalGrams = incQty * parseFloat(incWeight);
-                        const nonWeight: string[] = [];
-                        for (const raw of existingEntries) {
-                            const lbl = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                            const xFmt = raw.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
-                            if (lbl && /^(gram|kilogram)s?$/i.test(lbl[2])) {
-                                totalGrams += parseFloat(lbl[1]) * parseFloat(lbl[3]);
-                            } else if (xFmt) {
-                                totalGrams += parseFloat(xFmt[1]) * parseFloat(xFmt[2]);
-                            } else {
-                                nonWeight.push(raw);
-                            }
-                        }
-                        const kgValue = totalGrams / 1000;
-                        const kgStr = kgValue % 1 === 0 ? kgValue.toString() : kgValue.toFixed(1);
-                        const kgNum = parseFloat(kgStr);
-                        const kgUnit = kgNum === 1 ? 'kilogram' : 'kilograms';
-                        
-                        const gramsNum = Math.round(totalGrams);
-                        const gramsUnit = gramsNum === 1 ? 'gram' : 'grams';
-                        
-                        const fmtEntry = totalGrams >= 1000
-                            ? `${kgStr} ${kgUnit}`
-                            : `${gramsNum} ${gramsUnit}`;
-                        const result = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${fmtEntry}` : fmtEntry;
-                        quantities[food.id] = result;
-                        merged = true;
-                    } else {
-                        // Match by label + weight (e.g. "6 Each (304g)" + "3 Each (304g)" = "9 Each (304g)")
-                        const matchIdx = existingEntries.findIndex((raw: string) => {
-                            const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                            return m && m[2] === incLabel && m[3] === incWeight;
-                        });
-                        if (matchIdx >= 0) {
-                            const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
-                            const sumQty = (m ? parseFloat(m[1]) : 0) + incQty;
-                            existingEntries[matchIdx] = `${sumQty} ${incLabel} (${incWeight}g)`;
-                            quantities[food.id] = existingEntries.join(' + ');
-                            merged = true;
-                        }
-                    }
-                } else if (incomingX) {
-                    // "N x Wg" format — consolidate with existing weight entries
-                    let totalGrams = parseFloat(incomingX[1]) * parseFloat(incomingX[2]);
-                    const nonWeight: string[] = [];
-                    for (const raw of existingEntries) {
-                        const lbl = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                        const xFmt = raw.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
-                        if (lbl && /^(gram|kilogram)s?$/i.test(lbl[2])) {
-                            totalGrams += parseFloat(lbl[1]) * parseFloat(lbl[3]);
-                        } else if (xFmt) {
-                            totalGrams += parseFloat(xFmt[1]) * parseFloat(xFmt[2]);
-                        } else {
-                            nonWeight.push(raw);
-                        }
-                    }
-                    const fmtEntry = totalGrams >= 1000
-                        ? `${(totalGrams / 1000) % 1 === 0 ? (totalGrams / 1000).toString() : (totalGrams / 1000).toFixed(1)} kilogram (1000g)`
-                        : `${Math.round(totalGrams)} gram (1g)`;
-                    const result = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${fmtEntry}` : fmtEntry;
-                    quantities[food.id] = result;
-                    merged = true;
+                const currentQty = quantities[food.id] || food.quantity || '';
+                if (currentQty) {
+                    const merged = mergeQuantityStrings(currentQty, quantityString);
+                    const cleaned = stripZeroEntries(merged);
+                    await updateQuantity(food.id, cleaned);
+                } else {
+                    await dbAddToPantry(food, quantityString);
                 }
-
-                if (!merged) {
-                    // Fallback: append
-                    quantities[food.id] = existingEntries.length > 0
-                        ? `${existingEntries.join(' + ')} + ${quantityString}`
-                        : quantityString;
-                }
-
-                // Update UI
-                setFood(prev => prev ? { ...prev, is_in_pantry: true, quantity: quantities[food.id] } : null);
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-
-                // Update DB — only admin modifies global flag; non-admins use pantry_items
-                const { data: { user: currentUser } } = await supabase.auth.getUser();
-                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-                const userIsAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
                 
-                if (userIsAdmin) {
-                    const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
-                    if (error) throw error;
-                } else if (currentUser) {
-                    const { data: existing } = await supabase
-                        .from('pantry_items')
-                        .select('id')
-                        .eq('user_id', currentUser.id)
-                        .eq('food_item_id', food.id)
-                        .maybeSingle();
-                    if (!existing) {
-                        const { error } = await supabase.from('pantry_items').insert({
-                            user_id: currentUser.id,
-                            name: food.common_name || food.name,
-                            quantity: quantities[food.id],
-                            food_item_id: food.id
-                        });
-                        if (error) throw error;
-                    }
-                }
-
+                // Update local UI state
+                setFood(prev => prev ? { ...prev, is_in_pantry: true, quantity: quantities[food.id] || quantityString } : null);
+                
                 toast.success(`Added to pantry: ${quantityString}`);
             } catch (error) {
                 toast.error('Failed to update pantry');
             }
         } else {
-            const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            const newItem = {
-                id: `manual-${Date.now()}`,
+            await addShoppingListItem({
                 name: food.name,
                 quantity: quantityString,
-                unit: '',
-                checked: false,
-                source: 'manual',
-                food_item_id: food.id
-            };
-            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+                food_item_id: food.id,
+                category: food.category
+            });
             toast.success(`Added to groceries`);
         }
         setActiveSection(null);

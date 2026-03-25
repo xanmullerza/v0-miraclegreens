@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -23,6 +23,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn, formatFoodName } from '@/lib/utils';
+import { usePantry } from '@/hooks/use-pantry';
+import { useShoppingList } from '@/hooks/use-shopping-list';
 
 interface FoodItem {
     id: string;
@@ -40,6 +42,9 @@ interface FoodItem {
 
 export function AllFoodsView() {
     const router = useRouter();
+    const { quantities, addToPantry: dbAddToPantry } = usePantry();
+    const { addItem: addShoppingItem } = useShoppingList();
+
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -65,21 +70,12 @@ export function AllFoodsView() {
 
             const fetchedFoods = data || [];
 
-            // Merge in locally-stored quantities (persists without login)
-            try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');
-                if (savedQuantities) {
-                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
-                    fetchedFoods.forEach(item => {
-                        if (quantities[item.id]) {
-                            item.quantity = quantities[item.id];
-                            item.is_in_pantry = true;
-                        }
-                    });
+            fetchedFoods.forEach(item => {
+                if (quantities[item.id]) {
+                    item.quantity = quantities[item.id];
+                    item.is_in_pantry = true;
                 }
-            } catch (e) {
-                console.error('Failed to load saved quantities', e);
-            }
+            });
 
             setFoods(fetchedFoods);
         } catch (error) {
@@ -92,53 +88,7 @@ export function AllFoodsView() {
 
     const addToPantry = async (food: FoodItem) => {
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            const user = session?.user;
-            if (!user) {
-                toast.info('Sign in to save pantry items to the cloud');
-                setQuickAddItem(null);
-                return;
-            }
-
-            // Check if already in pantry_items
-            const { data: existing } = await supabase
-                .from('pantry_items')
-                .select('id, quantity')
-                .eq('user_id', user.id)
-                .eq('food_item_id', food.id)
-                .limit(1)
-                .single();
-
-            if (existing) {
-                // Aggregate
-                const parseQty = (s: string) => {
-                    const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
-                    return match ? { num: parseFloat(match[1]), unit: match[2].trim() } : null;
-                };
-                const oldQty = parseQty(existing.quantity || '0');
-                const newQty = parseQty(quickAddQty);
-
-                let finalQty = quickAddQty;
-                if (oldQty && newQty && oldQty.unit === newQty.unit) {
-                    const sum = oldQty.num + newQty.num;
-                    finalQty = oldQty.unit ? `${sum} ${oldQty.unit}` : `${sum}`;
-                } else if (existing.quantity) {
-                    finalQty = `${existing.quantity} + ${quickAddQty}`;
-                }
-
-                await supabase
-                    .from('pantry_items')
-                    .update({ quantity: finalQty })
-                    .eq('id', existing.id);
-            } else {
-                await supabase.from('pantry_items').insert({
-                    user_id: user.id,
-                    name: food.common_name || food.name,
-                    quantity: quickAddQty,
-                    food_item_id: food.id
-                });
-            }
-
+            await dbAddToPantry(food, quickAddQty);
             toast.success(`Added ${quickAddQty}× "${food.common_name || food.name}" to pantry`);
             setQuickAddItem(null);
             setQuickAddQty('1');
@@ -148,57 +98,19 @@ export function AllFoodsView() {
         }
     };
 
-    const addToShoppingList = (food: FoodItem) => {
-        const saved = localStorage.getItem('vitala_shopping_manual_items');
-        let manualItems: any[] = [];
+    const addToShoppingList = async (food: FoodItem) => {
         try {
-            manualItems = saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            console.error('Failed to parse shopping list', e);
-        }
-
-        const itemName = food.common_name || food.name;
-
-        // Check for existing
-        const existingIndex = manualItems.findIndex(item =>
-            item.food_item_id === food.id ||
-            item.name.toLowerCase() === itemName.toLowerCase()
-        );
-
-        if (existingIndex >= 0) {
-            const existing = manualItems[existingIndex];
-            const parseQty = (s: string) => {
-                const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
-                return match ? { num: parseFloat(match[1]), unit: match[2].trim() } : null;
-            };
-
-            const oldQty = parseQty(existing.quantity);
-            const newQty = parseQty(quickAddQty);
-
-            if (oldQty && newQty && oldQty.unit === newQty.unit) {
-                const sum = oldQty.num + newQty.num;
-                manualItems[existingIndex].quantity = oldQty.unit ? `${sum} ${oldQty.unit}` : `${sum}`;
-            } else {
-                manualItems[existingIndex].quantity = `${existing.quantity} + ${quickAddQty}`;
-            }
-
-            toast.success(`Updated "${itemName}" quantity in shopping list`);
-        } else {
-            manualItems.push({
-                id: `manual-${Date.now()}`,
-                name: itemName,
+            await addShoppingItem({
+                name: food.common_name || food.name,
                 quantity: quickAddQty,
-                unit: '',
-                checked: false,
-                source: 'manual',
                 food_item_id: food.id
             });
-            toast.success(`Added ${quickAddQty}× "${itemName}" to shopping list`);
+            toast.success(`Added ${quickAddQty}× "${food.common_name || food.name}" to shopping list`);
+            setQuickAddItem(null);
+            setQuickAddQty('1');
+        } catch (e) {
+            toast.error('Failed to add to shopping list');
         }
-
-        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
-        setQuickAddItem(null);
-        setQuickAddQty('1');
     };
 
     const filteredFoods = foods.filter(food =>

@@ -15,6 +15,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
+import { usePantry } from '@/hooks/use-pantry';
 
 export const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements'];
 const PAGE_SIZE = 20;
@@ -36,6 +37,7 @@ export function FoodsView({
 }: FoodsViewProps) {
     const { energyUnit } = useUserPreferences();
     const { searchQuery } = useSearch();
+    const { quantities, pantryItems, loading: pantryLoading } = usePantry();
 
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -122,18 +124,12 @@ export function FoodsView({
                 } catch { /* ignore */ }
             }
 
-            // Merge locally-stored pantry quantities
-            try {
-                const raw = localStorage.getItem('pantry_quantities');
-                if (raw) {
-                    const quantities: Record<string, string> = JSON.parse(raw);
-                    fetchedItems = fetchedItems.map(item =>
-                        quantities[item.id]
-                            ? { ...item, quantity: quantities[item.id], is_in_pantry: true }
-                            : item
-                    );
-                }
-            } catch { /* ignore */ }
+            // Merge pantry quantities from hook
+            fetchedItems = fetchedItems.map(item =>
+                quantities[item.id]
+                    ? { ...item, quantity: quantities[item.id], is_in_pantry: true }
+                    : item
+            );
 
             if (isNewSearch) {
                 setFoods(fetchedItems);

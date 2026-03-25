@@ -92,6 +92,8 @@ import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/lib/context/search-context';
 import { HeroSearch } from '@/components/ui/hero-search';
+import { usePantry } from '@/hooks/use-pantry';
+import { useShoppingList } from '@/hooks/use-shopping-list';
 
 import { FoodItemCreatorContent } from '@/app/(main)/dashboard/meal-o-matic/maker/food/page';
 import { UserRecipeBuilder as MealBuilderContent } from '@/app/(main)/dashboard/meal-o-matic/maker/meal/page';
@@ -429,50 +431,32 @@ const RecipeListItem = ({
   const uniqueMatched = dedup(matchedIngredients);
   const uniqueMissing = dedup(missingIngredients);
   const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
-  // Initialise from localStorage so the disabled state survives a page refresh
-  const [addedToList, setAddedToList] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      const list = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-      return (
-        uniqueMissing.length > 0 &&
-        uniqueMissing.every((m) =>
-          list.some(
-            (item: any) =>
-              (item.food_item_id && m.food_item_id && item.food_item_id === m.food_item_id) ||
-              (item.name || '').toLowerCase().trim() === m.name.toLowerCase().trim(),
-          ),
-        )
-      );
-    } catch {
-      return false;
+
+  const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
+
+  // Initialise from the centralized shopping list so the state is consistent
+  const [addedToList, setAddedToList] = useState(false);
+
+  useEffect(() => {
+    if (uniqueMissing.length === 0) {
+      setAddedToList(false);
+      return;
     }
-  });
+
+    const allInList = uniqueMissing.every((m) =>
+      shoppingItems.some(
+        (item: any) =>
+          (item.food_item_id && m.food_item_id && item.food_item_id === m.food_item_id) ||
+          (item.name || '').toLowerCase().trim() === m.name.toLowerCase().trim() ||
+          (item.name || '').toLowerCase().includes(m.name.toLowerCase().trim())
+      )
+    );
+    setAddedToList(allInList);
+  }, [uniqueMissing, shoppingItems]);
+
   // 3-state to-buy button: toAdd → toBuy → ready
   const toBuyState: 'toAdd' | 'toBuy' | 'ready' =
     uniqueMissing.length === 0 ? 'ready' : addedToList ? 'toBuy' : 'toAdd';
-
-  // Re-check when live DB ingredients load in (uniqueMissing may change after fetch)
-  useEffect(() => {
-    if (typeof window === 'undefined' || addedToList) return;
-    try {
-      const list = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-      if (
-        uniqueMissing.length > 0 &&
-        uniqueMissing.every((m) =>
-          list.some(
-            (item: any) =>
-              (item.food_item_id && m.food_item_id && item.food_item_id === m.food_item_id) ||
-              (item.name || '').toLowerCase().trim() === m.name.toLowerCase().trim(),
-          ),
-        )
-      )
-        setAddedToList(true);
-    } catch {
-      /* ignore */
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [liveIngs]);
   return (
     <div
       onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
@@ -793,15 +777,12 @@ const RecipeListItem = ({
               </span>
             )}
           </div>
-          {activePanel === 'toBuy' && uniqueMissing.length > 0 && (
+            {activePanel === 'toBuy' && uniqueMissing.length > 0 && (
             <button
-              onClick={() => {
-                const currentList = JSON.parse(
-                  localStorage.getItem('vitala_shopping_manual_items') || '[]',
-                );
+              onClick={async () => {
                 let addedCount = 0;
                 for (const entry of uniqueMissing) {
-                  const exists = currentList.some(
+                  const exists = shoppingItems.some(
                     (item: any) =>
                       (item.food_item_id &&
                         entry.food_item_id &&
@@ -809,20 +790,15 @@ const RecipeListItem = ({
                       (item.name || '').toLowerCase().trim() === entry.name.toLowerCase().trim(),
                   );
                   if (!exists) {
-                    currentList.push({
-                      id: `plan-${Date.now()}-${addedCount}`,
+                    await addShoppingItem({
                       name: entry.name,
                       food_item_id: entry.food_item_id || null,
                       quantity: 'As needed',
-                      unit: '',
-                      checked: false,
                       source: 'mealplan',
                     });
                     addedCount++;
                   }
                 }
-                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
-                window.dispatchEvent(new CustomEvent('shopping-list-updated'));
                 setAddedToList(true);
                 toast.success(
                   `${addedCount > 0 ? `${addedCount} item${addedCount !== 1 ? 's' : ''} added` : 'Already on your list'}`,
@@ -871,7 +847,9 @@ export default function MealPlannerContent({
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [generating, setGenerating] = useState(false);
-  const [pantryItems, setPantryItems] = useState<any[]>([]);
+  
+  const { quantities, pantryItems, updateQuantity } = usePantry();
+  const { addItem: addShoppingItem } = useShoppingList();
 
   // HeroSearch state
   const [heroSearchQuery, setHeroSearchQuery] = useState('');
@@ -1049,9 +1027,6 @@ export default function MealPlannerContent({
       console.log('[markEaten] Failed to fetch fresh ingredients, using plan snapshot');
     }
 
-    const saved = localStorage.getItem('pantry_quantities');
-    const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-
     let subtracted = 0;
 
     console.log('[markEaten] Recipe:', recipe.title, 'Servings:', servings);
@@ -1201,25 +1176,17 @@ export default function MealPlannerContent({
       );
       quantities[itemId] = formatWeightStr(remaining);
       console.log('[markEaten] New quantity for', itemId, ':', quantities[itemId]);
+      await updateQuantity(itemId, quantities[itemId]);
       subtracted++;
     }
 
-    console.log('[markEaten] Final quantities to save:', quantities);
-    console.log('[markEaten] Total subtracted:', subtracted);
+    console.log('[markEaten] Final quantities updated via hook, count:', subtracted);
 
     // Log if any item is being set to 0 and move to shopping list
-    const savedBefore = localStorage.getItem('pantry_quantities');
-    const beforeObj = savedBefore ? JSON.parse(savedBefore) : {};
     const itemsToReplenish: { id: string; name: string }[] = [];
 
     Object.entries(quantities).forEach(([id, qty]) => {
-      if ((qty === '0 grams' || qty === '0 g' || qty === '0') && beforeObj[id] !== qty) {
-        console.warn('🥔 [markEaten] ⚠️ ITEM ZEROED OUT!', {
-          id,
-          wasBefore: beforeObj[id],
-          nowIs: qty,
-          recipe: recipe.title,
-        });
+      if ((qty === '0 grams' || qty === '0 g' || qty === '0')) {
         // Find the item name from pantryItems
         const item = pantryItems.find((p) => p.id === id);
         if (item) {
@@ -1228,76 +1195,24 @@ export default function MealPlannerContent({
       }
     });
 
-    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-
     // Move zeroed items to shopping list and remove from pantry
     if (itemsToReplenish.length > 0) {
       try {
-        // Add to shopping list
-        const shoppingList = JSON.parse(
-          localStorage.getItem('vitala_shopping_manual_items') || '[]',
-        );
         for (const item of itemsToReplenish) {
-          shoppingList.push({
-            id: `replenish-${Date.now()}-${item.id}`,
+          await addShoppingItem({
             name: `Replenish: ${item.name}`,
             quantity: 'As needed',
-            unit: '',
-            checked: false,
             source: 'auto-replenish',
           });
-
-          // Remove from pantry (only admin modifies global flag)
-          const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-          const {
-            data: { user: currentUser },
-          } = await supabase.auth.getUser();
-          const admin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
-
-          if (admin) {
-            const foodItemUpdate = await supabase
-              .from('food_items')
-              .update({ is_in_pantry: false } as any)
-              .eq('id', item.id);
-
-            if (foodItemUpdate.error) {
-              console.warn(
-                '[markEaten] Failed to remove',
-                item.name,
-                'from pantry:',
-                foodItemUpdate.error,
-              );
-            } else {
-              console.log(
-                '[markEaten] Auto-removed',
-                item.name,
-                'from pantry and added to shopping list',
-              );
-            }
-          } else if (currentUser) {
-            // Non-admin: delete from per-user pantry_items
-            await supabase
-              .from('pantry_items')
-              .delete()
-              .eq('user_id', currentUser.id)
-              .eq('food_item_id', item.id);
-          }
         }
-        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
-        window.dispatchEvent(new CustomEvent('shopping-list-updated'));
       } catch (e) {
         console.error('[markEaten] Failed to auto-replenish items:', e);
       }
     }
 
-    // Notify any mounted pantry views to re-apply the updated quantities
-    window.dispatchEvent(new CustomEvent('pantry-quantities-updated'));
     setEatenMeals((prev) => new Set([...prev, mealType]));
 
     if (subtracted > 0) {
-      // Verify the save worked
-      const verify = localStorage.getItem('pantry_quantities');
-      console.log('[markEaten] VERIFIED localStorage after save:', verify);
       toast.success(
         `Marked as eaten. ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`,
       );
@@ -1313,65 +1228,6 @@ export default function MealPlannerContent({
     }
   };
 
-  useEffect(() => {
-    const fetchPantry = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-        const admin = !!(user?.email && adminEmail && user.email === adminEmail);
-
-        const [foodItemsRes, pantryItemsRes] = await Promise.all([
-          admin
-            ? supabase.from('food_items').select('*').eq('is_in_pantry', true)
-            : Promise.resolve({ data: [], error: null }),
-          user
-            ? supabase
-                .from('pantry_items')
-                .select('*, scanned_products(name, nutrition, image_url), food_items(*)')
-                .eq('user_id', user.id)
-            : { data: [] },
-        ]);
-
-        let items: any[] = foodItemsRes.data || [];
-
-        // Transform and add personal items
-        if (pantryItemsRes.data) {
-          const personalItems = pantryItemsRes.data.map((item: any) => {
-            const sp = item.scanned_products;
-            const fi = item.food_items;
-            return {
-              id: item.food_item_id || item.id,
-              name: sp?.name || fi?.name || item.custom_name,
-              common_name: fi?.common_name || sp?.name || fi?.name || item.custom_name,
-              is_in_pantry: true,
-            };
-          });
-          items = [...items, ...personalItems];
-        }
-
-        // Merge in LocalStorage quantities — only overlay on already-fetched items,
-        // and only create phantom entries for admins (non-admins use pantry_items)
-        const saved = localStorage.getItem('pantry_quantities');
-        if (saved) {
-          const localQ = JSON.parse(saved);
-          if (admin) {
-            Object.keys(localQ).forEach((id) => {
-              if (!items.find((it) => it.id === id)) {
-                items.push({ id: id, is_in_pantry: true });
-              }
-            });
-          }
-        }
-
-        setPantryItems(items);
-      } catch (err) {
-        console.error('Failed to fetch pantry:', err);
-      }
-    };
-    fetchPantry();
-  }, []);
 
   const {
     profile,

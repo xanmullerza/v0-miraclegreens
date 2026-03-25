@@ -2,6 +2,27 @@
 
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2, Wand2, Trash2, Tag, ChevronRight, Plus, RotateCcw } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRDA } from '@/hooks/use-rda';
+import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
+import { ChatbotShare } from '@/components/chatbot-share';
+import FoodItemPicker from '@/components/recipe/food-item-picker';
+import { 
+    extractCoreName, 
+    cleanIngredientDisplay, 
+    dePluralize, 
+    formatFraction, 
+    parseRecipeAmount 
+} from '@/lib/utils/parsing-utils';
+import { 
+    calculateAggregatedNutrition, 
+    formatEnergyValue, 
+    formatNutrientValue 
+} from '@/lib/utils/nutrition-utils';
+import { useSmartMatch } from '@/hooks/use-smart-match';
 
 function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: () => void }) {
     const [confirming, setConfirming] = useState(false);
@@ -78,14 +99,6 @@ function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: ()
         </button>
     );
 }
-import { supabase } from '@/lib/supabase';
-import { useRDA } from '@/hooks/use-rda';
-import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { searchFoodItem, searchUSDAFood, getUSDAFoodDetails, isFlavoringIngredient } from '@/lib/services/nutrition';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { ChatbotShare } from './chatbot-share';
-import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 interface Recipe {
     id: string;
@@ -152,12 +165,12 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     const [showShareDialog, setShowShareDialog] = useState(false);
     const [showTagsDialog, setShowTagsDialog] = useState(false);
 
-    // Smart Match State
-    const [smartMatchRunning, setSmartMatchRunning] = useState(false);
+    const smartMatch = useSmartMatch();
     const [matchedIngredients, setMatchedIngredients] = useState<Record<string, any>>({});
     const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
     const [skippedIngredients, setSkippedIngredients] = useState<Record<string, boolean>>({});
     const [acceptedMatches, setAcceptedMatches] = useState<Record<string, boolean>>({});
+
     // USDA Phase 2 State
     const [usdaResults, setUsdaResults] = useState<Record<string, any[]>>({});
     const [usdaLoading, setUsdaLoading] = useState<Record<string, boolean>>({});
@@ -184,15 +197,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     const [waterSolubleThreshold, setWaterSolubleThreshold] = useState<50 | 75 | 100>(75);
     const [storedVitaminThreshold, setStoredVitaminThreshold] = useState<50 | 75 | 100>(75);
 
-    // Smart Match Picker State
-    const [showSmartMatchPicker, setShowSmartMatchPicker] = useState(false);
-    const [smartMatchPickerIngredientIdx, setSmartMatchPickerIngredientIdx] = useState<number>(0);
-    const [smartMatchPickerResults, setSmartMatchPickerResults] = useState<any[]>([]);
-    const [smartMatchQueue, setSmartMatchQueue] = useState<Array<{idx: number, ingredient: Ingredient, results: any[]}>>([]);
-
     // User preferences and RDA
     const { profile, nutrientDisplayMode } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
+    const [smartMatchRunning, setSmartMatchRunning] = useState(false);
 
     useEffect(() => {
         fetchRecipeDetails();
@@ -463,147 +471,55 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
         fetchRelated();
     }, [ingredients, recipeId]);
 
-    // --- Ingredient Name Extraction Helpers ---
-    const extractCoreName = (name: string) => {
-        let cleaned = name.toLowerCase().trim();
-        
-        // Remove anything in parentheses first
-        cleaned = cleaned.replace(/\s*\(.*?\)/g, '').trim();
-        
-        // Multi-pass leading cleanup (run twice so e.g. "small bunch of" all gets stripped)
-        for (let i = 0; i < 2; i++) {
-            cleaned = cleaned.replace(/^[\d\/\.\-]+\s*(x\s+)?/g, '').trim();
-            cleaned = cleaned.replace(/^(tbsp|tsp|cups?|ml|g|kg|oz|lb|liters?|bunch|handful|pinch|dash|cans?|cloves?|sprigs?|leaves?|stalks?)\s+/gi, '').trim();
-            cleaned = cleaned.replace(/^of\s+/gi, '').trim();
-            cleaned = cleaned.replace(/^(small|large|medium|big|thin|thick)\s+/gi, '').trim();
-            cleaned = cleaned.replace(/^(organic|fresh|frozen|canned|diced|chopped|sliced|minced|peeled|roasted|cooked|raw|grated|finely|roughly|thinly|rinsed|pitted|separated|skin-on|bone-in|boneless|skinless)\s*,?\s*/gi, '').trim();
-        }
-        
-        // Remove trailing non-food descriptors (sprigs, stalks, leaves, cloves only)
-        cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?|bunch|bunches)\s*$/gi, '').trim();
-        
-        // Remove trailing prep descriptions
-        cleaned = cleaned.replace(/\s+(finely|roughly|thinly|sliced|diced|chopped|minced|grated|peeled|rinsed|separated|to serve|to taste|and leaves|stalks and leaves).*$/gi, '').trim();
-        
-        // Handle commas: try to find the most food-like segment
-        if (cleaned.includes(',')) {
-            const parts = cleaned.split(',').map(p => p.trim()).filter(p => p.length > 1);
-            const descriptorPattern = /^(skin-on|bone-in|boneless|skinless|dried|fresh|raw|cooked|chopped|diced|sliced|minced|grated|peeled|whole|ground|crushed|smoked|roasted|canned|frozen|organic|rinsed|pitted|grade|unprepared)/i;
-            const foodPart = parts.find(p => !descriptorPattern.test(p));
-            cleaned = foodPart || parts[parts.length - 1] || cleaned;
-            cleaned = cleaned.trim();
-        }
-        
-        // Final cleanup
-        cleaned = cleaned.replace(/\s+(sprigs?|stalks?|leaves?|cloves?)\s*$/gi, '').trim();
-        
-        return cleaned;
-    };
+    const handleSmartMatchPickerSelect = async (foodItem: any) => {
+        if (smartMatch.queue.length === 0) return;
 
-    // Helper to clean ingredient display names
-    const cleanIngredientDisplay = (name: string) => {
-        let cleaned = name.trim();
-        
-        // Remove trailing prep descriptions like "crushed or finely grated", "torn, to serve", etc.
-        cleaned = cleaned.replace(/\s+(crushed or finely grated|drained and roughly chopped|finely chopped|roughly chopped|torn to serve|torn, to serve|and leaves stalks and leaves|stalks and leaves).*$/i, '');
-        cleaned = cleaned.replace(/\s*,\s*(drained|roughly chopped|finely chopped|crushed|grated|torn|picked|separated|skinless|boneless|and.*).*$/i, '');
-        cleaned = cleaned.replace(/\s+(to taste|to serve|optional).*$/i, '');
-        
-        return cleaned.trim();
-    };
+        const currentItem = smartMatch.queue[smartMatch.currentIdx];
+        const newMatches = { ...matchedIngredients };
+        const newFlipped = { ...flippedCards };
 
-    const dePluralize = (term: string) => {
-        if (term.endsWith('ies')) return term.slice(0, -3) + 'y';
-        if (term.endsWith('ves')) return term.slice(0, -3) + 'f';
-        if (term.endsWith('es') && !term.endsWith('ses')) return term.slice(0, -2);
-        if (term.endsWith('s') && !term.endsWith('ss')) return term.slice(0, -1);
-        return term;
-    };
+        newMatches[currentItem.ingredient.id] = foodItem;
+        newFlipped[currentItem.ingredient.id] = true;
 
-    // --- Phase 3: Quantity Parsing & Accept Handling ---
-    const formatFraction = (num: number) => {
-        const whole = Math.floor(num);
-        const frac = num - whole;
-        let fracStr = '';
-        if (Math.abs(frac - 0.25) < 0.01) fracStr = '1/4';
-        else if (Math.abs(frac - 0.33) < 0.02) fracStr = '1/3';
-        else if (Math.abs(frac - 0.5) < 0.01) fracStr = '1/2';
-        else if (Math.abs(frac - 0.66) < 0.02) fracStr = '2/3';
-        else if (Math.abs(frac - 0.75) < 0.01) fracStr = '3/4';
-        else if (frac > 0) fracStr = frac.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
-
-        if (whole > 0 && fracStr) return `${whole} ${fracStr}`;
-        if (whole > 0) return `${whole}`;
-        if (fracStr) return fracStr;
-        return '0';
-    };
-
-    const parseRecipeAmount = (amountStr: string, itemStr?: string) => {
-        let quantity = 1;
-        let measure = '';
-
-        let str = (amountStr || '').trim().toLowerCase();
-        
-        // Match the number and the rest of the string
-        const mainMatch = str.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*(.*)/);
-        const hasNumber = !!mainMatch;
-
-        // Only fallback to itemStr if we REALLY don't have a number in amountStr
-        if (!hasNumber && itemStr) {
-            const itemLower = itemStr.trim().toLowerCase();
-            if (itemLower.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*([a-z]+)/)) {
-                str = itemLower;
-            }
-        }
-
-        const match = str.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*(.*)/);
-        if (match) {
-            let numStr = match[1];
-            if (numStr.includes('/')) {
-                const parts = numStr.split(' ');
-                if (parts.length === 2) {
-                    const [whole, frac] = parts;
-                    const [n, d] = frac.split('/');
-                    quantity = parseInt(whole) + (parseInt(n) / parseInt(d));
-                } else {
-                    const [n, d] = numStr.split('/');
-                    quantity = parseInt(n) / parseInt(d);
-                }
-            } else {
-                quantity = parseFloat(numStr);
-            }
-            
-            let restStr = match[2].trim();
-            const firstWordMatch = restStr.match(/^([a-z]+)/);
-            if (firstWordMatch) {
-                measure = firstWordMatch[1];
-            }
+        // Move to next in queue or close picker
+        const nextIdx = smartMatch.currentIdx + 1;
+        if (nextIdx < smartMatch.queue.length) {
+            smartMatch.setCurrentIdx(nextIdx);
+            smartMatch.setResults(smartMatch.queue[nextIdx].results);
+            setMatchedIngredients(newMatches);
+            setFlippedCards(newFlipped);
+            toast.success(`✓ Matched "${foodItem.name}" - showing next ingredient`, { duration: 2000 });
         } else {
-             const firstWordMatch = str.match(/^([a-z]+)/);
-             if (firstWordMatch) {
-                 measure = firstWordMatch[1];
-             }
+            setMatchedIngredients(newMatches);
+            setFlippedCards(newFlipped);
+            smartMatch.setShowPicker(false);
+            smartMatch.reset();
+            toast.success(`Smart Match completed! All ${smartMatch.queue.length} ingredients matched.`, { id: 'smart-match' });
         }
-        
-        if (['tbs', 'tbsp', 'tablespoon', 'tablespoons'].includes(measure)) measure = 'tbsp';
-        if (['tsp', 'teaspoon', 'teaspoons'].includes(measure)) measure = 'tsp';
-        if (['oz', 'ounce', 'ounces'].includes(measure)) measure = 'oz';
-        if (['lb', 'lbs', 'pound', 'pounds'].includes(measure)) measure = 'lb';
-        if (['g', 'gram', 'grams'].includes(measure)) measure = 'g';
-        if (['c', 'cup', 'cups'].includes(measure)) measure = 'cup';
-        if (['ml', 'milliliter', 'milliliters'].includes(measure)) measure = 'ml';
-        
-        // Small kitchen units
-        if (['sprig', 'sprigs'].includes(measure)) measure = 'sprig';
-        if (['clove', 'cloves'].includes(measure)) measure = 'clove';
-        if (['bunch', 'bunches'].includes(measure)) measure = 'bunch';
-        if (['cube', 'cubes'].includes(measure)) measure = 'cube';
-        if (['stalk', 'stalks'].includes(measure)) measure = 'stalk';
+    };
 
-        if (measure.endsWith('s') && !['oz', 'lbs', 'g', 'ml'].includes(measure)) {
-             measure = measure.slice(0, -1);
+    const handleSmartMatchSkip = () => {
+        // Mark current ingredient as skipped
+        const currentItem = smartMatch.queue[smartMatch.currentIdx];
+        const newSkipped = { ...skippedIngredients, [currentItem.ingredient.id]: true };
+        setSkippedIngredients(newSkipped);
+
+        // Move to next ingredient without matching
+        const nextIdx = smartMatch.currentIdx + 1;
+        const currentIngreqName = currentItem.ingredient.base_ingredient || currentItem.ingredient.item;
+        
+        if (nextIdx < smartMatch.queue.length) {
+            smartMatch.setCurrentIdx(nextIdx);
+            smartMatch.setResults(smartMatch.queue[nextIdx].results);
+            toast.info(`⊘ Skipped "${currentIngreqName}" - showing next ingredient`, { duration: 2000 });
+        } else {
+            const matchedCount = Object.keys(matchedIngredients).length;
+            const skippedCount = Object.keys(newSkipped).length;
+            
+            smartMatch.setShowPicker(false);
+            smartMatch.reset();
+            toast.success(`Smart Match completed: ${matchedCount} matched, ${skippedCount} skipped`, { id: 'smart-match', duration: 3000 });
         }
-        return { quantity: quantity || 1, measure_label: measure || 'item' };
     };
 
     const processAcceptIngredient = (ing: Ingredient, matchedItem: any) => {
@@ -618,137 +534,14 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
         setFlippedCards(prev => ({ ...prev, [ing.id]: false }));
     };
 
-    // --- Smart Match Logic ---
     const runSmartMatch = async () => {
-        if (smartMatchRunning || ingredients.length === 0) return;
-        setSmartMatchRunning(true);
-        toast.loading("Analyzing ingredients with Smart Match...", { id: 'smart-match' });
-
-        try {
-            const queue: Array<{idx: number, ingredient: Ingredient, results: any[]}> = [];
-            const skippedFlavorings: string[] = [];
-
-            for (let idx = 0; idx < ingredients.length; idx++) {
-                const ing = ingredients[idx];
-                const searchTermRaw = ing.base_ingredient || ing.item;
-                const searchTerm = extractCoreName(searchTermRaw);
-                
-                if (!searchTerm || searchTerm.length < 2) continue;
-
-                // Check if this ingredient is a flavoring (spice, herb, etc.) - auto-skip if it is
-                if (isFlavoringIngredient({ name: searchTermRaw } as any)) {
-                    setSkippedIngredients(prev => ({ ...prev, [ing.id]: true }));
-                    skippedFlavorings.push(searchTermRaw);
-                    console.log(`[Smart Match] Auto-skipped flavoring: ${searchTermRaw}`);
-                    continue;
-                }
-
-                // Use unified search (USDA + local with dedup and local prioritized)
-                let matchData = await searchFoodItem(searchTerm);
-                
-                // If no match, try de-pluralized version (e.g. "chicken thighs" -> "chicken thigh")
-                if (!matchData || matchData.length === 0) {
-                    const singular = dePluralize(searchTerm);
-                    if (singular !== searchTerm) {
-                        matchData = await searchFoodItem(singular);
-                    }
-                }
-                
-                // If still no match, try just the last word (e.g. "cherry tomatoes" -> "tomato")
-                if ((!matchData || matchData.length === 0) && searchTerm.includes(' ')) {
-                    const words = searchTerm.split(' ');
-                    for (let w = words.length - 1; w >= 0; w--) {
-                        const subTerm = words.slice(w).join(' ');
-                        matchData = await searchFoodItem(subTerm);
-                        if (!matchData || matchData.length === 0) {
-                            const subSingular = dePluralize(subTerm);
-                            if (subSingular !== subTerm) matchData = await searchFoodItem(subSingular);
-                        }
-                        if (matchData && matchData.length > 0) break;
-                    }
-                }
-
-                // Queue results to show in picker modal (preserving USDA-first order from searchFoodItem)
-                if (matchData && matchData.length > 0) {
-                    queue.push({ idx, ingredient: ing, results: matchData });
-                    console.log(`[Smart Match] Found ${matchData.length} results for "${searchTerm}" - showing picker`);
-                }
-            }
-
-            if (queue.length > 0) {
-                setSmartMatchQueue(queue);
-                // Show the first ingredient's results in the picker
-                const firstInQueue = queue[0];
-                setSmartMatchPickerIngredientIdx(0);
-                setSmartMatchPickerResults(firstInQueue.results);
-                setShowSmartMatchPicker(true);
-                const flavorMsg = skippedFlavorings.length > 0 ? ` (${skippedFlavorings.length} flavorings auto-skipped)` : '';
-                toast.success(`Smart Match: Select matches for ${queue.length} ingredients${flavorMsg}`, { id: 'smart-match' });
-            } else if (skippedFlavorings.length > 0) {
-                setShowSmartMatchPicker(false);
-                setSmartMatchQueue([]);
-                toast.success(`Smart Match: ${skippedFlavorings.length} flavorings were auto-skipped. All non-flavor ingredients processed!`, { id: 'smart-match', duration: 3000 });
-            } else {
-                toast.error("Smart Match couldn't find any direct mappings. You may need to add these items to your database.", { id: 'smart-match' });
-            }
-
-        } finally {
-            setSmartMatchRunning(false);
-        }
-    };
-
-    const handleSmartMatchPickerSelect = async (foodItem: any) => {
-        if (smartMatchQueue.length === 0) return;
-
-        const currentItem = smartMatchQueue[smartMatchPickerIngredientIdx];
-        const newMatches = { ...matchedIngredients };
-        const newFlipped = { ...flippedCards };
-
-        newMatches[currentItem.ingredient.id] = foodItem;
-        newFlipped[currentItem.ingredient.id] = true;
-
-        // Move to next in queue or close picker
-        const nextIdx = smartMatchPickerIngredientIdx + 1;
-        if (nextIdx < smartMatchQueue.length) {
-            const nextItem = smartMatchQueue[nextIdx];
-            setSmartMatchPickerIngredientIdx(nextIdx);
-            setSmartMatchPickerResults(nextItem.results);
-            setMatchedIngredients(newMatches);
-            setFlippedCards(newFlipped);
-            toast.success(`✓ Matched "${foodItem.name}" - showing next ingredient`, { duration: 2000 });
-        } else {
-            setMatchedIngredients(newMatches);
-            setFlippedCards(newFlipped);
-            setShowSmartMatchPicker(false);
-            setSmartMatchQueue([]);
-            toast.success(`Smart Match completed! All ${smartMatchQueue.length} ingredients matched.`, { id: 'smart-match' });
-        }
-    };
-
-    const handleSmartMatchSkip = () => {
-        // Mark current ingredient as skipped
-        const currentItem = smartMatchQueue[smartMatchPickerIngredientIdx];
-        const newSkipped = { ...skippedIngredients, [currentItem.ingredient.id]: true };
-        setSkippedIngredients(newSkipped);
-
-        // Move to next ingredient without matching
-        const nextIdx = smartMatchPickerIngredientIdx + 1;
-        const currentIngreqName = currentItem.ingredient.base_ingredient || currentItem.ingredient.item;
-        
-        if (nextIdx < smartMatchQueue.length) {
-            const nextItem = smartMatchQueue[nextIdx];
-            setSmartMatchPickerIngredientIdx(nextIdx);
-            setSmartMatchPickerResults(nextItem.results);
-            toast.info(`⊘ Skipped "${currentIngreqName}" - showing next ingredient`, { duration: 2000 });
-        } else {
-            // All ingredients processed - check if any are not matched
-            const unmatchedCount = smartMatchQueue.filter(q => !matchedIngredients[q.ingredient.id]).length;
-            const matchedCount = Object.keys(matchedIngredients).length;
-            const skippedCount = Object.keys(newSkipped).length;
-            
-            setShowSmartMatchPicker(false);
-            setSmartMatchQueue([]);
-            toast.success(`Smart Match completed: ${matchedCount} matched, ${skippedCount} skipped`, { id: 'smart-match', duration: 3000 });
+        const result = await smartMatch.runMatch(ingredients);
+        if (result?.skippedFlavorings && result.skippedFlavorings.length > 0) {
+            result.skippedFlavorings.forEach(f => {
+                // Pre-skip these in the detail view state
+                const ing = ingredients.find(i => (i.base_ingredient || i.item) === f);
+                if (ing) setSkippedIngredients(prev => ({ ...prev, [ing.id]: true }));
+            });
         }
     };
 
@@ -763,21 +556,10 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
         }
 
         setSmartMatchRunning(true);
-        const loadingToastId = toast.loading("Calculating total recipe nutrition...", { id: 'finalize-nutrition' });
+        const loadingToastId = toast.loading("Calculating total recipe nutrition...");
 
         try {
-            // Initialize totals
-            let totalCalories = 0;
-            let totalProtein = 0;
-            let totalCarbs = 0;
-            let totalFat = 0;
-            let aggregatedMicros: Record<string, number> = {};
-            
-            // Outlier detection
-            const outliers: Array<{ item: string, nutrient: string, value: number }> = [];
-
-            // We use the already matched food data and the saved weight_g
-            // We need to re-fetch ingredients to make sure we have the latest weight_g from DB
+            // Re-fetch ingredients to make sure we have the latest weight_g from DB
             const { data: updatedIngs, error: fetchErr } = await supabase
                 .from('ingredients')
                 .select('*, food_items(*)')
@@ -785,94 +567,40 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
 
             if (fetchErr) throw fetchErr;
 
-            updatedIngs?.forEach(ing => {
-                // Skip ingredients that were intentionally skipped
-                if (skippedIngredients[ing.id]) {
-                    return;
-                }
-                
-                const food = ing.food_items;
-                const weight = ing.weight_g || 0;
-                
-                if (food && weight > 0) {
-                    const ratio = weight / 100; // Database values are typically per 100g
-                    
-                    const contribCal = (food.energy_kcal || 0) * ratio;
-                    const contribProt = (food.protein_g || 0) * ratio;
-                    const contribCarb = (food.carbs_g || 0) * ratio;
-                    const contribFat = (food.fat_g || 0) * ratio;
+            const nutrition = calculateAggregatedNutrition(updatedIngs || []);
+            
+            // Note: We'll round metrics to 1 decimal for consistency in the DB
+            const finalCals = Math.round(nutrition.calories);
+            const finalCarbs = Math.round(nutrition.carbs * 10) / 10;
+            const finalFat = Math.round(nutrition.fat * 10) / 10;
+            const finalProtein = Math.round(nutrition.protein * 10) / 10;
+            const finalKj = Math.round(nutrition.energyKj);
 
-                    totalCalories += contribCal;
-                    totalProtein += contribProt;
-                    totalCarbs += contribCarb;
-                    totalFat += contribFat;
-
-                    // Outlier checks for macros
-                    if (contribCal > 2000) outliers.push({ item: ing.item, nutrient: 'Calories', value: Math.round(contribCal) });
-
-                    // Aggregate micronutrients and extra macros (fiber, sugar, etc)
-                    const foodMicros = food.micronutrients || {};
-                    
-                    // Sum up all available micronutrients in JSON
-                    Object.entries(foodMicros).forEach(([key, val]) => {
-                        if (typeof val === 'number') {
-                            const contrib = val * ratio;
-                            aggregatedMicros[key] = (aggregatedMicros[key] || 0) + contrib;
-
-                            // Micro outlier thresholds
-                            if (key.toLowerCase().includes('iron') && contrib > 50) outliers.push({ item: ing.item, nutrient: 'Iron', value: Math.round(contrib) });
-                            if (key.toLowerCase().includes('calcium') && contrib > 1000) outliers.push({ item: ing.item, nutrient: 'Calcium', value: Math.round(contrib) });
-                            if (key.toLowerCase().includes('sodium') && contrib > 5000) outliers.push({ item: ing.item, nutrient: 'Sodium', value: Math.round(contrib) });
-                        }
-                    });
-
-                    // Ensure specific top-level micros are accounted for if they're in columns
-                    if (food.fiber_g) aggregatedMicros['Fiber'] = (aggregatedMicros['Fiber'] || 0) + (food.fiber_g * ratio);
-                    if (food.sugars_g) aggregatedMicros['Sugars'] = (aggregatedMicros['Sugars'] || 0) + (food.sugars_g * ratio);
-                }
-            });
-
-            // If we found significant outliers, warn the user but allow proceed (they might be cooking for 100 people)
-            if (outliers.length > 0) {
-                const outlierMsg = outliers.map(o => `${o.item}: ${o.value}${o.nutrient === 'Calories' ? 'kcal' : 'mg'} ${o.nutrient}`).join(', ');
-                toast.warning(`Nutritional outliers detected! ${outlierMsg}. Please verify weights.`, { duration: 6000 });
-            }
-
-            // Round macros to 1 decimal
-            totalCalories = Math.round(totalCalories);
-            totalProtein = Math.round(totalProtein * 10) / 10;
-            totalCarbs = Math.round(totalCarbs * 10) / 10;
-            totalFat = Math.round(totalFat * 10) / 10;
-
-            // Round all micros to 1 decimal to avoid float junk and clean up display
-            Object.keys(aggregatedMicros).forEach(key => {
-                aggregatedMicros[key] = Math.round(aggregatedMicros[key] * 10) / 10;
-            });
-
-            // 2. Update the recipe in database
-            const { error: updateErr } = await supabase
+            // Update recipe in Supabase
+            const { error: updateError } = await supabase
                 .from('recipes')
                 .update({
-                    calories: totalCalories,
-                    protein: totalProtein,
-                    carbs: totalCarbs,
-                    fat: totalFat,
-                    micronutrients: aggregatedMicros
+                    calories: finalCals,
+                    energy_kj: finalKj,
+                    carbs: finalCarbs,
+                    fat: finalFat,
+                    protein: finalProtein,
+                    micronutrients: nutrition.micronutrients,
+                    phytonutrients: nutrition.phytonutrients
                 })
                 .eq('id', recipeId);
 
-            if (updateErr) throw updateErr;
+            if (updateError) throw updateError;
 
-            toast.success("Recipe nutrition analyzed and saved!", { id: 'finalize-nutrition' });
+            toast.success("Recipe nutrition analyzed and saved!", { id: loadingToastId });
             
-            // 3. Update local state and move to nutrition section
-            await fetchRecipeDetails(); // Re-fetch all to refresh the UI
+            await fetchRecipeDetails();
             setActiveSection('nutrition');
-            setMappingStep('FOOD_MATCH'); // Reset mapping UI step for next time
+            setMappingStep('FOOD_MATCH');
             
         } catch (err: any) {
             console.error("Finalize error:", err);
-            toast.error(err.message || "Failed to finalize recipe nutrition", { id: 'finalize-nutrition' });
+            toast.error(err.message || "Failed to finalize recipe nutrition", { id: loadingToastId });
         } finally {
             setSmartMatchRunning(false);
         }
@@ -1113,19 +841,16 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
             )}
 
             {/* Smart Match Picker Modal */}
-            {showSmartMatchPicker && smartMatchQueue.length > 0 && (
+            {smartMatch.showPicker && smartMatch.queue.length > 0 && (
                 <FoodItemPicker
                     onSelect={handleSmartMatchPickerSelect}
                     onSkip={handleSmartMatchSkip}
-                    onClose={() => {
-                        setShowSmartMatchPicker(false);
-                        setSmartMatchQueue([]);
-                    }}
+                    onClose={() => smartMatch.reset()}
                     mode="all"
                     isAdmin={false}
                     inline={false}
-                    initialSearchQuery={smartMatchQueue[smartMatchPickerIngredientIdx]?.ingredient?.base_ingredient || smartMatchQueue[smartMatchPickerIngredientIdx]?.ingredient?.item || ''}
-                    initialResults={smartMatchPickerResults}
+                    initialSearchQuery={smartMatch.queue[smartMatch.currentIdx]?.ingredient?.base_ingredient || smartMatch.queue[smartMatch.currentIdx]?.ingredient?.item || ''}
+                    initialResults={smartMatch.results}
                 />
             )}
 
@@ -2081,7 +1806,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
 
                                     // Handler: accept a USDA result for this ingredient
                                     const handleAcceptUsda = async (result: any) => {
-                                        toast.loading(`Importing ${result.name}...`, { id: `import-usda-${ing.id}` });
+                                        const toastId = toast.loading(`Importing ${result.name}...`);
                                         try {
                                             const { data: { session } } = await supabase.auth.getSession();
                                             const userId = session?.user?.id || null;
@@ -2138,11 +1863,11 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                             }
 
                                             setUsdaExpanded(prev => ({ ...prev, [ing.id]: false }));
-                                            toast.success(`Imported & Matched: ${result.name}`, { id: `import-usda-${ing.id}` });
+                                            toast.success(`Imported & Matched: ${result.name}`, { id: toastId });
                                             processAcceptIngredient(ing, { ...finalFood, source: 'usda' });
                                         } catch (err: any) {
                                             console.error('Error importing USDA item:', err);
-                                            toast.error(`Failed to import: ${err.message}`, { id: `import-usda-${ing.id}` });
+                                            toast.error(`Failed to import: ${err.message}`, { id: toastId });
                                         }
                                     };
 

@@ -21,6 +21,7 @@ export interface ShoppingItem {
     image?: string;
     common_name?: string;
     food_item_id?: string;
+    checked?: boolean;
 }
 
 // ── Enrichment Cache ────────────────────────────────────────────

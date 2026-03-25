@@ -9,10 +9,12 @@ import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import {
-    PANTRY_QUANTITIES_KEY,
     PORTION_EXCLUDE_REGEX,
     mergeQuantityStrings,
+    buildQuantityString,
+    stripZeroEntries
 } from './pantry-types';
+import { usePantry } from '@/hooks/use-pantry';
 
 interface PantryQuickAddProps {
     food: any;
@@ -21,6 +23,7 @@ interface PantryQuickAddProps {
 }
 
 export function PantryQuickAdd({ food, onClose, onAdded }: PantryQuickAddProps) {
+    const { quantities, updateQuantity, addToPantry: dbAddToPantry } = usePantry();
     const [qty, setQty] = useState('1');
     const [portions, setPortions] = useState<{ label: string; weight_g: number }[]>([]);
     const [selectedPortion, setSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
@@ -52,41 +55,16 @@ export function PantryQuickAdd({ food, onClose, onAdded }: PantryQuickAddProps) 
         if (!food) return;
         setIsAdding(true);
         try {
-            const quantityString = selectedPortion
-                ? `${qty} ${selectedPortion.label} (${selectedPortion.weight_g}g)`
-                : weight ? `${qty} x ${weight}${unit}` : qty;
-
-            // Check admin status
-            const { data: { user: currentUser } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const isAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
-
-            // Supabase persistence
-            if (isAdmin) {
-                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
-            } else if (currentUser) {
-                const { data: existing } = await supabase
-                    .from('pantry_items')
-                    .select('id, quantity')
-                    .eq('user_id', currentUser.id)
-                    .eq('food_item_id', food.id)
-                    .maybeSingle();
-                if (!existing) {
-                    await supabase.from('pantry_items').insert({
-                        user_id: currentUser.id,
-                        name: food.common_name || food.name,
-                        quantity: quantityString,
-                        food_item_id: food.id,
-                    });
-                }
+            const quantityString = buildQuantityString(qty, selectedPortion, weight, unit);
+            const currentQty = quantities[food.id] || '';
+            
+            if (currentQty) {
+                const merged = mergeQuantityStrings(currentQty, quantityString);
+                const cleaned = stripZeroEntries(merged);
+                await updateQuantity(food.id, cleaned);
+            } else {
+                await dbAddToPantry(food, quantityString);
             }
-
-            // localStorage quantity merge
-            const saved = localStorage.getItem(PANTRY_QUANTITIES_KEY);
-            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-            const existing = quantities[food.id] || '';
-            quantities[food.id] = mergeQuantityStrings(existing || undefined, quantityString);
-            localStorage.setItem(PANTRY_QUANTITIES_KEY, JSON.stringify(quantities));
 
             toast.success(`${food.common_name || food.name} added to pantry`);
             onAdded();

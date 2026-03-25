@@ -33,6 +33,7 @@ import { supabase } from '@/lib/supabase';
 import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
 import { inferEquipmentFromRecipe } from '@/lib/utils/equipment-inference';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
+import { usePantry } from '@/hooks/use-pantry';
 
 interface RecipeWithIngredients extends Recipe {
     ingredients?: any[];
@@ -68,7 +69,7 @@ export function MyRecipesView({ onRecipeClick, hideControls = false, isMix = fal
     const { energyUnit } = useUserPreferences();
     const { filters } = useRecipeFilter();
     const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading, recipeRefreshVersion } = useDataPersistence();
-    const [pantryItems, setPantryItems] = useState<any[]>([]);
+    const { pantryItems, loading: pantryLoading } = usePantry();
 
 
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
@@ -83,51 +84,14 @@ export function MyRecipesView({ onRecipeClick, hideControls = false, isMix = fal
         }
     }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, user, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, recipeRefreshVersion]);
 
-    const getPantryItems = async () => {
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            const [foodItemsRes, pantryItemsRes] = await Promise.all([
-                supabase.from('food_items').select('*').eq('is_in_pantry', true),
-                user ? supabase.from('pantry_items').select('*, scanned_products(nutrition), food_items(*)').eq('user_id', user.id) : { data: [] }
-            ]);
-
-            let combined: any[] = [
-                ...(foodItemsRes.data || []).map(f => ({ ...f, source_table: 'food_items' })),
-                ...(pantryItemsRes.data || []).map((item: any) => ({
-                    id: item.id,
-                    food_item_id: item.food_item_id,
-                    name: item.scanned_products?.name || item.food_items?.name || item.custom_name,
-                    quantity: item.quantity,
-                    source_table: 'pantry_items'
-                }))
-            ];
-
-            const saved = localStorage.getItem(PANTRY_QUANTITIES_KEY);
-            if (saved) {
-                const quantities = JSON.parse(saved);
-                combined = combined.map(item => ({
-                    ...item,
-                    quantity: quantities[item.id] || item.quantity
-                }));
-            }
-            return combined;
-        } catch (err) {
-            console.error('Failed to fetch pantry items', err);
-            return [];
-        }
-    };
 
     const fetchMyRecipes = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
         else setLoadingMore(true);
 
         try {
-            // Fetch pantry items first if needed
-            let currentPantry = pantryItems;
-            if (filters.pantryMode === 'pantry-only') {
-                currentPantry = await getPantryItems();
-                setPantryItems(currentPantry);
-            }
+            // Use pantryItems from hook
+            const currentPantry = pantryItems;
 
             const needsIngredients = filters.pantryMode === 'pantry-only' || 
                                     filters.selectedExclusions.length > 0 || 

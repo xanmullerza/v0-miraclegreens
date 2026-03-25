@@ -44,6 +44,9 @@ import { BarcodeScanner } from './barcode-scanner';
 import { ScanConfirmDialog } from './scan-confirm-dialog';
 import { recordPurchase, saveScannedProduct } from '@/lib/services/product-lookup';
 import { PantryMatchDialog } from './pantry-match-dialog';
+import { useShoppingList } from '@/hooks/use-shopping-list';
+import { usePantry } from '@/hooks/use-pantry';
+import { mergeQuantityStrings, stripZeroEntries } from '../pantry/pantry-types';
 
 interface ShoppingListItem {
     id: string;
@@ -71,8 +74,10 @@ const enrichmentCache = new Map<string, { id: string; category: string; image: s
 
 export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOpenChange }: ShoppingListViewProps = {}) {
     const router = useRouter();
+    const { items: manualItems, loading: shoppingLoading, addItem: addShoppingListItem, toggleChecked, removeItem: removeShoppingListItem, clearChecked, clearAll: clearShoppingList } = useShoppingList();
+    const { addToPantry, updateQuantity, quantities } = usePantry();
+
     const [items, setItems] = useState<ShoppingListItem[]>([]);
-    const [manualItems, setManualItems] = useState<ShoppingListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [enriching, setEnriching] = useState(false);
     const { searchQuery } = useSearch();
@@ -110,88 +115,27 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         setPantryAddItem(null);
     };
 
-    // Load manual items from local storage on mount and when storage changes
-    useEffect(() => {
-        const loadManualItems = () => {
-            const saved = localStorage.getItem('vitala_shopping_manual_items');
-            if (saved) {
-                try {
-                    setManualItems(JSON.parse(saved));
-                } catch (e) {
-                    console.error('Failed to load shopping list', e);
-                }
-            }
-        };
-
-        loadManualItems();
-        fetchData();
-
-        // Listen for storage events from other components
-        window.addEventListener('storage', loadManualItems);
-        return () => window.removeEventListener('storage', loadManualItems);
-    }, []);
-
-    // Save manual items to local storage whenever they change (with dedup)
-    useEffect(() => {
-        if (!loading) {
-            // Deduplicate by food_item_id before saving
-            const deduped: ShoppingListItem[] = [];
-            const seenFoodIds = new Map<string, number>();
-            for (const item of manualItems) {
-                if (item.food_item_id && seenFoodIds.has(item.food_item_id)) {
-                    const idx = seenFoodIds.get(item.food_item_id)!;
-                    const existing = deduped[idx];
-                    deduped[idx] = { ...existing, quantity: `${existing.quantity} + ${item.quantity}` };
-                } else {
-                    if (item.food_item_id) seenFoodIds.set(item.food_item_id, deduped.length);
-                    deduped.push(item);
-                }
-            }
-            // If dedup reduced items, update state too
-            if (deduped.length < manualItems.length) {
-                setManualItems(deduped);
-            }
-            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(deduped));
-        }
-    }, [manualItems, loading]);
-
     // Combine manual items with meal plan items, then enrich before setting state
     useEffect(() => {
+        setLoading(shoppingLoading);
+    }, [shoppingLoading]);
+
+    // ── Enrichment loop (Cloud First) ───────────────────────────
+    useEffect(() => {
         let isCancelled = false;
-
         const combineAndEnrich = async () => {
-            // Deduplicate manualItems by food_item_id (merge quantities)
-            const deduped: ShoppingListItem[] = [];
-            const seenFoodIds = new Map<string, number>(); // food_item_id -> index in deduped
-            for (const item of manualItems) {
-                if (item.food_item_id && seenFoodIds.has(item.food_item_id)) {
-                    const idx = seenFoodIds.get(item.food_item_id)!;
-                    const existing = deduped[idx];
-                    // Merge quantities
-                    const merged = existing.quantity && item.quantity
-                        ? `${existing.quantity} + ${item.quantity}`
-                        : existing.quantity || item.quantity;
-                    deduped[idx] = { ...existing, quantity: merged };
-                } else {
-                    if (item.food_item_id) seenFoodIds.set(item.food_item_id, deduped.length);
-                    deduped.push(item);
-                }
-            }
-
-            let combined = [...deduped];
-
-            // Enrich items before setting state to avoid the "Other" flash
-            // Apply cached enrichment data first
-            combined = combined.map(item => {
+            if (shoppingLoading) return;
+            
+            let combined = [...manualItems].map(item => {
                 const cacheKey = item.food_item_id || item.name.toLowerCase();
                 const cached = enrichmentCache.get(cacheKey);
                 if (cached) {
-                    const updated = { ...item };
-                    if (!item.category && cached.category) updated.category = cached.category;
-                    if (!item.image && cached.image) updated.image = cached.image;
-                    if (!item.common_name && cached.common_name) updated.common_name = cached.common_name;
-                    if (!item.food_item_id && cached.id) updated.food_item_id = cached.id;
-                    return updated;
+                    const u = { ...item };
+                    if (!item.category && cached.category) u.category = cached.category;
+                    if (!item.image && cached.image) u.image = cached.image;
+                    if (!item.common_name && cached.common_name) u.common_name = cached.common_name;
+                    if (!item.food_item_id && cached.id) u.food_item_id = cached.id;
+                    return u;
                 }
                 return item;
             });
@@ -201,64 +145,31 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
             if (needEnrichById.length > 0 || needEnrichByName.length > 0) {
                 setEnriching(true);
-
-                // Phase 1: Enrich by food_item_id (single batch query)
                 const idToData = new Map<string, any>();
                 if (needEnrichById.length > 0) {
                     const ids = needEnrichById.map(i => i.food_item_id).filter(Boolean) as string[];
-                    if (ids.length > 0) {
-                        const { data } = await supabase
-                            .from('food_items')
-                            .select('id, category, image, common_name')
-                            .in('id', ids);
-                        if (data) data.forEach((d: any) => {
-                            idToData.set(d.id, d);
-                            enrichmentCache.set(d.id, d);
-                        });
-                    }
+                    const { data } = await supabase.from('food_items').select('id, category, image, common_name').in('id', ids);
+                    data?.forEach((d: any) => { idToData.set(d.id, d); enrichmentCache.set(d.id, d); });
                 }
-
-                // Phase 2: Enrich by name (prefer exact matches over fuzzy)
+                
                 const nameToData = new Map<string, any>();
                 if (needEnrichByName.length > 0 && !isCancelled) {
                     const uniqueNames = [...new Set(needEnrichByName.map(i => i.name.toLowerCase()))];
-                    // Build a single query that matches all names at once
-                    const orConditions = uniqueNames
-                        .map(name => `name.ilike.%${name}%,common_name.ilike.%${name}%`)
-                        .join(',');
-                    const { data } = await supabase
-                        .from('food_items')
-                        .select('id, name, common_name, category, image')
-                        .or(orConditions)
-                        .limit(uniqueNames.length * 5);
+                    const orConditions = uniqueNames.map(name => `name.ilike.%${name}%,common_name.ilike.%${name}%`).join(',');
+                    const { data } = await supabase.from('food_items').select('id, name, common_name, category, image').or(orConditions).limit(uniqueNames.length * 5);
                     if (data) {
-                        // Score each result against each search name — exact > starts-with > contains
                         for (const searchName of uniqueNames) {
-                            if (nameToData.has(searchName)) continue;
-                            let bestMatch: any = null;
-                            let bestScore = 0;
+                            let bestMatch: any = null, bestScore = 0;
                             for (const d of data) {
-                                const dbName = (d.name || '').toLowerCase();
-                                const dbCommon = (d.common_name || '').toLowerCase();
+                                const dbName = (d.name || '').toLowerCase(), dbCommon = (d.common_name || '').toLowerCase();
                                 let score = 0;
-                                // Exact match on name or common_name (highest priority)
                                 if (dbName === searchName || dbCommon === searchName) score = 4;
-                                // Starts with the search term
                                 else if (dbName.startsWith(searchName) || dbCommon.startsWith(searchName)) score = 3;
-                                // Search term starts with db name (e.g. "salt (iodized)" starts with "salt")
                                 else if (searchName.startsWith(dbName) || searchName.startsWith(dbCommon)) score = 2;
-                                // Contains (lowest priority — this is the old fuzzy match)
                                 else if (dbName.includes(searchName) || dbCommon.includes(searchName)) score = 1;
-
-                                if (score > bestScore) {
-                                    bestScore = score;
-                                    bestMatch = d;
-                                }
+                                if (score > bestScore) { bestScore = score; bestMatch = d; }
                             }
-                            if (bestMatch) {
-                                nameToData.set(searchName, bestMatch);
-                                enrichmentCache.set(searchName, bestMatch);
-                            }
+                            if (bestMatch) { nameToData.set(searchName, bestMatch); enrichmentCache.set(searchName, bestMatch); }
                         }
                     }
                 }
@@ -267,39 +178,23 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     combined = combined.map(item => {
                         if (item.food_item_id && idToData.has(item.food_item_id)) {
                             const d = idToData.get(item.food_item_id);
-                            const updated = { ...item };
-                            if (!item.category && d.category) updated.category = d.category;
-                            if (!item.image && d.image) updated.image = d.image;
-                            if (!item.common_name && d.common_name) updated.common_name = d.common_name;
-                            return updated;
+                            return { ...item, category: item.category || d.category, image: item.image || d.image, common_name: item.common_name || d.common_name };
                         }
                         if (!item.category && nameToData.has(item.name.toLowerCase())) {
                             const d = nameToData.get(item.name.toLowerCase());
-                            const updated = { ...item };
-                            if (d.category) updated.category = d.category;
-                            if (d.image) updated.image = d.image;
-                            if (d.common_name) updated.common_name = d.common_name;
-                            if (d.id) updated.food_item_id = d.id;
-                            return updated;
+                            return { ...item, category: d.category, image: d.image, common_name: d.common_name, food_item_id: d.id };
                         }
                         return item;
                     });
                 }
-
                 setEnriching(false);
             }
 
-            if (!isCancelled) {
-                setItems(combined);
-            }
+            if (!isCancelled) setItems(combined);
         };
-
         combineAndEnrich();
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [manualItems]);
+        return () => { isCancelled = true; };
+    }, [manualItems, shoppingLoading]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -334,9 +229,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         image_url?: string;
         nutrition?: any;
     }) => {
-        // Add to shopping list
-        const newItem: ShoppingListItem = {
-            id: `scanned-${Date.now()}`,
+        await addShoppingListItem({
             name: product.name,
             quantity: `${product.quantity} ${product.unit}`,
             unit: product.unit,
@@ -345,9 +238,8 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             price: product.price,
             image_url: product.image_url,
             food_item_id: product.food_item_id
-        };
+        });
 
-        setManualItems(prev => [...prev, newItem]);
         setConfirmDialogOpen(false);
         setScannedBarcode('');
 
@@ -368,81 +260,34 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
 
     const removeItem = (id: string) => {
-        // Always remove from both states — plan-* items live only in manualItems
-        setManualItems(prev => prev.filter(item => item.id !== id));
-        setItems(prev => prev.filter(item => item.id !== id));
-        // Also persist the removal immediately so refresh doesn't bring them back
-        try {
-            const saved = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            const updated = saved.filter((item: ShoppingListItem) => item.id !== id);
-            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(updated));
-        } catch { /* ignore */ }
+        removeShoppingListItem(id);
     };
 
     // Tick button: directly add item to pantry using its existing shopping-list quantity
     const [tickLoadingId, setTickLoadingId] = useState<string | null>(null);
+
     const quickAddToPantry = async (item: ShoppingListItem) => {
         setTickLoadingId(item.id);
         try {
-            // Resolve food_item_id
             let foodItemId = item.food_item_id || null;
             if (!foodItemId && item.name) {
                 const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
-                const { data } = await supabase
-                    .from('food_items')
-                    .select('id')
-                    .or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`)
-                    .limit(1)
-                    .maybeSingle();
+                const { data } = await supabase.from('food_items').select('id, name, common_name, category, image').or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`).limit(1).maybeSingle();
                 if (data) foodItemId = data.id;
             }
-            if (!foodItemId) {
-                // No DB match — still remove from shopping list, then open match dialog
-                removeItem(item.id);
-                moveToPantry(item);
-                return;
-            }
+            if (!foodItemId) { removeItem(item.id); moveToPantry(item); return; }
 
-            // Use the item's existing quantity, stripping leading "As needed +" noise
             const rawQty = (item.quantity || '').trim();
-            const quantityString = rawQty
-                .split(/\s*\+\s*/)
-                .map((s: string) => s.trim())
-                .filter((s: string) => !/^as\s+needed$/i.test(s) && s.length > 0)
-                .join(' + ') || rawQty || '1';
+            const qtyStr = rawQty.split(/\s*\+\s*/).map(s => s.trim()).filter(s => !/^as\s+needed$/i.test(s) && s.length > 0).join(' + ') || rawQty || '1';
 
-            // Persist to pantry_quantities
-            const saved = localStorage.getItem('pantry_quantities');
-            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-            const existing = quantities[foodItemId];
-            quantities[foodItemId] = existing ? `${existing} + ${quantityString}` : quantityString;
-            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+            const currentPantryQty = quantities[foodItemId] || '';
+            const merged = mergeQuantityStrings(currentPantryQty, qtyStr);
+            const cleaned = stripZeroEntries(merged);
 
-            // Write to Supabase
-            const { data: { user: currentUser } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const userIsAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
-            if (userIsAdmin) {
-                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
-            } else if (currentUser) {
-                const { data: existingRow } = await supabase
-                    .from('pantry_items')
-                    .select('id')
-                    .eq('user_id', currentUser.id)
-                    .eq('food_item_id', foodItemId)
-                    .maybeSingle();
-                if (!existingRow) {
-                    await supabase.from('pantry_items').insert({
-                        user_id: currentUser.id,
-                        name: item.name,
-                        quantity: quantities[foodItemId],
-                        food_item_id: foodItemId
-                    });
-                } else {
-                    await supabase.from('pantry_items')
-                        .update({ quantity: quantities[foodItemId] })
-                        .eq('id', existingRow.id);
-                }
+            if (currentPantryQty) {
+                await updateQuantity(foodItemId, cleaned);
+            } else {
+                await addToPantry({ id: foodItemId, name: item.name, common_name: item.common_name, category: item.category, image: item.image }, cleaned);
             }
 
             removeItem(item.id);
@@ -557,7 +402,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     };
 
     // Add item to groceries (shopping list) with aggregation
-    const confirmAddToGroceries = () => {
+    const confirmAddToGroceries = async () => {
         if (!pantryAddItem) return;
 
         const qty = pantryAddQty || '1';
@@ -565,41 +410,13 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             ? `${qty} ${pantryAddSelectedPortion.label} (${pantryAddSelectedPortion.weight_g}g)`
             : qty;
 
-        // Match existing item by food_item_id (most reliable), then fall back to name
-        const normalize = (s: string) => s.toLowerCase().trim();
-        const existingIndex = manualItems.findIndex(item => {
-            if (pantryAddItem.food_item_id && item.food_item_id) {
-                return item.food_item_id === pantryAddItem.food_item_id;
-            }
-            return normalize(item.name) === normalize(pantryAddItem.name);
+        await addShoppingListItem({
+            name: pantryAddItem.common_name || pantryAddItem.name,
+            quantity: quantityString,
+            food_item_id: pantryAddItem.food_item_id,
         });
 
-        if (existingIndex >= 0) {
-            // Item exists — intelligently combine quantities
-            const existing = manualItems[existingIndex];
-            const existingQty = existing.quantity || '1';
-            const combined = smartCombineQuantities(existingQty, quantityString);
-
-            const updated = [...manualItems];
-            updated[existingIndex] = { ...existing, quantity: combined };
-            setManualItems(updated);
-            toast.success(`Updated ${pantryAddItem.common_name || pantryAddItem.name} quantity`);
-        } else {
-            // New item
-            const newItem: ShoppingListItem = {
-                id: `manual-${Date.now()}`,
-                name: pantryAddItem.common_name || pantryAddItem.name,
-                quantity: quantityString,
-                unit: '',
-                source: 'manual',
-                image: pantryAddItem.image,
-                image_url: pantryAddItem.image_url,
-                food_item_id: pantryAddItem.food_item_id,
-            };
-
-            setManualItems(prev => [...prev, newItem]);
-            toast.success(`Added ${pantryAddItem.common_name || pantryAddItem.name} to shopping list`);
-        }
+        toast.success(`Updated ${pantryAddItem.common_name || pantryAddItem.name} in shopping list`);
 
         // Close the form and reset
         setPantryAddItem(null);
@@ -647,123 +464,30 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     // Confirm adding a grocery item to the pantry with the chosen qty + portion
     const confirmPantryAdd = async () => {
         if (!pantryAddItem) return;
-        const foodItemId = pantryAddFoodId;
-        if (!foodItemId) {
-            // No food resolved – fall back to match dialog
-            moveToPantry(pantryAddItem);
-            setPantryAddItem(null);
-            return;
-        }
 
         setPantryAddLoading(true);
         try {
-            // Build quantity string from the panel inputs
             const qty = pantryAddQty || '1';
-            const quantityString = pantryAddSelectedPortion
-                ? `${qty} ${pantryAddSelectedPortion.label} (${pantryAddSelectedPortion.weight_g}g)`
-                : qty;
-
-            const saved = localStorage.getItem('pantry_quantities');
-            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-            const current = quantities[foodItemId] || '';
-
-            // Helper: format grams as kg when >= 1000g
-            const fmtG = (g: number) => {
-                if (g >= 1000) {
-                    const kg = g / 1000;
-                    const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-                    const kgNum = parseFloat(kgStr);
-                    const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
-                    return `${kgStr} ${unit}`;
+            const qtyStr = pantryAddSelectedPortion ? `${qty} ${pantryAddSelectedPortion.label} (${pantryAddSelectedPortion.weight_g}g)` : qty;
+            
+            let foodItemId = pantryAddFoodId;
+            if (foodItemId) {
+                const currentPantryQty = quantities[foodItemId] || '';
+                const merged = mergeQuantityStrings(currentPantryQty, qtyStr);
+                const cleaned = stripZeroEntries(merged);
+                
+                if (currentPantryQty) {
+                    await updateQuantity(foodItemId, cleaned);
+                } else {
+                    await dbAddToPantry({ id: foodItemId, name: pantryAddItem.name, common_name: pantryAddItem.common_name, category: pantryAddItem.category, image: pantryAddItem.image }, cleaned);
                 }
-                const gramsNum = Math.round(g);
-                const unit = gramsNum === 1 ? 'gram' : 'grams';
-                return `${gramsNum} ${unit}`;
-            };
-
-            // Merge with existing stock
-            const existingEntries = current
-                .split(/\s*\+\s*/)
-                .map((s: string) => s.trim())
-                .filter((s: string) => {
-                    if (!s) return false;
-                    const m = s.match(/^(\d+(?:\.\d+)?)/);
-                    return m ? parseFloat(m[1]) > 0 : true;
-                });
-
-            const parseEntry = (s: string) => {
-                const labeled = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                if (labeled) return { qty: parseFloat(labeled[1]), label: labeled[2], wg: parseFloat(labeled[3]) };
-                const xFmt = s.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
-                if (xFmt) return { qty: parseFloat(xFmt[1]), label: null, wg: parseFloat(xFmt[2]) };
-                return null;
-            };
-            const isWeightOnly = (p: ReturnType<typeof parseEntry>) =>
-                p != null && (p.label === null || /^(gram|kilogram)s?$/i.test(p.label));
-            const totalG = (p: NonNullable<ReturnType<typeof parseEntry>>) => p.qty * p.wg;
-
-            const incomingParsed = parseEntry(quantityString);
-            let merged = false;
-
-            if (incomingParsed && isWeightOnly(incomingParsed)) {
-                let grams = totalG(incomingParsed);
-                const nonWeight: string[] = [];
-                for (const raw of existingEntries) {
-                    const p = parseEntry(raw);
-                    if (p && isWeightOnly(p)) grams += totalG(p);
-                    else nonWeight.push(raw);
-                }
-                const consolidated = fmtG(grams);
-                quantities[foodItemId] = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${consolidated}` : consolidated;
-                merged = true;
-            } else if (incomingParsed && incomingParsed.label) {
-                const matchIdx = existingEntries.findIndex((raw: string) => {
-                    const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                    return m && m[2] === incomingParsed.label && parseFloat(m[3]) === incomingParsed.wg;
-                });
-                if (matchIdx >= 0) {
-                    const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
-                    existingEntries[matchIdx] = `${(m ? parseFloat(m[1]) : 0) + incomingParsed.qty} ${incomingParsed.label} (${incomingParsed.wg}g)`;
-                    quantities[foodItemId] = existingEntries.join(' + ');
-                    merged = true;
-                }
+            } else {
+                // Fallback to direct addToPantry if no ID resolved (should be rare now)
+                await addToPantry(pantryAddItem, qtyStr);
             }
 
-            if (!merged) {
-                quantities[foodItemId] = existingEntries.length > 0
-                    ? `${existingEntries.join(' + ')} + ${quantityString}`
-                    : quantityString;
-            }
-
-            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-            
-            // Only admins modify the global is_in_pantry flag; non-admins use pantry_items
-            const { data: { user: currentUser } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const userIsAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
-            
-            if (userIsAdmin) {
-                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
-            } else if (currentUser) {
-                // Insert into pantry_items for per-user storage
-                const { data: existing } = await supabase
-                    .from('pantry_items')
-                    .select('id')
-                    .eq('user_id', currentUser.id)
-                    .eq('food_item_id', foodItemId)
-                    .maybeSingle();
-                if (!existing) {
-                    await supabase.from('pantry_items').insert({
-                        user_id: currentUser.id,
-                        name: pantryAddItem.name,
-                        quantity: quantities[foodItemId],
-                        food_item_id: foodItemId
-                    });
-                }
-            }
-            
             removeItem(pantryAddItem.id);
-            toast.success(`"${pantryAddItem.name}" added to pantry: ${quantityString}`);
+            toast.success(`"${pantryAddItem.name}" added to pantry`);
             setPantryAddItem(null);
         } catch (e) {
             toast.error('Failed to add to pantry');
@@ -837,116 +561,37 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
     const handleMatchConfirm = async (foodItemId: string | null, name: string, quantity: string) => {
         if (!selectedMatchItem) return;
-
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-
-            // Determine effective IDs
-            // If foodItemId is passed (from search), use it.
-            // If null (confirmed known item), use existing item's food_item_id or scannedIdToLink
             const effectiveFoodId = foodItemId || selectedMatchItem.food_item_id || null;
-            const effectiveScannedId = (!foodItemId && scannedIdToLink) ? scannedIdToLink : null;
-
-            // If no food_item was found, try to guess category from item name
-            let categoryHint = '';
-            if (!effectiveFoodId && name) {
-                const lowerName = name.toLowerCase();
-                if (lowerName.match(/(apple|banana|orange|grape|berry|mango|pineapple|melon|peach|pear|plum|cherry|lemon|lime|kiwi|avocado|coconut)/)) {
-                    categoryHint = 'Fruit';
-                } else if (lowerName.match(/(broccoli|spinach|kale|lettuce|carrot|tomato|potato|onion|garlic|pepper|cucumber|zucchini|cabbage)/)) {
-                    categoryHint = 'Vegetables';
-                } else if (lowerName.match(/(chicken|beef|pork|turkey|fish|salmon|tuna|egg|milk|cheese|yogurt|meat)/)) {
-                    categoryHint = 'Proteins';
-                } else if (lowerName.match(/(rice|wheat|oat|barley|quinoa|corn|bread|pasta|grain)/)) {
-                    categoryHint = 'Grains';
-                } else if (lowerName.match(/(peanut|almond|walnut|cashew|nut|seed)/)) {
-                    categoryHint = 'Nuts';
-                }
+            if (!effectiveFoodId) {
+                // If no food_item resolved, fallback to legacy move (or alert user)
+                await addToPantry(selectedMatchItem, quantity);
+                removeItem(selectedMatchItem.id);
+                setMatchDialogOpen(false);
+                return;
             }
 
-            // Store category hint in notes
-            const notesWithCategory = [selectedMatchItem.category || categoryHint ? `Category: ${selectedMatchItem.category || categoryHint}` : ''].filter(Boolean).join('; ');
+            const currentPantryQty = quantities[effectiveFoodId] || '';
+            const merged = mergeQuantityStrings(currentPantryQty, quantity);
+            const cleaned = stripZeroEntries(merged);
 
-            // Aggregation check: look for an existing item with the same identifier or name
-            let existingItem = null;
-
-            // Try to find by food_item_id first
-            if (effectiveFoodId) {
-                const { data } = await supabase
-                    .from('pantry_items')
-                    .select('id, quantity')
-                    .eq('user_id', user.id)
-                    .eq('food_item_id', effectiveFoodId)
-                    .limit(1)
-                    .single();
-                if (data) existingItem = data;
-            }
-
-            // Try to find by scanned_product_id if no match yet
-            if (!existingItem && effectiveScannedId) {
-                const { data } = await supabase
-                    .from('pantry_items')
-                    .select('id, quantity')
-                    .eq('user_id', user.id)
-                    .eq('scanned_product_id', effectiveScannedId)
-                    .limit(1)
-                    .single();
-                if (data) existingItem = data;
-            }
-
-            // Fallback: try to find by exact name match
-            if (!existingItem) {
-                const { data } = await supabase
-                    .from('pantry_items')
-                    .select('id, quantity')
-                    .eq('user_id', user.id)
-                    .ilike('name', name)
-                    .limit(1)
-                    .single();
-                if (data) existingItem = data;
-            }
-
-            if (existingItem) {
-                // Update existing item with combined quantity
-                const newQuantity = aggregateQuantities(existingItem.quantity || '0', quantity);
-                const { error } = await supabase
-                    .from('pantry_items')
-                    .update({
-                        quantity: newQuantity,
-                        food_item_id: effectiveFoodId || undefined,
-                        scanned_product_id: effectiveScannedId || undefined,
-                        notes: notesWithCategory || undefined
-                    })
-                    .eq('id', existingItem.id);
-                if (error) throw error;
+            if (currentPantryQty) {
+                await updateQuantity(effectiveFoodId, cleaned);
             } else {
-                // Insert new row
-                const { error } = await supabase.from('pantry_items').insert({
-                    user_id: user.id,
-                    name: name,
-                    quantity: quantity,
-                    food_item_id: effectiveFoodId,
-                    scanned_product_id: effectiveScannedId,
-                    notes: notesWithCategory || undefined
-                });
-                if (error) throw error;
+                await addToPantry({ 
+                    id: effectiveFoodId, 
+                    name: name, 
+                    common_name: selectedMatchItem.common_name || name,
+                    category: selectedMatchItem.category, 
+                    image: selectedMatchItem.image
+                }, cleaned);
             }
 
             removeItem(selectedMatchItem.id);
-
-            // Also remove from manualItems if it's a manual/scanned item
-            if (selectedMatchItem.id.startsWith('manual-') || selectedMatchItem.id.startsWith('scanned-')) {
-                setManualItems(prev => prev.filter(item => item.id !== selectedMatchItem.id));
-            }
-
             setMatchDialogOpen(false);
             setSelectedMatchItem(null);
             setScannedIdToLink(null);
             toast.success(`"${name}" updated in your pantry`);
-
-            fetchData();
-
         } catch (error) {
             console.error('Error linking to pantry:', error);
             toast.error('Failed to update pantry');
@@ -1096,11 +741,10 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                             {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
                         </p>
                         <button
-                            onClick={() => {
+                            onClick={async () => {
                                 if (!confirm('Clear all items from your grocery list?')) return;
-                                setManualItems([]);
+                                await clearShoppingList();
                                 setItems([]);
-                                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([]));
                                 toast.success('Grocery list cleared');
                             }}
                             className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5"
@@ -1256,10 +900,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                             removeItem(item.id);
                                                                             // Re-add with reduced quantity if > 1
                                                                             if (parseInt(updatedItem.quantity) > 0) {
-                                                                                const manualItems = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-                                                                                manualItems.push(updatedItem);
-                                                                                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
-                                                                                setManualItems(manualItems);
+                                                                                addItem(updatedItem);
                                                                             }
                                                                             setExpandedRemoveId(null);
                                                                             setSelectedRemoveItem(null);

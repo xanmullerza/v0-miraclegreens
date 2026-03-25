@@ -14,6 +14,7 @@ import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { formatFoodName } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useShoppingList } from '@/hooks/use-shopping-list';
 
 const CAL_TO_KJ = 4.184;
 
@@ -25,6 +26,7 @@ function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
 export default function ShoppingListPage() {
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
+    const { addItem: addShoppingListItem } = useShoppingList();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -178,36 +180,15 @@ export default function ShoppingListPage() {
                 ? `${quickAddQty} ${selectedPortion.label} (${selectedPortion.weight_g}g)`
                 : quickAddQty;
 
-            const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+            await addShoppingListItem({
+                name: selectedFood.common_name || selectedFood.name,
+                quantity: quantityString,
+                food_item_id: selectedFood.id,
+                category: selectedFood.category || 'General',
+                image: selectedFood.image || undefined,
+            });
 
-            // Check if item already exists by food_item_id
-            const existingIndex = currentList.findIndex((item: any) => item.food_item_id === selectedFood.id);
-
-            if (existingIndex !== -1) {
-                // Try to intelligently combine quantities
-                const existingQty = currentList[existingIndex].quantity;
-                const combined = combineQuantities(existingQty, quantityString);
-                currentList[existingIndex].quantity = combined;
-                toast.success(`Added to ${selectedFood.common_name || selectedFood.name} total`);
-            } else {
-                // Add new item
-                const newItem = {
-                    id: `manual-${Date.now()}`,
-                    name: selectedFood.common_name || selectedFood.name,
-                    quantity: quantityString,
-                    unit: '',
-                    checked: false,
-                    source: 'manual',
-                    food_item_id: selectedFood.id,
-                    category: selectedFood.category,
-                    image: selectedFood.image,
-                };
-                currentList.push(newItem);
-                toast.success(`${selectedFood.common_name || selectedFood.name} added to shopping list`);
-            }
-
-            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
-            window.dispatchEvent(new Event('storage'));
+            toast.success(`${selectedFood.common_name || selectedFood.name} added to shopping list`);
 
             setShowAddModal(false);
             setSelectedFood(null);

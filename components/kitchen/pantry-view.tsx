@@ -45,6 +45,9 @@ import { cn, formatFoodName } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DailyPlan } from '@/lib/utils/meal-generator';
 import { Recipe } from '@/lib/data/recipes';
+import { usePantry } from '@/hooks/use-pantry';
+import { useShoppingList } from '@/hooks/use-shopping-list';
+import { mergeQuantityStrings, stripZeroEntries } from '../pantry/pantry-types';
 
 interface FoodItem {
     id: string;
@@ -88,19 +91,14 @@ export function PantryView({
     refreshKey = 0
 }: PantryViewProps) {
     const router = useRouter();
+    const { quantities, pantryItems: dbPantryItems, loading: pantryLoading, updateQuantity, addToPantry, removeFromPantry: dbRemoveFromPantry } = usePantry();
+    const { addItem: addShoppingItem } = useShoppingList();
+
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const { searchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const { dailyPlan, updateDailyPlan, energyUnit, measurementUnit } = useUserPreferences();
-
-    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
-    const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
-    const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
-
-    const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>([]);
-    const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
-    const setSelectedCategories = externalSetSelectedCategories !== undefined ? externalSetSelectedCategories : setLocalSelectedCategories;
 
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -218,29 +216,36 @@ export function PantryView({
     };
 
     useEffect(() => {
-        fetchPantry();
-    }, [refreshKey]);
-
-    // Re-apply localStorage quantities when another component (e.g. mark-as-eaten) updates them
-    useEffect(() => {
-        const handleQuantitiesUpdated = () => {
-            try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');
-                if (!savedQuantities) return;
-                const quantities: Record<string, string> = JSON.parse(savedQuantities);
-                setFoods(prev => prev.map(item => {
-                    if (quantities[item.id] !== undefined) {
-                        return { ...item, quantity: quantities[item.id] };
-                    }
-                    return item;
-                }));
-            } catch (e) {
-                console.error('Failed to re-apply pantry quantities', e);
-            }
-        };
-        window.addEventListener('pantry-quantities-updated', handleQuantitiesUpdated);
-        return () => window.removeEventListener('pantry-quantities-updated', handleQuantitiesUpdated);
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            setUser(user);
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            setIsAdmin(!!(user?.email && adminEmail && user.email === adminEmail));
+        });
     }, []);
+
+    // Synchronize local foods state with centralized hook data
+    useEffect(() => {
+        if (pantryLoading) return;
+        
+        const combined = dbPantryItems.map(item => ({
+            id: item.food_item_id || item.id,
+            name: item.name,
+            common_name: item.food_items?.common_name || item.name,
+            energy_kcal: item.food_items?.energy_kcal || 0,
+            protein_g: item.food_items?.protein_g || 0,
+            carbs_g: item.food_items?.carbs_g || 0,
+            fat_g: item.food_items?.fat_g || 0,
+            image: item.food_items?.image || null,
+            is_in_pantry: true,
+            is_favorite: item.food_items?.is_favorite || false,
+            category: item.food_items?.category || 'General',
+            source_table: 'pantry_items' as const,
+            quantity: quantities[item.food_item_id || item.id] || ''
+        }));
+        
+        setFoods(combined);
+        setLoading(false);
+    }, [dbPantryItems, quantities, pantryLoading]);
 
     // Fetch portions when a buyMoreItem is selected
     useEffect(() => {
@@ -299,103 +304,16 @@ export function PantryView({
         if (weight) return `${qty} x ${weight}${unit}`;
         return qty;
     };
-
-    // Detect entries that are pure weight measures (gram, kilogram, or "1 x Ng") � these are fungible
     const isWeightOnlyEntry = (entry: QuantityEntry): boolean => {
         if (!entry.label) return entry.weight_g != null && (entry.unit === 'g' || entry.unit === null);
         return /^(gram|kilogram)s?$/i.test(entry.label);
     };
 
-    const entryTotalGrams = (entry: QuantityEntry): number => {
-        return entry.qty * (entry.weight_g ?? 0);
-    };
+    const entryTotalGrams = (entry: QuantityEntry): number => (entry.qty || 0) * (entry.weight_g || 0);
 
-    // Format a gram total into shortform (kg/g)
     const formatGramsEntry = (grams: number): string => {
-        if (grams >= 1000) {
-            const kg = grams / 1000;
-            // Use up to 3 decimal places, stripping trailing zeros
-            const kgStr = parseFloat(kg.toFixed(3)).toString();
-            return `${kgStr} kg`;
-        }
+        if (grams >= 1000) return `${parseFloat((grams / 1000).toFixed(3))} kg`;
         return `${Math.round(grams)} g`;
-    };
-
-    // Strip zero-valued entries from a "+" separated quantity string
-    const stripZeroEntries = (qtyStr: string): string => {
-        const entries = qtyStr.split(/\s*\+\s*/).map(s => s.trim()).filter(s => {
-            if (!s) return false;
-            const parsed = parseQuantityEntry(s);
-            const totalG = (parsed.qty || 0) * (parsed.weight_g || 0);
-            // Keep entries that have qty > 0 AND either have meaningful weight or are label-only (e.g. "3 Large")
-            if (parsed.qty <= 0) return false;
-            if (parsed.weight_g != null && totalG <= 0) return false;
-            return true;
-        });
-        return entries.join(' + ');
-    };
-
-    const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
-        if (!existing) {
-            if (existing === '' || existing === '0' || existing === '0 grams') {
-            }
-            return incoming;
-        }
-        // Drop zero-quantity entries before merging (e.g. '0' left after items are consumed)
-        const existingEntries = existing.split(/\s*\+\s*/).map(s => s.trim()).filter(s => {
-            if (!s) return false;
-            const e = parseQuantityEntry(s);
-            return e.qty > 0;
-        });
-        // If all existing entries were zeros, just return incoming
-        if (existingEntries.length === 0) {
-            return incoming;
-        }
-        const b = parseQuantityEntry(incoming);
-
-        // If incoming is a pure weight entry, consolidate with ALL existing weight entries
-        if (isWeightOnlyEntry(b)) {
-            let totalGrams = entryTotalGrams(b);
-            const nonWeightEntries: string[] = [];
-            for (const raw of existingEntries) {
-                const parsed = parseQuantityEntry(raw);
-                if (isWeightOnlyEntry(parsed)) {
-                    totalGrams += entryTotalGrams(parsed);
-                } else {
-                    nonWeightEntries.push(raw);
-                }
-            }
-            const consolidated = formatGramsEntry(totalGrams);
-            return nonWeightEntries.length > 0
-                ? `${nonWeightEntries.join(' + ')} + ${consolidated}`
-                : consolidated;
-        }
-
-        // For non-weight entries (e.g. "5 Large (223g)"), match by label (case-insensitive) + approximate weight_g
-        const matchIndex = existingEntries.findIndex(e => {
-            const a = parseQuantityEntry(e);
-            if (!b.label || !a.label) return a.label === b.label && a.weight_g === b.weight_g && a.unit === b.unit;
-            // Case-insensitive label match + weight within 1g tolerance (handles DB float precision)
-            const labelMatch = a.label.toLowerCase() === b.label.toLowerCase();
-            const weightClose = a.weight_g != null && b.weight_g != null
-                ? Math.abs(a.weight_g - b.weight_g) < 1
-                : a.weight_g === b.weight_g;
-            return labelMatch && weightClose;
-        });
-        if (matchIndex >= 0) {
-            const a = parseQuantityEntry(existingEntries[matchIndex]);
-            const sumQty = a.qty + b.qty;
-            if (b.label && b.weight_g) {
-                existingEntries[matchIndex] = `${sumQty} ${b.label} (${b.weight_g}g)`;
-            } else if (b.weight_g) {
-                existingEntries[matchIndex] = `${sumQty} x ${b.weight_g}${b.unit}`;
-            } else {
-                existingEntries[matchIndex] = `${sumQty}`;
-            }
-            return existingEntries.join(' + ');
-        }
-        // No matching entry � append incoming to the non-zero filtered entries
-        return `${existingEntries.join(' + ')} + ${incoming}`;
     };
 
     const handleBuyMoreAdd = async () => {
@@ -405,16 +323,8 @@ export function PantryView({
             const quantityString = buildQuantityString(buyMoreQty, buyMoreSelectedPortion, buyMoreWeight, buyMoreUnit);
 
             if (quickAddMode === 'pantry') {
-                if (buyMoreItem.source_table === 'food_items' && isAdmin) {
-                    await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', buyMoreItem.id);
-                }
-                const saved = localStorage.getItem('pantry_quantities');
-                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                const currentQty = quantities[buyMoreItem.id] || buyMoreItem.quantity;
+                const currentQty = quantities[buyMoreItem.id] || '';
                 const merged = mergeQuantityStrings(currentQty, quantityString);
-                if (buyMoreItem.common_name?.toLowerCase().includes('potato')) {
-                } else {
-                }
                 
                 // Check if merged result is 0 - if so, move to shopping list
                 const parseTest = parseQuantityEntry(merged);
@@ -422,57 +332,26 @@ export function PantryView({
                 const isZero = totalGrams === 0 || merged === '0' || merged === '';
                 
                 if (isZero) {
-                    // Add to shopping list
-                    const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-                    shoppingList.push({
-                        id: `replenish-${Date.now()}-${buyMoreItem.id}`,
+                    await addShoppingItem({
                         name: buyMoreItem.common_name || buyMoreItem.name,
-                        quantity: 'As needed',
-                        unit: '',
-                        checked: false,
-                        source: 'auto-replenish',
                         food_item_id: buyMoreItem.id,
-                        category: buyMoreItem.category
+                        quantity: 'As needed',
+                        source: 'manual',
                     });
-                    localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
                     
-                    // Remove from pantry
-                    delete quantities[buyMoreItem.id];
-                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                    
-                    if (buyMoreItem.source_table === 'food_items' && isAdmin) {
-                        await supabase
-                            .from('food_items')
-                            .update({ is_in_pantry: false } as any)
-                            .eq('id', buyMoreItem.id);
-                    } else if (buyMoreItem.source_table === 'pantry_items') {
-                        await supabase
-                            .from('pantry_items')
-                            .delete()
-                            .eq('id', buyMoreItem.id);
-                    }
-                    
-                    setFoods(prev => prev.filter(f => f.id !== buyMoreItem.id));
+                    await dbRemoveFromPantry(buyMoreItem.id);
                     toast.success(`${buyMoreItem.common_name || buyMoreItem.name} moved to shopping list`);
-                    window.dispatchEvent(new CustomEvent('shopping-list-updated'));
                 } else {
                     const cleaned = stripZeroEntries(merged);
-                    quantities[buyMoreItem.id] = cleaned;
-                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                    setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: cleaned } : f));
+                    await updateQuantity(buyMoreItem.id, cleaned);
                     toast.success(`Updated quantity for ${buyMoreItem.common_name || buyMoreItem.name}`);
                 }
             } else {
-                const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-                const newItem = {
-                    id: `manual-${Date.now()}`,
+                await addShoppingItem({
                     name: buyMoreItem.common_name || buyMoreItem.name,
                     quantity: quantityString,
-                    unit: '',
-                    checked: false,
                     source: 'manual'
-                };
-                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+                });
                 toast.success(`Added to groceries`);
             }
             setBuyMoreItem(null);
@@ -489,10 +368,7 @@ export function PantryView({
         setRemoveRemoving(true);
         try {
             const quantityString = buildQuantityString(removeQty, removeSelectedPortion, removeWeight, removeUnit);
-            
-            const saved = localStorage.getItem('pantry_quantities');
-            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-            const currentQty = quantities[removeItem.id] || removeItem.quantity || '0';
+            const currentQty = quantities[removeItem.id] || '0';
             
             // Parse current and remove quantities to get grams
             const currentRaw = currentQty.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
@@ -508,38 +384,15 @@ export function PantryView({
             
             const remainingGrams = Math.max(0, currentGrams - removeGrams);
             if (remainingGrams === 0 || currentGrams === 0) {
-                // Remove from pantry and add to shopping list
-                const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-                shoppingList.push({
-                    id: `replenish-${Date.now()}-${removeItem.id}`,
+                await addShoppingItem({
                     name: removeItem.common_name || removeItem.name,
-                    quantity: 'As needed',
-                    unit: '',
-                    checked: false,
-                    source: 'auto-replenish',
                     food_item_id: removeItem.id,
-                    category: removeItem.category
+                    quantity: 'As needed',
+                    source: 'manual',
                 });
-                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
                 
-                delete quantities[removeItem.id];
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                
-                if (removeItem.source_table === 'food_items' && isAdmin) {
-                    await supabase
-                        .from('food_items')
-                        .update({ is_in_pantry: false } as any)
-                        .eq('id', removeItem.id);
-                } else if (removeItem.source_table === 'pantry_items') {
-                    await supabase
-                        .from('pantry_items')
-                        .delete()
-                        .eq('id', removeItem.id);
-                }
-                
-                setFoods(prev => prev.filter(f => f.id !== removeItem.id));
+                await dbRemoveFromPantry(removeItem.id);
                 toast.success(`${removeItem.common_name || removeItem.name} depleted and moved to shopping list`);
-                window.dispatchEvent(new CustomEvent('shopping-list-updated'));
             } else {
                 // Subtract grams proportionally from each entry, then strip zeros
                 let gramsToRemove = removeGrams;
@@ -547,30 +400,25 @@ export function PantryView({
                 for (const entry of currentRaw) {
                     const parsed = parseQuantityEntry(entry);
                     const entryG = (parsed.qty || 0) * (parsed.weight_g || 0);
-                    if (entryG <= 0) continue; // skip already-zero entries
+                    if (entryG <= 0) continue;
                     if (gramsToRemove >= entryG) {
-                        // This entry is fully consumed � skip it
                         gramsToRemove -= entryG;
                     } else if (gramsToRemove > 0 && parsed.weight_g && parsed.weight_g > 0) {
-                        // Partially consume this entry
                         const remainingEntryG = entryG - gramsToRemove;
                         gramsToRemove = 0;
                         if (parsed.label && !isWeightOnlyEntry(parsed)) {
-                            // For labeled entries (e.g. "2 Cups (224.99g)"), reduce qty
                             const newQty = Math.max(0, Math.round((remainingEntryG / parsed.weight_g) * 100) / 100);
                             if (newQty > 0) updatedEntries.push(`${newQty} ${parsed.label} (${parsed.weight_g}g)`);
                         } else {
                             updatedEntries.push(formatGramsEntry(remainingEntryG));
                         }
                     } else {
-                        updatedEntries.push(entry); // untouched
+                        updatedEntries.push(entry);
                     }
                 }
                 const remainingStr = updatedEntries.length > 0 ? updatedEntries.join(' + ') : formatGramsEntry(remainingGrams);
                 const cleaned = stripZeroEntries(remainingStr);
-                quantities[removeItem.id] = cleaned;
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                setFoods(prev => prev.map(f => f.id === removeItem.id ? { ...f, quantity: cleaned } : f));
+                await updateQuantity(removeItem.id, cleaned);
                 toast.success(`Removed ${quantityString} from ${removeItem.common_name || removeItem.name}`);
             }
             
@@ -606,100 +454,6 @@ export function PantryView({
         }));
     };
 
-    const fetchPantry = async () => {
-        setLoading(true);
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
-
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
-            setIsAdmin(admin);
-
-            const [foodItemsRes, pantryItemsRes] = await Promise.all([
-                // Only admins see the global curated pantry from food_items
-                admin
-                    ? supabase.from('food_items')
-                        .select('*')
-                        .eq('is_in_pantry', true)
-                        .order('common_name', { ascending: true })
-                    : Promise.resolve({ data: [], error: null }),
-                user ? supabase.from('pantry_items')
-                    .select('*, scanned_products(nutrition, image_url, default_unit), food_items(*)')
-                    .eq('user_id', user.id)
-                    : { data: [] }
-            ]);
-
-            if (foodItemsRes.error) throw foodItemsRes.error;
-
-            const curatedFoods = (foodItemsRes.data || []) as FoodItem[];
-
-            const personalFoods = (pantryItemsRes.data || []).map((item: any) => {
-                const sp = item.scanned_products;
-                const fi = item.food_items;
-                const nutrition = sp?.nutrition || {};
-
-                // Try to extract category from notes if not linked to food_item
-                let category = fi?.category || 'General';
-                if (category === 'General' && item.notes) {
-                    const categoryMatch = item.notes.match(/Category:\s*(\w+)/);
-                    if (categoryMatch) {
-                        category = categoryMatch[1];
-                    }
-                }
-
-                return {
-                    id: item.id,
-                    name: sp?.name || fi?.name || item.custom_name || 'Personal Item',
-                    common_name: fi?.common_name || sp?.name || fi?.name || item.custom_name || 'Personal Item',
-                    energy_kcal: nutrition.energy || fi?.energy_kcal || 0,
-                    protein_g: nutrition.protein || fi?.protein_g || 0,
-                    carbs_g: nutrition.carbs || fi?.carbs_g || 0,
-                    fat_g: nutrition.fat || fi?.fat_g || 0,
-                    image: sp?.image_url || fi?.image || null,
-                    is_in_pantry: true,
-                    is_favorite: fi?.is_favorite || false,
-                    category: category,
-                    source_table: 'pantry_items',
-                    quantity: item.quantity
-                } as FoodItem;
-            });
-
-            const combined = [
-                ...curatedFoods.map(f => ({ ...f, source_table: 'food_items' as const })),
-                ...personalFoods
-            ];
-
-            // Merge in locally-stored quantities (persists without login)
-            try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');
-                if (savedQuantities) {
-                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
-                    combined.forEach(item => {
-                        if (quantities[item.id] !== undefined) {
-                            if (item.common_name?.toLowerCase().includes('potato')) {
-                            } else {
-                            }
-                            item.quantity = quantities[item.id];
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Failed to load saved quantities', e);
-            }
-
-            setFoods(combined);
-        } catch (error: any) {
-            console.error('Error fetching pantry:', error);
-            if (error.code === '42703') {
-                toast.error("Database schema update required. Please run the latest migration.");
-            } else {
-                toast.error("Failed to load pantry.");
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const confirmDelete = (id: string, name: string, commonName: string = '', source: string = 'food_items') => {
         const displayName = commonName || name;
@@ -724,7 +478,7 @@ export function PantryView({
                         <button
                             onClick={() => {
                                 toast.dismiss(t);
-                                removeFromPantry(id, name, source);
+                                removeFromPantryAction(id, name);
                             }}
                             className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-800 rounded transition-colors"
                         >
@@ -774,31 +528,8 @@ export function PantryView({
     const deleteCategory = async (categoryName: string, items: FoodItem[]) => {
         try {
             for (const food of items) {
-                const source = food.source_table || 'food_items';
-                
-                if (source === 'pantry_items') {
-                    const res = await supabase.from('pantry_items').delete().eq('id', food.id);
-                    if (res.error) throw res.error;
-                } else if (isAdmin) {
-                    const res = await supabase
-                        .from('food_items')
-                        .update({ is_in_pantry: false } as any)
-                        .eq('id', food.id);
-                    if (res.error) throw res.error;
-                }
-
-                // Clear localStorage quantity
-                try {
-                    const saved = localStorage.getItem('pantry_quantities');
-                    if (saved) {
-                        const quantities: Record<string, string> = JSON.parse(saved);
-                        delete quantities[food.id];
-                        localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                    }
-                } catch (e) { /* ignore */ }
+                await dbRemoveFromPantry(food.id);
             }
-
-            setFoods(prev => prev.filter(f => !items.find(item => item.id === f.id)));
             toast.success(`${categoryName} category cleared`);
         } catch (error) {
             console.error('Error deleting category:', error);
@@ -806,34 +537,9 @@ export function PantryView({
         }
     };
 
-    const removeFromPantry = async (id: string, name: string, source: string = 'food_items') => {
+    const removeFromPantryAction = async (id: string, name: string) => {
         try {
-            let error;
-
-            if (source === 'pantry_items') {
-                const res = await supabase.from('pantry_items').delete().eq('id', id);
-                error = res.error;
-            } else if (isAdmin) {
-                const res = await supabase
-                    .from('food_items')
-                    .update({ is_in_pantry: false } as any)
-                    .eq('id', id);
-                error = res.error;
-            }
-
-            if (error) throw error;
-
-            // Clear localStorage quantity so the deleted item doesn't haunt other views
-            try {
-                const saved = localStorage.getItem('pantry_quantities');
-                if (saved) {
-                    const quantities: Record<string, string> = JSON.parse(saved);
-                    delete quantities[id];
-                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                }
-            } catch (e) { /* ignore */ }
-
-            setFoods(prev => prev.filter(f => f.id !== id));
+            await dbRemoveFromPantry(id);
             setDeleteConfirm(null);
             toast.success(`${name} removed from pantry`);
         } catch (error) {
@@ -845,29 +551,9 @@ export function PantryView({
     const clearPantry = async () => {
         if (!confirm('Remove all items from your pantry?')) return;
         try {
-            const foodItemIds = foods.filter(f => f.source_table === 'food_items').map(f => f.id);
-            const pantryItemIds = foods.filter(f => f.source_table === 'pantry_items').map(f => f.id);
-
-            if (foodItemIds.length > 0 && isAdmin) {
-                const { error } = await supabase.from('food_items').update({ is_in_pantry: false } as any).in('id', foodItemIds);
-                if (error) throw error;
+            for (const food of foods) {
+                await dbRemoveFromPantry(food.id);
             }
-            if (pantryItemIds.length > 0) {
-                const { error } = await supabase.from('pantry_items').delete().in('id', pantryItemIds);
-                if (error) throw error;
-            }
-
-            // Clear localStorage quantities
-            try {
-                const saved = localStorage.getItem('pantry_quantities');
-                if (saved) {
-                    const quantities: Record<string, string> = JSON.parse(saved);
-                    foods.forEach(f => delete quantities[f.id]);
-                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                }
-            } catch (e) { /* ignore */ }
-
-            setFoods([]);
             toast.success('Pantry cleared');
         } catch (error) {
             console.error('Error clearing pantry:', error);
@@ -877,141 +563,39 @@ export function PantryView({
 
     const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string, newUnit: string) => {
         const quantityString = newWeight ? `${newQty} x ${newWeight}${newUnit}` : newQty;
-
-        // Check if this is being set to 0
         const parseTest = parseQuantityEntry(quantityString);
         const totalGrams = (parseTest.qty || 0) * (parseTest.weight_g || 0);
         const isZero = totalGrams === 0 || quantityString === '0' || quantityString === '';
         
         if (isZero) {
-            // Move to shopping list instead of keeping in pantry
-            // Add to shopping list
-            const saved = localStorage.getItem('vitala_shopping_manual_items');
-            const manualItems = saved ? JSON.parse(saved) : [];
-            manualItems.push({
-                id: `replenish-${Date.now()}-${item.id}`,
-                name: `Replenish: ${item.common_name || item.name}`,
+            await addShoppingItem({
+                name: item.common_name || item.name,
+                food_item_id: item.id,
                 quantity: 'As needed',
-                unit: '',
-                checked: false,
-                source: 'auto-replenish'
+                source: 'manual',
             });
-            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
-            
-            // Remove from pantry
-            try {
-                const saved = localStorage.getItem('pantry_quantities');
-                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                delete quantities[item.id];
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                
-                // Also update DB
-                if (item.source_table === 'food_items' && isAdmin) {
-                    await supabase
-                        .from('food_items')
-                        .update({ is_in_pantry: false } as any)
-                        .eq('id', item.id);
-                } else if (item.source_table === 'pantry_items') {
-                    await supabase
-                        .from('pantry_items')
-                        .delete()
-                        .eq('id', item.id);
-                }
-            } catch (e) {
-                console.error('[updatePantryQuantity] Failed to remove', item.name, 'from pantry:', e);
-            }
-            
-            setFoods(prev => prev.filter(f => f.id !== item.id));
+            await dbRemoveFromPantry(item.id);
             toast.success(`${item.common_name || item.name} moved to shopping list`);
-            window.dispatchEvent(new CustomEvent('shopping-list-updated'));
             return;
         }
 
-        // Update UI immediately
-        setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
+        await updateQuantity(item.id, quantityString);
         setBuyMoreItem(null);
         toast.success(`Updated quantity for "${item.name}"`);
-
-        // Persist to localStorage (works without login)
-        try {
-            const saved = localStorage.getItem('pantry_quantities');
-            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-            quantities[item.id] = quantityString;
-            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-        } catch (e) {
-            console.error('Failed to save quantity to localStorage', e);
-        }
-
-        // Also try to save to DB for pantry_items (best-effort, won't error if it fails)
-        if (item.source_table === 'pantry_items') {
-            try {
-                await supabase
-                    .from('pantry_items')
-                    .update({ quantity: quantityString } as any)
-                    .eq('id', item.id);
-            } catch (e) {
-                console.warn('DB sync skipped', e);
-            }
-        }
     };
 
     const addToShoppingList = (food: FoodItem) => {
-        // Get existing manual items from localStorage
-        const saved = localStorage.getItem('vitala_shopping_manual_items');
-        let manualItems: any[] = [];
-        try {
-            manualItems = saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            console.error('Failed to parse shopping list', e);
-        }
-
         const itemName = food.common_name || food.name;
-        const foodId = food.source_table === 'food_items' ? food.id : undefined;
+        const foodId = food.id;
+        const qtyStr = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}${buyMoreUnit}` : buyMoreQty;
 
-        // Check for existing item with same name or food_item_id
-        const existingIndex = manualItems.findIndex(item =>
-            (foodId && item.food_item_id === foodId) ||
-            item.name.toLowerCase() === itemName.toLowerCase()
-        );
-
-        if (existingIndex >= 0) {
-            // Aggregate quantities
-            const existing = manualItems[existingIndex];
-            const parseQty = (s: string) => {
-                const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
-                return match ? { num: parseFloat(match[1]), unit: match[2].trim() } : null;
-            };
-
-            const oldQty = parseQty(existing.quantity);
-            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}${buyMoreUnit}` : buyMoreQty;
-            const newQty = parseQty(quantityString);
-
-            if (oldQty && newQty && oldQty.unit === newQty.unit) {
-                const sum = oldQty.num + newQty.num;
-                manualItems[existingIndex].quantity = oldQty.unit ? `${sum} ${oldQty.unit}` : `${sum}`;
-            } else {
-                // Different units, concatenate
-                manualItems[existingIndex].quantity = `${existing.quantity} + ${quantityString}`;
-            }
-
-            toast.success(`Updated "${itemName}" quantity in shopping list`);
-        } else {
-            // Add new item
-            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}${buyMoreUnit}` : buyMoreQty;
-            const newItem = {
-                id: `manual-${Date.now()}`,
-                name: itemName,
-                quantity: quantityString,
-                unit: '',
-                checked: false,
-                source: 'manual',
-                food_item_id: foodId
-            };
-            manualItems.push(newItem);
-            toast.success(`Added ${quantityString} "${itemName}" to shopping list`);
-        }
-
-        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
+        addShoppingItem({
+            name: itemName,
+            quantity: qtyStr,
+            food_item_id: foodId,
+            source: 'manual'
+        });
+        toast.success(`Added ${qtyStr} "${itemName}" to groceries`);
         setBuyMoreItem(null);
         setBuyMoreQty('1');
     };

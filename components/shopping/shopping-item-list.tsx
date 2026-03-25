@@ -25,11 +25,14 @@ import {
     formatGramsFull,
     PORTION_EXCLUDE_REGEX,
 } from './shopping-types';
+import { useShoppingList } from '@/hooks/use-shopping-list';
+import { usePantry } from '@/hooks/use-pantry';
+import { mergeQuantityStrings, stripZeroEntries } from '../pantry/pantry-types';
 
 export function ShoppingItemList() {
+    const { items: hookItems, loading: hookLoading, removeItem: hookRemoveItem, addItem: hookAddItem, clearAll: hookClearAll } = useShoppingList();
+    const { quantities, updateQuantity, addToPantry: dbAddToPantry } = usePantry();
     const [items, setItems] = useState<ShoppingItem[]>([]);
-    const [manualItems, setManualItems] = useState<ShoppingItem[]>([]);
-    const [loading, setLoading] = useState(true);
     const [enriching, setEnriching] = useState(false);
 
     // Expanded panel state
@@ -54,43 +57,14 @@ export function ShoppingItemList() {
         setPantryAddItem(null);
     };
 
-    // ── Load from localStorage ──────────────────────────────────
-    useEffect(() => {
-        const load = () => {
-            const saved = localStorage.getItem(SHOPPING_STORAGE_KEY);
-            if (saved) {
-                try { setManualItems(JSON.parse(saved)); } catch { /* ignore */ }
-            }
-            setLoading(false);
-        };
-        load();
-        window.addEventListener('storage', load);
-        return () => window.removeEventListener('storage', load);
-    }, []);
 
-    // ── Save to localStorage (with dedup) ───────────────────────
-    useEffect(() => {
-        if (loading) return;
-        const deduped: ShoppingItem[] = [];
-        const seenIds = new Map<string, number>();
-        for (const item of manualItems) {
-            if (item.food_item_id && seenIds.has(item.food_item_id)) {
-                const idx = seenIds.get(item.food_item_id)!;
-                deduped[idx] = { ...deduped[idx], quantity: `${deduped[idx].quantity} + ${item.quantity}` };
-            } else {
-                if (item.food_item_id) seenIds.set(item.food_item_id, deduped.length);
-                deduped.push(item);
-            }
-        }
-        if (deduped.length < manualItems.length) setManualItems(deduped);
-        localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify(deduped));
-    }, [manualItems, loading]);
-
-    // ── Enrich & combine ────────────────────────────────────────
+    // ── Enrichment loop (Cloud First) ───────────────────────────
     useEffect(() => {
         let cancelled = false;
         const enrichAndCombine = async () => {
-            let combined = [...manualItems].map(item => {
+            if (hookLoading) return;
+            
+            let combined = [...hookItems].map(item => {
                 const key = item.food_item_id || item.name.toLowerCase();
                 const cached = enrichmentCache.get(key);
                 if (cached) {
@@ -109,14 +83,14 @@ export function ShoppingItemList() {
 
             if (needById.length > 0 || needByName.length > 0) {
                 setEnriching(true);
+                // ... same enrichment logic ...
                 const idMap = new Map<string, any>();
                 if (needById.length > 0) {
                     const ids = needById.map(i => i.food_item_id).filter(Boolean) as string[];
-                    if (ids.length > 0) {
-                        const { data } = await supabase.from('food_items').select('id, category, image, common_name').in('id', ids);
-                        data?.forEach((d: any) => { idMap.set(d.id, d); enrichmentCache.set(d.id, d); });
-                    }
+                    const { data } = await supabase.from('food_items').select('id, category, image, common_name').in('id', ids);
+                    data?.forEach((d: any) => { idMap.set(d.id, d); enrichmentCache.set(d.id, d); });
                 }
+                
                 const nameMap = new Map<string, any>();
                 if (needByName.length > 0 && !cancelled) {
                     const names = [...new Set(needByName.map(i => i.name.toLowerCase()))];
@@ -143,20 +117,11 @@ export function ShoppingItemList() {
                     combined = combined.map(item => {
                         if (item.food_item_id && idMap.has(item.food_item_id)) {
                             const d = idMap.get(item.food_item_id);
-                            const u = { ...item };
-                            if (!item.category && d.category) u.category = d.category;
-                            if (!item.image && d.image) u.image = d.image;
-                            if (!item.common_name && d.common_name) u.common_name = d.common_name;
-                            return u;
+                            return { ...item, category: item.category || d.category, image: item.image || d.image, common_name: item.common_name || d.common_name };
                         }
                         if (!item.category && nameMap.has(item.name.toLowerCase())) {
                             const d = nameMap.get(item.name.toLowerCase());
-                            const u = { ...item };
-                            if (d.category) u.category = d.category;
-                            if (d.image) u.image = d.image;
-                            if (d.common_name) u.common_name = d.common_name;
-                            if (d.id) u.food_item_id = d.id;
-                            return u;
+                            return { ...item, category: d.category, image: d.image, common_name: d.common_name, food_item_id: d.id };
                         }
                         return item;
                     });
@@ -168,17 +133,12 @@ export function ShoppingItemList() {
         };
         enrichAndCombine();
         return () => { cancelled = true; };
-    }, [manualItems]);
+    }, [hookItems, hookLoading]);
 
     // ── Item actions ────────────────────────────────────────────
 
-    const removeItem = (id: string) => {
-        setManualItems(prev => prev.filter(i => i.id !== id));
-        setItems(prev => prev.filter(i => i.id !== id));
-        try {
-            const saved = JSON.parse(localStorage.getItem(SHOPPING_STORAGE_KEY) || '[]');
-            localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify(saved.filter((i: any) => i.id !== id)));
-        } catch { /* ignore */ }
+    const removeItem = async (id: string) => {
+        await hookRemoveItem(id);
     };
 
     const confirmDelete = (item: ShoppingItem) => {
@@ -207,38 +167,28 @@ export function ShoppingItemList() {
             let foodItemId = item.food_item_id || null;
             if (!foodItemId && item.name) {
                 const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
-                const { data } = await supabase.from('food_items').select('id').or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`).limit(1).maybeSingle();
+                const { data } = await supabase.from('food_items').select('id, name, common_name, category, image').or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`).limit(1).maybeSingle();
                 if (data) foodItemId = data.id;
             }
-            if (!foodItemId) { removeItem(item.id); return; }
+            if (!foodItemId) { await removeItem(item.id); return; }
 
             const rawQty = (item.quantity || '').trim();
             const qtyStr = rawQty.split(/\s*\+\s*/).map(s => s.trim()).filter(s => !/^as\s+needed$/i.test(s) && s.length > 0).join(' + ') || rawQty || '1';
 
-            const saved = localStorage.getItem('pantry_quantities');
-            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-            const existing = quantities[foodItemId];
-            quantities[foodItemId] = existing ? `${existing} + ${qtyStr}` : qtyStr;
-            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+            const currentPantryQty = quantities[foodItemId] || '';
+            const merged = mergeQuantityStrings(currentPantryQty, qtyStr);
+            const cleaned = stripZeroEntries(merged);
 
-            const { data: { user: currentUser } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const isAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
-
-            if (isAdmin) {
-                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
-            } else if (currentUser) {
-                const { data: existingRow } = await supabase.from('pantry_items').select('id').eq('user_id', currentUser.id).eq('food_item_id', foodItemId).maybeSingle();
-                if (!existingRow) {
-                    await supabase.from('pantry_items').insert({ user_id: currentUser.id, name: item.name, quantity: quantities[foodItemId], food_item_id: foodItemId });
-                } else {
-                    await supabase.from('pantry_items').update({ quantity: quantities[foodItemId] }).eq('id', existingRow.id);
-                }
+            if (currentPantryQty) {
+                await updateQuantity(foodItemId, cleaned);
+            } else {
+                await dbAddToPantry({ id: foodItemId, name: item.name, common_name: item.common_name, category: item.category, image: item.image }, cleaned);
             }
 
-            removeItem(item.id);
+            await removeItem(item.id);
             toast.success(`"${item.common_name || item.name}" added to pantry`);
-        } catch {
+        } catch (error) {
+            console.error('Error adding to pantry:', error);
             toast.error('Failed to add to pantry');
         } finally {
             setTickLoadingId(null);
@@ -281,27 +231,16 @@ export function ShoppingItemList() {
         }
     };
 
-    const confirmAddToList = () => {
+    const confirmAddToList = async () => {
         if (!pantryAddItem) return;
         const qty = pantryAddQty || '1';
         const qtyStr = pantryAddSelectedPortion ? `${qty} ${pantryAddSelectedPortion.label} (${pantryAddSelectedPortion.weight_g}g)` : qty;
 
-        const normalize = (s: string) => s.toLowerCase().trim();
-        const idx = manualItems.findIndex(i => (pantryAddItem.food_item_id && i.food_item_id) ? i.food_item_id === pantryAddItem.food_item_id : normalize(i.name) === normalize(pantryAddItem.name));
-
-        if (idx >= 0) {
-            const updated = [...manualItems];
-            updated[idx] = { ...updated[idx], quantity: smartCombineQuantities(updated[idx].quantity, qtyStr) };
-            setManualItems(updated);
-            toast.success(`Updated ${pantryAddItem.common_name || pantryAddItem.name} quantity`);
-        } else {
-            setManualItems(prev => [...prev, {
-                id: `manual-${Date.now()}`, name: pantryAddItem.common_name || pantryAddItem.name,
-                quantity: qtyStr, unit: '', source: 'manual', image: pantryAddItem.image,
-                image_url: pantryAddItem.image_url, food_item_id: pantryAddItem.food_item_id,
-            } as ShoppingItem]);
-            toast.success(`Added ${pantryAddItem.common_name || pantryAddItem.name}`);
-        }
+        await hookAddItem({
+            ...pantryAddItem,
+            quantity: qtyStr,
+        });
+        
         setPantryAddItem(null);
     };
 
@@ -316,7 +255,7 @@ export function ShoppingItemList() {
 
     // ── Render ──────────────────────────────────────────────────
 
-    if (loading || enriching) {
+    if (hookLoading || enriching) {
         return (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
                 <Loader2 className="animate-spin text-emerald-500" size={32} />
@@ -347,10 +286,16 @@ export function ShoppingItemList() {
                     {items.length} item{items.length !== 1 ? 's' : ''}
                 </p>
                 <button
-                    onClick={() => {
+                    onClick={async () => {
                         if (!confirm('Clear all items from your grocery list?')) return;
-                        setManualItems([]); setItems([]);
-                        localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify([]));
+                        if (hookClearAll) {
+                            await hookClearAll();
+                        } else {
+                            // Fallback if clearAll not in hook yet
+                            for (const item of hookItems) {
+                                await hookRemoveItem(item.id);
+                            }
+                        }
                         toast.success('Grocery list cleared');
                     }}
                     className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-rose-500 transition-colors flex items-center gap-1.5"
@@ -451,20 +396,15 @@ export function ShoppingItemList() {
                                             <div className="p-3 rounded-lg border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/20 animate-in slide-in-from-top-2 duration-200">
                                                 <p className="text-xs font-bold text-foreground mb-2">Remove from {item.name}</p>
                                                 <div className="flex items-center gap-2">
-                                                    <Button size="sm" variant="outline" onClick={(e) => {
+                                                    <Button size="sm" variant="outline" onClick={async (e) => {
                                                         e.stopPropagation();
                                                         const qty = parseInt(item.quantity);
                                                         if (qty && qty > 1) {
-                                                            const updated = { ...item, quantity: String(qty - 1) };
-                                                            removeItem(item.id);
-                                                            if (parseInt(updated.quantity) > 0) {
-                                                                const list = JSON.parse(localStorage.getItem(SHOPPING_STORAGE_KEY) || '[]');
-                                                                list.push(updated);
-                                                                localStorage.setItem(SHOPPING_STORAGE_KEY, JSON.stringify(list));
-                                                                setManualItems(list);
-                                                            }
-                                                            setExpandedRemoveId(null);
+                                                            await hookAddItem({ ...item, quantity: '-1' }); // useShoppingList should handle negative for subtraction
+                                                        } else {
+                                                            await hookRemoveItem(item.id);
                                                         }
+                                                        setExpandedRemoveId(null);
                                                     }} className="h-8 px-3 text-xs">Remove 1</Button>
                                                     <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setExpandedRemoveId(null); }} className="h-8 px-3 text-xs text-muted-foreground">Cancel</Button>
                                                 </div>

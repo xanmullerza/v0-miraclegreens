@@ -30,6 +30,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn, formatFoodName } from '@/lib/utils';
+import { usePantry } from '@/hooks/use-pantry';
+import { useShoppingList } from '@/hooks/use-shopping-list';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DailyPlan } from '@/lib/utils/meal-generator';
 import { Recipe } from '@/lib/data/recipes';
@@ -50,22 +52,14 @@ interface FoodItem {
 
 export function StaplesView() {
     const router = useRouter();
+    const { pantryItems, loading: pantryLoading, removeFromPantry: dbRemoveFromPantry, updateQuantity } = usePantry();
+    const { addItem: addShoppingListItem } = useShoppingList();
+    
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const { searchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const { dailyPlan, updateDailyPlan, measurementUnit } = useUserPreferences();
-
-    // Buy More State
-    const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
-    const [buyMoreQty, setBuyMoreQty] = useState('1');
-    const [buyMoreWeight, setBuyMoreWeight] = useState('');
-    const [buyMoreUnit, setBuyMoreUnit] = useState('g');
-    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
-
-    useEffect(() => {
-        fetchPantry();
-    }, []);
 
     const toggleGroup = (groupName: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -75,80 +69,23 @@ export function StaplesView() {
         }));
     };
 
-    const fetchPantry = async () => {
-        setLoading(true);
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
+    // Buy More State
+    const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
+    const [buyMoreQty, setBuyMoreQty] = useState('1');
+    const [buyMoreWeight, setBuyMoreWeight] = useState('');
+    const [buyMoreUnit, setBuyMoreUnit] = useState('g');
+    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
 
-            let fetchedItems: any[] = [];
-
-            if (admin) {
-                const { data, error } = await supabase
-                    .from('food_items')
-                    .select('*')
-                    .eq('is_in_pantry', true)
-                    .order('common_name', { ascending: true });
-                if (error) throw error;
-                fetchedItems = data || [];
-            } else if (user) {
-                const { data, error } = await supabase
-                    .from('pantry_items')
-                    .select('*, food_items(*)')
-                    .eq('user_id', user.id);
-                if (error) throw error;
-                fetchedItems = (data || []).map((item: any) => {
-                    const fi = item.food_items;
-                    return fi ? { ...fi, source_table: 'pantry_items', pantry_item_id: item.id } : null;
-                }).filter(Boolean);
-            }
-
-            // Merge in locally-stored quantities (persists without login)
-            try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');
-                if (savedQuantities) {
-                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
-                    fetchedItems.forEach(item => {
-                        if (quantities[item.id]) {
-                            item.quantity = quantities[item.id];
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Failed to load saved quantities', e);
-            }
-
-            setFoods(fetchedItems);
-        } catch (error: any) {
-            console.error('Error fetching pantry:', error);
-            if (error.code === '42703') {
-                toast.error("Database schema update required. Please run the latest migration.");
-            } else {
-                toast.error("Failed to load pantry.");
-            }
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        setLoading(pantryLoading);
+        if (!pantryLoading) {
+            setFoods(pantryItems as any);
         }
-    };
+    }, [pantryItems, pantryLoading]);
 
     const removeFromPantry = async (id: string, name: string) => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
-
-            if (admin) {
-                const { error } = await supabase
-                    .from('food_items')
-                    .update({ is_in_pantry: false } as any)
-                    .eq('id', id);
-                if (error) throw error;
-            } else if (user) {
-                await supabase.from('pantry_items').delete().eq('user_id', user.id).eq('food_item_id', id);
-            }
-
-            setFoods(prev => prev.filter(f => f.id !== id));
+            await dbRemoveFromPantry(id);
             toast.success(`${name} removed from staples`);
         } catch (error) {
             console.error('Error removing from pantry:', error);
@@ -158,35 +95,18 @@ export function StaplesView() {
 
     const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string, newUnit: string) => {
         const quantityString = newWeight ? `${newQty} x ${newWeight}${newUnit}` : newQty;
-
-        // Update UI immediately
-        setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
-
-        // Persist to localStorage
-        try {
-            const saved = localStorage.getItem('pantry_quantities');
-            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-            quantities[item.id] = quantityString;
-            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-            toast.success(`Inventory updated for "${item.name}"`);
-        } catch (e) {
-            console.error('Failed to save to localStorage', e);
-        }
+        await updateQuantity(item.id, quantityString);
+        toast.success(`Inventory updated for "${item.name}"`);
         setBuyMoreItem(null);
     };
 
-    const addToShoppingList = (food: FoodItem) => {
+    const addToShoppingList = async (food: FoodItem) => {
         const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}${buyMoreUnit}` : buyMoreQty;
-        const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-        const newItem = {
-            id: `manual-${Date.now()}`,
+        await addShoppingListItem({
             name: food.name,
             quantity: quantityString,
-            unit: '',
-            checked: false,
-            source: 'manual'
-        };
-        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+            food_item_id: food.id
+        });
         toast.success(`"${food.name}" added to groceries`);
         setBuyMoreItem(null);
     };

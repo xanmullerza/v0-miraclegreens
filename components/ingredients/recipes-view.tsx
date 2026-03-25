@@ -35,6 +35,7 @@ import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
 import { inferEquipmentFromRecipe } from '@/lib/utils/equipment-inference';
+import { usePantry } from '@/hooks/use-pantry';
 
 
 interface RecipeWithIngredients extends Recipe {
@@ -104,7 +105,7 @@ export function RecipesView({
     const { filters } = useRecipeFilter();
 
     const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading } = useDataPersistence();
-    const [pantryItems, setPantryItems] = useState<any[]>([]);
+    const { pantryItems, loading: pantryLoading } = usePantry();
 
 
     const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(MEAL_TYPES);
@@ -145,52 +146,14 @@ export function RecipesView({
         }
     }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty]);
 
-    // Fetch pantry items when needed
-    const getPantryItems = async () => {
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            const [foodItemsRes, pantryItemsRes] = await Promise.all([
-                supabase.from('food_items').select('*').eq('is_in_pantry', true),
-                user ? supabase.from('pantry_items').select('*, scanned_products(nutrition), food_items(*)').eq('user_id', user.id) : { data: [] }
-            ]);
-
-            let combined: any[] = [
-                ...(foodItemsRes.data || []).map(f => ({ ...f, source_table: 'food_items' })),
-                ...(pantryItemsRes.data || []).map((item: any) => ({
-                    id: item.id,
-                    food_item_id: item.food_item_id,
-                    name: item.scanned_products?.name || item.food_items?.name || item.custom_name,
-                    quantity: item.quantity,
-                    source_table: 'pantry_items'
-                }))
-            ];
-
-            const saved = localStorage.getItem(PANTRY_QUANTITIES_KEY);
-            if (saved) {
-                const quantities = JSON.parse(saved);
-                combined = combined.map(item => ({
-                    ...item,
-                    quantity: quantities[item.id] || item.quantity
-                }));
-            }
-            return combined;
-        } catch (err) {
-            console.error('Failed to fetch pantry items', err);
-            return [];
-        }
-    };
 
     const fetchRecipes = async (pageToLoad: number, isNewSearch = false) => {
         if (pageToLoad === 0) setLoading(true);
         else setLoadingMore(true);
 
         try {
-            // Fetch pantry items first if needed
-            let currentPantry = pantryItems;
-            if (filters.pantryMode === 'pantry-only') {
-                currentPantry = await getPantryItems();
-                setPantryItems(currentPantry);
-            }
+            // No longer need to manually fetch pantry items as they are provided by the usePantry hook
+            const currentPantry = pantryItems;
 
             const needsIngredients = filters.pantryMode === 'pantry-only' || 
                                     filters.selectedExclusions.length > 0 || 
