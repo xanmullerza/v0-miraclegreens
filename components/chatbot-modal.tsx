@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2, Clock, ChefHat, Home } from 'lucide-react';
+import { X, Search, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2, Clock, ChefHat, Home, Smartphone, TabletSmartphone, Monitor as Computer } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -28,7 +28,6 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { useChatbot } from '@/lib/context/chatbot-context';
 import { useSplitView } from '@/lib/context/split-view-context';
-import { Smartphone, TabletSmartphone, Monitor as Computer } from 'lucide-react';
 
 interface Message {
     id: string;
@@ -278,6 +277,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [isDragging, setIsDragging] = useState(false);
     const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
+    const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
 
     const getChatbotViewTitle = () => {
         switch (chatbotView) {
@@ -3390,6 +3390,26 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", showOnlyMyRecipes ? "text-indigo-500" : "text-slate-400")}>Mine</span>
                                 </div>
 
+                                {/* Search Bar */}
+                                <div className="flex-1 relative max-w-[180px]">
+                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        value={recipeSearchQuery}
+                                        onChange={(e) => setRecipeSearchQuery(e.target.value)}
+                                        placeholder="Search recipes..."
+                                        className="w-full pl-9 pr-8 py-1.5 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-[10px] font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500/50 placeholder:text-slate-400 transition-all"
+                                    />
+                                    {recipeSearchQuery && (
+                                        <button 
+                                            onClick={() => setRecipeSearchQuery('')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    )}
+                                </div>
+
                                 <div className="flex items-center gap-1.5">
                                     {/* Add Button */}
                                     <button
@@ -3489,8 +3509,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 isMix={cookbookTab === 'mixes'}
                                 isRemix={cookbookTab === 'remixes'}
                                 onlyMyRecipes={showOnlyMyRecipes}
-                                sortField={sortField}
+                                 sortField={sortField}
                                 sortDirection={sortDirection}
+                                searchQuery={recipeSearchQuery}
+                                onSearchChange={setRecipeSearchQuery}
                             />
                         </div>
                     </div>
