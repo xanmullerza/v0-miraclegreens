@@ -4,14 +4,23 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import {
     Search, ChevronLeft, ChevronRight, ChevronDown, Activity, Zap, Gem,
-    Battery, Droplet, Lightbulb, UtensilsCrossed, Leaf, Dna, Sparkles, Beaker, BookOpen
+    Battery, Droplet, Lightbulb, UtensilsCrossed, Leaf, Dna, Sparkles, Beaker, BookOpen, Filter
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { useRDA } from '@/hooks/use-rda';
 import { cn } from '@/lib/utils';
-import { HeroSearch } from '@/components/ui/hero-search';
+import { 
+    DropdownMenu, 
+    DropdownMenuTrigger, 
+    DropdownMenuContent, 
+    DropdownMenuLabel, 
+    DropdownMenuSeparator, 
+    DropdownMenuCheckboxItem 
+} from '@/components/ui/dropdown-menu';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -312,12 +321,32 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
 
     const handleHeroInput = useCallback((val: string) => {
         setHeroQuery(val);
-        if (!val || val.length < 1) { setHeroResults([]); return; }
-        const q = val.toLowerCase();
-        setHeroResults(ALL_NUTRIENTS.filter(n =>
-            n.label.toLowerCase().includes(q) || n.group.toLowerCase().includes(q)
-        ));
-    }, [ALL_NUTRIENTS]);
+    }, []);
+
+    // Auto-expand sections when searching
+    useEffect(() => {
+        if (heroQuery && heroQuery.length > 0) {
+            const q = heroQuery.toLowerCase();
+            const newExpanded = new Set(expandedSections);
+            let changed = false;
+
+            ACCORDION_SECTIONS.forEach(section => {
+                const matchSelf = section.label.toLowerCase().includes(q);
+                const matchNutrient = section.nutrients.some(n => {
+                    if (n.label.toLowerCase().includes(q)) return true;
+                    if (n.children?.some(c => c.label.toLowerCase().includes(q))) return true;
+                    return false;
+                });
+
+                if ((matchSelf || matchNutrient) && !newExpanded.has(section.id)) {
+                    newExpanded.add(section.id);
+                    changed = true;
+                }
+            });
+
+            if (changed) setExpandedSections(newExpanded);
+        }
+    }, [heroQuery]);
 
     // ─── RDA Lookup ───────────────────────────────────────────
 
@@ -729,174 +758,452 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
     //  LIST / ACCORDION VIEW
     // ═══════════════════════════════════════════════════════════
 
-    return (
-        <div className={cn("space-y-6", compact ? "max-h-[550px] overflow-y-auto" : "pb-32")}>
+    // ═══════════════════════════════════════════════════════════
+    //  MAIN RENDER
+    // ═══════════════════════════════════════════════════════════
 
-            {/* Hero Search */}
-            {!compact && (
-                <HeroSearch
-                    searchQuery={heroQuery}
-                    onQueryChange={handleHeroInput}
-                    results={heroResults}
-                    isLoading={false}
-                    isActive={isHeroActive}
-                    setIsActive={setIsHeroActive}
-                    onSelect={(item) => {
-                        // Find the node in the tree
-                        const findNode = (nodes: NutrientNode[]): NutrientNode | null => {
-                            for (const n of nodes) {
-                                if (n.id === item.id) return n;
-                                if (n.children) {
-                                    const found = findNode(n.children);
-                                    if (found) return found;
-                                }
-                            }
-                            return null;
-                        };
-                        for (const section of ACCORDION_SECTIONS) {
-                            const found = findNode(section.nutrients);
-                            if (found) { selectNutrient(found); break; }
-                        }
-                        setIsHeroActive(false);
-                        setHeroQuery('');
-                    }}
-                    theme="emerald"
-                    placeholder="SEARCH NUTRIENTS..."
-                    idleTitle="Nutridex"
-                    idleSubtitle="Search vitamins, minerals, amino acids, and phytonutrients"
-                    noResultsMessage="No matching nutrients found"
-                    enterMessage="Enter nutrient name to search"
-                    searchingMessage="Searching Nutrients..."
-                    renderResult={(item: any) => (
-                        <div className="flex items-center gap-4 min-w-0 w-full">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                <Activity size={16} className="text-emerald-500" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{item.label}</h4>
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">{item.group}</p>
-                            </div>
-                            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+    return (
+        <div className={cn("space-y-8 animate-in fade-in duration-500", compact ? "max-h-full" : "pb-32")}>
+            
+            {/* List Container */}
+            <div className={cn(
+                "w-full mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden",
+                !compact && "max-w-6xl"
+            )}>
+                
+                {/* Sticky Header */}
+                <div className="sticky top-0 z-20 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+                    
+                    {/* Mobile header (Drawer for filters + Search) */}
+                    <div className="flex md:hidden items-center justify-between gap-2 px-4 py-3">
+                        {!selectedNutrient && (
+                            <>
+                                <Sheet>
+                                    <SheetTrigger asChild>
+                                        <button className={cn(
+                                            'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
+                                            (excludeFlavour || excludeSupplements)
+                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
+                                        )}>
+                                            <Filter size={11} />
+                                            Filter
+                                            {(excludeFlavour || excludeSupplements) && (
+                                                <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
+                                                    {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
+                                                </span>
+                                            )}
+                                        </button>
+                                    </SheetTrigger>
+                                    <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
+                                        <SheetHeader className="mb-4">
+                                            <div className="flex items-center justify-between">
+                                                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Nutridex Filters</h3>
+                                            </div>
+                                        </SheetHeader>
+
+                                        <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Exclude Flavour/Spices</span>
+                                            <Switch checked={excludeFlavour} onCheckedChange={setExcludeFlavour} className="data-[state=checked]:bg-emerald-600" />
+                                        </div>
+
+                                        <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Exclude Supplements</span>
+                                            <Switch checked={excludeSupplements} onCheckedChange={setExcludeSupplements} className="data-[state=checked]:bg-emerald-600" />
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
+
+                                <div className="flex-1 relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                                    <input
+                                        type="text"
+                                        value={heroQuery}
+                                        onChange={(e) => handleHeroInput(e.target.value)}
+                                        placeholder="Search nutrients..."
+                                        className={cn(
+                                            "w-full h-9 pl-9 pr-4 rounded-full border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                            "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                            "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                            "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                        )}
+                                    />
+                                </div>
+                            </>
+                        )}
+                        {selectedNutrient && (
+                            <button
+                                onClick={() => { setSelectedNutrient(null); setTopFoods([]); setDetailTab('foods'); }}
+                                className="flex items-center gap-2 h-9 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-full transition-all"
+                            >
+                                <ChevronLeft size={14} /> Back to Nutridex
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Desktop header row */}
+                    {!compact && (
+                        <div className="hidden md:flex md:items-center gap-4 px-10 py-4 w-full">
+                            {!selectedNutrient ? (
+                                <>
+                                    <div className="flex items-center gap-4">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button className={cn(
+                                                    'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
+                                                    (excludeFlavour || excludeSupplements)
+                                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                        : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                                )}>
+                                                    <Filter size={13} />
+                                                    Filter
+                                                    {(excludeFlavour || excludeSupplements) && (
+                                                        <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
+                                                            {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 shadow-2xl">
+                                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 py-1.5">Exclude Categories</DropdownMenuLabel>
+                                                <div className="px-2 py-1.5">
+                                                    <div className="flex items-center justify-between py-2">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Flavour/Spices</span>
+                                                        <Switch checked={excludeFlavour} onCheckedChange={setExcludeFlavour} className="data-[state=checked]:bg-emerald-600" />
+                                                    </div>
+                                                    <div className="flex items-center justify-between py-2">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Supplements</span>
+                                                        <Switch checked={excludeSupplements} onCheckedChange={setExcludeSupplements} className="data-[state=checked]:bg-emerald-600" />
+                                                    </div>
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+
+                                        <div className="relative">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                                            <input
+                                                type="text"
+                                                value={heroQuery}
+                                                onChange={(e) => handleHeroInput(e.target.value)}
+                                                placeholder="Search nutrients..."
+                                                className={cn(
+                                                    "w-64 h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                                    "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                                    "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                                    "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Nutridex Library</div>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => { setSelectedNutrient(null); setTopFoods([]); setDetailTab('foods'); }}
+                                        className="flex items-center gap-2 h-9 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
+                                    >
+                                        <ChevronLeft size={14} /> Back to Nutridex
+                                    </button>
+                                    <div className="ml-auto flex items-center gap-3">
+                                        <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">{selectedNutrient.label}</h3>
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Nutrient Intelligence</div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
-                />
-            )}
-
-            {/* Compact search */}
-            {compact && (
-                <div className="relative sticky top-0 z-20 bg-white dark:bg-slate-900 pb-3">
-                    <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 text-muted-foreground" size={16} />
-                        <input
-                            type="text"
-                            placeholder="Search nutrients..."
-                            value={heroQuery}
-                            onChange={(e) => handleHeroInput(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-800 dark:border-slate-700"
-                        />
-                    </div>
                 </div>
-            )}
 
-            {/* Section header (non-compact) */}
-            {!compact && (
-                <div className="flex items-center gap-4 px-2">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-sm border border-emerald-500/10">
-                        <Activity size={24} />
-                    </div>
-                    <div>
-                        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">
-                            Nutridex
-                        </h2>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-                            Complete nutrient reference &amp; profile targets
-                        </p>
-                    </div>
-                </div>
-            )}
-
-            {/* Accordion Sections */}
-            <div className="space-y-4">
-                {ACCORDION_SECTIONS.map(section => {
-                    const Icon = section.icon;
-                    const isOpen = expandedSections.has(section.id);
-                    const theme = THEMES[section.theme] || THEMES.emerald;
-                    const leafCount = countLeaves(section.nutrients);
-
-                    // If searching in compact mode, filter
-                    const filteredNutrients = heroQuery
-                        ? section.nutrients.filter(n => {
-                            const q = heroQuery.toLowerCase();
-                            const matchSelf = n.label.toLowerCase().includes(q);
-                            const matchChild = n.children?.some(c =>
-                                c.label.toLowerCase().includes(q) ||
-                                c.children?.some(gc => gc.label.toLowerCase().includes(q))
-                            );
-                            return matchSelf || matchChild;
-                        })
-                        : section.nutrients;
-
-                    if (heroQuery && filteredNutrients.length === 0) return null;
-
-                    return (
-                        <div key={section.id} className={cn("rounded-2xl border overflow-hidden transition-all", theme.border)}>
-                            {/* Section Header */}
-                            <button
-                                onClick={() => toggleSection(section.id)}
-                                className={cn(
-                                    "w-full flex items-center gap-3 px-5 py-4 transition-all",
-                                    theme.sectionBg,
-                                    "hover:opacity-90"
-                                )}
-                            >
-                                <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center", theme.bg)}>
-                                    <Icon size={16} className={theme.text} />
+                {/* Main Content Area */}
+                <div className={cn("p-4 md:p-10", selectedNutrient ? "space-y-6" : "space-y-8")}>
+                    
+                    {/* NUTRIENT DETAIL VIEW */}
+                    {selectedNutrient && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            {/* Header card */}
+                            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/40 dark:to-emerald-900/20 rounded-3xl p-6 md:p-8 border border-emerald-200 dark:border-emerald-800/50 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                                    <Activity size={120} />
                                 </div>
-                                <div className="flex-1 text-left">
-                                    <h3 className={cn("text-[11px] font-black uppercase tracking-widest", theme.text)}>
-                                        {section.label}
-                                    </h3>
-                                    <p className="text-[9px] font-bold text-slate-400 mt-0.5">{section.subtitle}</p>
-                                </div>
-                                <span className={cn("text-[9px] font-black px-2 py-0.5 rounded-full", theme.badge)}>
-                                    {leafCount}
-                                </span>
-                                <ChevronDown
-                                    size={16}
-                                    className={cn(
-                                        "transition-transform duration-200",
-                                        theme.text,
-                                        isOpen ? "rotate-0" : "-rotate-90"
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                            <Activity size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-black text-2xl text-emerald-900 dark:text-emerald-100 uppercase tracking-tighter italic italic-bold">{selectedNutrient.label}</h3>
+                                            <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mt-0.5 opacity-75">
+                                                Target: {getRDA(selectedNutrient.id) >= 100 ? Math.round(getRDA(selectedNutrient.id)) : parseFloat(getRDA(selectedNutrient.id).toFixed(1))} {selectedNutrient.unit}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {nutrientInfo[selectedNutrient.id]?.importance && (
+                                        <p className="text-sm font-bold text-emerald-800 dark:text-emerald-300/80 leading-relaxed max-w-2xl">
+                                            {nutrientInfo[selectedNutrient.id].importance}
+                                        </p>
                                     )}
-                                />
-                            </button>
+                                </div>
+                            </div>
 
-                            {/* Section Body */}
-                            {isOpen && (
-                                <div className="px-3 py-2 space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200 bg-white dark:bg-slate-950">
-                                    {(heroQuery ? filteredNutrients : section.nutrients).map(node =>
-                                        renderNutrientRow(node, theme, 0)
+                            {/* Tabs */}
+                            <div className="flex gap-2 bg-slate-100 dark:bg-slate-900 rounded-2xl p-1.5 border border-slate-200 dark:border-slate-800 max-w-md">
+                                <button
+                                    onClick={() => setDetailTab('foods')}
+                                    className={cn(
+                                        "flex-1 text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all",
+                                        detailTab === 'foods' ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-md border border-slate-200 dark:border-slate-700" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                    )}
+                                >
+                                    <span className="inline-flex items-center gap-2"><UtensilsCrossed size={14} /> Top Foods</span>
+                                </button>
+                                <button
+                                    onClick={() => setDetailTab('learn')}
+                                    className={cn(
+                                        "flex-1 text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all",
+                                        detailTab === 'learn' ? "bg-white dark:bg-slate-800 text-amber-600 shadow-md border border-slate-200 dark:border-slate-700" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                    )}
+                                >
+                                    <span className="inline-flex items-center gap-2"><Lightbulb size={14} /> Information</span>
+                                </button>
+                            </div>
+
+                            {/* Foods Tab */}
+                            {detailTab === 'foods' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {isLoading ? (
+                                            <div className="col-span-full py-20 text-center animate-pulse">
+                                                <Loader2 size={32} className="mx-auto text-emerald-500 animate-spin mb-4" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Scanning Library...</p>
+                                            </div>
+                                        ) : topFoods.length > 0 ? (
+                                            topFoods.map(food => (
+                                                <Link
+                                                    key={food.name}
+                                                    href={`/foods/${food.name}`} // Note: Ideally should be ID, but Nutridex uses names in ranking right now
+                                                    className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-emerald-400/50 hover:shadow-lg transition-all group"
+                                                >
+                                                    <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-800">
+                                                        {food.image_url ? (
+                                                            <img src={food.image_url} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-300"><Leaf size={24} className="opacity-10" /></div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <span className="font-black text-emerald-600 dark:text-emerald-400 text-[10px] uppercase tracking-wider">#{food.rank}</span>
+                                                            <p className="font-bold text-sm text-slate-900 dark:text-white truncate capitalize">{food.common_name || food.name}</p>
+                                                        </div>
+                                                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                                                            {food.value >= 100 ? Math.round(food.value) : food.value.toFixed(1)} {selectedNutrient.unit} <span className="text-[8px] opacity-40 ml-1">/ 100G</span>
+                                                        </p>
+                                                    </div>
+                                                    {food.value >= ((getRDA(selectedNutrient.id) || 0) / 10) && (
+                                                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-[8px] font-black uppercase tracking-widest whitespace-nowrap shrink-0 border border-emerald-500/20">
+                                                            PREMIUM SOURCE
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <div className="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">No food data available for this nutrient.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Learn Tab (Information) */}
+                            {detailTab === 'learn' && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {nutrientInfo[selectedNutrient.id] ? (
+                                        <>
+                                            <div className="space-y-6">
+                                                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800">
+                                                    <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-amber-500 mb-4 flex items-center gap-2">
+                                                        <Activity size={14} /> Biological Role
+                                                    </h4>
+                                                    <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-medium">
+                                                        {nutrientInfo[selectedNutrient.id].history}
+                                                    </p>
+                                                </div>
+
+                                                {nutrientInfo[selectedNutrient.id].benefits && (
+                                                    <div className="bg-emerald-500/5 dark:bg-emerald-500/5 rounded-3xl p-6 border border-emerald-500/10">
+                                                        <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 mb-4">Core Benefits</h4>
+                                                        <ul className="space-y-3">
+                                                            {nutrientInfo[selectedNutrient.id].benefits.map((b, i) => (
+                                                                <li key={i} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300 font-medium">
+                                                                    <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
+                                                                    <span>{b}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-6">
+                                                {nutrientInfo[selectedNutrient.id].relatedFacts && (
+                                                    <div className="bg-blue-500/5 dark:bg-blue-500/5 rounded-3xl p-6 border border-blue-500/10">
+                                                        <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400 mb-4">Discovery & Science</h4>
+                                                        <div className="space-y-4">
+                                                            {nutrientInfo[selectedNutrient.id].relatedFacts.map((f, i) => (
+                                                                <div key={i} className="flex gap-4 group">
+                                                                    <span className="w-6 h-6 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-black shrink-0 text-[10px]">{i + 1}</span>
+                                                                    <p className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-400 font-medium">{f}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {nutrientInfo[selectedNutrient.id].deficiencySigns && (
+                                                    <div className="bg-rose-500/5 dark:bg-rose-500/5 rounded-3xl p-6 border border-rose-500/10">
+                                                        <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400 mb-4">Deficiency Signals</h4>
+                                                        <ul className="space-y-3">
+                                                            {nutrientInfo[selectedNutrient.id].deficiencySigns.map((s, i) => (
+                                                                <li key={i} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300 font-medium">
+                                                                    <span className="text-rose-500 shrink-0 mt-1">●</span>
+                                                                    <span>{s}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="col-span-full py-20 text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">No scientific briefing available yet.</p>
+                                        </div>
                                     )}
                                 </div>
                             )}
                         </div>
-                    );
-                })}
+                    )}
+
+                    {/* NUTRIENT LIST / ACCORDIONS */}
+                    {!selectedNutrient && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            
+                            {/* Title area (non-compact) */}
+                            {!compact && !heroQuery && (
+                                <div className="flex items-center gap-4 px-2 mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-sm border border-emerald-500/10">
+                                        <Activity size={24} />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">
+                                            Nutridex
+                                        </h2>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
+                                            Complete nutrient reference &amp; profile targets
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Accordion List */}
+                            <div className="space-y-4">
+                                {ACCORDION_SECTIONS.map(section => {
+                                    const Icon = section.icon;
+                                    const isOpen = expandedSections.has(section.id);
+                                    const theme = THEMES[section.theme] || THEMES.emerald;
+                                    const leafCount = countLeaves(section.nutrients);
+
+                                    // Filter nutrients if searching
+                                    const filteredNutrients = heroQuery
+                                        ? section.nutrients.filter(n => {
+                                            const q = heroQuery.toLowerCase();
+                                            const matchSelf = n.label.toLowerCase().includes(q);
+                                            const matchChild = n.children?.some(c =>
+                                                c.label.toLowerCase().includes(q) ||
+                                                c.children?.some(gc => gc.label.toLowerCase().includes(q))
+                                            );
+                                            return matchSelf || matchChild;
+                                        })
+                                        : section.nutrients;
+
+                                    if (heroQuery && filteredNutrients.length === 0) return null;
+
+                                    return (
+                                        <div key={section.id} className={cn("rounded-2xl border overflow-hidden transition-all duration-300", theme.border, isOpen ? "shadow-md scale-[1.01]" : "hover:scale-[1.005]")}>
+                                            <button
+                                                onClick={() => toggleSection(section.id)}
+                                                className={cn(
+                                                    "w-full flex items-center gap-3 px-6 py-5 transition-all text-left",
+                                                    theme.sectionBg,
+                                                    "hover:opacity-95"
+                                                )}
+                                            >
+                                                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", theme.bg, "shadow-sm border border-current/10")}>
+                                                    <Icon size={18} className={theme.text} />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className={cn("text-[13px] font-black uppercase tracking-[0.1em]", theme.text)}>
+                                                        {section.label}
+                                                    </h3>
+                                                    <p className="text-[10px] font-bold text-slate-500/60 dark:text-slate-400/60 mt-0.5">{section.subtitle}</p>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <span className={cn("text-[10px] font-black px-2.5 py-1 rounded-full", theme.badge)}>
+                                                        {leafCount}
+                                                    </span>
+                                                    <ChevronDown
+                                                        size={18}
+                                                        className={cn(
+                                                            "transition-transform duration-300",
+                                                            theme.text,
+                                                            isOpen ? "rotate-0" : "-rotate-90"
+                                                        )}
+                                                    />
+                                                </div>
+                                            </button>
+
+                                            {isOpen && (
+                                                <div className="px-5 py-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-300 bg-white dark:bg-slate-950/50">
+                                                    {filteredNutrients.map(node =>
+                                                        renderNutrientRow(node, theme, 0)
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                                
+                                {heroQuery && ACCORDION_SECTIONS.every(s => !s.label.toLowerCase().includes(heroQuery.toLowerCase()) && !s.nutrients.some(n => n.label.toLowerCase().includes(heroQuery.toLowerCase()) || n.children?.some(c => c.label.toLowerCase().includes(heroQuery.toLowerCase())))) && (
+                                    <div className="py-20 text-center">
+                                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
+                                            <Search size={24} className="opacity-20 text-slate-400" />
+                                        </div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">No nutrients match your search</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Info Card (non-compact only) */}
-            {!compact && (
-                <div className="pt-6">
-                    <div className="w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 p-8 flex flex-col md:flex-row items-center gap-8 shadow-sm">
-                        <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
-                            <Sparkles size={32} />
+            {/* Info Card (Outside the main container) */}
+            {!selectedNutrient && !compact && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+                    <div className="w-full max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 p-10 flex flex-col md:flex-row items-center gap-10 shadow-xl overflow-hidden relative group">
+                        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors duration-700" />
+                        <div className="w-20 h-20 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 shadow-lg border border-blue-500/10">
+                            <Sparkles size={40} />
                         </div>
-                        <div className="space-y-4 flex-1">
-                            <div className="space-y-1">
-                                <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-blue-500">Biological Reference</h4>
-                                <h3 className="text-xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">Profile-Aware Intelligence</h3>
+                        <div className="space-y-5 flex-1 relative z-10">
+                            <div className="space-y-2">
+                                <h4 className="font-black text-[11px] uppercase tracking-[0.4em] text-blue-500/70">Biological Framework</h4>
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">Profile-Aware Intelligence</h3>
                             </div>
-                            <p className="text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed italic border-l-4 border-blue-500/20 pl-6">
+                            <p className="text-base font-bold text-slate-500 dark:text-slate-400 leading-relaxed italic border-l-4 border-blue-500/20 pl-8">
                                 &quot;The targets shown above are custom-calculated based on your age, gender, and activity levels. Tap any nutrient to discover life-enhancing benefits, deficiency warnings, and the best whole-food sources.&quot;
                             </p>
                         </div>
