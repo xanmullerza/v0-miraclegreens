@@ -560,7 +560,8 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                     {/* Label */}
                     <span className={cn(
                         "flex-1 text-[10px] font-black uppercase tracking-widest",
-                        (node.isParent || node.theme) ? cn(theme.text, "text-[11px]") : "text-slate-700 dark:text-slate-300"
+                        (node.isParent || node.theme || depth > 0) ? theme.text : "text-slate-700 dark:text-slate-300",
+                        (node.isParent || node.theme) && "text-[11px]"
                     )}>
                         {node.label}
                     </span>
