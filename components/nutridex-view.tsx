@@ -67,6 +67,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                 children: [
                     {
                         id: 'Sugars', label: 'Sugars', unit: 'g', isParent: true,
+                        theme: 'violet',
                         children: [
                             { id: 'Fructose', label: 'Fructose', unit: 'g' },
                             { id: 'Glucose', label: 'Glucose', unit: 'g' },
@@ -77,9 +78,9 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                             { id: 'Allulose', label: 'Allulose', unit: 'g' },
                         ]
                     },
-                    { id: 'Starch', label: 'Starch', unit: 'g' },
-                    { id: 'Fiber', label: 'Fiber', unit: 'g' },
-                    { id: 'Sugar Alcohol', label: 'Sugar Alcohol', unit: 'g' },
+                    { id: 'Starch', label: 'Starch', unit: 'g', theme: 'amber' },
+                    { id: 'Fiber', label: 'Fiber', unit: 'g', theme: 'teal' },
+                    { id: 'Sugar Alcohol', label: 'Sugar Alcohol', unit: 'g', theme: 'sky' },
                 ]
             },
             {
@@ -233,6 +234,42 @@ const THEMES: Record<string, {
         parentBorder: 'border-l-emerald-500', parentBg: 'bg-emerald-50 dark:bg-emerald-950/20',
         sectionBg: 'bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10',
         badge: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    },
+    amber: {
+        bg: 'bg-amber-500/5', text: 'text-amber-500', border: 'border-amber-500/20',
+        parentBorder: 'border-l-amber-500', parentBg: 'bg-amber-50 dark:bg-amber-950/20',
+        sectionBg: 'bg-gradient-to-br from-amber-50/50 to-amber-100/30 dark:from-amber-950/20 dark:to-amber-900/10',
+        badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    },
+    teal: {
+        bg: 'bg-teal-500/5', text: 'text-teal-500', border: 'border-teal-500/20',
+        parentBorder: 'border-l-teal-500', parentBg: 'bg-teal-50 dark:bg-teal-950/20',
+        sectionBg: 'bg-gradient-to-br from-teal-50/50 to-teal-100/30 dark:from-teal-950/20 dark:to-teal-900/10',
+        badge: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
+    },
+    purple: {
+        bg: 'bg-purple-500/5', text: 'text-purple-500', border: 'border-purple-500/20',
+        parentBorder: 'border-l-purple-500', parentBg: 'bg-purple-50 dark:bg-purple-950/20',
+        sectionBg: 'bg-gradient-to-br from-purple-50/50 to-purple-100/30 dark:from-purple-950/20 dark:to-purple-900/10',
+        badge: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+    },
+    pink: {
+        bg: 'bg-pink-500/5', text: 'text-pink-500', border: 'border-pink-500/20',
+        parentBorder: 'border-l-pink-500', parentBg: 'bg-pink-50 dark:bg-pink-950/20',
+        sectionBg: 'bg-gradient-to-br from-pink-50/50 to-pink-100/30 dark:from-pink-950/20 dark:to-pink-900/10',
+        badge: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
+    },
+    violet: {
+        bg: 'bg-violet-500/5', text: 'text-violet-500', border: 'border-violet-500/20',
+        parentBorder: 'border-l-violet-500', parentBg: 'bg-violet-50 dark:bg-violet-950/20',
+        sectionBg: 'bg-gradient-to-br from-violet-50/50 to-violet-100/30 dark:from-violet-950/20 dark:to-violet-900/10',
+        badge: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+    },
+    sky: {
+        bg: 'bg-sky-500/5', text: 'text-sky-500', border: 'border-sky-500/20',
+        parentBorder: 'border-l-sky-500', parentBg: 'bg-sky-50 dark:bg-sky-950/20',
+        sectionBg: 'bg-gradient-to-br from-sky-50/50 to-sky-100/30 dark:from-sky-950/20 dark:to-sky-900/10',
+        badge: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
     },
 };
 
@@ -496,13 +533,14 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                 <div
                     className={cn(
                         "w-full text-left flex items-center gap-3 py-3 px-4 rounded-xl transition-all group",
-                        node.isParent
+                        (node.isParent || node.theme)
                             ? cn("border-l-[3px]", theme.parentBorder, theme.parentBg, "hover:shadow-md cursor-pointer")
                             : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-[3px] border-l-transparent",
                         depth > 0 && "ml-4"
                     )}
                     onClick={() => {
                         if (node.isParent) toggleParent(node.id);
+                        else if (!isGroupHeader) selectNutrient(node);
                     }}
                 >
                     {/* Expand chevron for parents */}
@@ -522,7 +560,7 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                     {/* Label */}
                     <span className={cn(
                         "flex-1 text-[10px] font-black uppercase tracking-widest",
-                        node.isParent ? cn(theme.text, "text-[11px]") : "text-slate-700 dark:text-slate-300"
+                        (node.isParent || node.theme) ? cn(theme.text, "text-[11px]") : "text-slate-700 dark:text-slate-300"
                     )}>
                         {node.label}
                     </span>
