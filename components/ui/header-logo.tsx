@@ -74,7 +74,7 @@ export function HeaderLogo({
                 </Link>
 
                 {/* Main App Navigation (Next to Logo) */}
-                <div className="hidden lg:flex items-center ml-8 gap-1">
+                <div className="flex items-center ml-2 sm:ml-6 gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
                     {[
                         { label: 'Mission', path: '/about-us', icon: Info, color: 'text-purple-500' },
                         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
