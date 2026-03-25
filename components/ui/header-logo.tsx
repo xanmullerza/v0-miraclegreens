@@ -72,10 +72,44 @@ export function HeaderLogo({
                         )}
                     </div>
                 </Link>
+
+                {/* Main App Navigation (Next to Logo) */}
+                <div className="hidden lg:flex items-center ml-8 gap-1">
+                    {[
+                        { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
+                        { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
+                        { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
+                        { label: 'Nutrients', path: '/dashboard/widgets/nutridex', icon: Beaker, color: 'text-emerald-500' },
+                    ].map((item) => {
+                        const Icon = item.icon;
+                        const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');
+                        const isActive = isHomeRedirect || pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
+                        
+                        return (
+                            <Link
+                                key={item.path}
+                                href={item.path}
+                                onClick={() => {
+                                    if (item.label === 'Home') setResizeMode('content-focus');
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-1.5 rounded-full transition-all text-[10px] font-black uppercase tracking-widest",
+                                    isActive
+                                        ? "bg-slate-800/5 dark:bg-slate-800 text-foreground"
+                                        : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-emerald-500 active:scale-95"
+                                )}
+                                title={item.label}
+                            >
+                                <Icon size={14} className={isActive ? item.color : 'opacity-70'} />
+                                <span>{item.label}</span>
+                            </Link>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Empty Center Column */}
-            <div className="flex justify-center w-full h-full" />
+            <div className="hidden xl:flex justify-center w-full h-full" />
 
             {/* Right Group - Theme Toggle, View Ratio, Profile */}
             <div className="flex justify-end items-center h-full">
