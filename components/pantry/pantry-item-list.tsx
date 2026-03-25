@@ -39,7 +39,7 @@ interface PantryItemListProps {
 }
 
 export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
-    const { pantryItems, loading: pantryLoading, updateQuantity, removeFromPantry: dbRemoveFromPantry } = usePantry();
+    const { pantryItems, loading: pantryLoading, updateQuantity, removeFromPantry: dbRemoveFromPantry, refresh } = usePantry();
     const { addItem: addShoppingListItem } = useShoppingList();
 
     const [foods, setFoods] = useState<PantryFoodItem[]>([]);
@@ -71,7 +71,7 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
     const [removeRemoving, setRemoveRemoving] = useState(false);
 
     // ── Fetch pantry ────────────────────────────────────────────
-    useEffect(() => { fetchPantry(); }, [refreshKey]);
+    useEffect(() => { refresh(); }, [refreshKey, refresh]);
 
     // Re-apply localStorage quantities from external updates
     useEffect(() => {
@@ -161,7 +161,7 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                     <p className="text-sm font-semibold text-foreground mb-3">Remove <span className="font-black text-rose-600 dark:text-rose-400">{displayName}</span> from pantry?</p>
                     <div className="flex gap-2 justify-end">
                         <button onClick={() => toast.dismiss(t)} className="px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted rounded transition-colors">Cancel</button>
-                        <button onClick={() => { toast.dismiss(t); removeFromPantry(food.id, food.name, food.source_table || 'food_items'); }} className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded transition-colors">Remove</button>
+                        <button onClick={() => { toast.dismiss(t); removeFromPantry(food.id, food.name); }} className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded transition-colors">Remove</button>
                     </div>
                 </div>
             ),
@@ -263,7 +263,7 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
                     quantity: 'As needed',
                     food_item_id: removeItem.id,
                     category: removeItem.category,
-                    source: 'auto-replenish'
+                    source: 'manual'
                 });
                 
                 await dbRemoveFromPantry(removeItem.id);
