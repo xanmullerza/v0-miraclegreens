@@ -111,7 +111,7 @@ export function HeaderLogo({
             {/* Right Group - Theme Toggle, View Ratio, Profile */}
             <div className="flex items-center h-full px-2 sm:px-4">
                 {/* Navigation Items (Privacy, Support, Terms) */}
-                <div className="hidden md:flex items-center h-full divide-x divide-border mr-1 border-l border-border">
+                <div className="flex items-center h-full sm:divide-x divide-border border-l border-border">
                     {[
                         { label: 'Privacy', path: '/privacy', icon: Shield, color: 'text-slate-500' },
                         { label: 'Support', path: '/support', icon: HelpCircle, color: 'text-slate-500' },
@@ -125,7 +125,7 @@ export function HeaderLogo({
                                 key={item.path}
                                 href={item.path}
                                 className={cn(
-                                    "flex items-center gap-2 px-3 sm:px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
+                                    "flex items-center gap-2 px-2.5 sm:px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
                                     isActive
                                         ? "bg-slate-900 dark:bg-slate-800 text-white"
                                         : "text-muted-foreground hover:bg-muted dark:hover:bg-slate-800/50 hover:text-emerald-500 active:scale-95"
@@ -133,7 +133,7 @@ export function HeaderLogo({
                                 title={item.label}
                             >
                                 <Icon size={14} className={isActive ? item.color : ''} />
-                                <span className="hidden md:inline">{item.label}</span>
+                                <span className="hidden sm:inline">{item.label}</span>
                             </Link>
                         );
                     })}
