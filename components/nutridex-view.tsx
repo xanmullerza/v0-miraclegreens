@@ -533,7 +533,7 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                 <div
                     className={cn(
                         "w-full text-left flex items-center gap-3 py-3 px-4 rounded-xl transition-all group",
-                        (node.isParent || node.theme)
+                        node.isParent
                             ? cn("border-l-[3px]", theme.parentBorder, theme.parentBg, "hover:shadow-md cursor-pointer")
                             : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-[3px] border-l-transparent",
                         depth > 0 && "ml-4"
