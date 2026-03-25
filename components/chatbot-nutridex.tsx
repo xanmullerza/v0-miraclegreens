@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Zap, Heart, Brain, Droplet, Shield } from 'lucide-react';
+import { Search, Zap, Heart, Brain, Droplet, Shield, ChevronDown, BookOpen } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Nutrient {
@@ -16,6 +16,7 @@ export function ChatbotNutridex() {
     const [selectedNutrient, setSelectedNutrient] = useState<string | null>(null);
     const [topFoods, setTopFoods] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [openGroup, setOpenGroup] = useState<string | null>(null);
 
     const ALL_NUTRIENTS: Nutrient[] = useMemo(() => [
         { id: 'Energy', label: 'Energy', group: 'Macros' },
@@ -76,6 +77,10 @@ export function ChatbotNutridex() {
     const handleSelectNutrient = (id: string) => {
         setSelectedNutrient(id);
         fetchTopFoods(id);
+    };
+
+    const toggleGroup = (group: string) => {
+        setOpenGroup(prev => prev === group ? null : group);
     };
 
     if (selectedNutrient) {
@@ -146,27 +151,50 @@ export function ChatbotNutridex() {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {Object.entries(groupedNutrients).map(([group, nutrients]) => (
-                    <div key={group}>
-                        <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
-                            {group}
-                        </h4>
-                        <div className="grid grid-cols-2 gap-2">
-                            {nutrients.map(nutrient => (
-                                <button
-                                    key={nutrient.id}
-                                    onClick={() => handleSelectNutrient(nutrient.id)}
-                                    className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-left transition-colors group"
-                                >
-                                    <p className="font-medium text-sm text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">
-                                        {nutrient.label}
-                                    </p>
-                                </button>
-                            ))}
+            <div className="flex-1 overflow-y-auto p-4 space-y-1">
+                {Object.entries(groupedNutrients).map(([group, nutrients]) => {
+                    const isOpen = openGroup === group;
+                    return (
+                        <div key={group} className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                            {/* Accordion header */}
+                            <button
+                                onClick={() => toggleGroup(group)}
+                                className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            >
+                                <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                    {group}
+                                </span>
+                                <ChevronDown
+                                    size={16}
+                                    className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                                />
+                            </button>
+
+                            {/* Accordion body */}
+                            {isOpen && (
+                                <div className="grid grid-cols-2 gap-2 p-3 bg-white dark:bg-slate-900">
+                                    {nutrients.map(nutrient => (
+                                        <div
+                                            key={nutrient.id}
+                                            className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 text-left transition-colors flex items-center justify-between gap-2"
+                                        >
+                                            <p className="font-medium text-sm text-slate-900 dark:text-white">
+                                                {nutrient.label}
+                                            </p>
+                                            <button
+                                                onClick={() => handleSelectNutrient(nutrient.id)}
+                                                title={`Learn about ${nutrient.label}`}
+                                                className="flex-shrink-0 p-1.5 rounded-md text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 transition-colors"
+                                            >
+                                                <BookOpen size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );
