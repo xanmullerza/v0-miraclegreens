@@ -3872,20 +3872,19 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Bottom Navigation Footer (Mobile Optimized) */}
                 <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50">
-                    {/* Split View Toggle for Desktop/Widescreen */}
+                    {/* Home Button - Navigates to homepage and closes chatbot */}
                     <button
-                        onClick={toggleResize}
+                        onClick={() => {
+                            onClose();
+                            router.push('/about-us');
+                        }}
                         className={cn(
                             "p-3 rounded-2xl transition-all active:scale-95 group",
-                            "text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800",
-                            resizeMode === 'equal' && "text-amber-500",
-                            resizeMode === 'dashboard-only' && "text-emerald-500"
+                            "text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                         )}
-                        title="Split View"
+                        title="Home"
                     >
-                        {resizeMode === 'equal' && <Computer size={24} />}
-                        {resizeMode === 'content-focus' && <TabletSmartphone size={24} />}
-                        {resizeMode === 'dashboard-only' && <Smartphone size={24} />}
+                        <Home size={24} />
                     </button>
                     
                     <button
