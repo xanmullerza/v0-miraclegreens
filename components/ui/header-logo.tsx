@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Beaker } from 'lucide-react';
+import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Beaker, Info, Shield, HelpCircle, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 import { useChatbot } from '@/lib/context/chatbot-context';
@@ -82,22 +82,18 @@ export function HeaderLogo({
                 {/* Navigation Items */}
                 <div className="flex items-center h-full divide-x divide-border mr-1 border-l border-border">
                     {[
-                        { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
-                        { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
-                        { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-                        { label: 'Nutrients', path: '/dashboard/widgets/nutridex', icon: Beaker, color: 'text-emerald-500' },
+                        { label: 'Mission', path: '/about-us', icon: Info, color: 'text-purple-500' },
+                        { label: 'Privacy', path: '/privacy', icon: Shield, color: 'text-slate-500' },
+                        { label: 'Support', path: '/support', icon: HelpCircle, color: 'text-slate-500' },
+                        { label: 'Terms', path: '/terms', icon: BookOpen, color: 'text-slate-500' },
                     ].map((item) => {
                         const Icon = item.icon;
-                        const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');
-                        const isActive = isHomeRedirect || pathname === item.path;
+                        const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
                         
                         return (
-                            <button
+                            <Link
                                 key={item.path}
-                                onClick={() => {
-                                    if (item.label === 'Home') setResizeMode('content-focus');
-                                    router.push(item.path);
-                                }}
+                                href={item.path}
                                 className={cn(
                                     "flex items-center gap-2 px-3 sm:px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
                                     isActive
@@ -108,7 +104,7 @@ export function HeaderLogo({
                             >
                                 <Icon size={14} className={isActive ? item.color : ''} />
                                 <span className="hidden md:inline">{item.label}</span>
-                            </button>
+                            </Link>
                         );
                     })}
                 </div>

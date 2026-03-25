@@ -9,6 +9,7 @@ import { ChatbotModal } from '@/components/chatbot-modal';
 import { RecipePreview } from '@/components/recipe/recipe-preview';
 import { Footer } from '@/components/footer';
 import { RDADrawer } from '@/components/rda-drawer';
+import { ContentNav } from '@/components/ui/content-nav';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
 import { SearchProvider } from '@/lib/context/search-context';
@@ -129,10 +130,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             <div className="flex flex-1 overflow-hidden">
                 {/* Content Area */}
                 <div className={cn(
-                    "flex flex-col transition-all duration-300 ease-in-out overflow-hidden",
+                    "flex flex-col transition-all duration-300 ease-in-out overflow-hidden z-20 relative",
                     getContentWidth(),
                     pathname === '/dashboard' ? 'w-full' : ''
                 )}>
+                    {/* Secondary Nav for Content Panel */}
+                    {pathname !== '/dashboard' && <ContentNav />}
+
                     {/* Main Content */}
                     <main className="flex-1 overflow-y-auto bg-background custom-scrollbar">
                         <div className={cn(
