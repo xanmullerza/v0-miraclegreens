@@ -129,9 +129,6 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                     },
                 ]
             },
-            { id: 'Water', label: 'Water', unit: 'g' },
-            { id: 'Ash', label: 'Ash', unit: 'g' },
-            { id: 'Alcohol', label: 'Alcohol', unit: 'g' },
         ]
     },
     {
@@ -200,20 +197,6 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
             { id: 'Choline', label: 'Choline', unit: 'mg' },
         ]
     },
-    {
-        id: 'phytonutrients',
-        label: 'Phytonutrients & Other',
-        subtitle: 'Bioactive compounds, stimulants, and metabolic markers',
-        icon: Leaf,
-        theme: 'emerald',
-        nutrients: [
-            { id: 'Lycopene', label: 'Lycopene', unit: 'µg' },
-            { id: 'Lutein + Zeaxanthin', label: 'Lutein + Zeaxanthin', unit: 'µg' },
-            { id: 'Caffeine', label: 'Caffeine', unit: 'mg' },
-            { id: 'Oxalate', label: 'Oxalate', unit: 'mg' },
-            { id: 'Beta-Hydroxybutyrate', label: 'Beta-Hydroxybutyrate', unit: 'mg' },
-        ]
-    }
 ];
 
 // ─── Theme Map ────────────────────────────────────────────────
