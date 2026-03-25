@@ -792,7 +792,7 @@ const RecipeListItem = ({
                   if (!exists) {
                     await addShoppingItem({
                       name: entry.name,
-                      food_item_id: entry.food_item_id || null,
+                      food_item_id: entry.food_item_id || undefined,
                       quantity: 'As needed',
                       source: 'mealplan',
                     });
@@ -1202,7 +1202,7 @@ export default function MealPlannerContent({
           await addShoppingItem({
             name: `Replenish: ${item.name}`,
             quantity: 'As needed',
-            source: 'auto-replenish',
+            source: 'manual',
           });
         }
       } catch (e) {
