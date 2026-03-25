@@ -53,11 +53,11 @@ export function HeaderLogo({
 
     return (
         <div suppressHydrationWarning className={cn(
-            "grid grid-cols-3 items-center bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12"
+            "flex items-center justify-between bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12"
         )}>
             {/* Left - Logo Area */}
-            <div className="flex h-full w-full items-center px-4 overflow-hidden">
-                <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-all active:scale-[0.98]">
+            <div className="flex h-full items-center px-4 overflow-hidden">
+                <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-all active:scale-[0.98] shrink-0">
                     <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-emerald-400/30 flex-shrink-0 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)]">
                         <Leaf size={16} className="text-white" />
                     </div>
@@ -93,7 +93,7 @@ export function HeaderLogo({
                                     if (item.label === 'Home') setResizeMode('content-focus');
                                 }}
                                 className={cn(
-                                    "flex items-center gap-2 px-3 py-1.5 rounded-full transition-all text-[10px] font-black uppercase tracking-widest",
+                                    "flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-full transition-all text-[10px] font-black uppercase tracking-widest shrink-0",
                                     isActive
                                         ? "bg-slate-800/5 dark:bg-slate-800 text-foreground"
                                         : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-emerald-500 active:scale-95"
@@ -101,20 +101,17 @@ export function HeaderLogo({
                                 title={item.label}
                             >
                                 <Icon size={14} className={isActive ? item.color : 'opacity-70'} />
-                                <span>{item.label}</span>
+                                <span className="hidden sm:inline">{item.label}</span>
                             </Link>
                         );
                     })}
                 </div>
             </div>
 
-            {/* Empty Center Column */}
-            <div className="hidden xl:flex justify-center w-full h-full" />
-
             {/* Right Group - Theme Toggle, View Ratio, Profile */}
-            <div className="flex justify-end items-center h-full">
-                {/* Navigation Items */}
-                <div className="flex items-center h-full divide-x divide-border mr-1 border-l border-border">
+            <div className="flex items-center h-full px-2 sm:px-4">
+                {/* Navigation Items (Privacy, Support, Terms) */}
+                <div className="hidden md:flex items-center h-full divide-x divide-border mr-1 border-l border-border">
                     {[
                         { label: 'Privacy', path: '/privacy', icon: Shield, color: 'text-slate-500' },
                         { label: 'Support', path: '/support', icon: HelpCircle, color: 'text-slate-500' },
@@ -172,10 +169,8 @@ export function HeaderLogo({
                     </div>
                 </button>
 
-
-
                 {/* Profile Button */}
-                <div className="flex flex-shrink-0 border-l border-border h-full overflow-hidden">
+                <div className="flex flex-shrink-0 border-l lg:border-l border-border h-full overflow-hidden">
                     {pathname === '/profile' ? (
                         <Link
                             href="/dashboard"
