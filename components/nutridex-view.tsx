@@ -87,18 +87,19 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                 id: 'Fat', label: 'Fat', unit: 'g', isParent: true,
                 theme: 'rose',
                 children: [
-                    { id: 'Saturated Fat', label: 'Saturated Fat', unit: 'g' },
-                    { id: 'Monounsaturated Fat', label: 'Monounsaturated Fat', unit: 'g' },
+                    { id: 'Saturated Fat', label: 'Saturated Fat', unit: 'g', theme: 'orange' },
+                    { id: 'Monounsaturated Fat', label: 'Monounsaturated Fat', unit: 'g', theme: 'amber' },
                     {
                         id: 'Polyunsaturated Fat', label: 'Polyunsaturated Fat', unit: 'g', isParent: true,
+                        theme: 'teal',
                         children: [
                             { id: 'Omega-3', label: 'Omega-3', unit: 'g' },
                             { id: 'Omega-6', label: 'Omega-6', unit: 'g' },
                         ]
                     },
-                    { id: 'Trans Fat', label: 'Trans Fat', unit: 'g' },
-                    { id: 'Cholesterol', label: 'Cholesterol', unit: 'mg' },
-                    { id: 'Phytosterol', label: 'Phytosterol', unit: 'mg' },
+                    { id: 'Trans Fat', label: 'Trans Fat', unit: 'g', theme: 'sky' },
+                    { id: 'Cholesterol', label: 'Cholesterol', unit: 'mg', theme: 'violet' },
+                    { id: 'Phytosterol', label: 'Phytosterol', unit: 'mg', theme: 'emerald' },
                 ]
             },
             {
@@ -107,6 +108,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                 children: [
                     {
                         id: '_essential_aa', label: 'Essential Amino Acids', unit: 'g', isParent: true,
+                        theme: 'purple',
                         children: [
                             { id: 'Histidine', label: 'Histidine', unit: 'g' },
                             { id: 'Isoleucine', label: 'Isoleucine', unit: 'g' },
@@ -121,6 +123,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
                     },
                     {
                         id: '_nonessential_aa', label: 'Non-Essential Amino Acids', unit: 'g', isParent: true,
+                        theme: 'pink',
                         children: [
                             { id: 'Alanine', label: 'Alanine', unit: 'g' },
                             { id: 'Arginine', label: 'Arginine', unit: 'g' },
