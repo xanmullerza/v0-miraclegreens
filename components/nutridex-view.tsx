@@ -31,6 +31,7 @@ interface NutrientNode {
     unit: string;
     isParent?: boolean;   // has children → accent color
     children?: NutrientNode[];
+    theme?: string;       // override theme for this node & children
 }
 
 interface AccordionSection {
@@ -58,10 +59,11 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
         label: 'Macronutrients',
         subtitle: 'Energy sources, structural compounds, and hydration',
         icon: Zap,
-        theme: 'orange',
+        theme: 'emerald',
         nutrients: [
             {
                 id: 'Carbs', label: 'Carbohydrates', unit: 'g', isParent: true,
+                theme: 'orange',
                 children: [
                     {
                         id: 'Sugars', label: 'Sugars', unit: 'g', isParent: true,
@@ -82,6 +84,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
             },
             {
                 id: 'Fat', label: 'Fat', unit: 'g', isParent: true,
+                theme: 'rose',
                 children: [
                     { id: 'Saturated Fat', label: 'Saturated Fat', unit: 'g' },
                     { id: 'Monounsaturated Fat', label: 'Monounsaturated Fat', unit: 'g' },
@@ -99,6 +102,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
             },
             {
                 id: 'Protein', label: 'Protein', unit: 'g', isParent: true,
+                theme: 'blue',
                 children: [
                     {
                         id: '_essential_aa', label: 'Essential Amino Acids', unit: 'g', isParent: true,
@@ -136,7 +140,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
         label: 'Minerals',
         subtitle: 'Essential elements for cellular function and structure',
         icon: Gem,
-        theme: 'rose',
+        theme: 'emerald',
         nutrients: [
             { id: 'Calcium', label: 'Calcium', unit: 'mg' },
             { id: 'Iron', label: 'Iron', unit: 'mg' },
@@ -159,7 +163,7 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
         label: 'Vitamins',
         subtitle: 'Organic compounds vital for metabolic processes',
         icon: Battery,
-        theme: 'blue',
+        theme: 'emerald',
         nutrients: [
             {
                 id: 'Vitamin A', label: 'Vitamin A', unit: 'µg', isParent: true,
@@ -481,7 +485,8 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
 
     // ─── Render a nutrient row ────────────────────────────────
 
-    const renderNutrientRow = (node: NutrientNode, theme: typeof THEMES['orange'], depth: number = 0) => {
+    const renderNutrientRow = (node: NutrientNode, sectionTheme: typeof THEMES['orange'], depth: number = 0) => {
+        const theme = node.theme ? (THEMES[node.theme] || sectionTheme) : sectionTheme;
         const isExpanded = expandedParents.has(node.id);
         const rda = getRDA(node.id);
         const isGroupHeader = node.id.startsWith('_');
