@@ -74,11 +74,11 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-purple-400',
         activeBg: 'bg-purple-500/10 border-purple-500/30',
         defaultHref: '/dashboard/widgets/comparator',
-        matchPaths: ['/dashboard/widgets/comparator', '/dashboard/widgets/nutridex', '/dashboard/widgets/lifeguard'],
+        matchPaths: ['/dashboard/widgets/comparator', '/nutrients', '/dashboard/widgets/lifeguard'],
         adminOnly: true,
         subtabs: [
             { id: 'comparator', label: 'Comparator', href: '/dashboard/widgets/comparator', icon: Scale },
-            { id: 'nutridex', label: 'Nutridex', href: '/dashboard/widgets/nutridex', icon: Activity },
+            { id: 'nutridex', label: 'Nutridex', href: '/nutrients', icon: Activity },
             { id: 'lifeguard', label: 'Life Guard', href: '/dashboard/widgets/lifeguard', icon: Wallet },
         ],
     },

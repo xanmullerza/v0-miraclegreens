@@ -697,7 +697,7 @@ export default function FoodDetailsPage() {
                         const hasBreakdown = breakdownLabels.includes(label);
 
                         return (
-                            <div key={label} onClick={() => router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
+                            <div key={label} onClick={() => router.push(`/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                                 <p className={cn(
                                     "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
                                     title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'

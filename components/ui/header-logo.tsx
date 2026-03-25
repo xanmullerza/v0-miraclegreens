@@ -79,7 +79,7 @@ export function HeaderLogo({
                         { label: 'Mission', path: '/about-us', icon: Info, color: 'text-purple-500' },
                         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
                         { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-                        { label: 'Nutrients', path: '/dashboard/widgets/nutridex', icon: Beaker, color: 'text-emerald-500' },
+                        { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500' },
                     ].map((item) => {
                         const Icon = item.icon;
                         const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');

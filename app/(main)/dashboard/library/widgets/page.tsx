@@ -25,7 +25,7 @@ const WIDGETS: Widget[] = [
         description: 'Biological reference guide & profile targets for all nutrients',
         icon: Activity,
         color: 'emerald',
-        path: '/dashboard/widgets/nutridex'
+        path: '/nutrients'
     },
     {
         id: 'comparator',

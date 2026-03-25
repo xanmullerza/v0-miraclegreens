@@ -230,7 +230,7 @@ export function NutrientsView() {
     const handleNutrientSelect = useCallback((id: string) => {
         setSelectedNutrientId(id);
         const encodedId = encodeURIComponent(id);
-        router.push(`/dashboard/widgets/nutridex/${encodedId}`);
+        router.push(`/nutrients/${encodedId}`);
     }, [router]);
 
     // Data Maps

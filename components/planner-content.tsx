@@ -3227,7 +3227,7 @@ export default function MealPlannerContent({
                                     key={label}
                                     onClick={() =>
                                       router.push(
-                                        `/dashboard/widgets/nutridex/${encodeURIComponent(label)}`,
+                                        `/nutrients/${encodeURIComponent(label)}`,
                                       )
                                     }
                                     className={cn(

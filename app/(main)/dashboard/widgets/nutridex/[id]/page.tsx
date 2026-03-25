@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams, usePathname, useSearchParams } from 'next/navigation';
@@ -239,7 +239,7 @@ export default function NutrientDetailsPage() {
                                 checked={nutrientInfoKey === id}
                                 onCheckedChange={() => {
                                     const params = new URLSearchParams(searchParams.toString());
-                                    router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(id)}?${params.toString()}`);
+                                    router.push(`/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
                                 }}
                                 className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                             >
@@ -272,7 +272,7 @@ export default function NutrientDetailsPage() {
                                 checked={nutrientInfoKey === id}
                                 onCheckedChange={() => {
                                     const params = new URLSearchParams(searchParams.toString());
-                                    router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(id)}?${params.toString()}`);
+                                    router.push(`/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
                                 }}
                                 className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                             >
@@ -305,7 +305,7 @@ export default function NutrientDetailsPage() {
                                 checked={nutrientInfoKey === id}
                                 onCheckedChange={() => {
                                     const params = new URLSearchParams(searchParams.toString());
-                                    router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(id)}?${params.toString()}`);
+                                    router.push(`/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
                                 }}
                                 className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                             >
@@ -417,7 +417,7 @@ export default function NutrientDetailsPage() {
                     <h2 className="text-2xl font-black uppercase tracking-tighter">Nutrient Not Found</h2>
                     <p className="text-slate-500 max-w-xs mx-auto text-sm">The requested nutrient does not exist in our health guide.</p>
                 </div>
-                <Button onClick={() => router.push('/dashboard/widgets/nutridex')} className="rounded-full px-8 bg-emerald-600">
+                <Button onClick={() => router.push('/nutrients')} className="rounded-full px-8 bg-emerald-600">
                     Back to Nutridex
                 </Button>
             </div>
