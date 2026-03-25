@@ -479,14 +479,14 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 if (currentPantryQty) {
                     await updateQuantity(foodItemId, cleaned);
                 } else {
-                    await dbAddToPantry({ id: foodItemId, name: pantryAddItem.name, common_name: pantryAddItem.common_name, category: pantryAddItem.category, image: pantryAddItem.image }, cleaned);
+                    await addToPantry({ id: foodItemId, name: pantryAddItem.name, common_name: pantryAddItem.common_name, category: pantryAddItem.category, image: pantryAddItem.image }, cleaned);
                 }
             } else {
                 // Fallback to direct addToPantry if no ID resolved (should be rare now)
                 await addToPantry(pantryAddItem, qtyStr);
             }
 
-            removeItem(pantryAddItem.id);
+            removeShoppingListItem(pantryAddItem.id);
             toast.success(`"${pantryAddItem.name}" added to pantry`);
             setPantryAddItem(null);
         } catch (e) {
@@ -772,7 +772,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                 {group}
                                                 <button
                                                     onClick={() => {
-                                                        groupItems.forEach(item => removeItem(item.id));
+                                                        groupItems.forEach(item => removeShoppingListItem(item.id));
                                                         toast.success(`${group} category cleared`);
                                                     }}
                                                     className="ml-auto p-1.5 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500 transition-colors flex-shrink-0"
@@ -897,10 +897,10 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                         const qty = parseInt(item.quantity);
                                                                         if (qty && qty > 1) {
                                                                             const updatedItem = { ...item, quantity: String(qty - 1) };
-                                                                            removeItem(item.id);
+                                                                            removeShoppingListItem(item.id);
                                                                             // Re-add with reduced quantity if > 1
                                                                             if (parseInt(updatedItem.quantity) > 0) {
-                                                                                addItem(updatedItem);
+                                                                                addShoppingListItem(updatedItem);
                                                                             }
                                                                             setExpandedRemoveId(null);
                                                                             setSelectedRemoveItem(null);
