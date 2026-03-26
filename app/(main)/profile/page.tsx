@@ -371,6 +371,7 @@ function ProfilePageContent() {
     );
 
     const [isDesktop, setIsDesktop] = useState(false);
+    const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
 
     React.useEffect(() => {
         const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
@@ -378,6 +379,10 @@ function ProfilePageContent() {
         window.addEventListener('resize', checkDesktop);
         return () => window.removeEventListener('resize', checkDesktop);
     }, []);
+
+    const toggleAccordion = (section: string) => {
+        setExpandedAccordion(expandedAccordion === section ? null : section);
+    };
 
 
 
@@ -471,17 +476,27 @@ function ProfilePageContent() {
                     <div className="max-w-2xl w-full space-y-8 pb-32">
                         <div className="grid grid-cols-1 gap-8">
                             {/* Measures Card */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                        <Globe size={24} className="stroke-[2.5]" />
+                            <section className="space-y-0">
+                                <button 
+                                    onClick={() => toggleAccordion('measures')}
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                            <Globe size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
+                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'measures' ? "rotate-180" : "")}>
+                                        <ChevronDown size={20} />
                                     </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                </button>
+                                
+                                {expandedAccordion === 'measures' && (
+                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
                                     {/* Country Selector */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
@@ -590,20 +605,31 @@ function ProfilePageContent() {
                                         <p className="text-[9px] text-slate-400 italic px-1">Show nutrient values as raw amounts, RDA percentages, or both.</p>
                                     </div>
                                 </div>
+                                )}
                             </section>
 
                             {/* Identification Card */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                        <User size={24} className="stroke-[2.5]" />
+                            <section className="space-y-0">
+                                <button 
+                                    onClick={() => toggleAccordion('identification')}
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                            <User size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Know Your Profile</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Know Your Profile</p>
+                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'identification' ? "rotate-180" : "")}>
+                                        <ChevronDown size={20} />
                                     </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                </button>
+                                
+                                {expandedAccordion === 'identification' && (
+                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
                                         <Input
@@ -723,20 +749,31 @@ function ProfilePageContent() {
                                         </div>
                                     </div>
                                 </div>
+                                )}
                             </section>
 
                             {/* Goals Card */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                        <Activity size={24} className="stroke-[2.5]" />
+                            <section className="space-y-0">
+                                <button 
+                                    onClick={() => toggleAccordion('goals')}
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                            <Activity size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Fitness Direction</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
+                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'goals' ? "rotate-180" : "")}>
+                                        <ChevronDown size={20} />
                                     </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                </button>
+                                
+                                {expandedAccordion === 'goals' && (
+                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
                                     {/* Biological Goal */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
@@ -785,20 +822,31 @@ function ProfilePageContent() {
                                         </div>
                                     </div>
                                 </div>
+                                )}
                             </section>
 
                             {/* Dietary Profile Card */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                        <Utensils size={24} className="stroke-[2.5]" />
+                            <section className="space-y-0">
+                                <button 
+                                    onClick={() => toggleAccordion('dietary')}
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                            <Utensils size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutritional Approach</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nutritional Approach</p>
+                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'dietary' ? "rotate-180" : "")}>
+                                        <ChevronDown size={20} />
                                     </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                </button>
+                                
+                                {expandedAccordion === 'dietary' && (
+                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
                                     {/* Dietary Protocol */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
@@ -822,20 +870,36 @@ function ProfilePageContent() {
                                         <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
                                     </div>
                                 </div>
+                                )}
                             </section>
 
                             {/* Health Considerations Card */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                        <Zap size={24} className="stroke-[2.5]" />
+                            <section className="space-y-0">
+                                <button 
+                                    onClick={() => toggleAccordion('health')}
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                            <Zap size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
+                                        </div>
                                     </div>
+                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'health' ? "rotate-180" : "")}>
+                                        <ChevronDown size={20} />
+                                    </div>
+                                </button>
+                                
+                                {expandedAccordion === 'health' && (
+                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
                                     <div>
                                         <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
                                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
                                     </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    
                                     {/* Allergen Exclusions */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Allergen Exclusions</Label>
@@ -896,20 +960,31 @@ function ProfilePageContent() {
                                         <p className="text-[10px] text-slate-400 italic">Select conditions to optimize meal plans with appropriate nutritional considerations.</p>
                                     </div>
                                 </div>
+                                )}
                             </section>
 
                             {/* App Settings Card */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                        <Settings size={24} className="stroke-[2.5]" />
+                            <section className="space-y-0">
+                                <button 
+                                    onClick={() => toggleAccordion('settings')}
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                >
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                            <Settings size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">App Settings</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Interface & Display</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">App Settings</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Interface & Display</p>
+                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'settings' ? "rotate-180" : "")}>
+                                        <ChevronDown size={20} />
                                     </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                </button>
+                                
+                                {expandedAccordion === 'settings' && (
+                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
                                     {/* Show Heroes */}
                                     <div className="space-y-3">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Dashboard Hero Sections</Label>
@@ -1000,6 +1075,7 @@ function ProfilePageContent() {
                                         </div>
                                     </div>
                                 </div>
+                                )}
                             </section>
 
 
