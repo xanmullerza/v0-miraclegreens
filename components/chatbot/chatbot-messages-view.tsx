@@ -2,7 +2,8 @@ import React from 'react';
 import { Loader2, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FormattedText } from '@/components/chatbot/formatted-text';
-import { Message, ParsedRecipe } from '@/components/chatbot-modal';
+import { ParsedRecipe } from '@/types/recipe';
+import { Message } from '@/lib/hooks/use-zum-assistant';
 
 interface ChatbotMessagesViewProps {
     messages: Message[];

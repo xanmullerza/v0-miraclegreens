@@ -175,7 +175,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
         setRecipeSaving(true);
         try {
-            const { recipeDataToSave, ingredientsList, instructionsList } = structureRecipeForSaving(recipe);
+            const structured = structureRecipeForSaving(recipe);
+            if (!structured) throw new Error('Failed to structure recipe data for saving');
+            const { recipeDataToSave, ingredientsList, instructionsList } = structured;
 
             // DEBUG: Log what we're about to save
             console.log('📋 Recipe data to save:', {

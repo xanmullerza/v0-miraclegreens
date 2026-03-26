@@ -1,5 +1,5 @@
 import { ParsedRecipe } from '@/types/recipe';
-import { RecipeIngredient } from '@/components/recipe/ingredient-builder';
+import { parseRecipeAmount } from './parsing-utils';
 
 const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -70,11 +70,113 @@ export const parseIngredientAmount = (ingredientLine: string) => {
 };
 
 /**
+ * Robustly parses a full recipe text string into structured components.
+ * Tries to identify title, servings, prep time, ingredients and instructions.
+ */
+export const parseRecipeText = (text: string) => {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    
+    const result = {
+        title: '',
+        prepTime: 30,
+        servings: 4,
+        ingredients: [] as { item: string; amount: string; weightG?: number; modifier?: string }[],
+        instructions: [] as string[]
+    };
+
+    if (lines.length === 0) return result;
+
+    let mode: 'none' | 'ingredients' | 'instructions' = 'none';
+    
+    // First line is often title
+    result.title = lines[0].replace(/^[#\s=]+|[#\s=]+$/g, '');
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const lower = line.toLowerCase();
+
+        // Detect sections
+        if (lower.match(/^(ingredients|protocol components|list of components|what you'll need):?\s*$/i)) {
+            mode = 'ingredients';
+            continue;
+        }
+        if (lower.match(/^(instructions|method|steps|preparation|directions|how to make):?\s*$/i)) {
+            mode = 'instructions';
+            continue;
+        }
+
+        // Parse servings/prep time if found
+        const servingsMatch = lower.match(/(?:servings|yields?|makes?):\s*(\d+)/i);
+        if (servingsMatch) result.servings = parseInt(servingsMatch[1]);
+
+        const timeMatch = lower.match(/(?:prep|preparation|cook|total)\s*time:\s*(\d+)\s*(?:min|hour|hr)/i);
+        if (timeMatch) result.prepTime = parseInt(timeMatch[1]);
+
+        // Process based on mode
+        if (mode === 'ingredients') {
+            const parsedArray = parseIngredientsOnly(line);
+            if (parsedArray.length > 0) {
+                const parsed = parsedArray[0];
+                if (parsed && parsed.item.length > 1) {
+                    result.ingredients.push(parsed);
+                }
+            }
+        } else if (mode === 'instructions') {
+            const step = line.replace(/^\d+\.\s*|^\s*[-•*]\s+/, '').trim();
+            if (step.length > 3) {
+                result.instructions.push(step);
+            }
+        }
+    }
+
+    // Fallback logic if no sections found
+    if (result.ingredients.length === 0 && result.instructions.length === 0) {
+        const half = Math.floor(lines.length / 2);
+        result.ingredients = parseIngredientsOnly(lines.slice(0, half + 1).join('\n'));
+        result.instructions = parseInstructionsOnly(lines.slice(half + 1).join('\n'));
+    }
+
+    return result;
+};
+
+/**
+ * Extracts structured ingredient data from a block of text.
+ */
+export const parseIngredientsOnly = (text: string) => {
+    return text.split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0 && !line.toLowerCase().startsWith('ingredients:'))
+        .map(line => {
+            // Use existing parseIngredientAmount to be consistent
+            const { quantity, measure, foodName } = parseIngredientAmount(line);
+            
+            return {
+                item: foodName,
+                amount: `${quantity} ${measure}`,
+                weightG: (measure === 'g') ? quantity : undefined,
+                modifier: ''
+            };
+        });
+};
+
+/**
+ * Extracts just the instructions from a block of text.
+ */
+export const parseInstructionsOnly = (text: string) => {
+    return text.split(/\n\s*\n|\n(?=\d+\.|\s*[-•*]\s+)/)
+        .map(step => step.replace(/^\d+\.\s*|^\s*[-•*]\s+/, '').trim())
+        .filter(step => step.length > 2);
+};
+
+/**
  * Converts a ParsedRecipe into structured data ready for saving.
+ * This is used by the Chatbot to finalize a recipe before database insertion.
  */
 export const structureRecipeForSaving = (recipe: ParsedRecipe) => {
+    if (!recipe) return null;
+
     // Ingredients
-    const ingredientsList = recipe.ingredients_text
+    const ingredientsList = (recipe.ingredients_text || '')
         .split('\n')
         .filter(line => line.trim())
         .map((line, idx) => {
@@ -89,11 +191,11 @@ export const structureRecipeForSaving = (recipe: ParsedRecipe) => {
                 protein: 0,
                 fat: 0,
                 carbs: 0,
-            } as any; // Cast to any to avoid complex type intersection issues here
+            } as any;
         });
 
     // Instructions
-    const instructionsList = recipe.instructions_text
+    const instructionsList = (recipe.instructions_text || '')
         .split('\n')
         .filter(line => line.trim());
 

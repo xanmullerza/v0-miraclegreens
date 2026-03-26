@@ -1,7 +1,7 @@
 import React from 'react';
 import { Camera, Loader2, Save, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ParsedRecipe } from '@/components/chatbot-modal';
+import { ParsedRecipe } from '@/types/recipe';
 
 interface RecipeImportViewProps {
     isLoading: boolean;
