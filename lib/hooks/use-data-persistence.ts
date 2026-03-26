@@ -158,8 +158,16 @@ export function useDataPersistence() {
             if (user) {
                 // SAVE TO CLOUD
                 const recipeId = recipe.id || generateId();
+                // Strip fields that don't exist on the 'recipes' table before saving
+                const { 
+                    phytonutrients, 
+                    ingredients: _ingredients, 
+                    instructions: _instructions,
+                    food_item,
+                    ...cleanRecipe 
+                } = recipe;
                 const recipeData = {
-                    ...recipe,
+                    ...cleanRecipe,
                     id: recipeId,
                     user_id: user.id,
                     is_curated: false,
