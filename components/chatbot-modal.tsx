@@ -26,6 +26,7 @@ import { ChatbotLifeguardFullIntegration } from '@/components/chatbot-lifeguard-
 import { ChatbotHelpSection } from '@/components/chatbot-help-section';
 import { ChatbotExport } from '@/components/chatbot-export';
 import { ChatbotShare } from '@/components/chatbot-share';
+import { RDAContent } from '@/components/rda-content';
 import ProfilePage from '@/app/(main)/profile/page';
 import { toast } from 'sonner';
 import { HeaderLogo } from '@/components/ui/header-logo';
@@ -851,10 +852,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-teal-500 transition-colors">Lifeguard</span>
                             </button>
 
-                            <div className="flex flex-col items-center justify-center gap-2 p-2 text-center opacity-40">
-                                <span className="text-3xl">⏳</span>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Coming Soon</span>
-                            </div>
+                            <button
+                                onClick={() => {
+                                    setPreviousView('widgetsMenu');
+                                    setChatbotView('recommended-intake');
+                                }}
+                                className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
+                            >
+                                <span className="text-3xl transition-all">📊</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">RDA</span>
+                            </button>
                         </div>
                     </div>
                 )}
@@ -981,6 +988,23 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </button>
                             ))
                         )}
+                    </div>
+                )}
+
+                {/* Recommended Intake View */}
+                {!showRecipeBuilder && chatbotView === 'recommended-intake' && (
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        <div className="flex justify-end p-4 pb-2">
+                            <button
+                                onClick={() => setChatbotView(previousView || 'dashboard')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-secondary text-secondary-foreground hover:bg-muted transition-colors uppercase tracking-widest"
+                            >
+                                🏠 Back
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <RDAContent compact={false} />
+                        </div>
                     </div>
                 )}
 
