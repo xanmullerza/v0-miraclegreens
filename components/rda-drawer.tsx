@@ -99,8 +99,8 @@ export function RDADrawer() {
                     if (isDesktop) e.preventDefault();
                 }}
             >
-                <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800">
-                    <SheetTitle className="text-lg font-black text-purple-400 uppercase tracking-widest font-sans">Recommended Intake</SheetTitle>
+                <SheetHeader className="bg-gradient-to-br from-emerald-50/10 to-emerald-100/5 dark:from-emerald-950/30 dark:to-emerald-900/10 p-6 border-b border-emerald-500/20">
+                    <SheetTitle className="text-lg font-black text-emerald-400 uppercase tracking-widest font-sans">Recommended Intake</SheetTitle>
                 </SheetHeader>
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
                     {/* view toggles */}
@@ -111,7 +111,7 @@ export function RDADrawer() {
                                 className={cn(
                                     "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
                                     !showSafety
-                                        ? "bg-slate-800 text-purple-400 shadow-lg"
+                                        ? "bg-slate-800 text-emerald-400 shadow-lg"
                                         : "text-slate-500 hover:text-slate-300"
                                 )}
                             >
@@ -122,7 +122,7 @@ export function RDADrawer() {
                                 className={cn(
                                     "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
                                     showSafety
-                                        ? "bg-slate-800 text-purple-400 shadow-lg"
+                                        ? "bg-slate-800 text-emerald-400 shadow-lg"
                                         : "text-slate-500 hover:text-slate-300"
                                 )}
                             >
@@ -160,8 +160,8 @@ export function RDADrawer() {
 
                             return (
                                 <div key={idx} className="space-y-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500/60 pl-1 font-sans">{cat.title}</h4>
-                                    <div className="space-y-1">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/80 pl-1 font-sans">{cat.title}</h4>
+                                    <div className="space-y-1.5">
                                         {availableNutrients.map(([nutrient, value]) => {
                                             const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g') || cat.title === "Amino Acids") ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
                                             // compute display value depending on view
@@ -176,11 +176,11 @@ export function RDADrawer() {
                                                 displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
                                             }
                                             return (
-                                                <div key={nutrient} className="bg-slate-900/40 px-5 py-3 rounded-2xl flex items-center justify-between hover:bg-slate-900 transition-colors group/item border border-transparent hover:border-slate-800">
+                                                <div key={nutrient} className="bg-gradient-to-br from-emerald-50/5 to-emerald-100/[0.02] dark:from-emerald-950/20 dark:to-emerald-900/10 px-5 py-3 rounded-2xl flex items-center justify-between hover:bg-gradient-to-br hover:from-emerald-50/10 hover:to-emerald-100/5 dark:hover:from-emerald-950/30 dark:hover:to-emerald-900/20 transition-all group/item border border-emerald-500/10 hover:border-emerald-500/20">
                                                     <div className="flex flex-col min-w-0 pr-2">
                                                         <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-200 transition-colors leading-none font-sans">{nutrient}</p>
                                                         {['ALA', 'EPA', 'Histidine', 'Leucine', 'Isoleucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Threonine', 'Tryptophan', 'Valine'].includes(nutrient) && (
-                                                            <span className="text-[7px] text-blue-500 font-black uppercase mt-1 tracking-widest font-sans">Constituent</span>
+                                                            <span className="text-[7px] text-emerald-500 font-black uppercase mt-1 tracking-widest font-sans">Constituent</span>
                                                         )}
                                                     </div>
                                                     <div className="flex items-baseline gap-1 font-sans">
@@ -199,10 +199,10 @@ export function RDADrawer() {
 
                 </div>
 
-                <div className="p-6 border-t border-slate-800 bg-slate-900/50">
-                    <div className="bg-purple-500/5 rounded-2xl p-4 border border-purple-500/10">
+                <div className="p-6 border-t border-emerald-500/20 bg-gradient-to-br from-emerald-950/40 to-emerald-900/20">
+                    <div className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20">
                         <div className="flex items-start gap-3">
-                            <Info size={14} className="text-purple-500 mt-0.5" />
+                            <Info size={14} className="text-emerald-500 mt-0.5" />
                             <p className="text-[9px] leading-relaxed text-slate-400 uppercase tracking-tight font-bold">
                                 These values reflect your current bio-data presets. Updating your weight or activity level will automatically recalibrate these targets.
                             </p>

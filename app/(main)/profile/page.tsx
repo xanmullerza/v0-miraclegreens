@@ -427,7 +427,7 @@ function ProfilePageContent() {
                     <div className="flex items-center gap-2 pt-4">
                         <Button
                             variant="outline"
-                            className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-purple-500/30 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 rounded-xl transition-all"
+                            className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
                             onClick={() => setShowRDADrawer(true)}
                         >
                             <Target size={14} className="mr-2" />
@@ -487,7 +487,7 @@ function ProfilePageContent() {
                                         </div>
                                         <div className="text-left">
                                             <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Know Your Profile</p>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Basic Information</p>
                                         </div>
                                     </div>
                                     <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'identification' ? "rotate-180" : "")}>
