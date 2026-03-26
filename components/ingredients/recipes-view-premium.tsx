@@ -25,7 +25,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/lib/context/chatbot-context';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { RecipesView, MEAL_TYPES } from '@/components/ingredients/recipes-view';
+import { RecipeFilterDialog } from '@/components/recipe/recipe-filter-dialog';
 
 type TabId = 'recipes' | 'remixes' | 'mixes';
 
@@ -46,6 +48,7 @@ export function RecipesViewPremium({
 }: RecipesViewPremiumProps) {
     const router = useRouter();
     const { setIsChatbotOpen, setChatbotView } = useChatbot();
+    const { hasActiveFilters } = useRecipeFilter();
 
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
     const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
@@ -55,6 +58,7 @@ export function RecipesViewPremium({
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
+    const [showFilterDialog, setShowFilterDialog] = useState(false);
 
     const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : localSearchQuery;
     const onSearchChange = externalOnSearchChange !== undefined ? externalOnSearchChange : setLocalSearchQuery;
@@ -260,7 +264,7 @@ export function RecipesViewPremium({
                             <DropdownMenuTrigger asChild>
                                 <button className={cn(
                                     "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
-                                    (showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length))
+                                    (showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length) || hasActiveFilters)
                                         ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
                                         : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
                                 )}>
@@ -298,12 +302,27 @@ export function RecipesViewPremium({
                                             {type}
                                         </DropdownMenuCheckboxItem>
                                     ))}
+                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                    <div className="px-1 py-1">
+                                        <button
+                                            onClick={() => setShowFilterDialog(true)}
+                                            className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-xl transition-colors mt-1"
+                                        >
+                                            Advanced Filters →
+                                        </button>
+                                    </div>
                                 </div>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
                 </div>
             </div>
+
+            {/* Recipe Filter Dialog */}
+            <RecipeFilterDialog 
+                isOpen={showFilterDialog} 
+                onClose={() => setShowFilterDialog(false)} 
+            />
 
             {/* Recipe List */}
             <div className="flex-1 overflow-hidden">
