@@ -150,55 +150,65 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             }
         }
 
-        // 2. Then sync from Cloud (consistent across devices)
+        // 2. Define Sync Logic
+        const syncProfile = async (sessionUser: any) => {
+            if (!sessionUser) return;
+
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', sessionUser.id)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Error fetching profile:', error);
+                return;
+            }
+
+            if (data) {
+                const cloudProfile: UserProfile = {
+                    name: data.full_name || "",
+                    nickname: data.nickname || "",
+                    gender: data.gender || "female",
+                    age: data.age || "",
+                    weight: data.weight || "",
+                    height: data.height || "",
+                    goal: data.goal || "maintain",
+                    dietType: data.dietary_preferences?.dietType || "anything",
+                    activityLevel: data.activity_level || "sedentary",
+                    nutrientStrategy: data.nutrient_strategy || "balanced",
+                    exclusions: data.dietary_preferences?.exclusions || [],
+                    healthConditions: data.health_conditions || [],
+                    country: data.country || "Australia",
+                    familyMembers: data.family_members || [],
+                    isPremium: data.is_premium || false
+                };
+                setProfileState(cloudProfile);
+                localStorage.setItem("userProfile", JSON.stringify(cloudProfile));
+            } else {
+                // Profile doesn't exist yet, create one with defaults
+                const { error: insertError } = await supabase.from('profiles').insert({
+                    id: sessionUser.id,
+                    full_name: sessionUser.user_metadata?.full_name || "",
+                    avatar_url: sessionUser.user_metadata?.avatar_url || null
+                });
+                if (insertError) console.error('Error creating profile:', insertError);
+            }
+        };
+
+        // 3. Initial sync
         supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session?.user) {
-                supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .maybeSingle()
-                    .then(({ data, error }) => {
-                        if (error) {
-                            console.error('Error fetching profile:', error);
-                            return;
-                        }
-                        
-                        if (data) {
-                            const cloudProfile: UserProfile = {
-                                name: data.full_name || "",
-                                nickname: data.nickname || "",
-                                gender: data.gender || "female",
-                                age: data.age || "",
-                                weight: data.weight || "",
-                                height: data.height || "",
-                                goal: data.goal || "maintain",
-                                dietType: data.dietary_preferences?.dietType || "anything",
-                                activityLevel: data.activity_level || "sedentary",
-                                nutrientStrategy: data.nutrient_strategy || "balanced",
-                                exclusions: data.dietary_preferences?.exclusions || [],
-                                healthConditions: data.health_conditions || [],
-                                country: data.country || "Australia",
-                                familyMembers: data.family_members || [],
-                                isPremium: data.is_premium || false
-                            };
-                            setProfileState(cloudProfile);
-                            localStorage.setItem("userProfile", JSON.stringify(cloudProfile));
-                        } else {
-                            // Profile doesn't exist yet, create one with defaults
-                            supabase.from('profiles').insert({
-                                id: session.user.id,
-                                full_name: session.user.user_metadata?.full_name || "",
-                                avatar_url: session.user.user_metadata?.avatar_url || null
-                            }).then(({ error }) => {
-                                if (error) console.error('Error creating profile:', error);
-                            });
-                        }
-                    });
+            if (session?.user) syncProfile(session.user);
+        });
+
+        // 4. Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+                if (session?.user) syncProfile(session.user);
             }
         });
 
-        // 3. Request Persistent Storage (Best practice for Mobile)
+        // 5. Request Persistent Storage (Best practice for Mobile)
         if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().then(persistent => {
                 if (persistent) {
@@ -206,6 +216,10 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                 }
             });
         }
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, []);
 
     const setEnergyUnit = (unit: EnergyUnit) => {
