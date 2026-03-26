@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { PageContainer } from '@/components/ui/page-container';
-import { Shield, Scale, Globe } from 'lucide-react';
+import { Shield, Scale, Globe, BookOpen, TrendingUp, Users, Settings } from 'lucide-react';
 import { Carousel } from '@/components/ui/carousel';
 
 export default function AboutUsPage() {
@@ -75,7 +75,72 @@ export default function AboutUsPage() {
                             })}
                         </Carousel>
                     </section>
-                </div>
+
+                    {/* Features Grid Section */}
+                    <section className="space-y-8 mt-16">
+                        <div className="text-center space-y-2">
+                            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+                                Explore Vitala
+                            </h2>
+                            <p className="text-slate-500 font-medium">
+                                Access powerful tools to optimize your nutrition
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Cookbook Card */}
+                            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
+                                <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
+                                    <BookOpen size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Cookbook</h3>
+                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
+                                        Discover and create nutritious recipes tailored to your dietary goals.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Tracker Card */}
+                            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
+                                <div className="w-12 h-12 rounded-2xl bg-green-500/10 text-green-500 flex items-center justify-center">
+                                    <TrendingUp size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Tracker</h3>
+                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
+                                        Monitor your nutritional intake and reach your health targets daily.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Coach Card */}
+                            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                                    <Users size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Coach</h3>
+                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
+                                        Get personalized guidance and insights from your AI nutrition coach.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Settings Card */}
+                            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
+                                <div className="w-12 h-12 rounded-2xl bg-slate-500/10 text-slate-500 flex items-center justify-center">
+                                    <Settings size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Settings</h3>
+                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
+                                        Customize your preferences and manage your account.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
             </main>
         </PageContainer>
     );
