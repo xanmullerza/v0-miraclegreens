@@ -3368,151 +3368,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                     Mixes
                                 </button>
                             </div>
-
-                            {/* Ownership Toggle and Filter */}
-                            <div className="flex items-center justify-between gap-4">
-                                <div className="flex items-center gap-3 bg-slate-100/50 dark:bg-slate-900/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0">
-                                    <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", !showOnlyMyRecipes ? "text-emerald-500" : "text-slate-400")}>All</span>
-                                    <button
-                                        onClick={() => setShowOnlyMyRecipes(!showOnlyMyRecipes)}
-                                        className={cn(
-                                            "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
-                                            showOnlyMyRecipes ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"
-                                        )}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform",
-                                                showOnlyMyRecipes ? "translate-x-4.5" : "translate-x-1"
-                                            )}
-                                        />
-                                    </button>
-                                    <span className={cn("text-[9px] font-black uppercase tracking-widest transition-colors", showOnlyMyRecipes ? "text-indigo-500" : "text-slate-400")}>Mine</span>
-                                </div>
-
-                                {/* Search Bar */}
-                                <div className="flex-1 relative max-w-[180px]">
-                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        value={recipeSearchQuery}
-                                        onChange={(e) => setRecipeSearchQuery(e.target.value)}
-                                        placeholder="Search recipes..."
-                                        className="w-full pl-9 pr-8 py-1.5 rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-[10px] font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500/50 placeholder:text-slate-400 transition-all"
-                                    />
-                                    {recipeSearchQuery && (
-                                        <button 
-                                            onClick={() => setRecipeSearchQuery('')}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                                        >
-                                            <X size={12} />
-                                        </button>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center gap-1.5">
-                                    {/* Add Button */}
-                                    <button
-                                        onClick={() => setChatbotView('import')}
-                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-emerald-500 hover:text-emerald-600 shrink-0"
-                                        title="Add Recipe"
-                                    >
-                                        <Plus size={18} />
-                                    </button>
-
-                                    {/* Help Button */}
-                                    <button
-                                        onClick={() => setChatbotView('help-cookbook')}
-                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-blue-500 hover:text-blue-600 shrink-0"
-                                        title="Cookbook Help"
-                                    >
-                                        <CircleHelp size={18} />
-                                    </button>
-
-                                    {/* Sort Button */}
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setShowSortOptions(!showSortOptions)}
-                                            className={cn(
-                                                "p-1.5 rounded-lg transition-colors flex items-center gap-1",
-                                                showSortOptions 
-                                                    ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" 
-                                                    : "hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500"
-                                            )}
-                                            title="Sort Recipes"
-                                        >
-                                            <ArrowDownUp size={18} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
-                                                {sortField === 'title' ? 'A-Z' : sortField === 'prep_time' ? 'Time' : sortField === 'calories' ? 'Cal' : 'Diff'}
-                                            </span>
-                                        </button>
-
-                                        {showSortOptions && (
-                                            <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] p-1 animate-in fade-in zoom-in-95 duration-100">
-                                                {[
-                                                    { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
-                                                    { id: 'prep_time', label: 'Prep Time', icon: <Clock size={14} /> },
-                                                    { id: 'difficulty', label: 'Difficulty', icon: <ChefHat size={14} /> },
-                                                    { id: 'calories', label: 'Calories', icon: <Salad size={14} /> },
-                                                ].map((opt) => (
-                                                    <button
-                                                        key={opt.id}
-                                                        onClick={() => {
-                                                            if (sortField === opt.id) {
-                                                                setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-                                                            } else {
-                                                                setSortField(opt.id);
-                                                                setSortDirection('asc');
-                                                            }
-                                                            setShowSortOptions(false);
-                                                        }}
-                                                        className={cn(
-                                                            "w-full text-left px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center justify-between transition-colors",
-                                                            sortField === opt.id
-                                                                ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600"
-                                                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                        )}
-                                                    >
-                                                        <span className="flex items-center gap-2">
-                                                            {opt.icon}
-                                                            {opt.label}
-                                                        </span>
-                                                        {sortField === opt.id && (
-                                                            <span className="text-[10px]">
-                                                                {sortDirection === 'asc' ? '↑' : '↓'}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Filter Button */}
-                                    <button
-                                        onClick={() => setShowFilterDialog(true)}
-                                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-emerald-500 shrink-0"
-                                        title="Filter Recipes"
-                                    >
-                                        <Filter size={18} />
-                                    </button>
-                                </div>
-                            </div>
                         </div>
-                        
+
                         {/* Recipes View */}
-                        <div className="flex-1">
+                        <div className="flex-1 overflow-hidden">
                             <RecipesView 
-                                key={`${cookbookTab}-${showOnlyMyRecipes}`}
+                                key={`${cookbookTab}`}
                                 onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
-                                hideControls={true}
+                                hideControls={false}
                                 isMix={cookbookTab === 'mixes'}
                                 isRemix={cookbookTab === 'remixes'}
-                                onlyMyRecipes={showOnlyMyRecipes}
-                                 sortField={sortField}
-                                sortDirection={sortDirection}
-                                searchQuery={recipeSearchQuery}
-                                onSearchChange={setRecipeSearchQuery}
                             />
                         </div>
                     </div>
