@@ -476,13 +476,13 @@ function ProfilePageContent() {
                     <div className="max-w-2xl w-full space-y-8 pb-32">
                         <div className="grid grid-cols-1 gap-8">
                             {/* Measures Card */}
-                            <section className="space-y-0">
+                            <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('measures')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
                                             <Globe size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -490,13 +490,13 @@ function ProfilePageContent() {
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
                                         </div>
                                     </div>
-                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'measures' ? "rotate-180" : "")}>
+                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'measures' ? "rotate-180" : "")}>
                                         <ChevronDown size={20} />
                                     </div>
                                 </button>
                                 
                                 {expandedAccordion === 'measures' && (
-                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
+                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
                                     {/* Country Selector */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
@@ -508,8 +508,8 @@ function ProfilePageContent() {
                                                     className={cn(
                                                         "px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
                                                         formData.country === country
-                                                            ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm"
-                                                            : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:text-purple-600 dark:hover:text-purple-400"
+                                                            ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                                                            : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400"
                                                     )}
                                                 >
                                                     {country}
@@ -527,7 +527,7 @@ function ProfilePageContent() {
                                                     onClick={(e) => { e.preventDefault(); setEnergyUnit("kJ"); }}
                                                     className={cn(
                                                         "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                        energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                        energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                     )}
                                                 >
                                                     <Zap size={14} /> kJ
@@ -536,7 +536,7 @@ function ProfilePageContent() {
                                                     onClick={(e) => { e.preventDefault(); setEnergyUnit("kcal"); }}
                                                     className={cn(
                                                         "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                        energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                        energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                     )}
                                                 >
                                                     <Flame size={14} /> kcal
@@ -552,7 +552,7 @@ function ProfilePageContent() {
                                                     onClick={(e) => { e.preventDefault(); setMeasurementUnit("metric"); }}
                                                     className={cn(
                                                         "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                        measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                        measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                     )}
                                                 >
                                                     <Scale size={14} /> Metric
@@ -561,7 +561,7 @@ function ProfilePageContent() {
                                                     onClick={(e) => { e.preventDefault(); setMeasurementUnit("imperial"); }}
                                                     className={cn(
                                                         "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                        measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                        measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                     )}
                                                 >
                                                     <Scale size={14} /> Imperial
@@ -609,13 +609,13 @@ function ProfilePageContent() {
                             </section>
 
                             {/* Identification Card */}
-                            <section className="space-y-0">
+                            <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('identification')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
                                             <User size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -623,13 +623,13 @@ function ProfilePageContent() {
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Know Your Profile</p>
                                         </div>
                                     </div>
-                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'identification' ? "rotate-180" : "")}>
+                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'identification' ? "rotate-180" : "")}>
                                         <ChevronDown size={20} />
                                     </div>
                                 </button>
                                 
                                 {expandedAccordion === 'identification' && (
-                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
+                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-6 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
                                         <Input
@@ -645,13 +645,13 @@ function ProfilePageContent() {
                                             <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
                                                 <button
                                                     onClick={() => setFormData({ ...formData, gender: 'male' })}
-                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
                                                 >
                                                     M
                                                 </button>
                                                 <button
                                                     onClick={() => setFormData({ ...formData, gender: 'female' })}
-                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
                                                 >
                                                     F
                                                 </button>
@@ -668,7 +668,7 @@ function ProfilePageContent() {
                                                     className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
                                                 />
                                                 <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
                                                         <ChevronUp size={12} />
                                                     </button>
                                                     <button onClick={() => setFormData(prev => ({ ...prev, age: Math.max(0, (Number(prev.age) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
@@ -688,7 +688,7 @@ function ProfilePageContent() {
                                                     className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
                                                 />
                                                 <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
                                                         <ChevronUp size={12} />
                                                     </button>
                                                     <button onClick={() => setFormData(prev => ({ ...prev, weight: Math.max(0, (Number(prev.weight) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
@@ -722,7 +722,7 @@ function ProfilePageContent() {
                                     {/* BMR Result Section */}
                                     <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
+                                            <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
                                                 <Flame size={16} />
                                             </div>
                                             <div>
@@ -753,13 +753,13 @@ function ProfilePageContent() {
                             </section>
 
                             {/* Goals Card */}
-                            <section className="space-y-0">
+                            <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('goals')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
                                             <Activity size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -767,13 +767,13 @@ function ProfilePageContent() {
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Fitness Direction</p>
                                         </div>
                                     </div>
-                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'goals' ? "rotate-180" : "")}>
+                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'goals' ? "rotate-180" : "")}>
                                         <ChevronDown size={20} />
                                     </div>
                                 </button>
                                 
                                 {expandedAccordion === 'goals' && (
-                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
+                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
                                     {/* Biological Goal */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
@@ -797,7 +797,7 @@ function ProfilePageContent() {
                                     {/* TDEE Result Section */}
                                     <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
+                                            <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
                                                 <Target size={16} />
                                             </div>
                                             <div>
@@ -816,7 +816,7 @@ function ProfilePageContent() {
                                                     {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
                                                 </span>
                                             </div>
-                                            <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
+                                            <p className="text-[9px] font-black text-emerald-500/60 uppercase tracking-widest mt-0.5">
                                                 Daily Target Energy
                                             </p>
                                         </div>
@@ -826,13 +826,13 @@ function ProfilePageContent() {
                             </section>
 
                             {/* Dietary Profile Card */}
-                            <section className="space-y-0">
+                            <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('dietary')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
                                             <Utensils size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -840,13 +840,13 @@ function ProfilePageContent() {
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutritional Approach</p>
                                         </div>
                                     </div>
-                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'dietary' ? "rotate-180" : "")}>
+                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'dietary' ? "rotate-180" : "")}>
                                         <ChevronDown size={20} />
                                     </div>
                                 </button>
                                 
                                 {expandedAccordion === 'dietary' && (
-                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
+                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-6 space-y-6 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
                                     {/* Dietary Protocol */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
@@ -877,10 +877,10 @@ function ProfilePageContent() {
                             <section className="space-y-0">
                                 <button 
                                     onClick={() => toggleAccordion('health')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
                                             <Zap size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -888,13 +888,13 @@ function ProfilePageContent() {
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
                                         </div>
                                     </div>
-                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'health' ? "rotate-180" : "")}>
+                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'health' ? "rotate-180" : "")}>
                                         <ChevronDown size={20} />
                                     </div>
                                 </button>
                                 
                                 {expandedAccordion === 'health' && (
-                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
+                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
                                     <div>
                                         <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
                                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
@@ -964,13 +964,13 @@ function ProfilePageContent() {
                             </section>
 
                             {/* App Settings Card */}
-                            <section className="space-y-0">
+                            <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('settings')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-white dark:bg-slate-950 rounded-t-3xl hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-colors group"
+                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500 group-hover:bg-purple-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
                                             <Settings size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -978,13 +978,13 @@ function ProfilePageContent() {
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Interface & Display</p>
                                         </div>
                                     </div>
-                                    <div className={cn("text-purple-500 transition-transform duration-300", expandedAccordion === 'settings' ? "rotate-180" : "")}>
+                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'settings' ? "rotate-180" : "")}>
                                         <ChevronDown size={20} />
                                     </div>
                                 </button>
                                 
                                 {expandedAccordion === 'settings' && (
-                                <div className="bg-white dark:bg-slate-950 rounded-b-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50 border-t border-slate-100 dark:border-slate-800">
+                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
                                     {/* Show Heroes */}
                                     <div className="space-y-3">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Dashboard Hero Sections</Label>
@@ -993,7 +993,7 @@ function ProfilePageContent() {
                                                 onClick={() => setShowHeroes(true)}
                                                 className={cn(
                                                     "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                                    showHeroes ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    showHeroes ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                 )}
                                                 title="Show hero sections with welcome and overview"
                                             >
@@ -1003,7 +1003,7 @@ function ProfilePageContent() {
                                                 onClick={() => setShowHeroes(false)}
                                                 className={cn(
                                                     "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                                    !showHeroes ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    !showHeroes ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                 )}
                                                 title="Hide hero sections for experienced users"
                                             >
@@ -1021,7 +1021,7 @@ function ProfilePageContent() {
                                                 onClick={() => setHeaderStyle('labels')}
                                                 className={cn(
                                                     "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                                    headerStyle === 'labels' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    headerStyle === 'labels' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                 )}
                                                 title="Show text labels in the header breadcrumb bar"
                                             >
@@ -1031,7 +1031,7 @@ function ProfilePageContent() {
                                                 onClick={() => setHeaderStyle('icons')}
                                                 className={cn(
                                                     "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                                    headerStyle === 'icons' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    headerStyle === 'icons' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                 )}
                                                 title="Show icons in the header breadcrumb bar"
                                             >
@@ -1049,7 +1049,7 @@ function ProfilePageContent() {
                                                 onClick={() => setTheme("light")}
                                                 className={cn(
                                                     "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                                    theme === "light" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    theme === "light" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                 )}
                                             >
                                                 <Sun size={12} /> Light
@@ -1058,7 +1058,7 @@ function ProfilePageContent() {
                                                 onClick={() => setTheme("dark")}
                                                 className={cn(
                                                     "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                                    theme === "dark" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    theme === "dark" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                 )}
                                             >
                                                 <Moon size={12} /> Dark
@@ -1067,7 +1067,7 @@ function ProfilePageContent() {
                                                 onClick={() => setTheme("system")}
                                                 className={cn(
                                                     "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                                    theme === "system" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    theme === "system" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                                 )}
                                             >
                                                 <Monitor size={12} /> System
