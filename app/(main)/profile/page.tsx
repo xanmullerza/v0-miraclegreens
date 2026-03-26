@@ -479,10 +479,10 @@ function ProfilePageContent() {
                             <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('measures')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
+                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
                                             <Globe size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -496,7 +496,7 @@ function ProfilePageContent() {
                                 </button>
                                 
                                 {expandedAccordion === 'measures' && (
-                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
+                                <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
                                     {/* Country Selector */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
@@ -612,10 +612,10 @@ function ProfilePageContent() {
                             <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('identification')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
+                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
                                             <User size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -756,10 +756,10 @@ function ProfilePageContent() {
                             <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('goals')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
+                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
                                             <Activity size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -773,7 +773,7 @@ function ProfilePageContent() {
                                 </button>
                                 
                                 {expandedAccordion === 'goals' && (
-                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
+                                <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
                                     {/* Biological Goal */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
@@ -829,10 +829,10 @@ function ProfilePageContent() {
                             <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('dietary')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
+                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
                                             <Utensils size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -846,7 +846,7 @@ function ProfilePageContent() {
                                 </button>
                                 
                                 {expandedAccordion === 'dietary' && (
-                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-6 space-y-6 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
+                                <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
                                     {/* Dietary Protocol */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
@@ -877,10 +877,10 @@ function ProfilePageContent() {
                             <section className="space-y-0">
                                 <button 
                                     onClick={() => toggleAccordion('health')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
+                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
                                             <Zap size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -894,7 +894,7 @@ function ProfilePageContent() {
                                 </button>
                                 
                                 {expandedAccordion === 'health' && (
-                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
+                                <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
                                     <div>
                                         <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
                                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
@@ -967,10 +967,10 @@ function ProfilePageContent() {
                             <section className="space-y-1">
                                 <button 
                                     onClick={() => toggleAccordion('settings')}
-                                    className="w-full flex items-center justify-between gap-4 p-6 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-t-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 transition-all hover:shadow-md group"
+                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
                                 >
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
+                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
                                             <Settings size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div className="text-left">
@@ -984,7 +984,7 @@ function ProfilePageContent() {
                                 </button>
                                 
                                 {expandedAccordion === 'settings' && (
-                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
+                                <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
                                     {/* Show Heroes */}
                                     <div className="space-y-3">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Dashboard Hero Sections</Label>
