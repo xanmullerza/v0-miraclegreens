@@ -993,18 +993,12 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Recommended Intake View */}
                 {!showRecipeBuilder && chatbotView === 'recommended-intake' && (
-                    <div className="flex-1 flex flex-col overflow-hidden">
-                        <div className="flex justify-end p-4 pb-2">
-                            <button
-                                onClick={() => setChatbotView(previousView || 'dashboard')}
-                                className="px-3 py-1.5 rounded-lg text-xs font-black bg-secondary text-secondary-foreground hover:bg-muted transition-colors uppercase tracking-widest"
-                            >
-                                🏠 Back
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                            <RDAContent compact={false} />
-                        </div>
+                    <div className="flex-1 overflow-hidden">
+                        <RDAContent 
+                            compact={false} 
+                            showBackButton={true}
+                            onBack={() => setChatbotView(previousView || 'widgetsMenu')}
+                        />
                     </div>
                 )}
 
