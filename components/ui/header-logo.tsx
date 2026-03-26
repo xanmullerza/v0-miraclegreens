@@ -77,11 +77,11 @@ export function HeaderLogo({
 
                 {/* Main App Navigation (Next to Logo) */}
                 <div className="flex items-center ml-2 sm:ml-6 gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
-                    {[
+                    { [
                         { label: 'Mission', path: '/about-us', icon: Info, color: 'text-purple-500' },
-                        { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500', chatbotView: 'view-recipes' },
-                        { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500', chatbotView: 'pantry' },
-                        { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500', chatbotView: 'nutridex' },
+                        { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
+                        { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
+                        { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500' },
                     ].map((item: any) => {
                         const Icon = item.icon;
                         const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');
@@ -90,14 +90,10 @@ export function HeaderLogo({
                         return (
                             <Link
                                 key={item.path}
-                                href={profile.isPremium || !item.chatbotView ? item.path : '#'}
-                                onClick={(e: React.MouseEvent) => {
+                                href={item.path}
+                                onClick={() => {
                                     if (item.label === 'Home') {
                                         setResizeMode('content-focus');
-                                    } else if (!profile.isPremium && item.chatbotView) {
-                                        e.preventDefault();
-                                        setChatbotView(item.chatbotView);
-                                        setIsChatbotOpen(true);
                                     }
                                 }}
                                 className={cn(

@@ -64,6 +64,7 @@ interface UserPreferencesContextType {
     updateDailyPlan: (plan: DailyPlan | null) => void;
     showRDADrawer: boolean;
     setShowRDADrawer: (show: boolean) => void;
+    profileLoaded: boolean;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(
@@ -96,6 +97,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
     const [dailyPlan, setDailyPlanState] = useState<DailyPlan | null>(null);
     const [showRDADrawer, setShowRDADrawer] = useState(false);
+    const [profileLoaded, setProfileLoaded] = useState(false);
 
     // Load initial data from localStorage and cloud
     useEffect(() => {
@@ -185,6 +187,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                 };
                 setProfileState(cloudProfile);
                 localStorage.setItem("userProfile", JSON.stringify(cloudProfile));
+                setProfileLoaded(true);
             } else {
                 // Profile doesn't exist yet, create one with defaults
                 const { error: insertError } = await supabase.from('profiles').insert({
@@ -193,12 +196,17 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                     avatar_url: sessionUser.user_metadata?.avatar_url || null
                 });
                 if (insertError) console.error('Error creating profile:', insertError);
+                setProfileLoaded(true);
             }
         };
 
         // 3. Initial sync
         supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session?.user) syncProfile(session.user);
+            if (session?.user) {
+                syncProfile(session.user);
+            } else {
+                setProfileLoaded(true); // No user, so profile is "loaded" as default
+            }
         });
 
         // 4. Listen for auth changes
@@ -335,7 +343,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             dailyPlan,
             updateDailyPlan,
             showRDADrawer,
-            setShowRDADrawer
+            setShowRDADrawer,
+            profileLoaded
         }}>
             {children}
         </UserPreferencesContext.Provider>
