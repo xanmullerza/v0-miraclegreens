@@ -3,16 +3,16 @@
 import React, { useState } from 'react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
-import { ArrowLeft } from 'lucide-react';
+import { X, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RDAContentProps {
     compact?: boolean;
-    showBackButton?: boolean;
-    onBack?: () => void;
+    showCloseButton?: boolean;
+    onClose?: () => void;
 }
 
-export function RDAContent({ compact = false, showBackButton = false, onBack }: RDAContentProps) {
+export function RDAContent({ compact = false, showCloseButton = false, onClose }: RDAContentProps) {
     const {
         profile,
         energyUnit,
@@ -88,13 +88,16 @@ export function RDAContent({ compact = false, showBackButton = false, onBack }: 
         )}>
             {/* Header */}
             <div className="bg-gradient-to-br from-cyan-50/10 to-cyan-100/5 dark:from-cyan-950/30 dark:to-cyan-900/10 p-6 border-b border-cyan-500/20 flex items-center justify-between">
-                <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic leading-none">Recommended Intake</h2>
-                {showBackButton && onBack && (
+                <div className="flex items-center gap-3">
+                    <Zap size={24} className="text-cyan-400" />
+                    <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic leading-none">Recommended Intake</h2>
+                </div>
+                {showCloseButton && onClose && (
                     <button
-                        onClick={onBack}
+                        onClick={onClose}
                         className="p-2 rounded-lg hover:bg-cyan-500/10 transition-colors text-cyan-400 hover:text-cyan-300"
                     >
-                        <ArrowLeft size={20} />
+                        <X size={20} />
                     </button>
                 )}
             </div>
@@ -136,7 +139,7 @@ export function RDAContent({ compact = false, showBackButton = false, onBack }: 
                     const categories = [
                         {
                             title: "Essential Macros",
-                            nutrients: ['Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'ALA', 'EPA + DHA']
+                            nutrients: ['Energy', 'Protein', 'Carbs', 'Fat']
                         },
                         {
                             title: "Minerals",
@@ -145,10 +148,6 @@ export function RDAContent({ compact = false, showBackButton = false, onBack }: 
                         {
                             title: "Vitamins & Choline",
                             nutrients: ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B7 (Biotin)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline']
-                        },
-                        {
-                            title: "Amino Acids",
-                            nutrients: ['Histidine', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Threonine', 'Tryptophan', 'Valine']
                         }
                     ];
 
@@ -177,9 +176,7 @@ export function RDAContent({ compact = false, showBackButton = false, onBack }: 
                                             <div key={nutrient} className="bg-gradient-to-br from-cyan-50/5 to-cyan-100/[0.02] dark:from-cyan-950/20 dark:to-cyan-900/10 px-5 py-3 rounded-2xl flex items-center justify-between hover:bg-gradient-to-br hover:from-cyan-50/10 hover:to-cyan-100/5 dark:hover:from-cyan-950/30 dark:hover:to-cyan-900/20 transition-all group/item border border-cyan-500/10 hover:border-cyan-500/20">
                                                 <div className="flex flex-col min-w-0 pr-2">
                                                     <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-200 transition-colors leading-none font-sans">{nutrient}</p>
-                                                    {['ALA', 'EPA', 'Histidine', 'Leucine', 'Isoleucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Threonine', 'Tryptophan', 'Valine'].includes(nutrient) && (
-                                                        <span className="text-[7px] text-cyan-500 font-black uppercase mt-1 tracking-widest font-sans">Constituent</span>
-                                                    )}
+
                                                 </div>
                                                 <div className="flex items-baseline gap-1 font-sans">
                                                     <span className="text-sm font-black text-white tracking-tighter leading-none">{displayVal}</span>

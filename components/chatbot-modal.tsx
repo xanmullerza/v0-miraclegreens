@@ -996,8 +996,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-hidden">
                         <RDAContent 
                             compact={false} 
-                            showBackButton={true}
-                            onBack={() => setChatbotView(previousView || 'widgetsMenu')}
+                            showCloseButton={true}
+                            onClose={() => setChatbotView(previousView || 'widgetsMenu')}
                         />
                     </div>
                 )}
