@@ -213,6 +213,29 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
                 if (session?.user) syncProfile(session.user);
+            } else if (event === 'SIGNED_OUT') {
+                // Reset to defaults
+                const defaultProfile: UserProfile = {
+                    name: "",
+                    nickname: "",
+                    gender: "female",
+                    age: "",
+                    weight: "",
+                    height: "",
+                    goal: "maintain",
+                    dietType: "anything",
+                    activityLevel: "sedentary",
+                    nutrientStrategy: "balanced",
+                    exclusions: [],
+                    healthConditions: [],
+                    country: "Oceania",
+                    familyMembers: [],
+                    isPremium: false
+                };
+                setProfileState(defaultProfile);
+                localStorage.removeItem("userProfile");
+                localStorage.removeItem("dailyPlan");
+                setProfileLoaded(true);
             }
         });
 
