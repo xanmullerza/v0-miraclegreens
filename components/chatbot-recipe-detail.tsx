@@ -585,8 +585,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                     carbs: finalCarbs,
                     fat: finalFat,
                     protein: finalProtein,
-                    micronutrients: nutrition.micronutrients,
-                    phytonutrients: nutrition.phytonutrients
+                    micronutrients: nutrition.micronutrients
                 })
                 .eq('id', recipeId);
 
