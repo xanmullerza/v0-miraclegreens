@@ -888,25 +888,19 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <ChatbotImportView
                         setChatbotView={setChatbotView}
                         handleManualRecipeCreation={handleManualRecipeCreation}
-                        recipeContentRef={recipeContentRef}
-                        pastedRecipeContent={pastedRecipeContent}
-                        setPastedRecipeContent={setPastedRecipeContent}
-                        handlePasteRecipeContent={handlePasteRecipeContent}
                         isLoading={isLoading}
+                        recipeLoading={recipeLoading}
+                        recipeSaving={recipeSaving}
+                        successRecipe={successRecipe}
+                        setSuccessRecipe={setSuccessRecipe}
                         pastedRecipeURL={pastedRecipeURL}
                         setpastedRecipeURL={setpastedRecipeURL}
                         handlePasteRecipeURL={handlePasteRecipeURL}
+                        handleSaveAndViewRecipe={handleSaveAndViewRecipe}
                         isDragging={isDragging}
                         setIsDragging={setIsDragging}
                         processRecipeImage={processRecipeImage}
                         fileInputRef={fileInputRef}
-                        isRecording={isRecording}
-                        recordingTime={recordingTime}
-                        startAudioRecording={startAudioRecording}
-                        stopAudioRecording={stopAudioRecording}
-                        videoURL={videoURL}
-                        setVideoURL={setVideoURL}
-                        toast={toast}
                     />
                 )}
 
