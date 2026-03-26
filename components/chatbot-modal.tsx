@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
-import { RecipesView } from '@/components/ingredients/recipes-view';
+import { RecipesViewPremium } from '@/components/ingredients/recipes-view-premium';
 import { MyRecipesView } from '@/components/ingredients/my-recipes-view';
 import { ChatbotRecipeDetail } from '@/components/chatbot-recipe-detail';
 import { ChatbotShopping } from '@/components/chatbot-shopping';
@@ -3331,55 +3331,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {!showRecipeBuilder && chatbotView === 'view-recipes' && (
                     <div className="flex-1 overflow-y-auto custom-scrollbar px-2 flex flex-col">
-                        {/* Tab Section */}
-                        <div className="sticky top-0 z-10 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800 space-y-4">
-                            <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1">
-                                <button 
-                                    onClick={() => setCookbookTab('recipes')} 
-                                    className={cn(
-                                        "flex-1 py-2 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all", 
-                                        cookbookTab === 'recipes' 
-                                            ? "bg-white dark:bg-slate-800 text-emerald-500 shadow-sm" 
-                                            : "text-slate-400 hover:text-slate-600"
-                                    )}
-                                >
-                                    Recipes
-                                </button>
-                                <button 
-                                    onClick={() => setCookbookTab('remixes')} 
-                                    className={cn(
-                                        "flex-1 py-2 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all", 
-                                        cookbookTab === 'remixes' 
-                                            ? "bg-white dark:bg-slate-800 text-indigo-500 shadow-sm" 
-                                            : "text-slate-400 hover:text-slate-600"
-                                    )}
-                                >
-                                    Remixes
-                                </button>
-                                <button 
-                                    onClick={() => setCookbookTab('mixes')} 
-                                    className={cn(
-                                        "flex-1 py-2 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all", 
-                                        cookbookTab === 'mixes' 
-                                            ? "bg-white dark:bg-slate-800 text-amber-500 shadow-sm" 
-                                            : "text-slate-400 hover:text-slate-600"
-                                    )}
-                                >
-                                    Mixes
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Recipes View */}
-                        <div className="flex-1 overflow-hidden">
-                            <RecipesView 
-                                key={`${cookbookTab}`}
-                                onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
-                                hideControls={false}
-                                isMix={cookbookTab === 'mixes'}
-                                isRemix={cookbookTab === 'remixes'}
-                            />
-                        </div>
+                        <RecipesViewPremium 
+                            onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
+                        />
                     </div>
                 )}
 
