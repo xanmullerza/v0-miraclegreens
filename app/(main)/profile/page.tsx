@@ -475,6 +475,150 @@ function ProfilePageContent() {
                     {/* Main Content (Compact Settings) */}
                     <div className="max-w-2xl w-full space-y-8 pb-32">
                         <div className="grid grid-cols-1 gap-8">
+                            {/* Identification Card */}
+                            <section className="space-y-1">
+                                <button 
+                                    onClick={() => toggleAccordion('identification')}
+                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
+                                >
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
+                                            <User size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Know Your Profile</p>
+                                        </div>
+                                    </div>
+                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'identification' ? "rotate-180" : "")}>
+                                        <ChevronDown size={20} />
+                                    </div>
+                                </button>
+                                
+                                {expandedAccordion === 'identification' && (
+                                <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
+                                        <Input
+                                            value={formData.nickname}
+                                            onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                                            placeholder="Enter your name"
+                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
+                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
+                                                <button
+                                                    onClick={() => setFormData({ ...formData, gender: 'male' })}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                >
+                                                    M
+                                                </button>
+                                                <button
+                                                    onClick={() => setFormData({ ...formData, gender: 'female' })}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                >
+                                                    F
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
+                                            <div className="relative group/stepper">
+                                                <Input
+                                                    type="number"
+                                                    value={formData.age === '' ? '' : formData.age}
+                                                    onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
+                                                    placeholder="Age"
+                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                        <ChevronUp size={12} />
+                                                    </button>
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: Math.max(0, (Number(prev.age) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                        <ChevronDown size={12} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'imperial' ? 'lb' : 'kg'})</Label>
+                                            <div className="relative group/stepper">
+                                                <Input
+                                                    type="number"
+                                                    value={formData.weight === '' ? '' : formData.weight}
+                                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
+                                                    placeholder={measurementUnit === 'imperial' ? "lb" : "kg"}
+                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                        <ChevronUp size={12} />
+                                                    </button>
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: Math.max(0, (Number(prev.weight) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                        <ChevronDown size={12} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'imperial' ? 'in' : 'cm'})</Label>
+                                            <div className="relative group/stepper">
+                                                <Input
+                                                    type="number"
+                                                    value={formData.height === '' ? '' : formData.height}
+                                                    onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
+                                                    placeholder={measurementUnit === 'imperial' ? "in" : "cm"}
+                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, height: (Number(prev.height) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
+                                                        <ChevronUp size={12} />
+                                                    </button>
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, height: Math.max(0, (Number(prev.height) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                        <ChevronDown size={12} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* BMR Result Section */}
+                                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
+                                                <Flame size={16} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Basal Metabolic Rate</h4>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated using Mifflin-St Jeor equation</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="flex items-baseline gap-1 justify-end">
+                                                <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+                                                    {energyUnit === 'kJ'
+                                                        ? Math.round(bmr * 4.184).toLocaleString()
+                                                        : Math.round(bmr).toLocaleString()}
+                                                </span>
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
+                                                </span>
+                                            </div>
+                                            <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
+                                                ≈ {energyUnit === 'kJ'
+                                                    ? `${Math.round(bmr).toLocaleString()} kcal`
+                                                    : `${Math.round(bmr * 4.184).toLocaleString()} kJ`}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                )}
+                            </section>
+
                             {/* Measures Card */}
                             <section className="space-y-1">
                                 <button 
@@ -603,150 +747,6 @@ function ProfilePageContent() {
                                             </button>
                                         </div>
                                         <p className="text-[9px] text-slate-400 italic px-1">Show nutrient values as raw amounts, RDA percentages, or both.</p>
-                                    </div>
-                                </div>
-                                )}
-                            </section>
-
-                            {/* Identification Card */}
-                            <section className="space-y-1">
-                                <button 
-                                    onClick={() => toggleAccordion('identification')}
-                                    className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
-                                >
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
-                                            <User size={24} className="stroke-[2.5]" />
-                                        </div>
-                                        <div className="text-left">
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Know Your Profile</p>
-                                        </div>
-                                    </div>
-                                    <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'identification' ? "rotate-180" : "")}>
-                                        <ChevronDown size={20} />
-                                    </div>
-                                </button>
-                                
-                                {expandedAccordion === 'identification' && (
-                                <div className="bg-slate-50 dark:bg-slate-950 rounded-b-2xl p-8 space-y-6 shadow-md relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50 border border-t-0 border-slate-200 dark:border-slate-800">
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
-                                        <Input
-                                            value={formData.nickname}
-                                            onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                                            placeholder="Enter your name"
-                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
-                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
-                                                <button
-                                                    onClick={() => setFormData({ ...formData, gender: 'male' })}
-                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
-                                                >
-                                                    M
-                                                </button>
-                                                <button
-                                                    onClick={() => setFormData({ ...formData, gender: 'female' })}
-                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
-                                                >
-                                                    F
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
-                                            <div className="relative group/stepper">
-                                                <Input
-                                                    type="number"
-                                                    value={formData.age === '' ? '' : formData.age}
-                                                    onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
-                                                    placeholder="Age"
-                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
-                                                />
-                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
-                                                        <ChevronUp size={12} />
-                                                    </button>
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: Math.max(0, (Number(prev.age) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
-                                                        <ChevronDown size={12} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'imperial' ? 'lb' : 'kg'})</Label>
-                                            <div className="relative group/stepper">
-                                                <Input
-                                                    type="number"
-                                                    value={formData.weight === '' ? '' : formData.weight}
-                                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
-                                                    placeholder={measurementUnit === 'imperial' ? "lb" : "kg"}
-                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
-                                                />
-                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
-                                                        <ChevronUp size={12} />
-                                                    </button>
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: Math.max(0, (Number(prev.weight) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
-                                                        <ChevronDown size={12} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'imperial' ? 'in' : 'cm'})</Label>
-                                            <div className="relative group/stepper">
-                                                <Input
-                                                    type="number"
-                                                    value={formData.height === '' ? '' : formData.height}
-                                                    onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
-                                                    placeholder={measurementUnit === 'imperial' ? "in" : "cm"}
-                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
-                                                />
-                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, height: (Number(prev.height) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
-                                                        <ChevronUp size={12} />
-                                                    </button>
-                                                    <button onClick={() => setFormData(prev => ({ ...prev, height: Math.max(0, (Number(prev.height) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
-                                                        <ChevronDown size={12} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* BMR Result Section */}
-                                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
-                                                <Flame size={16} />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Basal Metabolic Rate</h4>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated using Mifflin-St Jeor equation</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="flex items-baseline gap-1 justify-end">
-                                                <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
-                                                    {energyUnit === 'kJ'
-                                                        ? Math.round(bmr * 4.184).toLocaleString()
-                                                        : Math.round(bmr).toLocaleString()}
-                                                </span>
-                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                    {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
-                                                </span>
-                                            </div>
-                                            <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
-                                                ≈ {energyUnit === 'kJ'
-                                                    ? `${Math.round(bmr).toLocaleString()} kcal`
-                                                    : `${Math.round(bmr * 4.184).toLocaleString()} kJ`}
-                                            </p>
-                                        </div>
                                     </div>
                                 </div>
                                 )}
