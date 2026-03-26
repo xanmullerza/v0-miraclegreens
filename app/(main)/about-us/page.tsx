@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { PageContainer } from '@/components/ui/page-container';
 import { Shield, Scale, Globe, BookOpen, TrendingUp, Users, Settings } from 'lucide-react';
 import { Carousel } from '@/components/ui/carousel';
 
 export default function AboutUsPage() {
     const router = useRouter();
+    const { showHeroes } = useUserPreferences();
     const cards = [
         {
             icon: Globe,
@@ -37,6 +39,7 @@ export default function AboutUsPage() {
             <main className="max-w-[1000px] mx-auto xl:mx-0 p-8 pt-12 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="space-y-12">
                     {/* Hero Carousel Section */}
+                    {showHeroes && (
                     <section className="text-center space-y-8">
                         <div className="space-y-4 mb-8">
                             <h1 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white sm:text-5xl">
@@ -77,6 +80,7 @@ export default function AboutUsPage() {
                             })}
                         </Carousel>
                     </section>
+                    )}
 
                     {/* Features Grid Section */}
                     <section className="space-y-8 mt-16">
