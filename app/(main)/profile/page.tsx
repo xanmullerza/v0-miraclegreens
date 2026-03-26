@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useChatbot } from '@/lib/context/chatbot-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
     User,
@@ -191,6 +192,7 @@ function ProfilePageContent() {
         headerStyle,
         setHeaderStyle,
     } = useUserPreferences();
+    const { chatbotView, setChatbotView: setChatbotViewContext } = useChatbot();
     const { theme, setTheme } = useTheme();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -428,7 +430,14 @@ function ProfilePageContent() {
                         <Button
                             variant="outline"
                             className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
-                            onClick={() => setShowRDADrawer(true)}
+                            onClick={() => {
+                                // If inside chatbot modal, open as a view; otherwise open drawer
+                                if (chatbotView !== undefined && chatbotView !== null) {
+                                    setChatbotViewContext('recommended-intake');
+                                } else {
+                                    setShowRDADrawer(true);
+                                }
+                            }}
                         >
                             <Target size={14} className="mr-2" />
                             Recommended Intake
