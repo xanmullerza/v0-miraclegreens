@@ -3,8 +3,10 @@ import { Salad, ChevronRight, Calendar, Lock, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+import { ChatbotViewType } from '@/lib/context/chatbot-context';
+
 interface ChatbotDashboardViewProps {
-    setChatbotView: (view: any) => void;
+    setChatbotView: (view: ChatbotViewType) => void;
     setShowOnlyMyRecipes: (show: boolean) => void;
     isAdmin: boolean;
 }

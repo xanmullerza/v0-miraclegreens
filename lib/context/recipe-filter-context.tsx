@@ -20,6 +20,7 @@ interface RecipeFilterContextType {
   setFilters: (filters: RecipeFilterState) => void;
   updateFilter: (key: keyof RecipeFilterState, value: any) => void;
   resetToProfile: () => void;
+  resetAllFilters: () => void;
   hasActiveFilters: boolean;
 }
 
@@ -112,6 +113,20 @@ export function RecipeFilterProvider({
     });
   };
 
+  const resetAllFilters = () => {
+    setFilters({
+      selectedEquipment: [],
+      selectedDietType: 'anything',
+      selectedExclusions: [],
+      selectedHealthConditions: [],
+      pantryMode: 'all',
+      showFlavours: false,
+      showSupplements: false,
+      selectedDifficulty: [],
+      selectedTags: [],
+    });
+  };
+
   const hasActiveFilters =
     filters.selectedEquipment.length > 0 ||
     filters.selectedExclusions.length > 0 ||
@@ -128,6 +143,7 @@ export function RecipeFilterProvider({
         setFilters,
         updateFilter,
         resetToProfile,
+        resetAllFilters,
         hasActiveFilters,
       }}
     >

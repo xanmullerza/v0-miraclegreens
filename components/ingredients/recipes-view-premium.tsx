@@ -48,7 +48,7 @@ export function RecipesViewPremium({
 }: RecipesViewPremiumProps) {
     const router = useRouter();
     const { setIsChatbotOpen, setChatbotView } = useChatbot();
-    const { hasActiveFilters } = useRecipeFilter();
+    const { hasActiveFilters, resetAllFilters } = useRecipeFilter();
 
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
     const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
@@ -193,18 +193,6 @@ export function RecipesViewPremium({
                             <Plus size={18} className="group-hover:scale-110 transition-transform" />
                         </button>
 
-                        {/* Help Button */}
-                        <button
-                            onClick={() => {
-                                setChatbotView('help-cookbook');
-                                setIsChatbotOpen(true);
-                            }}
-                            className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all text-blue-500 hover:text-blue-600 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm group"
-                            title="Cookbook Help"
-                        >
-                            <CircleHelp size={18} className="group-hover:scale-110 transition-transform" />
-                        </button>
-
                         {/* Sort Button */}
                         <div className="relative">
                             <button
@@ -259,63 +247,40 @@ export function RecipesViewPremium({
                             )}
                         </div>
 
-                        {/* Filter Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className={cn(
-                                    "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
-                                    (showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length) || hasActiveFilters)
-                                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
-                                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
-                                )}>
-                                    <Filter size={18} />
-                                    <span className="hidden lg:inline">Filter</span>
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                side="bottom"
-                                align="end"
-                                className="w-56 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 z-[100]"
-                            >
-                                <div className="p-2">
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
-                                    <DropdownMenuCheckboxItem
-                                        checked={showFavoritesOnly}
-                                        onCheckedChange={setShowFavoritesOnly}
-                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
-                                    >
-                                        <Heart size={12} className={cn("mr-2 transition-transform", showFavoritesOnly && "fill-current scale-110")} />
-                                        Favorites Only
-                                    </DropdownMenuCheckboxItem>
-                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Types</DropdownMenuLabel>
-                                    {MEAL_TYPES.map(type => (
-                                        <DropdownMenuCheckboxItem
-                                            key={type}
-                                            checked={selectedTypes.includes(type)}
-                                            onCheckedChange={(checked) => {
-                                                if (checked) setSelectedTypes(prev => [...prev, type]);
-                                                else setSelectedTypes(prev => prev.filter(t => t !== type));
-                                            }}
-                                            className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600"
-                                        >
-                                            {type}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                    <div className="px-1 py-1">
-                                        <button
-                                            onClick={() => setShowFilterDialog(true)}
-                                            className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-xl transition-colors mt-1"
-                                        >
-                                            Advanced Filters →
-                                        </button>
-                                    </div>
-                                </div>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {/* Filter Button - Primary Action */}
+                        <button 
+                            onClick={() => setShowFilterDialog(true)}
+                            className={cn(
+                                "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
+                                hasActiveFilters
+                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
+                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
+                            )}
+                            title="Advanced Filters"
+                        >
+                            <Filter size={18} />
+                            <span className="hidden lg:inline">Filters</span>
+                            {hasActiveFilters && (
+                                <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
+                            )}
+                        </button>
                     </div>
                 </div>
+
+                {/* Filter Chips Area */}
+                {hasActiveFilters && (
+                    <div className="px-4 sm:px-6 pb-2 flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                        <div className="text-[8px] font-black uppercase tracking-widest text-slate-400 flex items-center mr-1">Active:</div>
+                        {/* We could add specific chips here if we had access to the filters object, 
+                            for now since they are in a context we can just show a 'Clear' chip */}
+                        <button 
+                            onClick={resetAllFilters}
+                            className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[8px] font-black uppercase tracking-widest border border-blue-200 dark:border-blue-800 flex items-center gap-1 hover:bg-blue-200 transition-colors"
+                        >
+                            Reset All <X size={10} />
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Recipe Filter Dialog */}
