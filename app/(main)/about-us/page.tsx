@@ -141,6 +141,7 @@ export default function AboutUsPage() {
                             </div>
                         </div>
                     </section>
+                </div>
             </main>
         </PageContainer>
     );
