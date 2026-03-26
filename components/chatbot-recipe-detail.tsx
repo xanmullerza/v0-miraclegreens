@@ -198,7 +198,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     const [storedVitaminThreshold, setStoredVitaminThreshold] = useState<50 | 75 | 100>(75);
 
     // User preferences and RDA
-    const { profile, nutrientDisplayMode } = useUserPreferences();
+    const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
 
@@ -637,46 +637,9 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     };
 
     // Calculate nutrition from current ingredients
-    const calculateNutritionFromIngredients = (): { calories: number; protein: number; carbs: number; fat: number; micronutrients: Record<string, number> } => {
-        let totalCalories = 0;
-        let totalProtein = 0;
-        let totalCarbs = 0;
-        let totalFat = 0;
-        let aggregatedMicros: Record<string, number> = {};
-
-        ingredients.forEach((ing) => {
-            const food = ing.food_items;
-            const weight = ing.weight_g || 0;
-            
-            if (food && weight > 0) {
-                const ratio = weight / 100; // Database values are per 100g
-                totalCalories += (food.energy_kcal || 0) * ratio;
-                totalProtein += (food.protein_g || 0) * ratio;
-                totalCarbs += (food.carbs_g || 0) * ratio;
-                totalFat += (food.fat_g || 0) * ratio;
-
-                // Aggregate micronutrients from food_items
-                const foodMicros = food.micronutrients || {};
-                Object.entries(foodMicros).forEach(([key, val]) => {
-                    if (typeof val === 'number') {
-                        aggregatedMicros[key] = (aggregatedMicros[key] || 0) + (val * ratio);
-                    }
-                });
-            }
-        });
-
-        return {
-            calories: Math.round(totalCalories),
-            protein: Math.round(totalProtein * 10) / 10,
-            carbs: Math.round(totalCarbs * 10) / 10,
-            fat: Math.round(totalFat * 10) / 10,
-            micronutrients: Object.fromEntries(
-                Object.entries(aggregatedMicros).map(([key, val]) => [key, Math.round(val * 10) / 10])
-            )
-        };
-    };
-
-    const calculatedNutrition = ingredients.length > 0 ? calculateNutritionFromIngredients() : { calories: 0, protein: 0, carbs: 0, fat: 0, micronutrients: {} };
+    const calculatedNutrition = ingredients.length > 0 
+        ? calculateAggregatedNutrition(ingredients) 
+        : { calories: 0, energyKj: 0, protein: 0, carbs: 0, fat: 0, micronutrients: {}, phytonutrients: {} };
 
     // Simplified NutrientGrid for chatbot
     const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, isRatios = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, isRatios?: boolean }) => {
@@ -700,7 +663,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                 
                 // 1. Direct handle for top-level macros - use calculated values from ingredients
                 if (key === 'Energy' || key === 'energy_kcal' || key === 'Calories' || key === 'calories') {
-                    value = calculatedNutrition.calories;
+                    value = energyUnit === 'kJ' ? (calculatedNutrition.energyKj || calculatedNutrition.calories * 4.184) : calculatedNutrition.calories;
                     break;
                 }
                 if (key === 'Protein' || key === 'protein_g' || key === 'protein') {
@@ -765,7 +728,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                             unitStr = ' to 1';
                         } else {
                             val = getNutrientValue(keys as string[]);
-                            unitStr = (label === 'Energy') ? 'kcal' :
+                            unitStr = (label === 'Energy') ? energyUnit :
                                 (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars') ? 'g' :
                                     (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label === 'Vitamin D') ? 'µg' : 'mg';
                         }
@@ -966,8 +929,14 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                 </div>
                                 <div className="grid grid-cols-4 gap-3">
                                     <div>
-                                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Calories</p>
-                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.calories / recipe.servings : calculatedNutrition.calories))} kcal</p>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">{energyUnit === 'kJ' ? 'Energy' : 'Calories'}</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">
+                                            {formatEnergyValue(
+                                                nutritionViewMode === 'per-serving' ? calculatedNutrition.calories / (recipe.servings || 1) : calculatedNutrition.calories,
+                                                energyUnit,
+                                                nutritionViewMode === 'per-serving' ? (calculatedNutrition.energyKj || calculatedNutrition.calories * 4.184) / (recipe.servings || 1) : (calculatedNutrition.energyKj || calculatedNutrition.calories * 4.184)
+                                            )}
+                                        </p>
                                     </div>
                                     <div>
                                         <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Protein</p>
@@ -1068,8 +1037,8 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                                                 </p>
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     <div>
-                                                                        <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCalories}</p>
-                                                                        <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">kcal</p>
+                                                                        <p className="text-emerald-600 dark:text-emerald-400 font-bold">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
+                                                                        <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">{energyUnit}</p>
                                                                     </div>
                                                                     <div>
                                                                         <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingProtein}g</p>
@@ -1092,7 +1061,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                                     {food && (
                                                         <div className="text-[9px] text-emerald-600 dark:text-emerald-400 border-t border-emerald-200 dark:border-emerald-700 pt-1 mt-1">
                                                             <p className="opacity-70">ID: {food.id}</p>
-                                                            <p className="opacity-70">Per 100g: {food.energy_kcal || '?'}kcal, {food.protein_g || '?'}g prot</p>
+                                                            <p className="opacity-70">Per 100g: {energyUnit === 'kJ' ? Math.round((food.energy_kcal || 0) * 4.184) + 'kJ' : (food.energy_kcal || '?') + 'kcal'}, {food.protein_g || '?'}g prot</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -1230,15 +1199,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                                     <circle cx="48" cy="48" r={R} fill="none" stroke="#f43f5e" strokeWidth={STROKE} strokeLinecap="butt" style={{ ...proteinSeg, transition: 'stroke-dasharray 0.7s ease, stroke-dashoffset 0.7s ease' }} />
                                                 </svg>
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">{Math.round(energyVal)}</span>
-                                                    <span className="text-[8px] text-slate-400 font-bold mt-0.5">kcal</span>
+                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">
+                                                        {Math.round(energyUnit === 'kJ' ? energyVal * 4.184 : energyVal)}
+                                                    </span>
+                                                    <span className="text-[8px] text-slate-400 font-bold mt-0.5">{energyUnit}</span>
                                                 </div>
                                             </div>
 
                                             {/* Energy stats */}
                                             <div className="flex-1 min-w-0">
                                                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
-                                                    {Math.round(energyVal)} kcal
+                                                    {formatEnergyValue(energyVal, energyUnit, energyVal * 4.184)}
                                                 </div>
                                                 <div className="space-y-2.5">
                                                     {[
