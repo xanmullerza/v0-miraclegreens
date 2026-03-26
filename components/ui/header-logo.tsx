@@ -9,6 +9,7 @@ import { useSplitView } from '@/lib/context/split-view-context';
 import { useChatbot } from '@/lib/context/chatbot-context';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface HeaderLogoProps {
     showSubtext?: boolean;
@@ -25,7 +26,8 @@ export function HeaderLogo({
     const router = useRouter();
     const { theme, setTheme } = useTheme();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
-    const { isChatbotOpen, setIsChatbotOpen } = useChatbot();
+    const { isChatbotOpen, setIsChatbotOpen, setChatbotView } = useChatbot();
+    const { profile } = useUserPreferences();
     const [isMobile, setIsMobile] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -77,10 +79,10 @@ export function HeaderLogo({
                 <div className="flex items-center ml-2 sm:ml-6 gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
                     {[
                         { label: 'Mission', path: '/about-us', icon: Info, color: 'text-purple-500' },
-                        { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
-                        { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-                        { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500' },
-                    ].map((item) => {
+                        { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500', chatbotView: 'view-recipes' },
+                        { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500', chatbotView: 'pantry' },
+                        { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500', chatbotView: 'nutridex' },
+                    ].map((item: any) => {
                         const Icon = item.icon;
                         const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');
                         const isActive = isHomeRedirect || pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
@@ -88,9 +90,15 @@ export function HeaderLogo({
                         return (
                             <Link
                                 key={item.path}
-                                href={item.path}
-                                onClick={() => {
-                                    if (item.label === 'Home') setResizeMode('content-focus');
+                                href={profile.isPremium || !item.chatbotView ? item.path : '#'}
+                                onClick={(e: React.MouseEvent) => {
+                                    if (item.label === 'Home') {
+                                        setResizeMode('content-focus');
+                                    } else if (!profile.isPremium && item.chatbotView) {
+                                        e.preventDefault();
+                                        setChatbotView(item.chatbotView);
+                                        setIsChatbotOpen(true);
+                                    }
                                 }}
                                 className={cn(
                                     "flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-full transition-all text-[10px] font-black uppercase tracking-widest shrink-0",

@@ -862,7 +862,7 @@ export function NutridexView({ compact = false }: NutridexViewProps) {
                                                             {food.value >= 100 ? Math.round(food.value) : food.value.toFixed(1)} {selectedNutrient?.unit} <span className="text-[8px] opacity-40 ml-1">/ 100G</span>
                                                         </p>
                                                     </div>
-                                                    {selectedNutrient && food.value >= ((getRDA(selectedNutrient.id) || 0) / 10) && (
+                                                    {selectedNutrient && profile.isPremium && food.value >= ((getRDA(selectedNutrient.id) || 0) / 10) && (
                                                         <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-[8px] font-black uppercase tracking-widest whitespace-nowrap shrink-0 border border-emerald-500/20">
                                                             PREMIUM SOURCE
                                                         </span>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { calculateIndividualTargets, GoalType, ActivityLevel, NutrientStrategy } from "@/lib/utils/nutrition-calculator";
@@ -36,6 +36,7 @@ interface UserProfile {
     healthConditions: string[];
     country: string;
     familyMembers: FamilyMember[];
+    isPremium: boolean;
 }
 
 interface UserPreferencesContextType {
@@ -89,7 +90,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         exclusions: [],
         healthConditions: [],
         country: "Oceania",
-        familyMembers: []
+        familyMembers: [],
+        isPremium: false
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
     const [dailyPlan, setDailyPlanState] = useState<DailyPlan | null>(null);
@@ -177,7 +179,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                                 exclusions: data.dietary_preferences?.exclusions || [],
                                 healthConditions: data.health_conditions || [],
                                 country: data.country || "Australia",
-                                familyMembers: data.family_members || []
+                                familyMembers: data.family_members || [],
+                                isPremium: data.is_premium || false
                             };
                             setProfileState(cloudProfile);
                             localStorage.setItem("userProfile", JSON.stringify(cloudProfile));
@@ -261,6 +264,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                 country: newProfile.country,
                 health_conditions: newProfile.healthConditions,
                 family_members: newProfile.familyMembers,
+                is_premium: newProfile.isPremium,
                 updated_at: new Date().toISOString()
             } as any);
 

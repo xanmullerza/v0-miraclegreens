@@ -71,6 +71,7 @@ interface RecipesViewProps {
     sortDirection?: 'asc' | 'desc';
     searchQuery?: string;
     onSearchChange?: (query: string) => void;
+    isPremium?: boolean;
 }
 
 export function RecipesView({
@@ -90,10 +91,14 @@ export function RecipesView({
     sortField: externalSortField,
     sortDirection: externalSortDirection,
     searchQuery: externalSearchQuery,
-    onSearchChange
+    onSearchChange,
+    isPremium: externalIsPremium
 }: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
+    const { profile } = useUserPreferences();
+    const isPremium = externalIsPremium ?? profile.isPremium;
+    
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -487,6 +492,42 @@ export function RecipesView({
                             </SheetContent>
                         </Sheet>
                         
+                        {/* Premium Tabs (Only shown if isPremium) */}
+                        {isPremium && (
+                            <div className="flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                                {[
+                                    { id: 'all', label: 'Recipes' },
+                                    { id: 'remixes', label: 'Remixes' },
+                                    { id: 'mixes', label: 'Mixes' }
+                                ].map((tab) => {
+                                    const isActive = (tab.id === 'all' && !isMix && !isRemix) || 
+                                                   (tab.id === 'mixes' && isMix) || 
+                                                   (tab.id === 'remixes' && isRemix);
+                                    return (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => {
+                                                // If we had a router-based tab system, we'd use it here.
+                                                // For now, these are usually controlled via props in the chatbot.
+                                                // On the full page, we might need internal state or URL params.
+                                                if (tab.id === 'all') router.push('/recipes');
+                                                else if (tab.id === 'remixes') router.push('/recipes?tab=remixes');
+                                                else if (tab.id === 'mixes') router.push('/recipes?tab=mixes');
+                                            }}
+                                            className={cn(
+                                                "px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                                                isActive 
+                                                    ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm" 
+                                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                            )}
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                        
                         {/* Mobile Search Input */}
                         <div className="flex-1 relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
@@ -594,6 +635,39 @@ export function RecipesView({
                                 </div>
                             </DropdownMenuContent>
                         </DropdownMenu>
+
+                        {/* Premium Tabs (Only shown if isPremium) */}
+                        {isPremium && (
+                            <div className="flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0">
+                                {[
+                                    { id: 'all', label: 'Recipes' },
+                                    { id: 'remixes', label: 'Remixes' },
+                                    { id: 'mixes', label: 'Mixes' }
+                                ].map((tab) => {
+                                    const isActive = (tab.id === 'all' && !isMix && !isRemix) || 
+                                                   (tab.id === 'mixes' && isMix) || 
+                                                   (tab.id === 'remixes' && isRemix);
+                                    return (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => {
+                                                if (tab.id === 'all') router.push('/recipes');
+                                                else if (tab.id === 'remixes') router.push('/recipes?tab=remixes');
+                                                else if (tab.id === 'mixes') router.push('/recipes?tab=mixes');
+                                            }}
+                                            className={cn(
+                                                "px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                                                isActive 
+                                                    ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm" 
+                                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                            )}
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
 
                         {/* Desktop Search Input */}
                         <div className="relative">
