@@ -15,7 +15,6 @@ import { ChatbotDashboardView } from '@/components/chatbot/chatbot-dashboard-vie
 import { ChatbotMessagesView } from '@/components/chatbot/chatbot-messages-view';
 import { ChatbotBottomNav } from '@/components/chatbot/chatbot-bottom-nav';
 import { ChatbotInputSection } from '@/components/chatbot/chatbot-input-section';
-import { ChatbotCreateRecipeView } from '@/components/chatbot/chatbot-create-recipe-view';
 import { ChatbotRecipeBuilderView } from '@/components/chatbot/chatbot-recipe-builder-view';
 import { ChatbotRecipeDetail } from '@/components/chatbot-recipe-detail';
 import { ChatbotShopping } from '@/components/chatbot-shopping';
@@ -704,7 +703,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {!showRecipeBuilder && chatbotView.startsWith('import') && (
                     <ChatbotImportView
-                        chatbotView={chatbotView}
                         setChatbotView={setChatbotView}
                         isLoading={isLoading}
                         recipeLoading={recipeLoading}
@@ -729,6 +727,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         stopAudioRecording={stopAudioRecording}
                         videoURL={videoURL}
                         setVideoURL={setVideoURL}
+                        toast={toast}
+                        recipeContentRef={recipeContentRef}
                     />
                 )}
 
@@ -885,7 +885,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 )}
 
                 {!showRecipeBuilder && chatbotView === 'messages' && isCreatingRecipe && !successRecipe && (
-                    <ChatbotCreateRecipeView
+                    <ChatbotImportView
+                        setChatbotView={setChatbotView}
                         handleManualRecipeCreation={handleManualRecipeCreation}
                         recipeContentRef={recipeContentRef}
                         pastedRecipeContent={pastedRecipeContent}
