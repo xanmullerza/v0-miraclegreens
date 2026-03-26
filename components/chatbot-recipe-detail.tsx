@@ -569,12 +569,17 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
 
             const nutrition = calculateAggregatedNutrition(updatedIngs || []);
             
-            // Note: We'll round metrics to 1 decimal for consistency in the DB
-            const finalCals = Math.round(nutrition.calories);
-            const finalCarbs = Math.round(nutrition.carbs * 10) / 10;
-            const finalFat = Math.round(nutrition.fat * 10) / 10;
-            const finalProtein = Math.round(nutrition.protein * 10) / 10;
-            const finalKj = Math.round(nutrition.energyKj);
+            const servings = recipe?.servings || 1;
+            const finalCals = Math.round(nutrition.calories / servings);
+            const finalCarbs = Math.round((nutrition.carbs / servings) * 10) / 10;
+            const finalFat = Math.round((nutrition.fat / servings) * 10) / 10;
+            const finalProtein = Math.round((nutrition.protein / servings) * 10) / 10;
+            const finalKj = Math.round(nutrition.energyKj / servings);
+            
+            // Also scale down the micronutrients dictionary
+            const finalMicros = Object.fromEntries(
+                Object.entries(nutrition.micronutrients || {}).map(([key, val]) => [key, val / servings])
+            );
 
             // Update recipe in Supabase
             const { error: updateError } = await supabase
@@ -585,7 +590,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                     carbs: finalCarbs,
                     fat: finalFat,
                     protein: finalProtein,
-                    micronutrients: nutrition.micronutrients
+                    micronutrients: finalMicros
                 })
                 .eq('id', recipeId);
 
