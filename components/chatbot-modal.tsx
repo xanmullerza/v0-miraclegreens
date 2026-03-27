@@ -82,6 +82,18 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
     const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
 
+    const handleGoHome = (fallback?: ChatbotViewType | null) => {
+        if (fallback && fallback !== 'dashboard' && fallback !== 'desktop-guide') {
+            setChatbotView(fallback);
+            return;
+        }
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setChatbotView('dashboard');
+        } else {
+            setChatbotView('desktop-guide');
+        }
+    };
+
     // Recipe builder state
     const [showRecipeBuilder, setShowRecipeBuilder] = useState(false); // Always reset on refresh
     const [recipeTitle, setRecipeTitle] = useState('');
@@ -161,9 +173,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 if (e.state.previousView) {
                     setPreviousView(e.state.previousView);
                 }
-            } else if (chatbotView !== 'dashboard') {
-                // If there's a popstate but no state data, go back to dashboard
-                setChatbotView('dashboard');
+            } else if (chatbotView !== 'dashboard' && chatbotView !== 'desktop-guide') {
+                // If there's a popstate but no state data, go back to home
+                handleGoHome();
             }
         };
 
@@ -698,7 +710,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             <h3 className="text-lg font-bold text-foreground">Coming Soon</h3>
                             <p className="mt-2 text-sm text-muted-foreground">This feature is on the way! Stay tuned for updates.</p>
                             <button
-                                onClick={() => setChatbotView('dashboard')}
+                                onClick={() => handleGoHome()}
                                 className="mt-4 px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
                             >
                                 Back to Dashboard
@@ -742,7 +754,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
-                                onClick={() => setChatbotView('dashboard')}
+                                onClick={() => handleGoHome(previousView)}
                                 className="px-3 py-1.5 rounded-lg text-xs font-black bg-secondary text-secondary-foreground hover:bg-muted transition-colors uppercase tracking-widest"
                             >
                                 🏠 Back to Dashboard
@@ -784,7 +796,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Settings</h2>
                             <button
-                                onClick={() => setChatbotView('dashboard')}
+                                onClick={() => handleGoHome(previousView)}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
@@ -800,7 +812,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
-                                onClick={() => setChatbotView('dashboard')}
+                                onClick={() => handleGoHome(previousView)}
                                 className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             >
                                 🏠 Back to Dashboard
@@ -843,7 +855,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
-                                onClick={() => setChatbotView('dashboard')}
+                                onClick={() => handleGoHome(previousView)}
                                 className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             >
                                 🏠 Back to Dashboard
@@ -1007,7 +1019,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <RDAContent 
                             compact={false} 
                             showCloseButton={true}
-                            onClose={() => setChatbotView(previousView || 'widgetsMenu')}
+                            onClose={() => handleGoHome(previousView)}
                         />
                     </div>
                 )}
