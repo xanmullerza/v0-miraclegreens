@@ -110,7 +110,7 @@ export default function AboutUsPage() {
                             </div>
 
                             {/* Tracker Card */}
-                            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
+                            <div onClick={() => router.push('/tracker')} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
                                 <div className="w-12 h-12 rounded-2xl bg-green-500/10 text-green-500 flex items-center justify-center">
                                     <TrendingUp size={24} />
                                 </div>
