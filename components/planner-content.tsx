@@ -90,6 +90,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRouter } from 'next/navigation';
+import { useChatbot } from '@/lib/context/chatbot-context';
 import { useSearch } from '@/lib/context/search-context';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { usePantry } from '@/hooks/use-pantry';
@@ -845,6 +846,7 @@ export default function MealPlannerContent({
   onRecipeClick,
 }: MealPlannerContentProps) {
   const router = useRouter();
+  const { setChatbotView, setIsChatbotOpen } = useChatbot();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [generating, setGenerating] = useState(false);
   
@@ -2090,7 +2092,10 @@ export default function MealPlannerContent({
 
                 <div className="flex items-center justify-between px-2">
                   <button
-                    onClick={() => router.push('/profile?from=/dashboard/meal-o-matic/planner')}
+                    onClick={() => {
+                      setChatbotView('profile');
+                      setIsChatbotOpen(true);
+                    }}
                     className="text-xs font-bold text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1"
                   >
                     Edit these settings
@@ -2147,7 +2152,10 @@ export default function MealPlannerContent({
                 </Button>
                 <Button
                   size="lg"
-                  onClick={() => router.push('/profile?from=/dashboard/meal-o-matic/planner')}
+                  onClick={() => {
+                    setChatbotView('profile');
+                    setIsChatbotOpen(true);
+                  }}
                   className="h-16 text-lg font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 group"
                 >
                   Complete Profile{' '}

@@ -774,6 +774,23 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
+                {!showRecipeBuilder && chatbotView === 'profile' && (
+                    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar pb-20 animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Settings</h2>
+                            <button
+                                onClick={() => setChatbotView('dashboard')}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="-mt-8 pb-10">
+                            <ProfilePage />
+                        </div>
+                    </div>
+                )}
+
                 {!showRecipeBuilder && chatbotView === 'plannerMenu' && (
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">

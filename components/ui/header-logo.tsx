@@ -183,8 +183,11 @@ export function HeaderLogo({
                             <Home size={18} />
                         </Link>
                     ) : (
-                        <Link
-                            href="/profile"
+                        <button
+                            onClick={() => {
+                                setChatbotView('profile');
+                                setIsChatbotOpen(true);
+                            }}
                             className="h-12 w-12 flex items-center justify-center hover:bg-muted dark:hover:bg-slate-800 transition-colors active:scale-95"
                             title="Profile"
                         >
@@ -204,7 +207,7 @@ export function HeaderLogo({
                                     <User size={14} />
                                 )}
                             </div>
-                        </Link>
+                        </button>
                     )}
                 </div>
             </div>

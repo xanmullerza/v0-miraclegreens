@@ -157,7 +157,10 @@ export default function AboutUsPage() {
                             </div>
 
                             {/* Settings Card */}
-                            <div onClick={() => router.push('/profile')} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
+                            <div onClick={() => {
+                                setChatbotView('profile');
+                                setIsChatbotOpen(true);
+                            }} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
                                 <div className="w-12 h-12 rounded-2xl bg-slate-500/10 text-slate-500 flex items-center justify-center">
                                     <Settings size={24} />
                                 </div>
