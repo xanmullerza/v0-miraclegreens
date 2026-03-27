@@ -83,34 +83,6 @@ export function ChatbotDashboardView({
                 </div>
             </div>
 
-            {/* Coach Section */}
-            <div className="bg-cyan-500/10 dark:bg-cyan-500/20 rounded-3xl p-6 border border-cyan-500/20 shadow-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
-                    <Users size={120} className="text-cyan-500 -rotate-12" />
-                </div>
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Coach</h3>
-                </div>
-                <div className="flex flex-col gap-4">
-                    <button
-                        onClick={() => setChatbotView('messages')}
-                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-cyan-500/20 hover:border-cyan-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group shadow-sm"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                                <MessageCircle size={24} className="text-cyan-600 dark:text-cyan-400 group-hover:text-white" />
-                            </div>
-                            <div className="text-left">
-                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Ask Coach</h4>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest">Get personalized guidance</p>
-                            </div>
-                        </div>
-                        <ChevronRight size={20} className="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
-                    </button>
-                </div>
-            </div>
-
             {/* Settings Section */}
             <div className="bg-slate-500/10 dark:bg-slate-500/20 rounded-3xl p-6 border border-slate-500/20 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
@@ -135,6 +107,34 @@ export function ChatbotDashboardView({
                             </div>
                         </div>
                         <ChevronRight size={20} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Coach Section */}
+            <div className="bg-cyan-500/10 dark:bg-cyan-500/20 rounded-3xl p-6 border border-cyan-500/20 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                    <Users size={120} className="text-cyan-500 -rotate-12" />
+                </div>
+                <div className="flex items-center gap-2 mb-6">
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Coach</h3>
+                </div>
+                <div className="flex flex-col gap-4">
+                    <button
+                        onClick={() => setChatbotView('messages')}
+                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-cyan-500/20 hover:border-cyan-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group shadow-sm"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                                <MessageCircle size={24} className="text-cyan-600 dark:text-cyan-400 group-hover:text-white" />
+                            </div>
+                            <div className="text-left">
+                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Ask Coach</h4>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest">Get personalized guidance</p>
+                            </div>
+                        </div>
+                        <ChevronRight size={20} className="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
                     </button>
                 </div>
             </div>
