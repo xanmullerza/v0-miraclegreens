@@ -12,6 +12,7 @@ import { RecipesViewPremium } from '@/components/ingredients/recipes-view-premiu
 import { ChatbotImportView } from '@/components/chatbot/chatbot-import-view';
 import { MyRecipesView } from '@/components/ingredients/my-recipes-view';
 import { ChatbotDashboardView } from '@/components/chatbot/chatbot-dashboard-view';
+import { ChatbotDesktopGuide } from '@/components/chatbot/chatbot-desktop-guide';
 import { ChatbotMessagesView } from '@/components/chatbot/chatbot-messages-view';
 import { ChatbotBottomNav } from '@/components/chatbot/chatbot-bottom-nav';
 import { ChatbotInputSection } from '@/components/chatbot/chatbot-input-section';
@@ -683,6 +684,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         setShowOnlyMyRecipes={setShowOnlyMyRecipes}
                         isAdmin={isAdmin}
                     />
+                )}
+
+                {/* Desktop Guide Menu - Simplified default state for desktop mode */}
+                {!showRecipeBuilder && chatbotView === 'desktop-guide' && (
+                    <ChatbotDesktopGuide setChatbotView={setChatbotView} />
                 )}
 
                 {/* Coming Soon Page */}
