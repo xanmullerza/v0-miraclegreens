@@ -19,10 +19,10 @@ export function ChatbotBottomNav({
     const router = useRouter();
 
     return (
-        <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-4 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50 gap-2">
+        <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-2 py-4 flex items-center justify-center pointer-events-auto shrink-0 z-50 gap-1">
             <button
                 onClick={() => setChatbotView('dashboard')}
-                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Home"
             >
                 <Home size={20} />
@@ -33,7 +33,7 @@ export function ChatbotBottomNav({
                     onClose();
                     router.push('/recipes');
                 }}
-                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Cookbook"
             >
                 <BookOpen size={20} />
@@ -44,7 +44,7 @@ export function ChatbotBottomNav({
                     onClose();
                     router.push('/tracker');
                 }}
-                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Tracker"
             >
                 <BarChart3 size={20} />
@@ -55,7 +55,7 @@ export function ChatbotBottomNav({
                     onClose();
                     router.push('/profile');
                 }}
-                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Settings"
             >
                 <Settings size={20} />
@@ -63,7 +63,7 @@ export function ChatbotBottomNav({
 
             <button
                 onClick={() => setChatbotView('messages')}
-                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Coach"
             >
                 <MessageCircle size={20} />
