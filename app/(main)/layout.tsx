@@ -103,7 +103,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     return (
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
             {/* Unified Header & Nav - Spans both panels */}
-            {pathname !== '/dashboard' && (
+            {pathname !== '/dashboard' && isDesktop && (
                 <>
                     {/* Header - Centered */}
                     <div suppressHydrationWarning className="z-40 bg-background">
@@ -143,7 +143,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                 {children}
                             </div>
                         </div>
-                        {pathname !== '/dashboard' && <Footer />}
+                        {pathname !== '/dashboard' && isDesktop && <Footer />}
                     </main>
                 </div>
 
