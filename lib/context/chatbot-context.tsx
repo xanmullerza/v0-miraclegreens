@@ -20,6 +20,13 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     const [chatbotView, setChatbotView] = useState<ChatbotViewType>('desktop-guide');
     const [previousView, setPreviousView] = useState<ChatbotViewType | null>(null);
 
+    // Initialize correct default view based on screen size across all routes
+    React.useEffect(() => {
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setChatbotView('dashboard');
+        }
+    }, []);
+
     return (
         <ChatbotContext.Provider value={{
             isChatbotOpen,
