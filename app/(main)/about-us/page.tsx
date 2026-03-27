@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useChatbot } from '@/lib/context/chatbot-context';
 import { PageContainer } from '@/components/ui/page-container';
 import { Shield, Scale, Globe, BookOpen, TrendingUp, Users, Settings } from 'lucide-react';
 import { Carousel } from '@/components/ui/carousel';
@@ -10,6 +11,7 @@ import { Carousel } from '@/components/ui/carousel';
 export default function AboutUsPage() {
     const router = useRouter();
     const { showHeroes } = useUserPreferences();
+    const { setChatbotView, setIsChatbotOpen } = useChatbot();
     const cards = [
         {
             icon: Globe,
@@ -121,7 +123,10 @@ export default function AboutUsPage() {
                             </div>
 
                             {/* Coach Card */}
-                            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
+                            <div onClick={() => {
+                                setChatbotView('messages');
+                                setIsChatbotOpen(true);
+                            }} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
                                 <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
                                     <Users size={24} />
                                 </div>
