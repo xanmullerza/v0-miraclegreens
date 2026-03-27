@@ -883,19 +883,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     </div>
                 )}
 
-                {!showRecipeBuilder && chatbotView === 'profile' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
-                        <div className="flex justify-end mb-3">
-                            <button
-                                onClick={() => setChatbotView('dashboard')}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-muted text-foreground hover:bg-secondary transition-colors"
-                            >
-                                🏠 Back to Dashboard
-                            </button>
-                        </div>
-                        <ProfilePage />
-                    </div>
-                )}
+
 
                 {/* Messages View - Full Screen, Only in chat mode */}
                 {!showRecipeBuilder && chatbotView === 'messages' && !isCreatingRecipe && (
