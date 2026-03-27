@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, MessageSquarePlus, Sparkles, BookOpen, ChevronRight, Zap } from 'lucide-react';
+import { Bot, MessageSquarePlus, Sparkles, BookOpen, ChevronRight, Zap, Settings } from 'lucide-react';
 import { ChatbotViewType } from '@/lib/context/chatbot-context';
 
 interface ChatbotDesktopGuideProps {
@@ -71,6 +71,20 @@ export function ChatbotDesktopGuide({ setChatbotView }: ChatbotDesktopGuideProps
                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Browse your recipes</p>
                     </div>
                     <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                </button>
+
+                <button
+                    onClick={() => setChatbotView('profile')}
+                    className="w-full flex items-center p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-500/50 hover:shadow-md transition-all group"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-slate-500/10 flex items-center justify-center mr-4 group-hover:bg-slate-500 group-hover:text-white transition-all">
+                        <Settings size={20} className="text-slate-600 dark:text-slate-400 group-hover:text-white transition-colors" />
+                    </div>
+                    <div className="flex-1 text-left">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">Settings</h4>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Customize preferences</p>
+                    </div>
+                    <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
                 </button>
             </div>
             
