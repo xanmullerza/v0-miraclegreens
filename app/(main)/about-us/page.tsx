@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useChatbot } from '@/lib/context/chatbot-context';
@@ -12,6 +12,15 @@ export default function AboutUsPage() {
     const router = useRouter();
     const { showHeroes } = useUserPreferences();
     const { setChatbotView, setIsChatbotOpen } = useChatbot();
+
+    // Open chatbot with dashboard view on mobile
+    useEffect(() => {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+            setIsChatbotOpen(true);
+            setChatbotView('dashboard');
+        }
+    }, [setIsChatbotOpen, setChatbotView]);
     const cards = [
         {
             icon: Globe,
