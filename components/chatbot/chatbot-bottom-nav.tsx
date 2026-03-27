@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, BookOpen, BarChart3, MessageCircle } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Settings, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -19,13 +19,13 @@ export function ChatbotBottomNav({
     const router = useRouter();
 
     return (
-        <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50">
+        <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-4 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50 gap-2">
             <button
                 onClick={() => setChatbotView('dashboard')}
-                className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Home"
             >
-                <Home size={24} />
+                <Home size={20} />
             </button>
 
             <button
@@ -33,10 +33,10 @@ export function ChatbotBottomNav({
                     onClose();
                     router.push('/recipes');
                 }}
-                className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Cookbook"
             >
-                <BookOpen size={24} />
+                <BookOpen size={20} />
             </button>
 
             <button
@@ -44,18 +44,29 @@ export function ChatbotBottomNav({
                     onClose();
                     router.push('/tracker');
                 }}
-                className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Tracker"
             >
-                <BarChart3 size={24} />
+                <BarChart3 size={20} />
+            </button>
+
+            <button
+                onClick={() => {
+                    onClose();
+                    router.push('/profile');
+                }}
+                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                title="Settings"
+            >
+                <Settings size={20} />
             </button>
 
             <button
                 onClick={() => setChatbotView('messages')}
-                className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Coach"
             >
-                <MessageCircle size={24} />
+                <MessageCircle size={20} />
             </button>
         </div>
     );
