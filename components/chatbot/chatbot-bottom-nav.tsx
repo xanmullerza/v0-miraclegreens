@@ -19,7 +19,7 @@ export function ChatbotBottomNav({
     const router = useRouter();
 
     return (
-        <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-2 py-4 flex items-center justify-center pointer-events-auto shrink-0 z-50 gap-1">
+        <div className="md:hidden mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-2 py-4 flex items-center justify-center pointer-events-auto shrink-0 z-50 gap-1">
             <button
                 onClick={() => setChatbotView('dashboard')}
                 className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
