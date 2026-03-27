@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Search, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2, Clock, ChefHat, Home, Smartphone, TabletSmartphone, Monitor as Computer } from 'lucide-react';
+import { X, Search, Send, Loader2, Upload, Menu, Salad, ChevronRight, ChevronLeft, Grid2x2, Plus, Trash2, ArrowLeft, Save, Camera, ShoppingBag, Package, Calendar, Mic, Square, Link, FileText, Pencil, Video, Database, Lock, Filter, MessageCircle, Wand2, Beaker, ArrowDownUp, CircleHelp, Share2, Clock, ChefHat, Home, Smartphone, TabletSmartphone, Monitor as Computer, BookOpen, TrendingUp, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -3894,43 +3894,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Bottom Navigation Footer (Mobile Optimized) */}
                 <div className="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between pointer-events-auto shrink-0 z-50">
-                    {/* Home Button - Navigates to homepage and closes chatbot */}
-                    <button
-                        onClick={() => {
-                            onClose();
-                            router.push('/about-us');
-                        }}
-                        className={cn(
-                            "p-3 rounded-2xl transition-all active:scale-95 group",
-                            "text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        )}
-                        title="Home"
-                    >
-                        <Home size={24} />
-                    </button>
-                    
-                    <button
-                        onClick={() => setChatbotView('dashboard')}
-                        className={cn(
-                            "w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-95 group",
-                            chatbotView === 'dashboard'
-                                ? "bg-emerald-500 text-white shadow-emerald-500/40"
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 shadow-xl shadow-black/5"
-                        )}
-                        title="Grid"
-                    >
-                        <Grid2x2 size={24} className="group-hover:scale-110 transition-transform" />
-                    </button>
-
-
-
-                    <button
-                        onClick={() => setChatbotView('messages')}
-                        className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90 text-slate-400 hover:text-emerald-500"
-                        title="Open Chat"
-                    >
-                        <MessageCircle size={24} />
-                    </button>
+                    <button onClick={() => { onClose(); router.push('/recipes'); }} className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800" title="Cookbook"><BookOpen size={24} /></button>
+                    <button onClick={() => { onClose(); router.push('/tracker'); }} className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800" title="Tracker"><TrendingUp size={24} /></button>
+                    <button onClick={() => { onClose(); router.push('/profile'); }} className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800" title="Settings"><Settings size={24} /></button>
+                    <button onClick={() => setChatbotView('messages')} className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800" title="Coach"><MessageCircle size={24} /></button>
                 </div>
             </div>
 
