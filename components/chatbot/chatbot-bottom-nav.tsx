@@ -29,10 +29,7 @@ export function ChatbotBottomNav({
             </button>
 
             <button
-                onClick={() => {
-                    onClose();
-                    router.push('/recipes');
-                }}
+                onClick={() => setChatbotView('view-recipes')}
                 className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Cookbook"
             >
@@ -40,10 +37,7 @@ export function ChatbotBottomNav({
             </button>
 
             <button
-                onClick={() => {
-                    onClose();
-                    router.push('/tracker');
-                }}
+                onClick={() => setChatbotView('shopping')}
                 className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Tracker"
             >
@@ -51,10 +45,7 @@ export function ChatbotBottomNav({
             </button>
 
             <button
-                onClick={() => {
-                    onClose();
-                    router.push('/profile');
-                }}
+                onClick={() => setChatbotView('profile')}
                 className="flex-1 flex justify-center p-2 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Settings"
             >
