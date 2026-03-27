@@ -82,7 +82,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
         if (pathLower.includes('/shopping')) return 'Shopping List';
         if (pathLower.includes('/planner')) return 'Meal Planner';
         if (pathLower.includes('/maker')) return 'Create a Meal';
-        if (pathLower.includes('/about-us')) return 'Discover & Learn';
+        if (pathLower === '/') return 'Discover & Learn';
         if (pathLower.includes('/comparator')) return 'Ready to Compare';
         
         return 'Ready to Search';

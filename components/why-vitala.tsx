@@ -97,7 +97,7 @@ export function WhyVitala() {
 
 				{/* <div className="flex justify-center mt-8">
 					<Button asChild size="lg" className="px-8">
-						<Link href="/about-us">Find Out More</Link>
+						<Link href="/">Find Out More</Link>
 					</Button>
 				</div> */}
 

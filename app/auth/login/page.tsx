@@ -36,7 +36,7 @@ function LoginContent() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const redirectTo = searchParams.get('from') || '/about-us';
+    const redirectTo = searchParams.get('from') || '/';
 
     const handleLogin = async () => {
         setLoading(true);

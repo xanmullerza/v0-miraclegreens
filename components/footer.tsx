@@ -13,7 +13,7 @@ export function Footer() {
   const { resizeMode, toggleResize, setResizeMode } = useSplitView();
 
 
-  const isHome = pathname === '/dashboard' || pathname === '/' || pathname === '/about-us';
+  const isHome = pathname === '/dashboard' || pathname === '/';
 
   // Mobile bottom navigation bar
   return (
@@ -26,7 +26,7 @@ export function Footer() {
             onClick={(e) => {
               e.preventDefault();
               setIsChatbotOpen(false);
-              router.push('/about-us');
+              router.push('/');
             }}
             className={cn(
               "p-3 rounded-2xl transition-all active:scale-95 group flex",

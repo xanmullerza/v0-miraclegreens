@@ -23,8 +23,7 @@ export function ContentNav() {
             <div className="flex items-center gap-2 w-full overflow-x-auto hide-scrollbar">
                 {navItems.map((item) => {
                     const Icon = item.icon;
-                    const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');
-                    const isActive = isHomeRedirect || pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
+                    const isActive = pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
 
                     return (
                         <Link

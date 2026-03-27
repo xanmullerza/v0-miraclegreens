@@ -78,14 +78,13 @@ export function HeaderLogo({
                 {/* Main App Navigation (Next to Logo) */}
                 <div className="flex items-center ml-2 sm:ml-6 gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
                     { [
-                        { label: 'Mission', path: '/about-us', icon: Info, color: 'text-purple-500' },
+                        { label: 'Mission', path: '/', icon: Info, color: 'text-purple-500' },
                         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
                         { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
                         { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500' },
                     ].map((item: any) => {
                         const Icon = item.icon;
-                        const isHomeRedirect = item.path === '/' && (pathname === '/about-us' || pathname === '/');
-                        const isActive = isHomeRedirect || pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
+                        const isActive = pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
                         
                         return (
                             <Link
