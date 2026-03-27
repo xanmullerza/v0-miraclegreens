@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, TrendingUp, Settings, MessageCircle } from 'lucide-react';
+import { BookOpen, BarChart3, Settings, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +39,7 @@ export function ChatbotBottomNav({
                 className="p-3 rounded-2xl transition-all active:scale-95 group text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                 title="Tracker"
             >
-                <TrendingUp size={24} />
+                <BarChart3 size={24} />
             </button>
 
             <button
