@@ -9,6 +9,8 @@ interface ChatbotContextType {
     setIsChatbotOpen: (open: boolean) => void;
     chatbotView: ChatbotViewType;
     setChatbotView: (view: ChatbotViewType) => void;
+    previousView: ChatbotViewType | null;
+    setPreviousView: (view: ChatbotViewType | null) => void;
 }
 
 const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
@@ -16,6 +18,7 @@ const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
 export function ChatbotProvider({ children }: { children: ReactNode }) {
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
     const [chatbotView, setChatbotView] = useState<ChatbotViewType>('dashboard');
+    const [previousView, setPreviousView] = useState<ChatbotViewType | null>(null);
 
     return (
         <ChatbotContext.Provider value={{
@@ -23,6 +26,8 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
             setIsChatbotOpen,
             chatbotView,
             setChatbotView,
+            previousView,
+            setPreviousView,
         }}>
             {children}
         </ChatbotContext.Provider>

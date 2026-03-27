@@ -51,7 +51,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const { user, saveRecipe } = useDataPersistence();
     const { profile } = useUserPreferences();
     const { filters } = useRecipeFilter();
-    const { chatbotView, setChatbotView } = useChatbot();
+    const { chatbotView, setChatbotView, previousView, setPreviousView } = useChatbot();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
@@ -80,7 +80,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
     const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
-    const [previousView, setPreviousView] = useState<ChatbotViewType | null>(null);
 
     // Recipe builder state
     const [showRecipeBuilder, setShowRecipeBuilder] = useState(false); // Always reset on refresh
