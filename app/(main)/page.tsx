@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useChatbot } from '@/lib/context/chatbot-context';
 import { PageContainer } from '@/components/ui/page-container';
-import { Shield, Scale, Globe, BookOpen, TrendingUp, Users, Settings } from 'lucide-react';
+import { Shield, Scale, Globe, BookOpen, TrendingUp, Users, Settings, ChevronRight, MessageCircle } from 'lucide-react';
 import { Carousel } from '@/components/ui/carousel';
 
 export default function AboutUsPage() {
@@ -115,60 +115,120 @@ export default function AboutUsPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Cookbook Card */}
-                            <div onClick={() => router.push('/recipes')} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
-                                <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
-                                    <BookOpen size={24} />
+                            <div className="bg-emerald-500/10 dark:bg-emerald-500/20 rounded-3xl p-6 border border-emerald-500/20 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                                    <BookOpen size={120} className="text-emerald-500 -rotate-12" />
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Cookbook</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
-                                        Discover and create nutritious recipes tailored to your dietary goals.
-                                    </p>
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Cookbook</h3>
+                                </div>
+                                <div className="flex flex-col gap-4 relative z-10">
+                                    <button
+                                        onClick={() => router.push('/recipes')}
+                                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover/btn:bg-emerald-500 group-hover/btn:text-white transition-all">
+                                                <BookOpen size={24} className="text-emerald-600 dark:text-emerald-400 group-hover/btn:text-white" />
+                                            </div>
+                                            <div className="text-left">
+                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">View Cookbook</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Discover and create nutritious recipes</p>
+                                            </div>
+                                        </div>
+                                        <ChevronRight size={20} className="text-slate-300 group-hover/btn:text-emerald-500 group-hover/btn:translate-x-1 transition-all" />
+                                    </button>
                                 </div>
                             </div>
 
                             {/* Tracker Card */}
-                            <div onClick={() => router.push('/tracker')} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
-                                <div className="w-12 h-12 rounded-2xl bg-green-500/10 text-green-500 flex items-center justify-center">
-                                    <TrendingUp size={24} />
+                            <div className="bg-green-500/10 dark:bg-green-500/20 rounded-3xl p-6 border border-green-500/20 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                                    <TrendingUp size={120} className="text-green-500 -rotate-12" />
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Tracker</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
-                                        Monitor your nutritional intake and reach your health targets daily.
-                                    </p>
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Tracker</h3>
+                                </div>
+                                <div className="flex flex-col gap-4 relative z-10">
+                                    <button
+                                        onClick={() => router.push('/tracker')}
+                                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-green-500/20 hover:border-green-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center group-hover/btn:bg-green-500 group-hover/btn:text-white transition-all">
+                                                <TrendingUp size={24} className="text-green-600 dark:text-green-400 group-hover/btn:text-white" />
+                                            </div>
+                                            <div className="text-left">
+                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Open Tracker</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Monitor your nutritional intake</p>
+                                            </div>
+                                        </div>
+                                        <ChevronRight size={20} className="text-slate-300 group-hover/btn:text-green-500 group-hover/btn:translate-x-1 transition-all" />
+                                    </button>
                                 </div>
                             </div>
 
                             {/* Coach Card */}
-                            <div onClick={() => {
-                                setChatbotView('messages');
-                                setIsChatbotOpen(true);
-                            }} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
-                                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                                    <Users size={24} />
+                            <div className="bg-cyan-500/10 dark:bg-cyan-500/20 rounded-3xl p-6 border border-cyan-500/20 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                                    <MessageCircle size={120} className="text-cyan-500 -rotate-12" />
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Coach</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
-                                        Get personalized guidance and insights from your AI nutrition coach.
-                                    </p>
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Coach</h3>
+                                </div>
+                                <div className="flex flex-col gap-4 relative z-10">
+                                    <button
+                                        onClick={() => {
+                                            setChatbotView('messages');
+                                            setIsChatbotOpen(true);
+                                        }}
+                                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-cyan-500/20 hover:border-cyan-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center group-hover/btn:bg-cyan-500 group-hover/btn:text-white transition-all">
+                                                <MessageCircle size={24} className="text-cyan-600 dark:text-cyan-400 group-hover/btn:text-white" />
+                                            </div>
+                                            <div className="text-left">
+                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Ask Coach</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Get personalized guidance</p>
+                                            </div>
+                                        </div>
+                                        <ChevronRight size={20} className="text-slate-300 group-hover/btn:text-cyan-500 group-hover/btn:translate-x-1 transition-all" />
+                                    </button>
                                 </div>
                             </div>
 
                             {/* Settings Card */}
-                            <div onClick={() => {
-                                setChatbotView('profile');
-                                setIsChatbotOpen(true);
-                            }} className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/30 dark:to-slate-800/50 border border-slate-100 dark:border-slate-800 space-y-4 cursor-pointer hover:shadow-lg hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300">
-                                <div className="w-12 h-12 rounded-2xl bg-slate-500/10 text-slate-500 flex items-center justify-center">
-                                    <Settings size={24} />
+                            <div className="bg-slate-500/10 dark:bg-slate-500/20 rounded-3xl p-6 border border-slate-500/20 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                                    <Settings size={120} className="text-slate-500 -rotate-12" />
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Settings</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
-                                        Customize your preferences and manage your account.
-                                    </p>
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Settings</h3>
+                                </div>
+                                <div className="flex flex-col gap-4 relative z-10">
+                                    <button
+                                        onClick={() => {
+                                            setChatbotView('profile');
+                                            setIsChatbotOpen(true);
+                                        }}
+                                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-slate-500/20 hover:border-slate-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover/btn:bg-slate-500 group-hover/btn:text-white transition-all">
+                                                <Settings size={24} className="text-slate-600 dark:text-slate-400 group-hover/btn:text-white" />
+                                            </div>
+                                            <div className="text-left">
+                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">View Settings</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Customize your preferences</p>
+                                            </div>
+                                        </div>
+                                        <ChevronRight size={20} className="text-slate-300 group-hover/btn:text-slate-500 group-hover/btn:translate-x-1 transition-all" />
+                                    </button>
                                 </div>
                             </div>
                         </div>
