@@ -1,5 +1,6 @@
 import React from 'react';
-import { Leaf, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings } from 'lucide-react';
+import Link from 'next/link';
+import { Leaf, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings, Shield, HelpCircle, BookOpen } from 'lucide-react';
 import { ChatbotViewType } from '@/lib/context/chatbot-context';
 
 interface ChatbotDesktopGuideProps {
@@ -22,6 +23,27 @@ export function ChatbotDesktopGuide({ setChatbotView }: ChatbotDesktopGuideProps
                         Nutritional Intelligence
                     </p>
                 </div>
+            </div>
+
+            {/* Info Links */}
+            <div className="flex items-center justify-center gap-2 mb-6 max-w-sm mx-auto">
+                {[
+                    { label: 'Privacy', path: '/privacy', icon: Shield },
+                    { label: 'Support', path: '/support', icon: HelpCircle },
+                    { label: 'Terms', path: '/terms', icon: BookOpen },
+                ].map((item) => {
+                    const Icon = item.icon;
+                    return (
+                        <Link
+                            key={item.path}
+                            href={item.path}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                        >
+                            <Icon size={12} />
+                            {item.label}
+                        </Link>
+                    );
+                })}
             </div>
 
             {/* Quick Actions */}
