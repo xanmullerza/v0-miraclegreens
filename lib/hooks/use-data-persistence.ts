@@ -22,6 +22,7 @@ export interface Recipe {
     is_curated?: boolean;
     is_mix?: boolean;
     is_remix?: boolean;
+    meal_type?: string;
 }
 
 export function useDataPersistence() {
