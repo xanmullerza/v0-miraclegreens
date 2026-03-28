@@ -142,28 +142,6 @@ export function RecipesViewPremium({
                                         Mine
                                     </button>
                                 </div>
-
-                                {/* Recipes | Remixes | Mixes inline tabs */}
-                                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                                    {([
-                                        { id: 'recipes' as TabId, label: 'Recipes' },
-                                        { id: 'remixes' as TabId, label: 'Remixes' },
-                                        { id: 'mixes' as TabId, label: 'Mixes' },
-                                    ]).map((tab) => (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => handleTabChange(tab.id)}
-                                            className={cn(
-                                                "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
-                                                activeTab === tab.id
-                                                    ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
-                                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                                            )}
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    ))}
-                                </div>
                             </div>
 
                             {/* Search Bar */}
