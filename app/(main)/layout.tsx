@@ -122,7 +122,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                 {children}
                             </div>
                         </div>
-                        {pathname !== '/dashboard' && isDesktop && <Footer />}
+                        {pathname !== '/dashboard' && !isDesktop && <Footer />}
                     </main>
                     {isDesktop && <DraggableFab />}
                 </div>
