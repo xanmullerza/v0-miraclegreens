@@ -446,8 +446,10 @@ export function RecipesView({
                                 }
                             }}
                             className={cn(
-                                "group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-500 cursor-pointer overflow-hidden",
-                                isMix ? "hover:border-indigo-400/50 hover:shadow-lg" : "hover:border-blue-400/50 hover:shadow-lg"
+                                "group relative rounded-xl border transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm",
+                                isMix 
+                                    ? "bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800/50 hover:border-indigo-400 hover:shadow-indigo-500/10 hover:shadow-xl" 
+                                    : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/50 hover:border-emerald-400 hover:shadow-emerald-500/10 hover:shadow-xl"
                             )}
                         >
                             <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">

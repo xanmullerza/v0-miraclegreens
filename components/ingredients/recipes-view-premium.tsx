@@ -117,7 +117,7 @@ export function RecipesViewPremium({
                     <>
                         {/* Premium Controls Row - Inside Card */}
                         <div className="sticky top-[68px] z-10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-                            <div className="px-6 py-3 flex items-center gap-4">
+                            <div className="px-6 py-3 flex items-center justify-center gap-4">
                                 {/* Search Bar */}
                                 <div className="relative w-full max-w-md">
                                     <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
