@@ -86,15 +86,32 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
     const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
 
+    const [viewStack, setViewStack] = useState<ChatbotViewType[]>([]);
+
     const navigateTo = (view: ChatbotViewType) => {
         if (view !== chatbotView) {
             setPreviousView(chatbotView);
+            setViewStack(prev => [...prev, chatbotView]);
             setChatbotView(view);
         }
     };
 
+    const handleBack = () => {
+        if (viewStack.length > 0) {
+            const newStack = [...viewStack];
+            const lastView = newStack.pop()!;
+            setViewStack(newStack);
+            // Also sync previousView for context compatibility
+            setPreviousView(newStack.length > 0 ? newStack[newStack.length - 1] : null);
+            setChatbotView(lastView);
+        } else {
+            handleGoHome();
+        }
+    };
+
     const handleGoHome = (fallback?: ChatbotViewType | null) => {
-        // Clear previousView to prevent infinite loops when manually routing home
+        // Clear history stack when explicitly resetting to home
+        setViewStack([]);
         setPreviousView(null);
         
         // If there's a fallback and it's not the current view, use it
@@ -199,8 +216,8 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     setPreviousView(e.state.previousView);
                 }
             } else if (chatbotView !== 'dashboard' && chatbotView !== 'desktop-guide') {
-                // If there's a popstate but no state data, go back to home
-                handleGoHome(previousView);
+                // Go back after success
+                handleBack();
             }
         };
 
@@ -401,11 +418,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     };
 
     const handleBackFromRecipeDetail = () => {
-        if (previousView) {
-            setChatbotView(previousView as ChatbotViewType);
-        } else {
-            setChatbotView('view-recipes');
-        }
+        handleBack();
         setSelectedRecipeId(null);
     };
 
@@ -554,7 +567,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     };
 
     const handleCloseRecipeBuilder = () => {
-        handleGoHome(previousView);
+        handleBack();
         setShowRecipeBuilder(false);
         setRecipeTitle('');
         setRecipeIngredients([]);
@@ -736,7 +749,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             <h3 className="text-lg font-bold text-foreground">Coming Soon</h3>
                             <p className="mt-2 text-sm text-muted-foreground">This feature is on the way! Stay tuned for updates.</p>
                             <button
-                                onClick={() => handleGoHome(previousView)}
+                                onClick={handleBack}
                                 className="mt-4 px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
                             >
                                 Back to Previous View
@@ -750,7 +763,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Recipe Import</h2>
                             <button
-                                onClick={() => handleGoHome(previousView)}
+                                onClick={handleBack}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
