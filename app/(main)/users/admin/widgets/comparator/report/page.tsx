@@ -43,7 +43,7 @@ function ComparisonReportContent() {
 
     useEffect(() => {
         if (ids.length === 0) {
-            router.push('/admin/widgets/comparator');
+            router.push('/users/admin/widgets/comparator');
             return;
         }
 

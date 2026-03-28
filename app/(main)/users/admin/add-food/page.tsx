@@ -463,7 +463,7 @@ Fat: ${item.fat_g || 0}g
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
             {/* Back Button */}
             <button
-                onClick={() => router.push('/admin')}
+                onClick={() => router.push('/users/admin')}
                 className="flex items-center gap-2 text-sky-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
             >
                 <ArrowLeft size={14} /> Back to Admin
@@ -496,7 +496,7 @@ Fat: ${item.fat_g || 0}g
 
                     <div className="grid grid-cols-2 gap-2">
                         <Button
-                            onClick={() => router.push('/admin/widgets/comparator')}
+                            onClick={() => router.push('/users/admin/widgets/comparator')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Scale size={14} className="group-hover/btn:scale-110 transition-transform" />

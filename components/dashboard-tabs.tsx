@@ -43,11 +43,11 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
         defaultHref: '/foods',
-        matchPaths: ['/foods', '/dashboard/library/meals', '/admin/widgets'],
+        matchPaths: ['/foods', '/dashboard/library/meals', '/users/admin/widgets'],
         subtabs: [
             { id: 'foods', label: 'Foods', href: '/foods', icon: Leaf },
             { id: 'meals', label: 'Meals', href: '/dashboard/library/meals', icon: ChefHat },
-            { id: 'widgets', label: 'Widgets', href: '/admin/widgets', icon: LayoutGrid },
+            { id: 'widgets', label: 'Widgets', href: '/users/admin/widgets', icon: LayoutGrid },
         ],
     },
     {
@@ -73,13 +73,13 @@ const TAB_CONFIG: TopTab[] = [
         color: 'text-muted-foreground',
         activeColor: 'text-purple-400',
         activeBg: 'bg-purple-500/10 border-purple-500/30',
-        defaultHref: '/admin/widgets/comparator',
-        matchPaths: ['/admin/widgets/comparator', '/nutrients', '/admin/widgets/lifeguard'],
+        defaultHref: '/users/admin/widgets/comparator',
+        matchPaths: ['/users/admin/widgets/comparator', '/nutrients', '/users/admin/widgets/lifeguard'],
         adminOnly: true,
         subtabs: [
-            { id: 'comparator', label: 'Comparator', href: '/admin/widgets/comparator', icon: Scale },
+            { id: 'comparator', label: 'Comparator', href: '/users/admin/widgets/comparator', icon: Scale },
             { id: 'nutridex', label: 'Nutridex', href: '/nutrients', icon: Activity },
-            { id: 'lifeguard', label: 'Life Guard', href: '/admin/widgets/lifeguard', icon: Wallet },
+            { id: 'lifeguard', label: 'Life Guard', href: '/users/admin/widgets/lifeguard', icon: Wallet },
         ],
     },
 ];

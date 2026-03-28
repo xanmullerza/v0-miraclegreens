@@ -519,7 +519,7 @@ export default function RecipeBuilderPage() {
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
             {/* Back Button - Hidden as breadcrumbs are sufficient */}
             {/* <button
-                onClick={() => router.push('/admin')}
+                onClick={() => router.push('/users/admin')}
                 className="flex items-center gap-2 text-violet-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
             >
                 <ArrowLeft size={14} /> Back to Admin
@@ -542,7 +542,7 @@ export default function RecipeBuilderPage() {
                         <span>Smart Protocol Import</span>
                     </Button>
                     <Button
-                        onClick={() => router.push('/admin')}
+                        onClick={() => router.push('/users/admin')}
                         variant="outline"
                         className="h-12 border-slate-200 dark:border-slate-800 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-[10px]"
                     >
