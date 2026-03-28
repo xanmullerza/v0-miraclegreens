@@ -10,6 +10,8 @@ export interface ParsedRecipe {
     source_url: string;
     image_url?: string;
     image?: string;
+    type?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+    meal_type?: string;
 }
 
 export interface Recipe {
