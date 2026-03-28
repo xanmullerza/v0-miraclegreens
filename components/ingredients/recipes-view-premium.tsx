@@ -87,8 +87,11 @@ export function RecipesViewPremium({
             <div className="w-full max-w-6xl mx-auto bg-transparent rounded-[2rem] border-none shadow-none overflow-hidden">
                 
                 {/* Big Tab Bar - Inside Card */}
-                <div className="sticky top-0 z-20 bg-emerald-950/80 backdrop-blur-xl border-b border-emerald-900/50 py-4 px-4">
-                    <div className="flex bg-slate-100 dark:bg-slate-900/50 rounded-xl p-1 max-w-xl mx-auto border border-slate-200 dark:border-slate-800">
+                <div className={cn(
+                    "sticky top-0 z-20 bg-emerald-950/80 backdrop-blur-xl py-4 px-4 transition-all duration-300",
+                    (activeTab === 'foods' || activeTab === 'nutrients') ? "rounded-b-[2rem] shadow-xl" : "rounded-none"
+                )}>
+                    <div className="flex bg-slate-100/10 dark:bg-slate-900/50 rounded-xl p-1 max-w-xl mx-auto border border-emerald-800/20">
                         {([
                             { id: 'recipes' as TabId, label: 'Recipes', activeColor: 'text-emerald-500' },
                             { id: 'remixes' as TabId, label: 'Remixes', activeColor: 'text-indigo-500' },
@@ -116,7 +119,7 @@ export function RecipesViewPremium({
                 {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
                     <>
                         {/* Premium Controls Row - Inside Card */}
-                        <div className="sticky top-[68px] z-10 bg-emerald-950/80 backdrop-blur-md border-b border-emerald-900/50">
+                        <div className="sticky top-[72px] z-10 bg-emerald-950/80 backdrop-blur-md rounded-b-[2rem] shadow-xl">
                             <div className="px-6 py-3 flex items-center justify-center gap-4">
                                 {/* Search Bar */}
                                 <div className="relative w-full max-w-md">
@@ -222,7 +225,7 @@ export function RecipesViewPremium({
                         />
 
                         {/* Recipe List */}
-                        <div className="flex-1 overflow-hidden">
+                        <div className="flex-1 overflow-hidden pt-8">
                             <RecipesView
                                 key={`${activeTab}-${filters.onlyMyRecipes}`}
                                 onRecipeClick={onRecipeClick}
@@ -247,14 +250,14 @@ export function RecipesViewPremium({
 
                 {/* Foods View */}
                 {activeTab === 'foods' && (
-                    <div className="flex-1 overflow-hidden animate-in fade-in duration-300">
+                    <div className="flex-1 overflow-hidden animate-in fade-in duration-300 pt-8">
                         <FoodsView noContainer={true} />
                     </div>
                 )}
 
                 {/* Nutrients View */}
                 {activeTab === 'nutrients' && (
-                    <div className="flex-1 overflow-hidden animate-in fade-in duration-300">
+                    <div className="flex-1 overflow-hidden animate-in fade-in duration-300 pt-8">
                         <NutridexView compact={false} noContainer={true} />
                     </div>
                 )}
