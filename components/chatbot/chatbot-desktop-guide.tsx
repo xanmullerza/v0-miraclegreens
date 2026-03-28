@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings } from 'lucide-react';
+import { Leaf, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings } from 'lucide-react';
 import { ChatbotViewType } from '@/lib/context/chatbot-context';
 
 interface ChatbotDesktopGuideProps {
@@ -10,16 +10,16 @@ export function ChatbotDesktopGuide({ setChatbotView }: ChatbotDesktopGuideProps
     return (
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-900/50">
             {/* Header Section */}
-            <div className="flex flex-col items-center justify-center py-8 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-2 shadow-sm border border-emerald-500/20">
-                    <Bot size={32} className="text-emerald-500" />
+            <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
+                <div className="flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                    <Leaf size={28} className="text-white" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                        Vitala Assistant
+                    <h2 className="text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white leading-tight">
+                        Miracle Greens
                     </h2>
-                    <p className="text-sm text-slate-500 font-medium max-w-[250px] mx-auto mt-2 leading-relaxed">
-                        I'm your nutritional guide. Use this panel to ask questions or access quick tools.
+                    <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-500/80 mt-1">
+                        Nutritional Intelligence
                     </p>
                 </div>
             </div>
