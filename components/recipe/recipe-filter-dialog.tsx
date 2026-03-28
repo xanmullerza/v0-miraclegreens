@@ -32,7 +32,7 @@ interface RecipeFilterDialogProps {
   onClose: () => void;
 }
 
-type SectionKey = 'cookingSetup' | 'dietary' | 'exclusions' | 'health' | 'pantry' | 'extras';
+type SectionKey = 'ownership' | 'cookingSetup' | 'dietary' | 'exclusions' | 'health' | 'pantry' | 'extras';
 
 const DIET_OPTIONS = ['anything', 'vegetarian', 'vegan', 'pescatarian'];
 
@@ -83,7 +83,7 @@ export function RecipeFilterDialog({
   const [tagSearchQuery, setTagSearchQuery] = useState('');
   const [allSystemTags, setAllSystemTags] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>('cookingSetup');
+  const [expandedSection, setExpandedSection] = useState<SectionKey | 'difficulty' | 'tags' | null>('ownership');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -105,7 +105,7 @@ export function RecipeFilterDialog({
     }
   }, [filters, isOpen]);
 
-  const handleToggleSection = (section: string) => {
+  const handleToggleSection = (section: SectionKey | 'difficulty' | 'tags') => {
     setExpandedSection((prev) => (prev === section ? null : section));
   };
 
@@ -207,12 +207,38 @@ export function RecipeFilterDialog({
       showSupplements: false,
       selectedDifficulty: [],
       selectedTags: [],
+      onlyMyRecipes: false,
     });
     toast.info('Filters reset to profile defaults');
   };
 
   const FilterContentInner = (
     <div className="p-4 sm:p-6 space-y-6 overflow-y-auto overflow-x-hidden flex-1 scrollbar-thin">
+      {/* Ownership Section */}
+      <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+        <div className="p-4 bg-white dark:bg-slate-900">
+          <label className="flex items-center justify-between cursor-pointer group">
+            <div className="space-y-0.5">
+              <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">
+                My Recipes Only
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                Show only recipes you have created
+              </p>
+            </div>
+            <Switch
+              checked={localFilters.onlyMyRecipes}
+              onCheckedChange={(checked) =>
+                setLocalFilters((prev) => ({
+                  ...prev,
+                  onlyMyRecipes: checked,
+                }))
+              }
+            />
+          </label>
+        </div>
+      </div>
+
       {/* Cooking Setup Section */}
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
         <button
@@ -710,7 +736,8 @@ export function RecipeFilterDialog({
         (filters.pantryMode === 'pantry-only' ? 1 : 0) +
         (filters.showFlavours ? 1 : 0) +
         filters.selectedDifficulty.length +
-        filters.selectedTags.length}
+        filters.selectedTags.length +
+        (filters.onlyMyRecipes ? 1 : 0)}
     </span>
   );
 

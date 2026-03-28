@@ -13,6 +13,7 @@ export interface RecipeFilterState {
   showSupplements: boolean;
   selectedDifficulty: string[];
   selectedTags: string[];
+  onlyMyRecipes: boolean;
 }
 
 interface RecipeFilterContextType {
@@ -44,6 +45,7 @@ export function RecipeFilterProvider({
     showSupplements: false,
     selectedDifficulty: [],
     selectedTags: [],
+    onlyMyRecipes: false,
   });
 
   // Sync with profile changes
@@ -70,6 +72,7 @@ export function RecipeFilterProvider({
           showSupplements: parsed.showSupplements || false,
           selectedDifficulty: parsed.selectedDifficulty || [],
           selectedTags: parsed.selectedTags || [],
+          onlyMyRecipes: parsed.onlyMyRecipes || false,
         }));
       } catch (e) {
         console.error('Failed to load recipe filters from localStorage', e);
@@ -88,9 +91,10 @@ export function RecipeFilterProvider({
         showSupplements: filters.showSupplements,
         selectedDifficulty: filters.selectedDifficulty,
         selectedTags: filters.selectedTags,
+        onlyMyRecipes: filters.onlyMyRecipes,
       })
     );
-  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements]);
+  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements, filters.onlyMyRecipes]);
 
   const updateFilter = (key: keyof RecipeFilterState, value: any) => {
     setFilters((prev) => ({
@@ -110,6 +114,7 @@ export function RecipeFilterProvider({
       showSupplements: false,
       selectedDifficulty: [],
       selectedTags: [],
+      onlyMyRecipes: false,
     });
   };
 
@@ -124,6 +129,7 @@ export function RecipeFilterProvider({
       showSupplements: false,
       selectedDifficulty: [],
       selectedTags: [],
+      onlyMyRecipes: false,
     });
   };
 
@@ -134,7 +140,8 @@ export function RecipeFilterProvider({
     filters.pantryMode === 'pantry-only' ||
     filters.showFlavours ||
     filters.selectedDifficulty.length > 0 ||
-    filters.selectedTags.length > 0;
+    filters.selectedTags.length > 0 ||
+    filters.onlyMyRecipes;
 
   return (
     <RecipeFilterContext.Provider

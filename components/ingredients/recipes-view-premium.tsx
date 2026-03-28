@@ -50,10 +50,9 @@ export function RecipesViewPremium({
 }: RecipesViewPremiumProps) {
     const router = useRouter();
     const { setIsChatbotOpen, setChatbotView } = useChatbot();
-    const { hasActiveFilters, resetAllFilters } = useRecipeFilter();
+    const { filters, hasActiveFilters, resetAllFilters } = useRecipeFilter();
 
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
-    const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
     const [localSearchQuery, setLocalSearchQuery] = useState('');
     const [showSortOptions, setShowSortOptions] = useState(false);
     const [sortField, setSortField] = useState<string>('title');
@@ -116,33 +115,7 @@ export function RecipesViewPremium({
                     {/* Premium Controls Row */}
                     <div className="sticky top-[60px] z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
                         <div className="px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center gap-3">
-                            <div className="flex items-center gap-3 w-full sm:w-auto shrink-0 justify-between sm:justify-start">
-                                {/* All | Mine Toggle */}
-                                <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                                    <button
-                                        onClick={() => setShowOnlyMyRecipes(false)}
-                                        className={cn(
-                                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
-                                            !showOnlyMyRecipes
-                                                ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
-                                                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                                        )}
-                                    >
-                                        All
-                                    </button>
-                                    <button
-                                        onClick={() => setShowOnlyMyRecipes(true)}
-                                        className={cn(
-                                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
-                                            showOnlyMyRecipes
-                                                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                                                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                                        )}
-                                    >
-                                        Mine
-                                    </button>
-                                </div>
-                            </div>
+
 
                             {/* Search Bar */}
                             <div className="flex-1 relative w-full sm:max-w-xs">
@@ -263,12 +236,12 @@ export function RecipesViewPremium({
                     {/* Recipe List */}
                     <div className="flex-1 overflow-hidden">
                         <RecipesView
-                            key={`${activeTab}-${showOnlyMyRecipes}`}
+                            key={`${activeTab}-${filters.onlyMyRecipes}`}
                             onRecipeClick={onRecipeClick}
                             hideControls={true}
                             isMix={isMix}
                             isRemix={isRemix}
-                            onlyMyRecipes={showOnlyMyRecipes}
+                            onlyMyRecipes={filters.onlyMyRecipes}
                             showFavoritesOnly={showFavoritesOnly}
                             setShowFavoritesOnly={setShowFavoritesOnly}
                             selectedTypes={selectedTypes}
