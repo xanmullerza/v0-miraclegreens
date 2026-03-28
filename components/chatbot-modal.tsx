@@ -1200,7 +1200,6 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Bottom Navigation Footer (Mobile Optimized) */}
                 <ChatbotBottomNav
                     chatbotView={chatbotView}
-                    setChatbotView={navigateTo}
                     onClose={onClose}
                 />
             </div>
