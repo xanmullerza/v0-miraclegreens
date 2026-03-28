@@ -83,7 +83,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
 
     const handleGoHome = (fallback?: ChatbotViewType | null) => {
-        if (fallback && fallback !== 'dashboard' && fallback !== 'desktop-guide') {
+        // Clear previousView to prevent infinite loops when manually routing home
+        setPreviousView(null);
+        
+        if (fallback && fallback !== 'dashboard' && fallback !== 'desktop-guide' && fallback !== chatbotView) {
             setChatbotView(fallback);
             return;
         }
