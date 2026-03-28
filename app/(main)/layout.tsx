@@ -130,7 +130,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 {/* Divider + Resize Button */}
                 {pathname !== '/dashboard' && !isMobile && resizeMode !== 'dashboard-only' && (
                     <>
-                        <div className="w-px bg-slate-200 dark:bg-slate-800" />
                         <button
                             onClick={toggleResize}
                             className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-10 h-10 rounded-l-lg bg-slate-100 dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -144,7 +143,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 {/* Chat Area - Desktop only (mobile uses overlay button) */}
                 {pathname !== '/dashboard' && !isMobile && (
                     <div className={cn(
-                        "flex flex-col transition-all duration-300 ease-in-out overflow-hidden border-l border-slate-200 dark:border-slate-800 relative",
+                        "flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative",
                         getChatWidth()
                     )}>
                         <ChatbotModal
