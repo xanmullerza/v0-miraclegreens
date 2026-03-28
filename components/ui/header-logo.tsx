@@ -116,9 +116,9 @@ export function HeaderLogo({
                 {/* Navigation Items (Privacy, Support, Terms) */}
                 <div className="flex items-center h-full sm:divide-x divide-border border-l border-border">
                     {[
-                        { label: 'Privacy', path: '/privacy', icon: Shield, color: 'text-slate-500' },
-                        { label: 'Support', path: '/support', icon: HelpCircle, color: 'text-slate-500' },
-                        { label: 'Terms', path: '/terms', icon: BookOpen, color: 'text-slate-500' },
+                        { label: 'Privacy', path: '/static/privacy', icon: Shield, color: 'text-slate-500' },
+                        { label: 'Support', path: '/static/support', icon: HelpCircle, color: 'text-slate-500' },
+                        { label: 'Terms', path: '/static/terms', icon: BookOpen, color: 'text-slate-500' },
                     ].map((item) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
