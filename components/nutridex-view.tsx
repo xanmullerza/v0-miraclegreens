@@ -314,9 +314,16 @@ const COLUMN_MAP: Record<string, string> = {
 interface NutridexViewProps {
     compact?: boolean;
     noContainer?: boolean;
+    searchQuery?: string;
+    onSearchChange?: (query: string) => void;
 }
 
-export function NutridexView({ compact = false, noContainer = false }: NutridexViewProps) {
+export function NutridexView({ 
+    compact = false, 
+    noContainer = false,
+    searchQuery: externalSearchQuery,
+    onSearchChange
+}: NutridexViewProps) {
     const router = useRouter();
     const { profile, dailyTargets, energyUnit } = useUserPreferences();
 
@@ -353,7 +360,15 @@ export function NutridexView({ compact = false, noContainer = false }: NutridexV
 
     const handleHeroInput = useCallback((val: string) => {
         setHeroQuery(val);
-    }, []);
+        onSearchChange?.(val);
+    }, [onSearchChange]);
+
+    // Sync external searchQuery with local hero search
+    useEffect(() => {
+        if (externalSearchQuery !== undefined) {
+             setHeroQuery(externalSearchQuery);
+        }
+    }, [externalSearchQuery]);
 
     // Auto-expand sections when searching
     useEffect(() => {

@@ -3,17 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Search,
-    Plus,
-    CircleHelp,
-    ArrowDownUp,
-    Filter,
-    Heart,
-    ChevronDown,
-    X,
-    Clock,
-    ChefHat,
-    Salad
+    Search, X, Plus, CircleHelp, ArrowDownUp, Filter, Heart, ChevronDown, Clock, ChefHat, Salad, Flame, Loader2
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -115,8 +105,8 @@ export function RecipesViewPremium({
                     </div>
                 </div>
 
-                {/* Recipe-specific controls - only visible for recipe tabs */}
-                {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
+                {/* Universal controls - visible for all tabs in premium layout */}
+                {true && (
                     <>
                         {/* Premium Controls Row - Inside Card */}
                         <div className="sticky top-[72px] z-10 bg-transparent backdrop-blur-md rounded-b-[2rem] shadow-xl">
@@ -128,8 +118,8 @@ export function RecipesViewPremium({
                                         type="text"
                                         value={searchQuery ?? ''}
                                         onChange={(e) => onSearchChange(e.target.value)}
-                                        placeholder="Search recipes..."
-                                        className="w-full pl-10 pr-10 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 transition-all shadow-sm"
+                                        placeholder={activeTab === 'foods' ? "Search ingredients..." : activeTab === 'nutrients' ? "Search nutrients..." : "Search recipes..."}
+                                        className="w-full pl-10 pr-10 py-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-800/20 text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 transition-all shadow-sm"
                                     />
                                     {searchQuery && (
                                         <button
@@ -143,122 +133,133 @@ export function RecipesViewPremium({
 
                                 {/* Actions Group */}
                                 <div className="flex items-center gap-2 shrink-0">
-                                    {/* Sort Button */}
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setShowSortOptions(!showSortOptions)}
-                                            className={cn(
-                                                "p-2 rounded-xl transition-all flex items-center gap-2 border shadow-sm",
-                                                showSortOptions
-                                                    ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200"
-                                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-indigo-500 hover:border-indigo-200"
-                                            )}
-                                            title="Sort Options"
-                                        >
-                                            <ArrowDownUp size={18} />
-                                            <span className="text-[9px] font-black uppercase tracking-widest hidden lg:inline">
-                                                {sortField === 'title' ? 'A-Z' : sortField === 'prep_time' ? 'Time' : sortField === 'calories' ? 'Cal' : 'Diff'}
-                                            </span>
-                                        </button>
+                                    {/* Sort Button - Context Aware */}
+                                    {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setShowSortOptions(!showSortOptions)}
+                                                className={cn(
+                                                    "p-2 rounded-xl transition-all flex items-center gap-2 border shadow-sm outline-none",
+                                                    showSortOptions
+                                                        ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200"
+                                                        : "bg-white dark:bg-slate-800 border-emerald-800/20 text-slate-400 hover:text-indigo-500 hover:border-indigo-200"
+                                                )}
+                                                title="Sort Options"
+                                            >
+                                                <ArrowDownUp size={18} />
+                                                <span className="text-[9px] font-black uppercase tracking-widest hidden lg:inline">
+                                                    {sortField === 'title' ? 'A-Z' : sortField === 'prep_time' ? 'Time' : sortField === 'calories' ? 'Cal' : 'Diff'}
+                                                </span>
+                                            </button>
 
-                                        {showSortOptions && (
-                                            <div className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] p-1.5 animate-in fade-in zoom-in-95 duration-200">
-                                                {[
-                                                    { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
-                                                    { id: 'prep_time', label: 'Prep Time', icon: <Clock size={14} /> },
-                                                    { id: 'difficulty', label: 'Difficulty', icon: <ChefHat size={14} /> },
-                                                    { id: 'calories', label: 'Calories', icon: <Salad size={14} /> },
-                                                ].map((opt) => (
-                                                    <button
-                                                        key={opt.id}
-                                                        onClick={() => {
-                                                            handleSort(opt.id);
-                                                            setShowSortOptions(false);
-                                                        }}
-                                                        className={cn(
-                                                            "w-full text-left px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-between transition-all",
-                                                            sortField === opt.id
-                                                                ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600"
-                                                                : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                        )}
-                                                    >
-                                                        <span className="flex items-center gap-2">
+                                            {showSortOptions && (
+                                                <div className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] p-1.5 animate-in fade-in zoom-in-95 duration-200">
+                                                    {[
+                                                        { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
+                                                        { id: 'prep_time', label: 'Prep Time', icon: <Clock size={14} /> },
+                                                        { id: 'difficulty', label: 'Difficulty', icon: <ChefHat size={14} /> },
+                                                        { id: 'calories', label: 'Calories', icon: <Flame size={14} /> }
+                                                    ].map((opt) => (
+                                                        <button
+                                                            key={opt.id}
+                                                            onClick={() => {
+                                                                handleSort(opt.id);
+                                                                setShowSortOptions(false);
+                                                            }}
+                                                            className={cn(
+                                                                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                                sortField === opt.id
+                                                                    ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-600"
+                                                                    : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                            )}
+                                                        >
                                                             {opt.icon}
                                                             {opt.label}
-                                                        </span>
-                                                        {sortField === opt.id && (
-                                                            <span className="text-[8px]">
-                                                                {sortDirection === 'asc' ? '↑' : '↓'}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
-                                    {/* Filter Button */}
-                                    <button 
-                                        onClick={() => setShowFilterDialog(true)}
-                                        className={cn(
-                                            "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
-                                            hasActiveFilters
-                                                ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
-                                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
-                                        )}
-                                        title="Advanced Filters"
-                                    >
-                                        <Filter size={18} />
-                                        <span className="hidden lg:inline">Filters</span>
-                                        {hasActiveFilters && (
-                                            <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
-                                        )}
-                                    </button>
+                                    {/* Filter Button - Show for Recipes and Foods */}
+                                    {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
+                                        <button 
+                                            onClick={() => setShowFilterDialog(true)}
+                                            className={cn(
+                                                "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
+                                                hasActiveFilters
+                                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
+                                                    : "bg-white dark:bg-slate-800 border-emerald-800/20 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
+                                            )}
+                                            title="Advanced Filters"
+                                        >
+                                            <Filter size={18} />
+                                            <span className="hidden lg:inline">Filters</span>
+                                            {hasActiveFilters && (
+                                                <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
+                                            )}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
                         {/* Recipe Filter Dialog */}
-                        <RecipeFilterDialog 
-                            isOpen={showFilterDialog} 
-                            onClose={() => setShowFilterDialog(false)} 
-                        />
+                        {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
+                            <RecipeFilterDialog 
+                                isOpen={showFilterDialog} 
+                                onClose={() => setShowFilterDialog(false)} 
+                            />
+                        )}
 
                         {/* Recipe List */}
-                        <div className="flex-1 overflow-hidden pt-8">
-                            <RecipesView
-                                key={`${activeTab}-${filters.onlyMyRecipes}`}
-                                onRecipeClick={onRecipeClick}
-                                hideControls={true}
-                                isMix={isMix}
-                                isRemix={isRemix}
-                                onlyMyRecipes={filters.onlyMyRecipes}
-                                showFavoritesOnly={showFavoritesOnly}
-                                setShowFavoritesOnly={setShowFavoritesOnly}
-                                selectedTypes={selectedTypes}
-                                setSelectedTypes={setSelectedTypes}
-                                sortField={sortField}
-                                sortDirection={sortDirection}
-                                searchQuery={searchQuery}
-                                onSearchChange={onSearchChange}
-                                isPremium={true}
-                                noContainer={true}
-                            />
-                        </div>
+                        {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
+                            <div className="flex-1 overflow-hidden pt-8">
+                                <RecipesView
+                                    key={`${activeTab}-${filters.onlyMyRecipes}`}
+                                    onRecipeClick={onRecipeClick}
+                                    hideControls={true}
+                                    isMix={isMix}
+                                    isRemix={isRemix}
+                                    onlyMyRecipes={filters.onlyMyRecipes}
+                                    showFavoritesOnly={showFavoritesOnly}
+                                    setShowFavoritesOnly={setShowFavoritesOnly}
+                                    selectedTypes={selectedTypes}
+                                    setSelectedTypes={setSelectedTypes}
+                                    sortField={sortField}
+                                    sortDirection={sortDirection}
+                                    searchQuery={searchQuery}
+                                    onSearchChange={onSearchChange}
+                                    isPremium={true}
+                                    noContainer={true}
+                                />
+                            </div>
+                        )}
                     </>
                 )}
 
                 {/* Foods View */}
                 {activeTab === 'foods' && (
                     <div className="flex-1 overflow-hidden animate-in fade-in duration-300 pt-8">
-                        <FoodsView noContainer={true} />
+                        <FoodsView 
+                            noContainer={true} 
+                            hideControls={true}
+                            searchQuery={searchQuery}
+                            onSearchChange={onSearchChange}
+                        />
                     </div>
                 )}
 
                 {/* Nutrients View */}
                 {activeTab === 'nutrients' && (
                     <div className="flex-1 overflow-hidden animate-in fade-in duration-300 pt-8">
-                        <NutridexView compact={false} noContainer={true} />
+                        <NutridexView 
+                            compact={false} 
+                            noContainer={true} 
+                            searchQuery={searchQuery}
+                            onSearchChange={onSearchChange}
+                        />
                     </div>
                 )}
             </div>
