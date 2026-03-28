@@ -35,4 +35,5 @@ export interface Recipe {
     is_mix?: boolean;
     is_remix?: boolean;
     source?: string;
+    meal_type?: string;
 }
