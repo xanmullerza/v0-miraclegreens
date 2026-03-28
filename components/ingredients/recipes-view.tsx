@@ -105,6 +105,7 @@ export function RecipesView({
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [updatingTypeIds, setUpdatingTypeIds] = useState<string[]>([]);
     const { searchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
     const { filters } = useRecipeFilter();
@@ -404,6 +405,23 @@ export function RecipesView({
         }
     };
 
+    const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>, recipe: Recipe) => {
+        e.stopPropagation();
+        const newType = e.target.value;
+
+        setUpdatingTypeIds(prev => [...prev, recipe.id]);
+        try {
+            await saveRecipe({ ...recipe, type: newType });
+            setRecipes(prev => prev.map(r => r.id === recipe.id ? { ...r, type: newType } : r));
+            toast.success(`Saved meal type as ${newType}`);
+        } catch (error) {
+            console.error('Failed to update recipe type', error);
+            toast.error('Could not update meal type');
+        } finally {
+            setUpdatingTypeIds(prev => prev.filter(id => id !== recipe.id));
+        }
+    };
+
     const handleEdit = (e: React.MouseEvent, recipeId: string) => {
         e.stopPropagation();
         router.push(`/recipes/${recipeId}`);
@@ -463,9 +481,29 @@ export function RecipesView({
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0 lg:p-0">
-                                    <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight line-clamp-2">
-                                        {recipe.title.toLowerCase().split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                                    </h3>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight line-clamp-2">
+                                            {recipe.title.toLowerCase().split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                        </h3>
+                                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                                            {recipe.type || recipe.meal_type || 'dinner'}
+                                        </span>
+                                    </div>
+                                    <div className="mt-2 lg:mt-1">
+                                        <select
+                                            value={recipe.type || recipe.meal_type || 'dinner'}
+                                            onChange={(e) => handleTypeChange(e, recipe)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            disabled={updatingTypeIds.includes(recipe.id)}
+                                            className="w-full max-w-[170px] rounded-full border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 outline-none transition-colors hover:border-slate-300 disabled:cursor-wait disabled:opacity-60"
+                                        >
+                                            {MEAL_TYPES.map((mealType) => (
+                                                <option key={mealType} value={mealType} className="uppercase">
+                                                    {mealType}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                     {(recipe.calories > 0 || recipe.protein > 0) && (
                                         <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
                                             <span className="text-blue-500">{formatEnergy(recipe.calories, energyUnit)}</span>
