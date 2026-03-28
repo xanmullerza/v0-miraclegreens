@@ -200,7 +200,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 }
             } else if (chatbotView !== 'dashboard' && chatbotView !== 'desktop-guide') {
                 // If there's a popstate but no state data, go back to home
-                handleGoHome();
+                handleGoHome(previousView);
             }
         };
 
@@ -554,7 +554,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     };
 
     const handleCloseRecipeBuilder = () => {
-        handleGoHome();
+        handleGoHome(previousView);
         setShowRecipeBuilder(false);
         setRecipeTitle('');
         setRecipeIngredients([]);
@@ -736,10 +736,10 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             <h3 className="text-lg font-bold text-foreground">Coming Soon</h3>
                             <p className="mt-2 text-sm text-muted-foreground">This feature is on the way! Stay tuned for updates.</p>
                             <button
-                                onClick={() => handleGoHome()}
+                                onClick={() => handleGoHome(previousView)}
                                 className="mt-4 px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
                             >
-                                Back to Dashboard
+                                Back to Previous View
                             </button>
                         </div>
                     </div>
@@ -750,7 +750,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Recipe Import</h2>
                             <button
-                                onClick={() => handleGoHome()}
+                                onClick={() => handleGoHome(previousView)}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
@@ -992,10 +992,21 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 )}
 
                 {!showRecipeBuilder && chatbotView === 'view-recipes' && (
-                    <div className="flex-1 overflow-y-auto custom-scrollbar px-2 flex flex-col">
-                        <RecipesViewPremium 
-                            onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
-                        />
+                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-20 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Recipes</h2>
+                            <button
+                                onClick={() => handleGoHome(previousView)}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="px-2 pb-20">
+                            <RecipesViewPremium 
+                                onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')}
+                            />
+                        </div>
                     </div>
                 )}
 
