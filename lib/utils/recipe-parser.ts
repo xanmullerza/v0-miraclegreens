@@ -208,7 +208,7 @@ export const structureRecipeForSaving = (recipe: ParsedRecipe) => {
         cook_time: recipe.cook_time || 0,
         difficulty: recipe.difficulty || 'Medium',
         tags: recipe.tags || [],
-        image: recipe.image_url,
+        image: recipe.image_url || recipe.image,
         is_favorite: true,
         is_mix: false,
         diet: [] as string[],

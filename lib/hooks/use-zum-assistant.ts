@@ -259,6 +259,7 @@ export function useZumAssistant() {
                     prep_time: data.prep_time || 30,
                     cook_time: data.cook_time || 0,
                     source_url: 'image-upload',
+                    image_url: data.image_url || data.image || undefined,
                 };
                 setSuccessRecipe(recipeData);
                 setMessages(prev => [...prev, {
@@ -307,6 +308,7 @@ export function useZumAssistant() {
                     prep_time: recipe.prep_time || 30,
                     cook_time: recipe.cook_time || 0,
                     source_url: 'pasted-content',
+                    image_url: recipe.image_url || recipe.image || undefined,
                 };
                 setSuccessRecipe(recipeData);
                 setMessages(prev => [...prev, {
@@ -352,6 +354,7 @@ export function useZumAssistant() {
                     prep_time: recipe.prep_time || 30,
                     cook_time: recipe.cook_time || 0,
                     source_url: url,
+                    image_url: recipe.image_url || recipe.image || undefined,
                 };
                 setSuccessRecipe(recipeData);
                 setMessages(prev => [...prev, {

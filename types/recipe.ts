@@ -9,6 +9,7 @@ export interface ParsedRecipe {
     tags?: string[];
     source_url: string;
     image_url?: string;
+    image?: string;
 }
 
 export interface Recipe {
