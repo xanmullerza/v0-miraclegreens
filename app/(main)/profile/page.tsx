@@ -192,7 +192,7 @@ function ProfilePageContent() {
         headerStyle,
         setHeaderStyle,
     } = useUserPreferences();
-    const { chatbotView, setChatbotView: setChatbotViewContext, setPreviousView } = useChatbot();
+    const { chatbotView, setChatbotView: setChatbotViewContext, setPreviousView, navigateTo, goBack } = useChatbot();
     const { theme, setTheme } = useTheme();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -433,8 +433,7 @@ function ProfilePageContent() {
                             onClick={() => {
                                 // If inside chatbot modal, open as a view; otherwise open drawer
                                 if (chatbotView !== undefined && chatbotView !== null) {
-                                    setPreviousView('profile');
-                                    setChatbotViewContext('recommended-intake');
+                                    navigateTo('recommended-intake');
                                 } else {
                                     setShowRDADrawer(true);
                                 }

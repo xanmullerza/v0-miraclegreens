@@ -11,6 +11,9 @@ interface ChatbotContextType {
     setChatbotView: (view: ChatbotViewType) => void;
     previousView: ChatbotViewType | null;
     setPreviousView: (view: ChatbotViewType | null) => void;
+    viewStack: ChatbotViewType[];
+    navigateTo: (view: ChatbotViewType) => void;
+    goBack: (fallbackProvider?: () => void) => void;
 }
 
 const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
@@ -19,6 +22,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
     const [chatbotView, setChatbotView] = useState<ChatbotViewType>('desktop-guide');
     const [previousView, setPreviousView] = useState<ChatbotViewType | null>(null);
+    const [viewStack, setViewStack] = useState<ChatbotViewType[]>([]);
 
     // Initialize correct default view based on screen size across all routes
     React.useEffect(() => {
@@ -26,6 +30,35 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
             setChatbotView('dashboard');
         }
     }, []);
+
+    const navigateTo = (view: ChatbotViewType) => {
+        if (view !== chatbotView) {
+            setPreviousView(chatbotView);
+            setViewStack(prev => [...prev, chatbotView]);
+            setChatbotView(view);
+        }
+    };
+
+    const goBack = (fallbackProvider?: () => void) => {
+        if (viewStack.length > 0) {
+            const newStack = [...viewStack];
+            const lastView = newStack.pop()!;
+            setViewStack(newStack);
+            setPreviousView(newStack.length > 0 ? newStack[newStack.length - 1] : null);
+            setChatbotView(lastView);
+        } else if (fallbackProvider) {
+            fallbackProvider();
+        } else {
+            // Default home behavior
+            setPreviousView(null);
+            setViewStack([]);
+            if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                setChatbotView('dashboard');
+            } else {
+                setChatbotView('desktop-guide');
+            }
+        }
+    };
 
     return (
         <ChatbotContext.Provider value={{
@@ -35,6 +68,9 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
             setChatbotView,
             previousView,
             setPreviousView,
+            viewStack,
+            navigateTo,
+            goBack,
         }}>
             {children}
         </ChatbotContext.Provider>

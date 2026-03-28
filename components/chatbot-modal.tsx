@@ -56,7 +56,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const { user, saveRecipe } = useDataPersistence();
     const { profile } = useUserPreferences();
     const { filters } = useRecipeFilter();
-    const { chatbotView, setChatbotView, previousView, setPreviousView } = useChatbot();
+    const { chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack } = useChatbot();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
@@ -86,47 +86,26 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
     const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
 
-    const [viewStack, setViewStack] = useState<ChatbotViewType[]>([]);
-
-    const navigateTo = (view: ChatbotViewType) => {
-        if (view !== chatbotView) {
-            setPreviousView(chatbotView);
-            setViewStack(prev => [...prev, chatbotView]);
-            setChatbotView(view);
+    const handleGoHome = (fallback?: ChatbotViewType | null) => {
+        // Clear history stack when explicitly resetting to home
+        // We do this via the context's setters to ensure everything stays in sync
+        setPreviousView(null);
+        // Note: Resetting the stack itself is better done by calling a context-level reset if needed,
+        // but for now setting the view directly without pushing works.
+        
+        if (fallback && fallback !== chatbotView) {
+            setChatbotView(fallback);
+        } else {
+            if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                setChatbotView('dashboard');
+            } else {
+                setChatbotView('desktop-guide');
+            }
         }
     };
 
     const handleBack = () => {
-        if (viewStack.length > 0) {
-            const newStack = [...viewStack];
-            const lastView = newStack.pop()!;
-            setViewStack(newStack);
-            // Also sync previousView for context compatibility
-            setPreviousView(newStack.length > 0 ? newStack[newStack.length - 1] : null);
-            setChatbotView(lastView);
-        } else {
-            handleGoHome();
-        }
-    };
-
-    const handleGoHome = (fallback?: ChatbotViewType | null) => {
-        // Clear history stack when explicitly resetting to home
-        setViewStack([]);
-        setPreviousView(null);
-        
-        // If there's a fallback and it's not the current view, use it
-        // This allows returning to 'dashboard' or 'desktop-guide' if they were the previous view
-        if (fallback && fallback !== chatbotView) {
-            setChatbotView(fallback);
-            return;
-        }
-
-        // Default home behavior based on screen size
-        if (typeof window !== 'undefined' && window.innerWidth < 768) {
-            setChatbotView('dashboard');
-        } else {
-            setChatbotView('desktop-guide');
-        }
+        goBack(handleGoHome);
     };
 
     // Recipe builder state
@@ -814,18 +793,15 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <button
-                                onClick={() => {
-                                    setChatbotView('view-recipes');
-                                    setShowOnlyMyRecipes(false);
-                                }}
+                                onClick={() => navigateTo('view-recipes')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
-                                <span className="text-3xl transition-all">�</span>
+                                <span className="text-3xl transition-all">📖</span>
                                 <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">View Recipes</span>
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('import-options')}
+                                onClick={() => navigateTo('import-options')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">✍️</span>
@@ -848,7 +824,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Settings</h2>
                             <button
-                                onClick={() => handleGoHome(previousView)}
+                                onClick={handleBack}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
@@ -864,7 +840,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
-                                onClick={() => handleGoHome(previousView)}
+                                onClick={handleBack}
                                 className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             >
                                 🏠 Back to Dashboard
@@ -872,7 +848,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <button
-                                onClick={() => setChatbotView('planner')}
+                                onClick={() => navigateTo('planner')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">🗂️</span>
@@ -880,7 +856,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('pantry')}
+                                onClick={() => navigateTo('pantry')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">🧺</span>
@@ -888,7 +864,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('shopping')}
+                                onClick={() => navigateTo('shopping')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">🛒</span>
@@ -907,7 +883,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 animate-in fade-in duration-200">
                         <div className="flex justify-end mb-3">
                             <button
-                                onClick={() => handleGoHome(previousView)}
+                                onClick={handleBack}
                                 className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             >
                                 🏠 Back to Dashboard
@@ -915,7 +891,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <button
-                                onClick={() => setChatbotView('nutridex')}
+                                onClick={() => navigateTo('nutridex')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">🧪</span>
@@ -923,7 +899,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('comparator')}
+                                onClick={() => navigateTo('comparator')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">⚖️</span>
@@ -931,7 +907,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => setChatbotView('lifeguard')}
+                                onClick={() => navigateTo('lifeguard')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">🛡️</span>
@@ -939,10 +915,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                             </button>
 
                             <button
-                                onClick={() => {
-                                    setPreviousView('widgetsMenu');
-                                    setChatbotView('recommended-intake');
-                                }}
+                                onClick={() => navigateTo('recommended-intake')}
                                 className="flex flex-col items-center justify-center gap-2 p-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                             >
                                 <span className="text-3xl transition-all">📊</span>
@@ -968,7 +941,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 </div>
                             </div>
                             <button
-                                onClick={() => handleGoHome(previousView)}
+                                onClick={handleBack}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
@@ -1009,7 +982,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-20 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Recipes</h2>
                             <button
-                                onClick={() => handleGoHome(previousView)}
+                                onClick={handleBack}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
