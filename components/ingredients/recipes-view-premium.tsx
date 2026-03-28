@@ -88,7 +88,7 @@ export function RecipesViewPremium({
                 
                 {/* Big Tab Bar - Inside Card */}
                 <div className={cn(
-                    "sticky top-0 z-20 bg-emerald-950/80 backdrop-blur-xl py-4 px-4 transition-all duration-300",
+                    "sticky top-0 z-20 bg-transparent backdrop-blur-xl py-4 px-4 transition-all duration-300",
                     (activeTab === 'foods' || activeTab === 'nutrients') ? "rounded-b-[2rem] shadow-xl" : "rounded-none"
                 )}>
                     <div className="flex bg-slate-100/10 dark:bg-slate-900/50 rounded-xl p-1 max-w-xl mx-auto border border-emerald-800/20">
@@ -119,7 +119,7 @@ export function RecipesViewPremium({
                 {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
                     <>
                         {/* Premium Controls Row - Inside Card */}
-                        <div className="sticky top-[72px] z-10 bg-emerald-950/80 backdrop-blur-md rounded-b-[2rem] shadow-xl">
+                        <div className="sticky top-[72px] z-10 bg-transparent backdrop-blur-md rounded-b-[2rem] shadow-xl">
                             <div className="px-6 py-3 flex items-center justify-center gap-4">
                                 {/* Search Bar */}
                                 <div className="relative w-full max-w-md">
