@@ -118,7 +118,7 @@ export function RecipesViewPremium({
 
 
                             {/* Search Bar */}
-                            <div className="flex-1 relative max-w-[200px]">
+                            <div className="flex-1 relative max-w-sm sm:max-w-md">
                                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
