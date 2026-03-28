@@ -213,18 +213,7 @@ export function RecipesViewPremium({
                             </div>
                         </div>
 
-                        {/* Filter Chips Area */}
-                        {hasActiveFilters && (
-                            <div className="px-4 sm:px-6 pb-2 flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
-                                <div className="text-[8px] font-black uppercase tracking-widest text-slate-400 flex items-center mr-1">Active:</div>
-                                <button 
-                                    onClick={resetAllFilters}
-                                    className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[8px] font-black uppercase tracking-widest border border-blue-200 dark:border-blue-800 flex items-center gap-1 hover:bg-blue-200 transition-colors"
-                                >
-                                    Reset All <X size={10} />
-                                </button>
-                            </div>
-                        )}
+
                     </div>
 
                     {/* Recipe Filter Dialog */}
