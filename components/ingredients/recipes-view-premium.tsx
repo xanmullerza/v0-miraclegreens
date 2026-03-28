@@ -118,7 +118,7 @@ export function RecipesViewPremium({
 
 
                             {/* Search Bar */}
-                            <div className="flex-1 relative max-w-sm sm:max-w-md">
+                            <div className="relative w-full max-w-sm sm:max-w-md">
                                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
@@ -136,7 +136,7 @@ export function RecipesViewPremium({
                                     </button>
                                 )}
                             </div>
-                            <div className="flex-1" />
+
 
                             {/* Actions Group */}
                             <div className="flex items-center gap-2 shrink-0">
