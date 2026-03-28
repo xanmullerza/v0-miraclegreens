@@ -260,6 +260,9 @@ export function useZumAssistant() {
                     cook_time: data.cook_time || 0,
                     source_url: 'image-upload',
                     image_url: data.image_url || data.image || undefined,
+                    image: data.image || data.image_url || undefined,
+                    type: data.type || data.meal_type || 'dinner',
+                    meal_type: data.meal_type || undefined,
                 };
                 setSuccessRecipe(recipeData);
                 setMessages(prev => [...prev, {
@@ -309,6 +312,9 @@ export function useZumAssistant() {
                     cook_time: recipe.cook_time || 0,
                     source_url: 'pasted-content',
                     image_url: recipe.image_url || recipe.image || undefined,
+                    image: recipe.image || recipe.image_url || undefined,
+                    type: recipe.type || recipe.meal_type || 'dinner',
+                    meal_type: recipe.meal_type || undefined,
                 };
                 setSuccessRecipe(recipeData);
                 setMessages(prev => [...prev, {
@@ -355,6 +361,9 @@ export function useZumAssistant() {
                     cook_time: recipe.cook_time || 0,
                     source_url: url,
                     image_url: recipe.image_url || recipe.image || undefined,
+                    image: recipe.image || recipe.image_url || undefined,
+                    type: recipe.type || recipe.meal_type || 'dinner',
+                    meal_type: recipe.meal_type || undefined,
                 };
                 setSuccessRecipe(recipeData);
                 setMessages(prev => [...prev, {

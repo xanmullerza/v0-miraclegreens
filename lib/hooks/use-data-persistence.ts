@@ -171,6 +171,7 @@ export function useDataPersistence() {
                     id: recipeId,
                     user_id: user.id,
                     is_curated: false,
+                    type: recipe.type || recipe.meal_type || 'dinner',
                     // Only set defaults if NOT provided
                     tags: recipe.tags !== undefined ? recipe.tags : [],
                     difficulty: recipe.difficulty !== undefined ? recipe.difficulty : 'Medium'

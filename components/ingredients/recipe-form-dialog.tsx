@@ -395,6 +395,22 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recipe Title</Label>
                                         <Input className="font-bold text-lg h-12" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={isMix ? "e.g. Green Smoothie Base" : "e.g. Grilled Chicken Salad"} />
                                     </div>
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Meal Type</Label>
+                                        <select
+                                            value={type}
+                                            onChange={(e) => setType(e.target.value as any)}
+                                            className="w-full rounded-xl border border-emerald-300 bg-white dark:bg-slate-950 px-3 py-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30"
+                                        >
+                                            <option value="breakfast">Breakfast</option>
+                                            <option value="lunch">Lunch</option>
+                                            <option value="dinner">Dinner</option>
+                                            <option value="snack">Snack</option>
+                                        </select>
+                                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                            This controls how the planner categorizes the recipe.
+                                        </p>
+                                    </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
                                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Prep Time (min)</Label>

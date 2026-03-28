@@ -202,7 +202,7 @@ export const structureRecipeForSaving = (recipe: ParsedRecipe) => {
     // Basic Data
     const recipeDataToSave = {
         title: recipe.title,
-        type: 'dinner' as const,
+        type: recipe.type || recipe.meal_type || 'dinner',
         servings: recipe.servings || 4,
         prep_time: recipe.prep_time || 30,
         cook_time: recipe.cook_time || 0,
