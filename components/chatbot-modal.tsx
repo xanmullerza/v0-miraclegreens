@@ -542,6 +542,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     };
 
     const handleCloseRecipeBuilder = () => {
+        handleGoHome();
         setShowRecipeBuilder(false);
         setRecipeTitle('');
         setRecipeIngredients([]);
