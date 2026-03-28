@@ -26,6 +26,7 @@ interface FoodsViewProps {
     searchQuery?: string;
     onSearchChange?: (query: string) => void;
     hideControls?: boolean;
+    noContainer?: boolean;
 }
 
 export function FoodsView({ 
@@ -33,7 +34,8 @@ export function FoodsView({
     setShowAddFood, 
     searchQuery: externalSearchQuery, 
     onSearchChange,
-    hideControls = false
+    hideControls = false,
+    noContainer = false
 }: FoodsViewProps) {
     const { energyUnit } = useUserPreferences();
     const { searchQuery } = useSearch();
@@ -168,8 +170,9 @@ export function FoodsView({
     }, [effectiveSearchQuery, authReady, fetchFoods]);
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className={cn("space-y-8 animate-in fade-in duration-500", noContainer && "space-y-0")}>
             {/* List Container */}
+            {!noContainer ? (
             <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
                 {showAddFood && setShowAddFood ? (
                     <FoodFormDialog onClose={() => setShowAddFood(false)} />
@@ -412,6 +415,79 @@ export function FoodsView({
                     </>
                 )}
             </div>
+            ) : (
+                <div className="space-y-2 p-4">
+                    {loading && foods.length === 0 && (
+                        <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
+                            <Loader2 size={24} className="animate-spin text-emerald-500" />
+                            <p className="text-[10px] font-black uppercase tracking-widest">Loading Library...</p>
+                        </div>
+                    )}
+
+                    {!loading && foods.length === 0 && (
+                        <div className="py-16 text-center">
+                            <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
+                                <Leaf size={22} className="opacity-20" />
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                {(showFavoritesOnly || selectedCategories.length > 0 || effectiveSearchQuery)
+                                    ? 'No ingredients match your filters'
+                                    : 'Library is empty'}
+                            </p>
+                        </div>
+                    )}
+
+                    {foods.map((food) => (
+                        <Link
+                            key={food.id}
+                            href={`/foods/${food.id}`}
+                            className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                        >
+                            <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
+                                <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
+                                    {food.image ? (
+                                        <Image src={food.image} alt={food.name} fill className="object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                            <Beef size={24} className="opacity-10" />
+                                        </div>
+                                    )}
+                                    {food.is_in_pantry && (
+                                        <div className="absolute top-1 right-1 bg-emerald-500 text-white rounded-full p-0.5 shadow-md">
+                                            <Check size={8} strokeWidth={4} />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
+                                        {formatFoodName(food.common_name || food.name)}
+                                    </h3>
+                                    <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
+                                        <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                        <span className="text-slate-300 text-[8px]">•</span>
+                                        <span className="text-amber-500">{food.carbs_g.toFixed(0)}g C</span>
+                                        <span className="text-slate-300 text-[8px]">•</span>
+                                        <span className="text-rose-500">{food.fat_g.toFixed(0)}g F</span>
+                                        <span className="text-slate-300 text-[8px]">•</span>
+                                        <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
+                                    </div>
+                                </div>
+
+                                <div className="hidden lg:flex items-center justify-end gap-3">
+                                    <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                    <span className="text-slate-300 text-[8px]">•</span>
+                                    <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{food.carbs_g.toFixed(1)}g</span>
+                                    <span className="text-slate-300 text-[8px]">•</span>
+                                    <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
+                                    <span className="text-slate-300 text-[8px]">•</span>
+                                    <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            )}
 
             {hasMore && (
                 <div className="flex justify-center pt-4 pb-8">
