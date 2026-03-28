@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import { Leaf, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings, Shield, HelpCircle, BookOpen } from 'lucide-react';
 import { ChatbotViewType } from '@/lib/context/chatbot-context';
 
@@ -27,21 +26,21 @@ export function ChatbotDesktopGuide({ setChatbotView }: ChatbotDesktopGuideProps
 
             {/* Info Links */}
             <div className="flex items-center justify-center gap-2 mb-6 max-w-sm mx-auto">
-                {[
-                    { label: 'Privacy', path: '/privacy', icon: Shield },
-                    { label: 'Support', path: '/support', icon: HelpCircle },
-                    { label: 'Terms', path: '/terms', icon: BookOpen },
-                ].map((item) => {
+                {([
+                    { label: 'Privacy', view: 'privacy' as const, icon: Shield },
+                    { label: 'Support', view: 'support' as const, icon: HelpCircle },
+                    { label: 'Terms', view: 'terms' as const, icon: BookOpen },
+                ]).map((item) => {
                     const Icon = item.icon;
                     return (
-                        <Link
-                            key={item.path}
-                            href={item.path}
+                        <button
+                            key={item.view}
+                            onClick={() => setChatbotView(item.view)}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
                         >
                             <Icon size={12} />
                             {item.label}
-                        </Link>
+                        </button>
                     );
                 })}
             </div>

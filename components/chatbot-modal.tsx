@@ -29,6 +29,9 @@ import { ChatbotExport } from '@/components/chatbot-export';
 import { ChatbotShare } from '@/components/chatbot-share';
 import { RDAContent } from '@/components/rda-content';
 import ProfilePage from '@/app/(main)/profile/page';
+import PrivacyPolicyPage from '@/app/(main)/privacy/page';
+import SupportPage from '@/app/(main)/support/page';
+import TermsPage from '@/app/(main)/terms/page';
 import { toast } from 'sonner';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -1090,6 +1093,60 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Help Pages */}
                 {!showRecipeBuilder && (chatbotView === 'help-cookbook' || chatbotView === 'help-planner' || chatbotView === 'help-widgets') && (
                     <ChatbotHelpSection type={chatbotView} />
+                )}
+
+                {/* Privacy View */}
+                {!showRecipeBuilder && chatbotView === 'privacy' && (
+                    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar pb-20 animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Privacy</h2>
+                            <button
+                                onClick={() => handleGoHome()}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="-mt-8 pb-10">
+                            <PrivacyPolicyPage />
+                        </div>
+                    </div>
+                )}
+
+                {/* Support View */}
+                {!showRecipeBuilder && chatbotView === 'support' && (
+                    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar pb-20 animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Support</h2>
+                            <button
+                                onClick={() => handleGoHome()}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="-mt-8 pb-10">
+                            <SupportPage />
+                        </div>
+                    </div>
+                )}
+
+                {/* Terms View */}
+                {!showRecipeBuilder && chatbotView === 'terms' && (
+                    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar pb-20 animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Terms</h2>
+                            <button
+                                onClick={() => handleGoHome()}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="-mt-8 pb-10">
+                            <TermsPage />
+                        </div>
+                    </div>
                 )}
 
                 {/* Bottom Navigation Footer (Mobile Optimized) */}
