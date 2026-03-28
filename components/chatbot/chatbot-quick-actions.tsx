@@ -135,7 +135,6 @@ export function ChatbotQuickActions({
                     <div className="mt-2 ml-4 space-y-2 pl-4 border-l-2 border-purple-500">
                         <button
                             onClick={() => {
-                                setPreviousView(previousView);
                                 setChatbotView('shopping');
                                 setShowQuickActions(false);
                                 setExpandedAppsMenu(false);
@@ -147,7 +146,6 @@ export function ChatbotQuickActions({
                         </button>
                         <button
                             onClick={() => {
-                                setPreviousView(previousView);
                                 setChatbotView('pantry');
                                 setShowQuickActions(false);
                                 setExpandedAppsMenu(false);
@@ -159,7 +157,6 @@ export function ChatbotQuickActions({
                         </button>
                         <button
                             onClick={() => {
-                                setPreviousView(previousView);
                                 setChatbotView('planner');
                                 setShowQuickActions(false);
                                 setExpandedAppsMenu(false);
@@ -201,7 +198,6 @@ export function ChatbotQuickActions({
                     <div className="mt-2 ml-4 space-y-2 pl-4 border-l-2 border-cyan-500">
                         <button
                             onClick={() => {
-                                setPreviousView(previousView);
                                 setChatbotView('nutridex');
                                 setShowQuickActions(false);
                                 setExpandedWidgetsMenu(false);
@@ -213,7 +209,6 @@ export function ChatbotQuickActions({
                         </button>
                         <button
                             onClick={() => {
-                                setPreviousView(previousView);
                                 setChatbotView('comparator');
                                 setShowQuickActions(false);
                                 setExpandedWidgetsMenu(false);
@@ -225,7 +220,6 @@ export function ChatbotQuickActions({
                         </button>
                         <button
                             onClick={() => {
-                                setPreviousView(previousView);
                                 setChatbotView('lifeguard');
                                 setShowQuickActions(false);
                                 setExpandedWidgetsMenu(false);

@@ -86,14 +86,25 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null); // Always reset on refresh
     const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
 
+    const navigateTo = (view: ChatbotViewType) => {
+        if (view !== chatbotView) {
+            setPreviousView(chatbotView);
+            setChatbotView(view);
+        }
+    };
+
     const handleGoHome = (fallback?: ChatbotViewType | null) => {
         // Clear previousView to prevent infinite loops when manually routing home
         setPreviousView(null);
         
-        if (fallback && fallback !== 'dashboard' && fallback !== 'desktop-guide' && fallback !== chatbotView) {
+        // If there's a fallback and it's not the current view, use it
+        // This allows returning to 'dashboard' or 'desktop-guide' if they were the previous view
+        if (fallback && fallback !== chatbotView) {
             setChatbotView(fallback);
             return;
         }
+
+        // Default home behavior based on screen size
         if (typeof window !== 'undefined' && window.innerWidth < 768) {
             setChatbotView('dashboard');
         } else {
@@ -406,14 +417,14 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     };
 
     const handleViewAllRecipes = () => {
-        setChatbotView('view-recipes');
+        navigateTo('view-recipes');
         setShowOnlyMyRecipes(false);
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };
 
     const handleViewMyRecipes = () => {
-        setChatbotView('view-recipes');
+        navigateTo('view-recipes');
         setShowOnlyMyRecipes(true);
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
@@ -707,7 +718,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Dashboard Menu - Flattened into sections */}
                 {!showRecipeBuilder && chatbotView === 'dashboard' && (
                     <ChatbotDashboardView
-                        setChatbotView={setChatbotView}
+                        setChatbotView={navigateTo}
                         setShowOnlyMyRecipes={setShowOnlyMyRecipes}
                         isAdmin={isAdmin}
                     />
@@ -715,7 +726,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
 
                 {/* Desktop Guide Menu - Simplified default state for desktop mode */}
                 {!showRecipeBuilder && chatbotView === 'desktop-guide' && (
-                    <ChatbotDesktopGuide setChatbotView={setChatbotView} />
+                    <ChatbotDesktopGuide setChatbotView={navigateTo} />
                 )}
 
                 {/* Coming Soon Page */}
@@ -1098,7 +1109,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         expandedWidgetsMenu={expandedWidgetsMenu}
                         setExpandedWidgetsMenu={setExpandedWidgetsMenu}
                         chatbotView={chatbotView}
-                        setChatbotView={setChatbotView}
+                        setChatbotView={navigateTo}
                         previousView={previousView}
                         setPreviousView={setPreviousView}
                         handleViewAllRecipes={handleViewAllRecipes}
@@ -1192,7 +1203,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 {/* Bottom Navigation Footer (Mobile Optimized) */}
                 <ChatbotBottomNav
                     chatbotView={chatbotView}
-                    setChatbotView={setChatbotView}
+                    setChatbotView={navigateTo}
                     onClose={onClose}
                 />
             </div>
