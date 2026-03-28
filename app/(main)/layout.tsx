@@ -103,28 +103,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
-            {/* Unified Header & Nav - Spans both panels */}
-            {pathname !== '/dashboard' && isDesktop && (
-                <>
-                    {/* Header - Centered */}
-                    <div suppressHydrationWarning className="z-40 bg-background">
-                        <div className="w-full flex pointer-events-none">
-                            <div className="pointer-events-auto w-full">
-                                <HeaderLogo 
-                                    showSubtext={true}
-                                    userStatus={
-                                        user ? 'cloud' :
-                                            (profile.name || profile.nickname) ? 'local' :
-                                                'anonymous'
-                                    }
-                                    userAvatarUrl={user?.user_metadata?.avatar_url}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                </>
-            )}
 
             {/* Main content flex container */}
             <div className="flex flex-1 overflow-hidden">
