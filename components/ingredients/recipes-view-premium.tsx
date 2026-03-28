@@ -39,7 +39,7 @@ export function RecipesViewPremium({
     onSearchChange: externalOnSearchChange,
 }: RecipesViewPremiumProps) {
     const router = useRouter();
-    const { setIsChatbotOpen, setChatbotView } = useChatbot();
+    const { setIsChatbotOpen, setChatbotView, isChatbotOpen, chatbotView } = useChatbot();
     const { filters, hasActiveFilters, resetAllFilters } = useRecipeFilter();
 
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
@@ -49,7 +49,6 @@ export function RecipesViewPremium({
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
-    const [showFilterDialog, setShowFilterDialog] = useState(false);
 
     const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : localSearchQuery;
     const onSearchChange = externalOnSearchChange !== undefined ? externalOnSearchChange : setLocalSearchQuery;
@@ -188,10 +187,15 @@ export function RecipesViewPremium({
 
                                     {/* Filter Button - Show for All Tabs */}
                                     <button 
-                                        onClick={() => (activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') ? setShowFilterDialog(true) : null}
+                                        onClick={() => {
+                                            if (activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') {
+                                                setChatbotView('recipe-filters');
+                                                setIsChatbotOpen(true);
+                                            }
+                                        }}
                                         className={cn(
                                             "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
-                                            hasActiveFilters
+                                            (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
                                                 ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
                                                 : "bg-white dark:bg-slate-800 border-emerald-800/20 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
                                         )}
@@ -207,13 +211,6 @@ export function RecipesViewPremium({
                             </div>
                         </div>
 
-                        {/* Recipe Filter Dialog */}
-                        {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
-                            <RecipeFilterDialog 
-                                isOpen={showFilterDialog} 
-                                onClose={() => setShowFilterDialog(false)} 
-                            />
-                        )}
 
                         {/* Recipe List */}
                         {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
