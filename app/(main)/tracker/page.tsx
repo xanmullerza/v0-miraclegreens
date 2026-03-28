@@ -5,9 +5,11 @@ import { PageContainer } from '@/components/ui/page-container';
 import MealPlannerContent from '@/components/planner-content';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PantryView } from '@/components/kitchen/pantry-view';
+import { FoodsView } from '@/components/ingredients/foods-view';
+import { NutridexView } from '@/components/nutridex-view';
 import { cn } from '@/lib/utils';
 
-type TabId = 'shopping' | 'pantry' | 'planner';
+type TabId = 'shopping' | 'pantry' | 'planner' | 'foods' | 'nutrients';
 
 export default function TrackerPage() {
     const [activeTab, setActiveTab] = useState<TabId>('shopping');
@@ -18,13 +20,15 @@ export default function TrackerPage() {
         { id: 'shopping', label: 'Shopping', activeColor: 'text-emerald-500' },
         { id: 'pantry', label: 'Pantry', activeColor: 'text-amber-500' },
         { id: 'planner', label: 'Planner', activeColor: 'text-blue-500' },
+        { id: 'foods', label: 'Foods', activeColor: 'text-cyan-500' },
+        { id: 'nutrients', label: 'Nutrients', activeColor: 'text-violet-500' },
     ];
 
     return (
         <>
             {/* Tab Bar */}
             <div className="sticky top-0 z-20 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800">
-                <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 max-w-md mx-auto">
+                <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 max-w-xl mx-auto">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
@@ -56,6 +60,16 @@ export default function TrackerPage() {
                     )}
                     {activeTab === 'planner' && (
                         <MealPlannerContent />
+                    )}
+                    {activeTab === 'foods' && (
+                        <div className="animate-in fade-in duration-300">
+                            <FoodsView />
+                        </div>
+                    )}
+                    {activeTab === 'nutrients' && (
+                        <div className="animate-in fade-in duration-300">
+                            <NutridexView compact={false} />
+                        </div>
                     )}
                 </div>
             </PageContainer>
