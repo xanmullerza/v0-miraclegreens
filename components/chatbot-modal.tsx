@@ -28,7 +28,7 @@ import { ChatbotHelpSection } from '@/components/chatbot-help-section';
 import { ChatbotExport } from '@/components/chatbot-export';
 import { ChatbotShare } from '@/components/chatbot-share';
 import { RDAContent } from '@/components/rda-content';
-import ProfilePage from '@/app/(main)/profile/page';
+import ProfilePage from '@/app/(main)/users/profile/page';
 import PrivacyPolicyPage from '@/app/(main)/static/privacy/page';
 import SupportPage from '@/app/(main)/static/support/page';
 import TermsPage from '@/app/(main)/static/terms/page';
