@@ -87,7 +87,7 @@ export function RecipesViewPremium({
             <div className="w-full max-w-6xl mx-auto bg-transparent rounded-[2rem] border-none shadow-none overflow-hidden">
                 
                 {/* Big Tab Bar - Inside Card */}
-                <div className="sticky top-0 z-20 bg-emerald-950/40 backdrop-blur-xl border-b border-emerald-900/50 py-4 px-4">
+                <div className="sticky top-0 z-20 bg-emerald-950/80 backdrop-blur-xl border-b border-emerald-900/50 py-4 px-4">
                     <div className="flex bg-slate-100 dark:bg-slate-900/50 rounded-xl p-1 max-w-xl mx-auto border border-slate-200 dark:border-slate-800">
                         {([
                             { id: 'recipes' as TabId, label: 'Recipes', activeColor: 'text-emerald-500' },
@@ -116,7 +116,7 @@ export function RecipesViewPremium({
                 {(activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') && (
                     <>
                         {/* Premium Controls Row - Inside Card */}
-                        <div className="sticky top-[68px] z-10 bg-emerald-950/60 backdrop-blur-md border-b border-emerald-900/50">
+                        <div className="sticky top-[68px] z-10 bg-emerald-950/80 backdrop-blur-md border-b border-emerald-900/50">
                             <div className="px-6 py-3 flex items-center justify-center gap-4">
                                 {/* Search Bar */}
                                 <div className="relative w-full max-w-md">
