@@ -1074,7 +1074,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <RDAContent 
                             compact={false} 
                             showCloseButton={true}
-                            onClose={() => handleGoHome(previousView)}
+                            onClose={handleBack}
                         />
                     </div>
                 )}
@@ -1131,7 +1131,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Privacy</h2>
                             <button
-                                onClick={() => handleGoHome()}
+                                onClick={handleBack}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
@@ -1149,7 +1149,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Support</h2>
                             <button
-                                onClick={() => handleGoHome()}
+                                onClick={handleBack}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
@@ -1167,7 +1167,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Terms</h2>
                             <button
-                                onClick={() => handleGoHome()}
+                                onClick={handleBack}
                                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
                             >
                                 <X size={20} />
