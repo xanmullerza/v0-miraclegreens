@@ -9,6 +9,7 @@ import { ChatbotModal } from '@/components/chatbot-modal';
 import { RecipePreview } from '@/components/recipe/recipe-preview';
 import { Footer } from '@/components/footer';
 import { RDADrawer } from '@/components/rda-drawer';
+import { DraggableFab } from '@/components/draggable-fab';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
 import { SearchProvider } from '@/lib/context/search-context';
@@ -145,6 +146,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         </div>
                         {pathname !== '/dashboard' && isDesktop && <Footer />}
                     </main>
+                    {isDesktop && <DraggableFab />}
                 </div>
 
                 {/* Divider + Resize Button */}
