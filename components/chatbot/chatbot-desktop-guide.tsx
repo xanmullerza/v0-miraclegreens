@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings, Shield, HelpCircle, BookOpen } from 'lucide-react';
+import { Leaf, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings, Shield, HelpCircle, BookOpen, Upload } from 'lucide-react';
 import { ChatbotViewType } from '@/lib/context/chatbot-context';
 
 interface ChatbotDesktopGuideProps {
@@ -78,6 +78,20 @@ export function ChatbotDesktopGuide({ setChatbotView }: ChatbotDesktopGuideProps
                         <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Create a meal</p>
                     </div>
                     <ChevronRight size={18} className="text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+                </button>
+
+                <button
+                    onClick={() => setChatbotView('import')}
+                    className="w-full flex items-center p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 hover:shadow-md transition-all group"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mr-4 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                        <Upload size={20} className="text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
+                    </div>
+                    <div className="flex-1 text-left">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">Import Recipe</h4>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Photo, link or text</p>
+                    </div>
+                    <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                 </button>
 
 

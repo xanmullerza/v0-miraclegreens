@@ -188,18 +188,6 @@ export function RecipesViewPremium({
 
                             {/* Actions Group */}
                             <div className="flex items-center gap-2 shrink-0">
-                                {/* Add Button */}
-                                <button
-                                    onClick={() => {
-                                        setChatbotView('import');
-                                        setIsChatbotOpen(true);
-                                    }}
-                                    className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all text-emerald-500 hover:text-emerald-600 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm group"
-                                    title="AI Recipe Import"
-                                >
-                                    <Plus size={18} className="group-hover:scale-110 transition-transform" />
-                                </button>
-
                                 {/* Sort Button */}
                                 <div className="relative">
                                     <button

@@ -726,34 +726,47 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 )}
 
                 {!showRecipeBuilder && chatbotView.startsWith('import') && (
-                    <ChatbotImportView
-                        setChatbotView={setChatbotView}
-                        isLoading={isLoading}
-                        recipeLoading={recipeLoading}
-                        recipeSaving={recipeSaving}
-                        successRecipe={successRecipe}
-                        setSuccessRecipe={setSuccessRecipe}
-                        pastedRecipeURL={pastedRecipeURL}
-                        setpastedRecipeURL={setpastedRecipeURL}
-                        pastedRecipeContent={pastedRecipeContent}
-                        setPastedRecipeContent={setPastedRecipeContent}
-                        handlePasteRecipeContent={handlePasteRecipeContent}
-                        handlePasteRecipeURL={handlePasteRecipeURL}
-                        handleSaveAndViewRecipe={handleSaveAndViewRecipe}
-                        handleManualRecipeCreation={handleManualRecipeCreation}
-                        isDragging={isDragging}
-                        setIsDragging={setIsDragging}
-                        processRecipeImage={processRecipeImage}
-                        fileInputRef={fileInputRef}
-                        isRecording={isRecording}
-                        recordingTime={recordingTime}
-                        startAudioRecording={startAudioRecording}
-                        stopAudioRecording={stopAudioRecording}
-                        videoURL={videoURL}
-                        setVideoURL={setVideoURL}
-                        toast={toast}
-                        recipeContentRef={recipeContentRef}
-                    />
+                    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar pb-20 animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Recipe Import</h2>
+                            <button
+                                onClick={() => handleGoHome()}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="-mt-4">
+                            <ChatbotImportView
+                                setChatbotView={setChatbotView}
+                                isLoading={isLoading}
+                                recipeLoading={recipeLoading}
+                                recipeSaving={recipeSaving}
+                                successRecipe={successRecipe}
+                                setSuccessRecipe={setSuccessRecipe}
+                                pastedRecipeURL={pastedRecipeURL}
+                                setpastedRecipeURL={setpastedRecipeURL}
+                                pastedRecipeContent={pastedRecipeContent}
+                                setPastedRecipeContent={setPastedRecipeContent}
+                                handlePasteRecipeContent={handlePasteRecipeContent}
+                                handlePasteRecipeURL={handlePasteRecipeURL}
+                                handleSaveAndViewRecipe={handleSaveAndViewRecipe}
+                                handleManualRecipeCreation={handleManualRecipeCreation}
+                                isDragging={isDragging}
+                                setIsDragging={setIsDragging}
+                                processRecipeImage={processRecipeImage}
+                                fileInputRef={fileInputRef}
+                                isRecording={isRecording}
+                                recordingTime={recordingTime}
+                                startAudioRecording={startAudioRecording}
+                                stopAudioRecording={stopAudioRecording}
+                                videoURL={videoURL}
+                                setVideoURL={setVideoURL}
+                                toast={toast}
+                                recipeContentRef={recipeContentRef}
+                            />
+                        </div>
+                    </div>
                 )}
 
                 {!showRecipeBuilder && chatbotView === 'cookbook' && (
