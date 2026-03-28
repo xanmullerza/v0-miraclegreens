@@ -14,7 +14,8 @@ import {
     FileText,
     Zap,
     Scale,
-    Beaker
+    Beaker,
+    Wallet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -89,6 +90,14 @@ export default function AdminOverview() {
             icon: Scale,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
+        },
+        {
+            name: 'Life Guard',
+            desc: 'Monitor nutritional thresholds.',
+            href: '/admin/widgets/lifeguard',
+            icon: Wallet,
+            color: 'text-teal-500',
+            bg: 'bg-teal-500/10'
         },
         {
             name: 'Spice Lab',
