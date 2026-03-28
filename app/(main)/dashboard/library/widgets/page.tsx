@@ -33,7 +33,7 @@ const WIDGETS: Widget[] = [
         description: 'Compare nutritional profiles of different foods side by side',
         icon: Zap,
         color: 'orange',
-        path: '/dashboard/widgets/comparator'
+        path: '/admin/widgets/comparator'
     },
     {
         id: 'lifeguard',
@@ -41,7 +41,7 @@ const WIDGETS: Widget[] = [
         description: 'Monitor and optimize your health markers and RDA targets',
         icon: Shield,
         color: 'rose',
-        path: '/dashboard/widgets/lifeguard'
+        path: '/admin/widgets/lifeguard'
     }
 ];
 

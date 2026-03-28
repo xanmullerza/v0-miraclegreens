@@ -85,7 +85,7 @@ export default function AdminOverview() {
         {
             name: 'Compare Foods',
             desc: 'Analyze and compare profiles.',
-            href: '/dashboard/widgets/comparator',
+            href: '/admin/widgets/comparator',
             icon: Scale,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'

@@ -7,7 +7,7 @@ export default function WidgetsPage() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/dashboard/widgets/comparator');
+        router.replace('/admin/widgets/comparator');
     }, [router]);
 
     return null;
