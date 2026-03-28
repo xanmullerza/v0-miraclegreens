@@ -45,18 +45,18 @@ export function ChatbotBottomNav({
             </button>
 
             <button
-                onClick={() => setChatbotView('dashboard')}
+                onClick={() => setChatbotView('desktop-guide')}
                 className={cn(
                     "flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 group",
-                    chatbotView === 'dashboard' ? "text-blue-500" : "text-slate-400"
+                    chatbotView === 'desktop-guide' ? "text-blue-500" : "text-slate-400"
                 )}
-                title="Assistant Hub"
+                title="Sidebar Assistant"
             >
                 <div className={cn(
                     "w-10 h-10 flex items-center justify-center rounded-xl transition-all",
-                    chatbotView === 'dashboard' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" : "bg-transparent"
+                    chatbotView === 'desktop-guide' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" : "bg-transparent"
                 )}>
-                    <Wand2 size={20} className={cn("transition-transform group-hover:scale-110", chatbotView === 'dashboard' && "animate-pulse")} />
+                    <Wand2 size={20} className={cn("transition-transform group-hover:scale-110", chatbotView === 'desktop-guide' && "animate-pulse")} />
                 </div>
                 <span className="text-[9px] font-black uppercase tracking-widest scale-[0.7] origin-top opacity-60">Assistant</span>
             </button>

@@ -51,7 +51,7 @@ export function Footer() {
           <button
             onClick={() => {
               setIsChatbotOpen(!isChatbotOpen);
-              if (!isChatbotOpen) setChatbotView('dashboard');
+              if (!isChatbotOpen) setChatbotView('desktop-guide');
             }}
             className={cn(
               "flex flex-col items-center justify-center gap-1 py-1.5 rounded-[2rem] transition-all duration-300 active:scale-95 group flex-1",
