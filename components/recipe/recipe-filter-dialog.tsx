@@ -15,11 +15,11 @@ import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { EQUIPMENT_CATEGORIES } from '@/lib/utils/equipment-inference';
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import {
   Drawer,
   DrawerContent,
@@ -765,17 +765,27 @@ export function RecipeFilterDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="z-[200] max-w-2xl w-full p-0 overflow-hidden max-h-[90vh] flex flex-col gap-0 border-none sm:border bg-white dark:bg-slate-900 shadow-2xl rounded-t-3xl sm:rounded-2xl fixed inset-x-0 bottom-0 top-auto translate-x-0 translate-y-0 data-[state=open]:translate-x-0 data-[state=open]:translate-y-0 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:data-[state=open]:-translate-x-1/2 sm:data-[state=open]:-translate-y-1/2" aria-describedby={undefined}>
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex items-center justify-between">
-          <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center">
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent 
+        side="right"
+        className="z-[200] w-full sm:max-w-md p-0 overflow-hidden flex flex-col gap-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl"
+        aria-describedby={undefined}
+      >
+        <SheetHeader className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex flex-row items-center justify-between text-left space-y-0">
+          <SheetTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center">
             Filter Recipes
             {FilterBadge}
-          </DialogTitle>
-        </div>
+          </SheetTitle>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </SheetHeader>
         {FilterContentInner}
         {FilterFooter}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
