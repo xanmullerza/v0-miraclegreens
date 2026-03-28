@@ -171,6 +171,13 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         }
     }, [chatbotView]);
 
+    // Automatically trigger manual recipe creation when view is set to recipe-builder
+    useEffect(() => {
+        if (chatbotView === 'recipe-builder' && !showRecipeBuilder) {
+            handleManualRecipeCreation();
+        }
+    }, [chatbotView, showRecipeBuilder]);
+
     // Handle popstate event (OS back button)
     useEffect(() => {
         const handlePopState = (e: PopStateEvent) => {

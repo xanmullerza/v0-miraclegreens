@@ -199,15 +199,6 @@ export function ChatbotImportView({
                     )}
                 </div>
 
-                {/* Manual Entry Card */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-purple-500/20 dark:bg-purple-500/10">
-                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Create Manually</h4>
-                    <div className="bg-emerald-500/10 dark:bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/20 flex flex-col flex-1 items-center justify-center group hover:border-emerald-500/40 transition-all duration-300 cursor-pointer"
-                        onClick={handleManualRecipeCreation}>
-                        <Pencil size={28} className="text-emerald-500 mb-2" />
-                        <p className="text-xs text-slate-600 dark:text-slate-400 text-center">Add recipe details manually</p>
-                    </div>
-                </div>
             </div>
         </div>
     );

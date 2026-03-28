@@ -74,8 +74,8 @@ export function ChatbotDesktopGuide({ setChatbotView }: ChatbotDesktopGuideProps
                         <Sparkles size={20} className="text-indigo-600 dark:text-indigo-400 group-hover:text-white transition-colors" />
                     </div>
                     <div className="flex-1 text-left">
-                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">Recipe Builder</h4>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Create a meal</p>
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">Recipe Maker</h4>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Build a unique meal</p>
                     </div>
                     <ChevronRight size={18} className="text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
                 </button>
