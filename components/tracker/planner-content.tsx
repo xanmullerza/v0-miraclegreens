@@ -95,6 +95,11 @@ import { useSearch } from '@/lib/context/search-context';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { usePantry } from '@/hooks/use-pantry';
 import { useShoppingList } from '@/hooks/use-shopping-list';
+import dynamic from 'next/dynamic';
+
+const FoodItemCreatorContent = dynamic(() => import('@/components/maker/food-item-creator').then(m => m.FoodItemCreatorContent), { ssr: false });
+const MealBuilderContent = dynamic(() => import('@/components/maker/meal-builder').then(m => m.MealBuilderContent), { ssr: false });
+const MixBuilderContent = dynamic(() => import('@/components/maker/mix-builder').then(m => m.MixBuilderContent), { ssr: false });
 
 
 const showShop = false;

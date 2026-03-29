@@ -25,7 +25,7 @@ const Card = React.forwardRef<HTMLDivElement, { children: React.ReactNode, class
 Card.displayName = "Card";
 
 interface UserRecipeBuilderProps {
-    defaultType?: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'mix';
+    defaultType?: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'mix' | 'meal';
     onSaveSuccess?: (recipeId: string) => void;
 }
 
@@ -723,7 +723,7 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
                                 <div className="space-y-3">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Meal Type</Label>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {['breakfast', 'lunch', 'dinner', 'snack', 'mix'].map(m => (
+                                        {['breakfast', 'lunch', 'dinner', 'snack', 'mix', 'meal'].map(m => (
                                             <button
                                                 key={m}
                                                 onClick={() => setType(m as any)}
