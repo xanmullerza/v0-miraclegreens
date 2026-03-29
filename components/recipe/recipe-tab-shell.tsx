@@ -17,6 +17,23 @@ interface RecipeTabShellProps {
     title: string;
 }
 
+const RECIPE_SORT_OPTIONS = [
+    { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
+    { id: 'prep_time', label: 'Prep Time', icon: <Clock size={14} /> },
+    { id: 'difficulty', label: 'Difficulty', icon: <ChefHat size={14} /> },
+    { id: 'calories', label: 'Calories', icon: <Flame size={14} /> }
+] as const;
+
+const getRecipeSortLabel = (field: string) => {
+    switch (field) {
+        case 'title': return 'A-Z';
+        case 'prep_time': return 'Time';
+        case 'difficulty': return 'Diff';
+        case 'calories': return 'Cal';
+        default: return 'Sort';
+    }
+};
+
 export function RecipeTabShell({
     children,
     searchQuery,
@@ -55,10 +72,10 @@ export function RecipeTabShell({
                                     "h-9 px-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-2 border",
                                     (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
                                         ? "bg-emerald-600 text-white border-emerald-500 shadow-emerald-500/20"
-                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
+                                        : "bg-white/10 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-300 hover:bg-white/20 dark:hover:bg-slate-900/60 hover:border-emerald-300 hover:text-emerald-400"
                                 )}
                             >
-                                <Filter size={14} className={(hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters')) ? 'text-white' : 'text-slate-500'} />
+                                <Filter size={14} className={(hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters')) ? 'text-white' : 'text-slate-300'} />
                                 <span>Filters</span>
                                 {hasActiveFilters && (
                                     <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -72,23 +89,18 @@ export function RecipeTabShell({
                                         "h-9 px-4 rounded-full transition-all flex items-center gap-2 border text-[10px] font-black uppercase tracking-[0.2em]",
                                         showSortOptions
                                             ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-                                            : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500"
+                                            : "bg-white/10 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-300 hover:bg-white/20 dark:hover:bg-slate-900/60 hover:border-emerald-300 hover:text-emerald-400"
                                     )}
                                 >
-                                    <ArrowDownUp size={16} className={showSortOptions ? 'text-emerald-500' : 'text-slate-500'} />
+                                    <ArrowDownUp size={16} className={showSortOptions ? 'text-emerald-500' : 'text-slate-300'} />
                                     <span>
-                                        {sortField === 'title' ? 'A-Z' : sortField === 'prep_time' ? 'Time' : sortField === 'calories' ? 'Cal' : 'Diff'}
+                                        {getRecipeSortLabel(sortField)}
                                     </span>
                                 </button>
 
                                 {showSortOptions && (
                                     <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-950 rounded-[1.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] p-2">
-                                        {[
-                                            { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
-                                            { id: 'prep_time', label: 'Prep Time', icon: <Clock size={14} /> },
-                                            { id: 'difficulty', label: 'Difficulty', icon: <ChefHat size={14} /> },
-                                            { id: 'calories', label: 'Calories', icon: <Flame size={14} /> }
-                                        ].map((opt) => (
+                                        {RECIPE_SORT_OPTIONS.map((opt) => (
                                             <button
                                                 key={opt.id}
                                                 onClick={() => {
@@ -119,7 +131,7 @@ export function RecipeTabShell({
                                     value={searchQuery}
                                     onChange={(e) => onSearchChange(e.target.value)}
                                     placeholder={`Search ${title.toLowerCase()}...`}
-                                    className="w-full h-9 pl-12 pr-10 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-full text-[10px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all shadow-sm"
+                                    className="w-full h-9 pl-12 pr-10 bg-white/10 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-full text-[10px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all shadow-sm"
                                 />
                                 {searchQuery && (
                                     <button
