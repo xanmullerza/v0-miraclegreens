@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, ReactNode } from 'react';
 import { SplitLayout } from '@/components/scattered/split-layout';
-import { ChatbotModal } from '@/components/scattered/chatbot-modal';
+import { ChatbotModal } from '@/components/chatbot/chatbot-modal';
 import { useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 

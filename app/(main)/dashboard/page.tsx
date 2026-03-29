@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChatbotModal } from '@/components/scattered/chatbot-modal';
+import { ChatbotModal } from '@/components/chatbot/chatbot-modal';
 import { RecipePreview } from '@/components/recipe/recipe-preview';
 
 interface ParsedRecipe {

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
 import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
-import { ChatbotShare } from '@/components/scattered/chatbot-share';
+import { ChatbotShare } from '@/components/chatbot/chatbot-share';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import { 
     extractCoreName, 

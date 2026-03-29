@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HeaderLogo } from '@/components/ui/header-logo';
-import { ChatbotModal } from '@/components/scattered/chatbot-modal';
+import { ChatbotModal } from '@/components/chatbot/chatbot-modal';
 import { RecipePreview } from '@/components/recipe/recipe-preview';
 import { Footer } from '@/components/scattered/footer';
 import { RDADrawer } from '@/components/scattered/rda-drawer';

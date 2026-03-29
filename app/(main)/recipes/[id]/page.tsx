@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ChatbotRecipeDetail } from '@/components/scattered/chatbot-recipe-detail';
+import { ChatbotRecipeDetail } from '@/components/chatbot/chatbot-recipe-detail';
 import { PageContainer } from '@/components/ui/page-container';
 
 export default function RecipeDetailsPage() {

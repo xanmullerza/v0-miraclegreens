@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ChefHat, Loader2, Share2, Search, X, Check, ArrowLeft } from 'lucide-react';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
 import { cn } from '@/lib/utils';
-import { ChatbotShare } from '@/components/scattered/chatbot-share';
+import { ChatbotShare } from '@/components/chatbot/chatbot-share';
 
 interface ChatbotExportProps {
     onBack: () => void;
