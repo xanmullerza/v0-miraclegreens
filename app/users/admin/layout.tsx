@@ -27,7 +27,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { Footer } from '@/components/footer';
+import { Footer } from '@/components/scattered/footer';
 
 function AdminLayoutContent({
     children,

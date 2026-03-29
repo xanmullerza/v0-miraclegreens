@@ -30,7 +30,7 @@ import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
-import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
+import { PANTRY_QUANTITIES_KEY } from '@/components/tracker/pantry/pantry-types';
 import { inferEquipmentFromRecipe } from '@/lib/utils/equipment-inference';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
 import { usePantry } from '@/hooks/use-pantry';

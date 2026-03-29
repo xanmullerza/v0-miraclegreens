@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PantrySearch } from '@/components/pantry/pantry-search';
-import { PantryQuickAdd } from '@/components/pantry/pantry-quick-add';
-import { PantryItemList } from '@/components/pantry/pantry-item-list';
+import { PantrySearch } from '@/components/tracker/pantry/pantry-search';
+import { PantryQuickAdd } from '@/components/tracker/pantry/pantry-quick-add';
+import { PantryItemList } from '@/components/tracker/pantry/pantry-item-list';
 
 interface ChatbotPantryProps {
     onBack?: () => void;

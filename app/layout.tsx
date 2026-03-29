@@ -2,7 +2,7 @@
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/scattered/theme-provider"
 import { UserPreferencesProvider } from "@/lib/context/user-preferences-context";
 
 const _dmSans = DM_Sans({ subsets: ['latin'] });

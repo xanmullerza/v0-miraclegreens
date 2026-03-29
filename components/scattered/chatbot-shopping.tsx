@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingSearch } from '@/components/shopping/shopping-search';
-import { ShoppingQuickAdd } from '@/components/shopping/shopping-quick-add';
-import { ShoppingItemList } from '@/components/shopping/shopping-item-list';
-import { SHOPPING_STORAGE_KEY } from '@/components/shopping/shopping-types';
+import { ShoppingSearch } from '@/components/tracker/shopping/shopping-search';
+import { ShoppingQuickAdd } from '@/components/tracker/shopping/shopping-quick-add';
+import { ShoppingItemList } from '@/components/tracker/shopping/shopping-item-list';
+import { SHOPPING_STORAGE_KEY } from '@/components/tracker/shopping/shopping-types';
 
 interface ChatbotShoppingProps {
     onBack?: () => void;

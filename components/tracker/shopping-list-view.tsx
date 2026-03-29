@@ -46,7 +46,7 @@ import { recordPurchase, saveScannedProduct } from '@/lib/services/product-looku
 import { PantryMatchDialog } from '@/components/kitchen/pantry-match-dialog';
 import { useShoppingList } from '@/hooks/use-shopping-list';
 import { usePantry } from '@/hooks/use-pantry';
-import { mergeQuantityStrings, stripZeroEntries } from '../pantry/pantry-types';
+import { mergeQuantityStrings, stripZeroEntries } from './pantry/pantry-types';
 
 interface ShoppingListItem {
     id: string;

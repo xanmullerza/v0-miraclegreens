@@ -32,7 +32,7 @@ import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
 import { RecipeFormDialog } from '@/components/ingredients/recipe-form-dialog';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
-import { PANTRY_QUANTITIES_KEY } from '@/components/pantry/pantry-types';
+import { PANTRY_QUANTITIES_KEY } from '@/components/tracker/pantry/pantry-types';
 import { inferEquipmentFromRecipe } from '@/lib/utils/equipment-inference';
 import { usePantry } from '@/hooks/use-pantry';
 

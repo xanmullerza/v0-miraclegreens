@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { PageContainer } from '@/components/ui/page-container';
-import { Footer } from '@/components/footer';
+import { Footer } from '@/components/scattered/footer';
 import { HelpCircle, Mail, MessageCircle, Phone } from 'lucide-react';
 
 export default function SupportPage() {

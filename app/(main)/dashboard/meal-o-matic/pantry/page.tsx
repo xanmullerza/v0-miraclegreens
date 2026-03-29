@@ -19,7 +19,7 @@ import {
     buildQuantityString, 
     mergeQuantityStrings, 
     stripZeroEntries 
-} from '@/components/pantry/pantry-types';
+} from '@/components/tracker/pantry/pantry-types';
 
 export default function PantryPage() {
     const router = useRouter();

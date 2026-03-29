@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { SHOPPING_STORAGE_KEY, ShoppingItem } from '@/components/shopping/shopping-types';
+import { SHOPPING_STORAGE_KEY, ShoppingItem } from '@/components/tracker/shopping/shopping-types';
 import { toast } from 'sonner';
 
 export function useShoppingList() {

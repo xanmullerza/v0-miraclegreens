@@ -47,7 +47,7 @@ import { DailyPlan } from '@/lib/utils/meal-generator';
 import { Recipe } from '@/lib/data/recipes';
 import { usePantry } from '@/hooks/use-pantry';
 import { useShoppingList } from '@/hooks/use-shopping-list';
-import { mergeQuantityStrings, stripZeroEntries } from '../pantry/pantry-types';
+import { mergeQuantityStrings, stripZeroEntries } from './pantry/pantry-types';
 
 interface FoodItem {
     id: string;

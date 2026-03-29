@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { RDAContent } from '@/components/rda-content';
+import { RDAContent } from '@/components/scattered/rda-content';
 
 export function RDADrawer() {
     const {

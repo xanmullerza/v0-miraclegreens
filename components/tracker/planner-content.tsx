@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DidYouKnow } from '@/components/DidYouKnow';
+import { DidYouKnow } from '@/components/scattered/DidYouKnow';
 import { PageContainer } from '@/components/ui/page-container';
 import { cn } from '@/lib/utils';
 

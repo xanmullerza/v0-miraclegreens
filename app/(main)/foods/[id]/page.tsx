@@ -56,7 +56,7 @@ import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
-import { DidYouKnow } from '@/components/DidYouKnow';
+import { DidYouKnow } from '@/components/scattered/DidYouKnow';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -69,7 +69,7 @@ import {
     mergeQuantityStrings,
     stripZeroEntries,
     buildQuantityString
-} from '@/components/pantry/pantry-types';
+} from '@/components/tracker/pantry/pantry-types';
 import { PageContainer } from '@/components/ui/page-container';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
