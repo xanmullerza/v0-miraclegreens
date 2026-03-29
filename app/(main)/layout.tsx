@@ -149,6 +149,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         <ChatbotModal
                             onClose={() => {}}
                             isInline={true}
+                            onRecipeDetected={handleRecipeDetected}
                         />
                         
                         {/* Mobile Resize Button (should not appear on mobile since compartment hidden) */}
@@ -169,6 +170,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     <ChatbotModal
                         onClose={() => setIsChatbotOpen(false)}
                         isInline={false}
+                        onRecipeDetected={handleRecipeDetected}
                     />
                 )}
             </div>

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import Link from 'next/link';
 import { LayoutDashboard, User, LogOut, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -68,7 +68,7 @@ export function Header() {
 						)}
 						{showDashboard && (
 							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
-								<Link href="/dashboard">
+								<Link href="/tracker">
 									<LayoutDashboard className="h-4 w-4" />
 									Dashboard
 								</Link>
