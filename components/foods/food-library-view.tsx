@@ -603,7 +603,7 @@ export function FoodsView({
             {hasMore && (
                 <div className="flex justify-center pt-4 pb-8">
                     <button
-                        onClick={() => fetchFoods(page + 1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user })}
+                        onClick={() => fetchFoods(page + 1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user, sortField, sortDirection })}
                         disabled={loading}
                         className="h-12 px-8 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-emerald-400 hover:text-emerald-600 transition-all disabled:opacity-40 shadow-xl"
                     >
