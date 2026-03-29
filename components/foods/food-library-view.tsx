@@ -12,13 +12,94 @@ import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
 
 export const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements'];
 const PAGE_SIZE = 20;
+
+interface FoodFiltersPanelProps {
+    showFavoritesOnly: boolean;
+    setShowFavoritesOnly: (value: boolean) => void;
+    selectedCategories: string[];
+    setSelectedCategories: (categories: string[]) => void;
+}
+
+function FoodFiltersPanel({
+    showFavoritesOnly,
+    setShowFavoritesOnly,
+    selectedCategories,
+    setSelectedCategories,
+}: FoodFiltersPanelProps) {
+    const activeCount = selectedCategories.length + (showFavoritesOnly ? 1 : 0);
+
+    return (
+        <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950">
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 p-5">
+                <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Food Filters</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Refine the ingredient library.</p>
+                </div>
+                {activeCount > 0 && (
+                    <button
+                        onClick={() => {
+                            setShowFavoritesOnly(false);
+                            setSelectedCategories([]);
+                        }}
+                        className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-500"
+                    >
+                        Clear
+                    </button>
+                )}
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Favorites only</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Show only saved favorite foods.</p>
+                        </div>
+                        <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
+                    </div>
+                </div>
+
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
+                    <div className="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Categories</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Filter ingredients by food group.</p>
+                        </div>
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">{selectedCategories.length} selected</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                        {CATEGORIES.map(category => {
+                            const active = selectedCategories.includes(category);
+                            return (
+                                <button
+                                    key={category}
+                                    onClick={() => {
+                                        if (active) setSelectedCategories(prev => prev.filter(item => item !== category));
+                                        else setSelectedCategories(prev => [...prev, category]);
+                                    }}
+                                    className={cn(
+                                        'h-9 px-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all',
+                                        active
+                                            ? 'bg-emerald-600 text-white border border-emerald-600'
+                                            : 'bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                    )}
+                                >
+                                    {category}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 const FOOD_SORT_OPTIONS = [
     { id: 'name', label: 'A-Z' },
@@ -227,51 +308,14 @@ export function FoodsView({
                                                 )}
                                             </button>
                                         </SheetTrigger>
-                                        <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
-                                            <SheetHeader className="mb-4">
-                                                <div className="flex items-center justify-between">
-                                                    {(showFavoritesOnly || selectedCategories.length > 0) && (
-                                                        <button
-                                                            onClick={() => { setShowFavoritesOnly(false); setSelectedCategories([]); }}
-                                                            className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
-                                                        >
-                                                            Clear all
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </SheetHeader>
-
-                                            <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
-                                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favourites only</span>
-                                                <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
-                                            </div>
-
-                                            <div className="mt-4">
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Category</span>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {CATEGORIES.map(cat => {
-                                                        const active = selectedCategories.includes(cat);
-                                                        return (
-                                                            <button
-                                                                key={cat}
-                                                                onClick={() => {
-                                                                    if (active) setSelectedCategories(prev => prev.filter(c => c !== cat));
-                                                                    else setSelectedCategories(prev => [...prev, cat]);
-                                                                }}
-                                                                className={cn(
-                                                                    'h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all',
-                                                                    active
-                                                                        ? 'bg-emerald-500 border-emerald-500 text-white'
-                                                                        : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
-                                                                )}
-                                                            >
-                                                                {cat}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </SheetContent>
+                                        <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl p-0">
+                                    <FoodFiltersPanel
+                                        showFavoritesOnly={showFavoritesOnly}
+                                        setShowFavoritesOnly={setShowFavoritesOnly}
+                                        selectedCategories={selectedCategories}
+                                        setSelectedCategories={setSelectedCategories}
+                                    />
+                                </SheetContent>
                                     </Sheet>
 
                                     <div className="relative">
@@ -336,8 +380,8 @@ export function FoodsView({
                                 {/* Desktop header row */}
                                 <div className="hidden md:flex md:items-center gap-4 px-10 py-4 w-full">
                                     <div className="flex items-center gap-4">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
+                                        <Sheet>
+                                            <SheetTrigger asChild>
                                                 <button className={cn(
                                                     'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
                                                     (showFavoritesOnly || selectedCategories.length > 0)
@@ -352,40 +396,17 @@ export function FoodsView({
                                                         </span>
                                                     )}
                                                 </button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 shadow-2xl">
-                                                <div className="px-2 py-1.5">
-                                                    <div className="flex items-center justify-between py-2">
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favourites Only</span>
-                                                        <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
-                                                    </div>
-                                                </div>
-                                                <DropdownMenuSeparator className="bg-slate-200 dark:bg-slate-800" />
-                                                <div className="px-2">
-                                                    <div className="flex items-center justify-between py-2">
-                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-0">Categories</DropdownMenuLabel>
-                                                        {selectedCategories.length > 0 && (
-                                                            <button onClick={() => setSelectedCategories([])} className="text-[9px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors">Clear</button>
-                                                        )}
-                                                    </div>
-                                                    <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
-                                                        {CATEGORIES.map(category => (
-                                                            <DropdownMenuCheckboxItem
-                                                                key={category}
-                                                                checked={selectedCategories.includes(category)}
-                                                                onCheckedChange={(checked) => {
-                                                                    if (checked) setSelectedCategories(prev => [...prev, category]);
-                                                                    else setSelectedCategories(prev => prev.filter(c => c !== category));
-                                                                }}
-                                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
-                                                            >
-                                                                {category}
-                                                            </DropdownMenuCheckboxItem>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                            </SheetTrigger>
+
+                                            <SheetContent side="right" className="bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 p-0">
+                                                <FoodFiltersPanel
+                                                    showFavoritesOnly={showFavoritesOnly}
+                                                    setShowFavoritesOnly={setShowFavoritesOnly}
+                                                    selectedCategories={selectedCategories}
+                                                    setSelectedCategories={setSelectedCategories}
+                                                />
+                                            </SheetContent>
+                                        </Sheet>
 
                                         <div className="relative">
                                             <button

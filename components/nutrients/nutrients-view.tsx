@@ -12,16 +12,67 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { useRDA } from '@/hooks/use-rda';
 import { cn } from '@/lib/utils';
-import { 
-    DropdownMenu, 
-    DropdownMenuTrigger, 
-    DropdownMenuContent, 
-    DropdownMenuLabel, 
-    DropdownMenuSeparator, 
-    DropdownMenuCheckboxItem 
-} from '@/components/ui/dropdown-menu';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
+
+interface NutrientFilterPanelProps {
+    excludeFlavour: boolean;
+    setExcludeFlavour: (value: boolean) => void;
+    excludeSupplements: boolean;
+    setExcludeSupplements: (value: boolean) => void;
+}
+
+function NutrientFilterPanel({
+    excludeFlavour,
+    setExcludeFlavour,
+    excludeSupplements,
+    setExcludeSupplements,
+}: NutrientFilterPanelProps) {
+    const activeCount = (excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0);
+
+    return (
+        <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950">
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 p-5">
+                <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nutridex Filters</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Refine the nutrient list in the sidebar.</p>
+                </div>
+                {activeCount > 0 && (
+                    <button
+                        onClick={() => {
+                            setExcludeFlavour(false);
+                            setExcludeSupplements(false);
+                        }}
+                        className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-500"
+                    >
+                        Clear
+                    </button>
+                )}
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Exclude Flavour/Spices</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Remove flavour and spice foods from the list.</p>
+                        </div>
+                        <Switch checked={excludeFlavour} onCheckedChange={setExcludeFlavour} className="data-[state=checked]:bg-emerald-600" />
+                    </div>
+                </div>
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Exclude Supplements</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Remove supplement foods from nutrient rankings.</p>
+                        </div>
+                        <Switch checked={excludeSupplements} onCheckedChange={setExcludeSupplements} className="data-[state=checked]:bg-emerald-600" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -679,22 +730,13 @@ export function NutrientsView({
                                                 )}
                                             </button>
                                         </SheetTrigger>
-                                        <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
-                                            <SheetHeader className="mb-4">
-                                                <div className="flex items-center justify-between">
-                                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Nutridex Filters</h3>
-                                                </div>
-                                            </SheetHeader>
-
-                                            <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
-                                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Exclude Flavour/Spices</span>
-                                                <Switch checked={excludeFlavour} onCheckedChange={setExcludeFlavour} className="data-[state=checked]:bg-emerald-600" />
-                                            </div>
-
-                                            <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
-                                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Exclude Supplements</span>
-                                                <Switch checked={excludeSupplements} onCheckedChange={setExcludeSupplements} className="data-[state=checked]:bg-emerald-600" />
-                                            </div>
+                                        <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl p-0">
+                                            <NutrientFilterPanel
+                                                excludeFlavour={excludeFlavour}
+                                                setExcludeFlavour={setExcludeFlavour}
+                                                excludeSupplements={excludeSupplements}
+                                                setExcludeSupplements={setExcludeSupplements}
+                                            />
                                         </SheetContent>
                                     </Sheet>
 
@@ -773,8 +815,8 @@ export function NutrientsView({
                                 {!selectedNutrient ? (
                                     <>
                                         <div className="flex items-center gap-4">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
+                                            <Sheet>
+                                                <SheetTrigger asChild>
                                                     <button className={cn(
                                                         'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
                                                         (excludeFlavour || excludeSupplements)
@@ -789,21 +831,17 @@ export function NutrientsView({
                                                             </span>
                                                         )}
                                                     </button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 shadow-2xl">
-                                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 py-1.5">Exclude Categories</DropdownMenuLabel>
-                                                    <div className="px-2 py-1.5">
-                                                        <div className="flex items-center justify-between py-2">
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Flavour/Spices</span>
-                                                            <Switch checked={excludeFlavour} onCheckedChange={setExcludeFlavour} className="data-[state=checked]:bg-emerald-600" />
-                                                        </div>
-                                                        <div className="flex items-center justify-between py-2">
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Supplements</span>
-                                                            <Switch checked={excludeSupplements} onCheckedChange={setExcludeSupplements} className="data-[state=checked]:bg-emerald-600" />
-                                                        </div>
-                                                    </div>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                                </SheetTrigger>
+
+                                                <SheetContent side="right" className="bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 p-0">
+                                                    <NutrientFilterPanel
+                                                        excludeFlavour={excludeFlavour}
+                                                        setExcludeFlavour={setExcludeFlavour}
+                                                        excludeSupplements={excludeSupplements}
+                                                        setExcludeSupplements={setExcludeSupplements}
+                                                    />
+                                                </SheetContent>
+                                            </Sheet>
 
                                             <div className="relative">
                                                 <button
