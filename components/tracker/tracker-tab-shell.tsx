@@ -59,35 +59,34 @@ export function TrackerTabShell({
     return (
         <div className="space-y-0">
             {/* Premium Controls Row */}
-            <div className="sticky top-[72px] z-30 bg-background/80 backdrop-blur-xl py-4 px-4 border-b border-border/50">
-                <div className="flex flex-wrap items-center justify-between gap-4 max-w-5xl mx-auto bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl overflow-x-auto no-scrollbar">
+            <div className="sticky top-[72px] z-30 bg-background/80 backdrop-blur-xl py-6 px-4 border-b border-border/50">
+                <div className="flex items-center justify-between gap-4 max-w-5xl mx-auto bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl overflow-x-auto no-scrollbar">
                     <div className="flex items-center min-w-[140px] py-3 px-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 bg-slate-800/80 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10">
                         {title}
                     </div>
-                    <div className="flex flex-1 flex-wrap items-center justify-between gap-3 px-2 py-2">
+                    <div className="flex flex-1 items-center gap-3 px-2 py-2">
                         {/* Search Bar */}
                         <div className="relative w-full max-w-md">
-                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                            placeholder={placeholder || `Search ${title.toLowerCase()}...`}
-                            className="w-full pl-10 pr-10 py-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-800/20 text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 transition-all shadow-sm"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => onSearchChange('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                            >
-                                <X size={12} />
-                            </button>
-                        )}
-                    </div>
-                    </div>
+                            <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => onSearchChange(e.target.value)}
+                                placeholder={placeholder || `Search ${title.toLowerCase()}...`}
+                                className="w-full pl-10 pr-10 py-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-800/20 text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 transition-all shadow-sm"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => onSearchChange('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
+                        </div>
 
-                    {/* Actions Group */}
-                    <div className="flex items-center gap-2 shrink-0">
+                        {/* Actions Group */}
+                        <div className="flex items-center gap-2 shrink-0">
                         {/* Sort Button */}
                         <div className="relative">
                             <button
@@ -149,6 +148,7 @@ export function TrackerTabShell({
                                 )}
                             </button>
                         )}
+                        </div>
                     </div>
                 </div>
             </div>
