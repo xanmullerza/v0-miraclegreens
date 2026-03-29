@@ -23,7 +23,7 @@ interface FoodFiltersPanelProps {
     showFavoritesOnly: boolean;
     setShowFavoritesOnly: (value: boolean) => void;
     selectedCategories: string[];
-    setSelectedCategories: (categories: string[]) => void;
+    setSelectedCategories: Dispatch<SetStateAction<string[]>>;
 }
 
 function FoodFiltersPanel({
