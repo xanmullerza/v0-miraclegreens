@@ -27,7 +27,7 @@ import { ChatbotLifeguardFullIntegration } from '@/components/chatbot/chatbot-li
 import { ChatbotHelpSection } from '@/components/chatbot/chatbot-help-section';
 import { ChatbotExport } from '@/components/chatbot/chatbot-export';
 import { ChatbotShare } from '@/components/chatbot/chatbot-share';
-import { RDAContent } from '@/components/scattered/rda-content';
+import { RDAContent } from '@/components/ux/rda-content';
 import ProfilePage from '@/app/users/profile/page';
 import PrivacyPolicyPage from '@/app/static/privacy/page';
 import SupportPage from '@/app/static/support/page';

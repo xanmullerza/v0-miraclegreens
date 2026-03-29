@@ -45,7 +45,7 @@ import { useRDA } from '@/hooks/use-rda';
 import { findSpiceFactor, isSpice, getSpiceMeasures } from '@/lib/utils/spice-conversion';
 import { CookingState } from '@/lib/utils/cooking-states';
 import { searchLocalFood } from '@/lib/services/nutrition';
-import { DidYouKnow } from '@/components/scattered/DidYouKnow';
+import { DidYouKnow } from '@/components/ux/DidYouKnow';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-card shadow-xl rounded-[2.5rem] border border-border overflow-hidden", className)}>

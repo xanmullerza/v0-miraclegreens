@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -27,7 +27,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { Footer } from '@/components/scattered/footer';
+import { Footer } from '@/components/ux/footer';
 
 function AdminLayoutContent({
     children,

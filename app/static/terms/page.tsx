@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 import { PageContainer } from '@/components/ui/page-container';
-import { Footer } from '@/components/scattered/footer';
+import { Footer } from '@/components/ux/footer';
 import { BookOpen, Mail } from 'lucide-react';
 
 export default function TermsOfServicePage() {
