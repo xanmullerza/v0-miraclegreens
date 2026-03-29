@@ -43,7 +43,7 @@ import {
 } from 'lucide-react';
 import { useSearch } from '@/lib/context/search-context';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
-import { CATEGORIES } from '@/components/shared/foods-view';
+import { CATEGORIES } from '@/components/foods/food-library-view';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

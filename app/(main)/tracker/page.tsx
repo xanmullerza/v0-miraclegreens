@@ -5,8 +5,8 @@ import { PageContainer } from '@/components/ui/page-container';
 import MealPlannerContent from '@/components/tracker/planner-content';
 import { ShoppingListView } from '@/components/tracker/shopping-list-view';
 import { PantryView } from '@/components/tracker/pantry-view';
-import { FoodsView } from '@/components/shared/foods-view';
-import { NutrientsView } from '@/components/shared/nutrients-view';
+import { FoodsView } from '@/components/foods/food-library-view';
+import { NutrientsView } from '@/components/foods/nutrients-view';
 import { cn } from '@/lib/utils';
 
 type TabId = 'shopping' | 'pantry' | 'planner' | 'foods' | 'nutrients';

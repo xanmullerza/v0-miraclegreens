@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
-import { FoodsView } from '@/components/shared/foods-view';
+import { FoodsView } from '@/components/foods/food-library-view';
 import { useSearch } from '@/lib/context/search-context';
 
 export default function IngredientsPage() {

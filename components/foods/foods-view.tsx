@@ -50,7 +50,7 @@ interface FoodItem {
     quantity?: string;
 }
 
-export function StaplesView() {
+export function FoodsView() {
     const router = useRouter();
     const { pantryItems, loading: pantryLoading, removeFromPantry: dbRemoveFromPantry, updateQuantity } = usePantry();
     const { addItem: addShoppingListItem } = useShoppingList();
