@@ -45,9 +45,8 @@ export function DraggableFab() {
         const deltaY = e.clientY - dragStartY.current;
         if (Math.abs(deltaY) > 5) {
             hasDragged.current = true;
+            setPosition({ y: initialY.current + deltaY });
         }
-        
-        setPosition({ y: initialY.current + deltaY });
     };
 
     const handlePointerUp = (e: PointerEvent) => {
