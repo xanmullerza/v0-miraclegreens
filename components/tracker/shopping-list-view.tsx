@@ -40,10 +40,10 @@ import { Badge } from '@/components/ui/badge';
 import { cn, formatFoodName } from '@/lib/utils';
 import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 // meal-generator import removed — shopping list is now manual-only
-import { BarcodeScanner } from './barcode-scanner';
-import { ScanConfirmDialog } from './scan-confirm-dialog';
+import { BarcodeScanner } from '@/components/kitchen/barcode-scanner';
+import { ScanConfirmDialog } from '@/components/kitchen/scan-confirm-dialog';
 import { recordPurchase, saveScannedProduct } from '@/lib/services/product-lookup';
-import { PantryMatchDialog } from './pantry-match-dialog';
+import { PantryMatchDialog } from '@/components/kitchen/pantry-match-dialog';
 import { useShoppingList } from '@/hooks/use-shopping-list';
 import { usePantry } from '@/hooks/use-pantry';
 import { mergeQuantityStrings, stripZeroEntries } from '../pantry/pantry-types';
