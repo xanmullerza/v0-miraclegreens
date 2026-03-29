@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
 import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
-import { ChatbotShare } from '@/components/chatbot/chatbot-share';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import { 
     extractCoreName, 
@@ -164,7 +163,6 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
     const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
-    const [showShareDialog, setShowShareDialog] = useState(false);
     const [showTagsDialog, setShowTagsDialog] = useState(false);
 
     const smartMatch = useSmartMatch();
@@ -202,7 +200,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     // User preferences and RDA
     const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
-    const { setIsChatbotOpen, setChatbotView, setRecipeToRemix } = useChatbot();
+    const { setIsChatbotOpen, setChatbotView, setRecipeToRemix, setRecipeToShare, navigateTo } = useChatbot();
     const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
     const isOwner = user && recipe && (recipe as any).user_id === user.id;
@@ -821,13 +819,6 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                 <div className="w-9" /> {/* Spacer to balance back button */}
             </div>
 
-            {/* Share Dialog Overlay */}
-            {showShareDialog && recipe && (
-                <ChatbotShare
-                    recipe={recipe}
-                    onClose={() => setShowShareDialog(false)}
-                />
-            )}
 
             {/* Smart Match Picker Modal */}
             {smartMatch.showPicker && smartMatch.queue.length > 0 && (
@@ -2455,7 +2446,16 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
 
                             {/* Share Button */}
                             <button
-                                onClick={() => recipe ? (onShare ? onShare(recipe) : setShowShareDialog(true)) : null}
+                                onClick={() => {
+                                    if (recipe) {
+                                        if (onShare) {
+                                            onShare(recipe);
+                                        } else {
+                                            setRecipeToShare(recipe);
+                                            navigateTo('recipe-share');
+                                        }
+                                    }
+                                }}
                                 className="flex flex-col items-center justify-center p-4 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-cyan-500/30 hover:text-cyan-600 transition-all active:scale-95 text-center gap-3 group"
                             >
                                 <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-cyan-500 transition-all">

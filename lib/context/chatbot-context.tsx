@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type ChatbotViewType = 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters';
+export type ChatbotViewType = 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'recipe-share' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters';
 
 interface ChatbotContextType {
     isChatbotOpen: boolean;
@@ -16,6 +16,8 @@ interface ChatbotContextType {
     goBack: (fallbackProvider?: () => void) => void;
     recipeToRemix: any | null;
     setRecipeToRemix: (recipe: any | null) => void;
+    recipeToShare: any | null;
+    setRecipeToShare: (recipe: any | null) => void;
 }
 
 const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
@@ -25,6 +27,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     const [chatbotView, setChatbotView] = useState<ChatbotViewType>('desktop-guide');
     const [previousView, setPreviousView] = useState<ChatbotViewType | null>(null);
     const [recipeToRemix, setRecipeToRemix] = useState<any | null>(null);
+    const [recipeToShare, setRecipeToShare] = useState<any | null>(null);
     const [viewStack, setViewStack] = useState<ChatbotViewType[]>([]);
 
     // Initialize correct default view based on screen size across all routes
@@ -76,6 +79,8 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
             goBack,
             recipeToRemix,
             setRecipeToRemix,
+            recipeToShare,
+            setRecipeToShare,
         }}>
             {children}
         </ChatbotContext.Provider>

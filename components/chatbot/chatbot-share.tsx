@@ -14,9 +14,10 @@ interface Recipe {
 interface ChatbotShareProps {
     recipe?: Recipe;
     onClose: () => void;
+    isInline?: boolean;
 }
 
-export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
+export function ChatbotShare({ recipe, onClose, isInline = false }: ChatbotShareProps) {
     const [copied, setCopied] = useState(false);
     const [showMore, setShowMore] = useState(false);
 
@@ -95,8 +96,16 @@ export function ChatbotShare({ recipe, onClose }: ChatbotShareProps) {
     ];
 
     return (
-        <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/20 backdrop-blur-[2px] p-4 animate-in fade-in duration-200">
-            <div className="w-full bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-in slide-in-from-bottom duration-300 overflow-hidden">
+        <div className={cn(
+            isInline ? "flex-1 w-full" : "absolute inset-0 z-50 flex items-end justify-center bg-black/20 backdrop-blur-[2px] p-4",
+            "animate-in fade-in duration-200"
+        )}>
+            <div className={cn(
+                "bg-white dark:bg-slate-900 overflow-hidden",
+                isInline 
+                    ? "w-full h-full flex flex-col p-4" 
+                    : "w-full rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-in slide-in-from-bottom duration-300"
+            )}>
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white">Share Recipe</h3>

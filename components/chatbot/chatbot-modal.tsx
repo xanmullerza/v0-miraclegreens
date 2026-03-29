@@ -56,7 +56,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const { user, saveRecipe } = useDataPersistence();
     const { profile } = useUserPreferences();
     const { filters } = useRecipeFilter();
-    const { isChatbotOpen, setIsChatbotOpen, chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack, recipeToRemix, setRecipeToRemix } = useChatbot();
+    const { isChatbotOpen, setIsChatbotOpen, chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack, recipeToRemix, setRecipeToRemix, recipeToShare, setRecipeToShare } = useChatbot();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
@@ -1021,6 +1021,15 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         recipeId={selectedRecipeId} 
                         onBack={handleBackFromRecipeDetail} 
                         onRemix={handleRemixRecipe}
+                    />
+                )}
+                
+                {/* Recipe Share View */}
+                {!showRecipeBuilder && chatbotView === 'recipe-share' && recipeToShare && (
+                    <ChatbotShare 
+                        recipe={recipeToShare} 
+                        onClose={handleBack}
+                        isInline={true}
                     />
                 )}
 
