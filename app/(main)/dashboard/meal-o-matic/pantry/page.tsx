@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PantryView } from '@/components/kitchen/pantry-view';
+import { PantryView } from '@/components/tracker/pantry-view';
 import { Beef, ChevronRight, Plus, X, Package, Receipt, Calendar, ShoppingBag, Library, LayoutGrid } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -303,4 +303,5 @@ export default function PantryPage() {
         </PageContainer>
     );
 }
+
 

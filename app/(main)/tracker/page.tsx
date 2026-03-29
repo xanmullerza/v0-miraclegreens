@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
-import MealPlannerContent from '@/components/planner-content';
-import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
-import { PantryView } from '@/components/kitchen/pantry-view';
-import { FoodsView } from '@/components/ingredients/foods-view';
-import { NutridexView } from '@/components/nutridex-view';
+import MealPlannerContent from '@/components/tracker/planner-content';
+import { ShoppingListView } from '@/components/tracker/shopping-list-view';
+import { PantryView } from '@/components/tracker/pantry-view';
+import { FoodsView } from '@/components/tracker/foods-view';
+import { NutridexView } from '@/components/tracker/nutridex-view';
 import { cn } from '@/lib/utils';
 
 type TabId = 'shopping' | 'pantry' | 'planner' | 'foods' | 'nutrients';
@@ -76,3 +76,4 @@ export default function TrackerPage() {
         </>
     );
 }
+

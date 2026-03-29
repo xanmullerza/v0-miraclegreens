@@ -4,7 +4,7 @@
 // The actual meal planner logic is maintained in app/dashboard/meal-o-matic/planner/page.tsx
 // to avoid code duplication.
 
-import MealPlannerContent from '@/components/planner-content';
+import MealPlannerContent from '@/components/tracker/planner-content';
 
 interface MealPlannerViewProps {
     showFavoritesOnly?: boolean;
@@ -19,3 +19,4 @@ interface MealPlannerViewProps {
 export function MealPlannerView(props: MealPlannerViewProps) {
     return <MealPlannerContent {...props} />;
 }
+

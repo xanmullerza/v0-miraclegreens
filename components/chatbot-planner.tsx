@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import MealPlannerContent from '@/components/planner-content';
+import MealPlannerContent from '@/components/tracker/planner-content';
 
 interface ChatbotPlannerProps {
     onBack?: () => void;
@@ -15,3 +15,4 @@ export function ChatbotPlanner({ onBack, onRecipeClick }: ChatbotPlannerProps) {
         </div>
     );
 }
+

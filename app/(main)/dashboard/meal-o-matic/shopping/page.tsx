@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Leaf, ChevronRight, ShoppingBag, ShoppingCart, Plus, X, ScanLine, Calendar, Package, Library, LayoutGrid } from 'lucide-react';
-import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
+import { ShoppingListView } from '@/components/tracker/shopping-list-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { Button } from '@/components/ui/button';
@@ -339,3 +339,4 @@ export default function ShoppingListPage() {
         </PageContainer>
     );
 }
+

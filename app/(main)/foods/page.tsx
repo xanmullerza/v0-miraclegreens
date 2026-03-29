@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
-import { FoodsView } from '@/components/ingredients/foods-view';
+import { FoodsView } from '@/components/tracker/foods-view';
 import { useSearch } from '@/lib/context/search-context';
 
 export default function IngredientsPage() {
@@ -22,3 +22,4 @@ export default function IngredientsPage() {
         </PageContainer>
     );
 }
+

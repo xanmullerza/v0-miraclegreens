@@ -1,6 +1,6 @@
 'use client';
 
-import { NutridexView } from '@/components/nutridex-view';
+import { NutridexView } from '@/components/tracker/nutridex-view';
 
 export default function NutrientsPage() {
     return (
@@ -11,3 +11,4 @@ export default function NutrientsPage() {
         </div>
     );
 }
+
