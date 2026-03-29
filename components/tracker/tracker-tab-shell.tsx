@@ -59,10 +59,14 @@ export function TrackerTabShell({
     return (
         <div className="space-y-0">
             {/* Premium Controls Row */}
-            <div className="sticky top-[72px] z-10 bg-transparent backdrop-blur-md rounded-b-[2rem] shadow-xl">
-                <div className="px-6 py-3 flex items-center justify-center gap-4">
-                    {/* Search Bar */}
-                    <div className="relative w-full max-w-md">
+            <div className="sticky top-[72px] z-30 bg-background/80 backdrop-blur-xl py-4 px-4 border-b border-border/50">
+                <div className="flex flex-wrap items-center justify-between gap-4 max-w-5xl mx-auto bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl overflow-x-auto no-scrollbar">
+                    <div className="flex items-center min-w-[140px] py-3 px-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 bg-slate-800/80 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10">
+                        {title}
+                    </div>
+                    <div className="flex flex-1 flex-wrap items-center justify-between gap-3 px-2 py-2">
+                        {/* Search Bar */}
+                        <div className="relative w-full max-w-md">
                         <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
@@ -79,6 +83,7 @@ export function TrackerTabShell({
                                 <X size={12} />
                             </button>
                         )}
+                    </div>
                     </div>
 
                     {/* Actions Group */}
