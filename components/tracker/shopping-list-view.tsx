@@ -46,6 +46,7 @@ import { recordPurchase, saveScannedProduct } from '@/lib/services/product-looku
 import { PantryMatchDialog } from '@/components/kitchen/pantry-match-dialog';
 import { useShoppingList } from '@/hooks/use-shopping-list';
 import { usePantry } from '@/hooks/use-pantry';
+import { TrackerTabShell, SortOption } from './tracker-tab-shell';
 import { mergeQuantityStrings, stripZeroEntries } from './pantry/pantry-types';
 
 interface ShoppingListItem {
@@ -80,7 +81,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [items, setItems] = useState<ShoppingListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [enriching, setEnriching] = useState(false);
-    const { searchQuery } = useSearch();
+    const { searchQuery, setSearchQuery } = useSearch();
 
     // Barcode scanner state
     const [internalScannerOpen, setInternalScannerOpen] = useState(false);
@@ -105,6 +106,16 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [expandedRemoveId, setExpandedRemoveId] = useState<string | null>(null);
     const [selectedRemoveItem, setSelectedRemoveItem] = useState<ShoppingListItem | null>(null);
     const [expandedBreakdownId, setExpandedBreakdownId] = useState<string | null>(null);
+
+    // Sorting state
+    const [sortField, setSortField] = useState('category');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+    const sortOptions: SortOption[] = [
+        { id: 'category', label: 'Category', icon: <Package size={14} /> },
+        { id: 'name', label: 'A-Z', icon: <List size={14} /> },
+        { id: 'source', label: 'Source', icon: <Sparkles size={14} /> },
+    ];
 
     // Helper to clear all expanded sub-panels
     const clearAllPanels = (exceptAction?: boolean) => {
@@ -657,18 +668,38 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
     const filteredItems = items.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    ).sort((a, b) => {
+        let comparison = 0;
+        if (sortField === 'name') {
+            comparison = a.name.localeCompare(b.name);
+        } else if (sortField === 'category') {
+            comparison = (a.category || '').localeCompare(b.category || '');
+        } else if (sortField === 'source') {
+            comparison = (a.source || '').localeCompare(b.source || '');
+        }
+        return sortDirection === 'asc' ? comparison : -comparison;
+    });
 
-    // Group items by category
-    const groupedItems = filteredItems.reduce((acc, item) => {
+    // Group items by category (only if sorting by category)
+    const groupedItems = sortField === 'category' ? filteredItems.reduce((acc, item) => {
         const group = getCategoryGroup(item.category);
         if (!acc[group]) acc[group] = [];
         acc[group].push(item);
         return acc;
-    }, {} as Record<string, ShoppingListItem[]>);
+    }, {} as Record<string, ShoppingListItem[]>) : { 'All Items': filteredItems };
 
     return (
-        <div className="space-y-8">
+        <TrackerTabShell
+            title="Shopping"
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortField={sortField}
+            setSortField={setSortField}
+            sortDirection={sortDirection}
+            setSortDirection={setSortDirection}
+            sortOptions={sortOptions}
+        >
+            <div className="space-y-8">
             {/* Barcode Scanner Modal */}
             <BarcodeScanner
                 isOpen={scannerOpen}
@@ -1025,5 +1056,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 </div>
             )}
         </div>
+        </TrackerTabShell>
     );
 }

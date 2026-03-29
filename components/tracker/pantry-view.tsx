@@ -34,7 +34,8 @@ import {
     Bean,
     Pill,
     Box,
-    Flame
+    Flame,
+    Package
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,6 +48,7 @@ import { DailyPlan } from '@/lib/utils/meal-generator';
 import { Recipe } from '@/lib/data/recipes';
 import { usePantry } from '@/hooks/use-pantry';
 import { useShoppingList } from '@/hooks/use-shopping-list';
+import { TrackerTabShell, SortOption } from './tracker-tab-shell';
 import { mergeQuantityStrings, stripZeroEntries } from './pantry/pantry-types';
 
 interface FoodItem {
@@ -96,7 +98,7 @@ export function PantryView({
 
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const { searchQuery } = useSearch();
+    const { searchQuery, setSearchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const { dailyPlan, updateDailyPlan, energyUnit, measurementUnit } = useUserPreferences();
 
@@ -164,6 +166,16 @@ export function PantryView({
     
     const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
     const [expandedStockBreakdownId, setExpandedStockBreakdownId] = useState<string | null>(null);
+
+    // Sorting state
+    const [sortField, setSortField] = useState('category');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+    const sortOptions: SortOption[] = [
+        { id: 'category', label: 'Category', icon: <Package size={14} /> },
+        { id: 'name', label: 'A-Z', icon: <List size={14} /> },
+        { id: 'weight', label: 'Weight', icon: <Zap size={14} /> },
+    ];
 
     interface QuantityEntry {
         qty: number;
@@ -607,15 +619,35 @@ export function PantryView({
         const matchesCategory = !externalSelectedCategories || externalSelectedCategories.length === 0 || externalSelectedCategories.includes(food.category || 'General');
 
         return matchesSearch && matchesFavorites && matchesCategory;
+    }).sort((a, b) => {
+        let comparison = 0;
+        if (sortField === 'name') {
+            comparison = (a.common_name || a.name).localeCompare(b.common_name || b.name);
+        } else if (sortField === 'category') {
+            comparison = (a.category || '').localeCompare(b.category || '');
+        } else if (sortField === 'weight') {
+            // Need a tiny helper to get weight for comparison
+            const getWeight = (f: FoodItem) => {
+                const entries = (f.quantity || '').split(' + ');
+                let total = 0;
+                for (const e of entries) {
+                    const parsed = parseQuantityEntry(e);
+                    total += (parsed.qty || 0) * (parsed.weight_g || 0);
+                }
+                return total;
+            };
+            comparison = getWeight(a) - getWeight(b);
+        }
+        return sortDirection === 'asc' ? comparison : -comparison;
     });
 
-    // Grouping logic - by category section instead of name
-    const groupedFoods = filteredFoods.reduce((acc, food) => {
+    // Grouping logic - by category section (only if sorting by category)
+    const groupedFoods = sortField === 'category' ? filteredFoods.reduce((acc, food) => {
         const categoryGroup = getCategoryGroup(food.category);
         if (!acc[categoryGroup]) acc[categoryGroup] = [];
         acc[categoryGroup].push(food);
         return acc;
-    }, {} as Record<string, FoodItem[]>);
+    }, {} as Record<string, FoodItem[]>) : { 'All Items': filteredFoods };
 
     // Sort groups - use actual DB category names
     const categoryOrder = ['Fruit', 'Vegetables', 'Grains', 'Legumes', 'Proteins', 'Nuts', 'Oils', 'Flavour', 'Supplements', 'Other'];
@@ -625,7 +657,17 @@ export function PantryView({
         return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
     });
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <TrackerTabShell
+            title="Pantry"
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortField={sortField}
+            setSortField={setSortField}
+            sortDirection={sortDirection}
+            setSortDirection={setSortDirection}
+            sortOptions={sortOptions}
+        >
+            <div className="space-y-8 animate-in fade-in duration-500">
             {/* Login Prompt - Only shown if not loading and no user */}
             {!loading && !user && (
                 <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/20 p-6 rounded-[2rem] flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group">
@@ -1074,8 +1116,7 @@ export function PantryView({
                     </div>
                 </div>
             )}
-
-
         </div>
+        </TrackerTabShell>
     );
 }
