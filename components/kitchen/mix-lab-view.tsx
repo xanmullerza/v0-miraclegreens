@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { LabView } from '@/components/admin/ingredients/lab-view';
+import { MixBuilderContent } from '@/components/maker/mix-builder';
 
 interface MixItem {
     id: string;
@@ -37,6 +38,7 @@ export function MixLabView() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSpiceLab, setShowSpiceLab] = useState(false);
+    const [showBuilder, setShowBuilder] = useState(false);
 
     useEffect(() => {
         fetchMixes();
@@ -45,16 +47,23 @@ export function MixLabView() {
     const fetchMixes = async () => {
         setLoading(true);
         try {
-            // For now, fetch from recipes table with a specific category or tag
-            // In the future, this could be a dedicated 'concoctions' or 'mixes' table
+            // Fetch recipes that are categorized as mixes/blends etc
             const { data, error } = await supabase
                 .from('recipes')
                 .select('*')
-                .or('category.ilike.%mix%,category.ilike.%blend%,category.ilike.%spice%,category.ilike.%condiment%,category.ilike.%sauce%')
-                .order('name', { ascending: true });
+                .or('type.ilike.%mix%,type.ilike.%blend%,type.ilike.%spice%,type.ilike.%condiment%,type.ilike.%sauce%')
+                .order('title', { ascending: true });
 
             if (error) throw error;
-            setMixes(data || []);
+            // Map 'title' to 'name' for backward compatibility if needed, but let's use actual data
+            setMixes(data?.map(mix => ({
+                id: mix.id,
+                name: mix.title,
+                description: mix.description,
+                category: mix.type,
+                image: mix.image,
+                created_at: mix.created_at
+            })) || []);
         } catch (error) {
             console.error('Error fetching mixes:', error);
             // Don't show error, just set empty
@@ -100,6 +109,10 @@ export function MixLabView() {
         );
     }
 
+    if (showBuilder) {
+        return <MixBuilderContent onBack={() => setShowBuilder(false)} />;
+    }
+
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -111,7 +124,7 @@ export function MixLabView() {
                     </span>
                 </div>
                 <Button
-                    onClick={() => router.push('/users/admin/recipebuilder?type=mix')}
+                    onClick={() => setShowBuilder(true)}
                     className="bg-purple-500 hover:bg-purple-600 text-white rounded-full px-6"
                 >
                     <Plus size={16} className="mr-2" />
@@ -185,7 +198,7 @@ export function MixLabView() {
                     <h3 className="text-lg font-bold text-foreground mb-2">No mixes yet</h3>
                     <p className="text-sm text-muted-foreground mb-6">Start creating your homemade concoctions!</p>
                     <Button
-                        onClick={() => router.push('/users/admin/recipebuilder?type=mix')}
+                        onClick={() => setShowBuilder(true)}
                         className="bg-purple-500 hover:bg-purple-600 text-white rounded-full px-8"
                     >
                         <Sparkles size={16} className="mr-2" />

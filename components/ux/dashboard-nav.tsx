@@ -13,9 +13,15 @@ export function DashboardNav() {
 
     // Determine active button
     const getActiveButton = () => {
-        if (pathname.includes('/dashboard/meal-o-matic/shopping')) return 'shopping';
-        if (pathname.includes('/dashboard/meal-o-matic/pantry')) return 'pantry';
-        if (pathname.includes('/dashboard/meal-o-matic/planner')) return 'planner';
+        if (pathname.includes('/tracker')) {
+            if (typeof window !== 'undefined') {
+                const searchParams = new URLSearchParams(window.location.search);
+                const tab = searchParams.get('tab');
+                if (tab === 'shopping') return 'shopping';
+                if (tab === 'pantry') return 'pantry';
+                if (tab === 'planner') return 'planner';
+            }
+        }
         return null;
     };
 
@@ -24,9 +30,9 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/dashboard/meal-o-matic/shopping', color: 'amber' },
-        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/dashboard/meal-o-matic/pantry', color: 'sky' },
-        { id: 'planner', icon: Calendar, label: 'Planner', path: '/dashboard/meal-o-matic/planner', color: 'purple' },
+        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/tracker?tab=shopping', color: 'amber' },
+        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/tracker?tab=pantry', color: 'sky' },
+        { id: 'planner', icon: Calendar, label: 'Planner', path: '/tracker?tab=planner', color: 'purple' },
     ];
 
     return (

@@ -96,9 +96,6 @@ import { HeroSearch } from '@/components/ui/hero-search';
 import { usePantry } from '@/hooks/use-pantry';
 import { useShoppingList } from '@/hooks/use-shopping-list';
 
-import { FoodItemCreatorContent } from '@/app/(main)/dashboard/meal-o-matic/maker/food/page';
-import { UserRecipeBuilder as MealBuilderContent } from '@/app/(main)/dashboard/meal-o-matic/maker/meal/page';
-import { UserRecipeBuilder as MixBuilderContent } from '@/app/(main)/dashboard/meal-o-matic/maker/mix/page';
 
 const showShop = false;
 

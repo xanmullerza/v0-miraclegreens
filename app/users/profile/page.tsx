@@ -42,8 +42,11 @@ import {
     Shapes,
     Settings,
     ShieldCheck,
-    ExternalLink
+    ExternalLink,
+    LayoutGrid,
+    ArrowRight
 } from 'lucide-react';
+import Link from 'next/link';
 import { PageContainer } from '@/components/ui/page-container';
 import { useTheme } from 'next-themes';
 import { useRDA } from '@/hooks/use-rda';
@@ -1133,9 +1136,7 @@ function ProfilePageContent() {
                                         <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
                                     </div>
                                 </section>
-                            )}
-
-                            {/* Admin Terminal Card - Only for Admins */}
+                            )}                            {/* Admin Terminal Card - Only for Admins */}
                             {isAdmin && (
                                 <section className="space-y-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                                     <div className="flex items-center gap-4">
@@ -1148,27 +1149,52 @@ function ProfilePageContent() {
                                         </div>
                                     </div>
                                     <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
-                                        <div className="flex flex-col gap-4">
-                                            <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest italic">Welcome to the central command unit.</p>
-                                            <Button
-                                                asChild
-                                                variant="outline"
-                                                className="w-full bg-slate-100 dark:bg-slate-900 border-none hover:bg-emerald-500/10 hover:text-emerald-500 text-slate-600 dark:text-slate-400 font-black h-16 rounded-2xl flex items-center justify-between px-6 group transition-all"
-                                            >
-                                                <a href="https://www.yourtestsite.xyz/admin" target="_blank" rel="noopener noreferrer">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500 group-hover:bg-emerald-500/20 transition-colors">
-                                                            <Settings size={20} />
+                                        <div className="flex flex-col gap-6">
+                                            <div className="space-y-2">
+                                                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest italic">Central Command Unit</p>
+                                                <Button
+                                                    asChild
+                                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black h-16 rounded-2xl flex items-center justify-between px-6 group transition-all shadow-lg shadow-emerald-500/20"
+                                                >
+                                                    <Link href="/users/admin">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="bg-white/10 p-2 rounded-xl text-white group-hover:bg-white/20 transition-colors">
+                                                                <LayoutGrid size={20} />
+                                                            </div>
+                                                            <div className="text-left">
+                                                                <h3 className="text-xs font-black uppercase tracking-wider italic leading-none">Open Admin Workspace</h3>
+                                                                <p className="text-[9px] opacity-70 mt-1 uppercase tracking-widest">Full Access Control</p>
+                                                            </div>
                                                         </div>
-                                                        <div className="text-left">
-                                                            <h3 className="text-xs font-black uppercase tracking-wider italic leading-none">Access Admin Workspace</h3>
+                                                        <div className="p-2 rounded-lg group-hover:bg-white/20 transition-all">
+                                                            <ArrowRight size={16} />
                                                         </div>
-                                                    </div>
-                                                    <div className="p-2 rounded-lg group-hover:bg-emerald-500/20 transition-all">
-                                                        <ExternalLink size={16} />
-                                                    </div>
-                                                </a>
-                                            </Button>
+                                                    </Link>
+                                                </Button>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <Button
+                                                    asChild
+                                                    variant="outline"
+                                                    className="h-14 rounded-xl border-slate-200 dark:border-slate-800 hover:border-violet-500/50 hover:bg-violet-500/5 group"
+                                                >
+                                                    <Link href="/users/admin/recipebuilder" className="flex flex-col items-center justify-center gap-1">
+                                                        <ChefHat size={14} className="text-violet-500 group-hover:scale-110 transition-transform" />
+                                                        <span className="text-[9px] font-black uppercase tracking-widest">Build Recipe</span>
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    asChild
+                                                    variant="outline"
+                                                    className="h-14 rounded-xl border-slate-200 dark:border-slate-800 hover:border-sky-500/50 hover:bg-sky-500/5 group"
+                                                >
+                                                    <Link href="/users/admin/add-food" className="flex flex-col items-center justify-center gap-1">
+                                                        <Plus size={14} className="text-sky-500 group-hover:scale-110 transition-transform" />
+                                                        <span className="text-[9px] font-black uppercase tracking-widest">Registry Entry</span>
+                                                    </Link>
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </section>

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -28,7 +28,7 @@ export default function AdminOverview() {
         {
             name: 'Bulk Manager',
             desc: 'Category and tag management.',
-            href: '/admin/manage-foods',
+            href: '/users/admin/manage-foods',
             icon: Table,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
@@ -36,7 +36,7 @@ export default function AdminOverview() {
         {
             name: 'Add New Food',
             desc: 'Manually enter clinical data.',
-            href: '/admin/add-food',
+            href: '/users/admin/add-food',
             icon: Plus,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
@@ -44,7 +44,7 @@ export default function AdminOverview() {
         {
             name: 'Edit Food Item',
             desc: 'Refine individual food details.',
-            href: '/admin/manage-foods',
+            href: '/users/admin/manage-foods',
             icon: Edit3,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
@@ -52,7 +52,7 @@ export default function AdminOverview() {
         {
             name: 'Recipe Architect',
             desc: 'Build smart meal data.',
-            href: '/admin/recipebuilder',
+            href: '/users/admin/recipebuilder',
             icon: ChefHat,
             color: 'text-violet-500',
             bg: 'bg-violet-500/10'
@@ -60,7 +60,7 @@ export default function AdminOverview() {
         {
             name: 'Edit Recipe',
             desc: 'Protocol and step refinement.',
-            href: '/admin/manage-recipes',
+            href: '/users/admin/manage-recipes',
             icon: FileText,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'
@@ -68,7 +68,7 @@ export default function AdminOverview() {
         {
             name: 'Lab Profile',
             desc: 'Manage account access.',
-            href: '/profile',
+            href: '/users/profile',
             icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
@@ -76,7 +76,7 @@ export default function AdminOverview() {
         {
             name: 'View Nutrients',
             desc: 'Deep-dive into biological markers.',
-            href: '/dashboard/library/nutrients',
+            href: '/tracker',
             icon: Zap,
             color: 'text-amber-500',
             bg: 'bg-amber-500/10'
@@ -84,7 +84,7 @@ export default function AdminOverview() {
         {
             name: 'Compare Foods',
             desc: 'Analyze and compare profiles.',
-            href: '/admin/widgets/comparator',
+            href: '/users/admin/widgets/comparator',
             icon: Scale,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
@@ -92,7 +92,7 @@ export default function AdminOverview() {
         {
             name: 'Life Guard',
             desc: 'Monitor nutritional thresholds.',
-            href: '/admin/widgets/lifeguard',
+            href: '/users/admin/widgets/lifeguard',
             icon: Wallet,
             color: 'text-teal-500',
             bg: 'bg-teal-500/10'
@@ -100,7 +100,7 @@ export default function AdminOverview() {
         {
             name: 'Spice Lab',
             desc: 'Convert whole vs ground spices.',
-            href: '/admin/spice-converter',
+            href: '/users/admin/spice-converter',
             icon: Beaker,
             color: 'text-indigo-500',
             bg: 'bg-indigo-500/10'

@@ -1,4 +1,4 @@
-﻿import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
@@ -49,8 +49,8 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // Require login for Shopping, Pantry, Planner, and Maker
-    const protectedRoutes = ['/dashboard/meal-o-matic', '/dashboard/maker'];
+    // Require login for Tracker
+    const protectedRoutes = ['/tracker'];
     if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
         if (!user) {
             const redirectUrl = new URL('/auth/login', request.url);
