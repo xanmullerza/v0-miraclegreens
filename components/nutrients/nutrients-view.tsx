@@ -4,7 +4,7 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-    Search, ChevronLeft, ChevronRight, ChevronDown, Activity, Zap, Gem,
+    ArrowDownUp, Search, ChevronLeft, ChevronRight, ChevronDown, Activity, Zap, Gem,
     Battery, Droplet, Lightbulb, UtensilsCrossed, Leaf, Dna, Sparkles, Beaker, BookOpen, Filter, Loader2
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -296,6 +296,11 @@ function flattenNodes(nodes: NutrientNode[], sectionLabel: string): { id: string
 
 // ─── Column map for Supabase queries ──────────────────────────
 
+const NUTRIENT_SORT_OPTIONS = [
+    { id: 'section', label: 'By Group' },
+    { id: 'name', label: 'A-Z' },
+] as const;
+
 const COLUMN_MAP: Record<string, string> = {
     'Energy': 'energy_kcal', 'Protein': 'protein_g', 'Carbs': 'carbs_g', 'Fat': 'fat_g',
     'Fiber': 'fiber_g', 'Sodium': 'sodium_mg', 'Potassium': 'potassium_mg',
@@ -343,6 +348,11 @@ export function NutrientsView({
     const [detailTab, setDetailTab] = useState<'foods' | 'learn'>('foods');
     const [excludeFlavour, setExcludeFlavour] = useState(true);
     const [excludeSupplements, setExcludeSupplements] = useState(true);
+    const [nutrientSortField, setNutrientSortField] = useState<'section' | 'name'>('section');
+    const [nutrientSortDirection, setNutrientSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [showSortOptions, setShowSortOptions] = useState(false);
+
+    const currentSortLabel = NUTRIENT_SORT_OPTIONS.find(opt => opt.id === nutrientSortField)?.label || 'Sort';
 
     // Hero search state
     const [heroQuery, setHeroQuery] = useState('');
@@ -688,6 +698,48 @@ export function NutrientsView({
                                         </SheetContent>
                                     </Sheet>
 
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setShowSortOptions(prev => !prev)}
+                                            className={cn(
+                                                "h-9 px-4 rounded-full flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
+                                                showSortOptions
+                                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
+                                                    : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
+                                            )}
+                                            title="Sort Options"
+                                        >
+                                            <ArrowDownUp size={13} />
+                                            <span className="hidden sm:inline">{currentSortLabel}</span>
+                                        </button>
+                                        {showSortOptions && (
+                                            <div className="absolute left-0 top-full mt-2 w-40 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
+                                                {NUTRIENT_SORT_OPTIONS.map(option => (
+                                                    <button
+                                                        key={option.id}
+                                                        onClick={() => {
+                                                            if (nutrientSortField === option.id) {
+                                                                setNutrientSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                                            } else {
+                                                                setNutrientSortField(option.id);
+                                                                setNutrientSortDirection('asc');
+                                                            }
+                                                            setShowSortOptions(false);
+                                                        }}
+                                                        className={cn(
+                                                            "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                            nutrientSortField === option.id
+                                                                ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
+                                                                : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                                        )}
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="flex-1 relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
                                         <input
@@ -752,6 +804,48 @@ export function NutrientsView({
                                                     </div>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
+
+                                            <div className="relative">
+                                                <button
+                                                    onClick={() => setShowSortOptions(prev => !prev)}
+                                                    className={cn(
+                                                        "h-9 px-4 rounded-xl flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
+                                                        showSortOptions
+                                                            ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
+                                                            : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
+                                                    )}
+                                                    title="Sort Options"
+                                                >
+                                                    <ArrowDownUp size={13} />
+                                                    <span>{currentSortLabel}</span>
+                                                </button>
+                                                {showSortOptions && (
+                                                    <div className="absolute left-0 top-full mt-2 w-44 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
+                                                        {NUTRIENT_SORT_OPTIONS.map(option => (
+                                                            <button
+                                                                key={option.id}
+                                                                onClick={() => {
+                                                                    if (nutrientSortField === option.id) {
+                                                                        setNutrientSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                                                    } else {
+                                                                        setNutrientSortField(option.id);
+                                                                        setNutrientSortDirection('asc');
+                                                                    }
+                                                                    setShowSortOptions(false);
+                                                                }}
+                                                                className={cn(
+                                                                    "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                                    nutrientSortField === option.id
+                                                                        ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
+                                                                        : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                                                )}
+                                                            >
+                                                                {option.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
 
                                             <div className="relative">
                                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
@@ -935,7 +1029,7 @@ export function NutrientsView({
                                     <div className="flex-1"><h3 className={cn("text-[13px] font-black uppercase tracking-[0.1em]", theme.text)}>{section.label}</h3><p className="text-[10px] font-bold text-slate-500/60 dark:text-slate-400/60 mt-0.5">{section.subtitle}</p></div>
                                     <div className="flex items-center gap-4"><span className={cn("text-[10px] font-black px-2.5 py-1 rounded-full", theme.badge)}>{leafCount}</span><ChevronDown size={18} className={cn("transition-transform duration-300", theme.text, isOpen ? "rotate-0" : "-rotate-90")} /></div>
                                 </button>
-                                {isOpen && <div className="px-5 py-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-300 bg-white dark:bg-slate-950/50">{filteredNutrients.map(node => renderNutrientRow(node, theme, 0))}</div>}
+                                {isOpen && <div className="px-5 py-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-300 bg-white dark:bg-slate-950/50">{(nutrientSortField === 'name' ? filteredNutrients.slice().sort((a, b) => nutrientSortDirection === 'asc' ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)) : filteredNutrients).map(node => renderNutrientRow(node, theme, 0))}</div>}
                             </div>
                         );
                     })}

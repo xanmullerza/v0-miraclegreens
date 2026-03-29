@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search } from 'lucide-react';
+import { ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
@@ -19,6 +19,14 @@ import { usePantry } from '@/hooks/use-pantry';
 
 export const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements'];
 const PAGE_SIZE = 20;
+
+const FOOD_SORT_OPTIONS = [
+    { id: 'name', label: 'A-Z' },
+    { id: 'energy_kcal', label: 'Energy' },
+    { id: 'protein_g', label: 'Protein' },
+    { id: 'carbs_g', label: 'Carbs' },
+    { id: 'fat_g', label: 'Fat' },
+] as const;
 
 interface FoodsViewProps {
     showAddFood?: boolean;
@@ -50,6 +58,11 @@ export function FoodsView({
 
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [sortField, setSortField] = useState<'name' | 'energy_kcal' | 'protein_g' | 'carbs_g' | 'fat_g'>('name');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [showSortOptions, setShowSortOptions] = useState(false);
+
+    const currentSortLabel = FOOD_SORT_OPTIONS.find(opt => opt.id === sortField)?.label || 'Sort';
 
     // Use external searchQuery if provided, otherwise use internal from useSearch
     const effectiveSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
@@ -73,7 +86,7 @@ export function FoodsView({
     // Single fetch function
     const fetchFoods = useCallback(async (
         pageNum: number,
-        opts: { q: string; favOnly: boolean; cats: string[]; currentUser: User | null },
+        opts: { q: string; favOnly: boolean; cats: string[]; currentUser: User | null; sortField: string; sortDirection: 'asc' | 'desc' },
         isNewSearch = false,
     ) => {
         setLoading(true);
@@ -96,7 +109,7 @@ export function FoodsView({
             }
 
             const from = (pageNum - 1) * PAGE_SIZE;
-            query = query.range(from, from + PAGE_SIZE - 1).order('name', { ascending: true });
+            query = query.range(from, from + PAGE_SIZE - 1).order(opts.sortField, { ascending: opts.sortDirection === 'asc' });
 
             const { data, error, count } = await query;
             if (error) throw error;
@@ -125,6 +138,20 @@ export function FoodsView({
                     }
                 } catch { /* ignore */ }
             }
+
+            const sortFoods = (items: FoodItem[]) => {
+                return [...items].sort((a, b) => {
+                    if (opts.sortField === 'name') {
+                        return opts.sortDirection === 'asc'
+                            ? a.name.localeCompare(b.name)
+                            : b.name.localeCompare(a.name);
+                    }
+                    const aVal = Number(a[opts.sortField as keyof FoodItem] ?? 0);
+                    const bVal = Number(b[opts.sortField as keyof FoodItem] ?? 0);
+                    return opts.sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+            };
+            fetchedItems = sortFoods(fetchedItems);
 
             // Merge pantry quantities from hook
             fetchedItems = fetchedItems.map(item =>
@@ -155,8 +182,8 @@ export function FoodsView({
     // Initial fetch
     useEffect(() => {
         if (!authReady) return;
-        fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
-    }, [authReady, showFavoritesOnly, selectedCategories, user, fetchFoods]);
+        fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user, sortField, sortDirection }, true);
+    }, [authReady, showFavoritesOnly, selectedCategories, user, sortField, sortDirection, fetchFoods]);
 
     // Debounced search
     const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -164,10 +191,10 @@ export function FoodsView({
         if (!authReady) return;
         if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
         searchTimerRef.current = setTimeout(() => {
-            fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
+            fetchFoods(1, { q: effectiveSearchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user, sortField, sortDirection }, true);
         }, 400);
         return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
-    }, [effectiveSearchQuery, authReady, fetchFoods]);
+    }, [effectiveSearchQuery, authReady, showFavoritesOnly, selectedCategories, user, sortField, sortDirection, fetchFoods]);
 
     return (
         <div className={cn("space-y-8 animate-in fade-in duration-500", noContainer && "space-y-0")}>
@@ -247,6 +274,48 @@ export function FoodsView({
                                         </SheetContent>
                                     </Sheet>
 
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setShowSortOptions(prev => !prev)}
+                                            className={cn(
+                                                "h-9 px-4 rounded-full flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
+                                                showSortOptions
+                                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
+                                                    : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
+                                            )}
+                                            title="Sort Options"
+                                        >
+                                            <ArrowDownUp size={13} />
+                                            <span className="hidden sm:inline">{currentSortLabel}</span>
+                                        </button>
+                                        {showSortOptions && (
+                                            <div className="absolute left-0 top-full mt-2 w-40 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
+                                                {FOOD_SORT_OPTIONS.map(option => (
+                                                    <button
+                                                        key={option.id}
+                                                        onClick={() => {
+                                                            if (sortField === option.id) {
+                                                                setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                                            } else {
+                                                                setSortField(option.id);
+                                                                setSortDirection('asc');
+                                                            }
+                                                            setShowSortOptions(false);
+                                                        }}
+                                                        className={cn(
+                                                            "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                            sortField === option.id
+                                                                ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
+                                                                : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                                        )}
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="flex-1 relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
                                         <input
@@ -317,6 +386,48 @@ export function FoodsView({
                                                 </div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
+
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setShowSortOptions(prev => !prev)}
+                                                className={cn(
+                                                    "h-9 px-4 rounded-xl flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
+                                                    showSortOptions
+                                                        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
+                                                        : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
+                                                )}
+                                                title="Sort Options"
+                                            >
+                                                <ArrowDownUp size={13} />
+                                                <span>{currentSortLabel}</span>
+                                            </button>
+                                            {showSortOptions && (
+                                                <div className="absolute left-0 top-full mt-2 w-44 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
+                                                    {FOOD_SORT_OPTIONS.map(option => (
+                                                        <button
+                                                            key={option.id}
+                                                            onClick={() => {
+                                                                if (sortField === option.id) {
+                                                                    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                                                } else {
+                                                                    setSortField(option.id);
+                                                                    setSortDirection('asc');
+                                                                }
+                                                                setShowSortOptions(false);
+                                                            }}
+                                                            className={cn(
+                                                                "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                                sortField === option.id
+                                                                    ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
+                                                                    : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                                            )}
+                                                        >
+                                                            {option.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
 
                                         <div className="relative">
                                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
