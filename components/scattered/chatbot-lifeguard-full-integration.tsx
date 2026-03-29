@@ -12,11 +12,11 @@ import { supabase } from '@/lib/supabase';
 import { searchLocalFood } from '@/lib/services/nutrition';
 import { calculateSurvivalStatus, SURVIVAL_PROFILES, INITIAL_STORES } from '@/lib/utils/survival-sim';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { LifeguardLongevityMeter } from '@/components/lifeguard/longevity-meter';
-import { LifeguardDeficitAnalysis } from '@/components/lifeguard/deficit-analysis';
-import { LifeguardDiagnosticWarnings } from '@/components/lifeguard/diagnostic-warnings';
-import { LifeguardScenarioComparison } from '@/components/lifeguard/scenario-comparison';
-import { LifeguardSurvivalCalendar } from '@/components/lifeguard/survival-calendar';
+import { LifeguardLongevityMeter } from '@/components/admin/lifeguard/longevity-meter';
+import { LifeguardDeficitAnalysis } from '@/components/admin/lifeguard/deficit-analysis';
+import { LifeguardDiagnosticWarnings } from '@/components/admin/lifeguard/diagnostic-warnings';
+import { LifeguardScenarioComparison } from '@/components/admin/lifeguard/scenario-comparison';
+import { LifeguardSurvivalCalendar } from '@/components/admin/lifeguard/survival-calendar';
 
 interface InventoryItem {
     id: string;

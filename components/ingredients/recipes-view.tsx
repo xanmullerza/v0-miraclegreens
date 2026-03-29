@@ -29,7 +29,7 @@ import { toast } from 'sonner';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
-import { RecipeFormDialog } from '@/components/ingredients/recipe-form-dialog';
+import { RecipeFormDialog } from '@/components/admin/ingredients/recipe-form-dialog';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 import { PANTRY_QUANTITIES_KEY } from '@/components/tracker/pantry/pantry-types';

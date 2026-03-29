@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -18,19 +18,19 @@ import { searchLocalFood } from '@/lib/services/nutrition';
 import Link from 'next/link';
 import { calculateSurvivalStatus, SURVIVAL_PROFILES, INITIAL_STORES } from '@/lib/utils/survival-sim';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { LifeguardLongevityMeter } from '@/components/lifeguard/longevity-meter';
-import { LifeguardDeficitAnalysis } from '@/components/lifeguard/deficit-analysis';
-import { LifeguardDiagnosticWarnings } from '@/components/lifeguard/diagnostic-warnings';
-import { LifeguardScenarioComparison } from '@/components/lifeguard/scenario-comparison';
-import { LifeguardSurvivalCalendar } from '@/components/lifeguard/survival-calendar';
-import { LifeguardInventoryManager } from '@/components/lifeguard/inventory-manager';
-import { LifeguardProtocolSuggestions } from '@/components/lifeguard/protocol-suggestions';
-import { LifeguardBiologicalHierarchy } from '@/components/lifeguard/biological-hierarchy';
-import { LifeguardSecurityAssessment } from '@/components/lifeguard/security-assessment';
-import { LifeguardWaterAssessment } from '@/components/lifeguard/water-assessment';
-import { LifeguardStepNavigation } from '@/components/lifeguard/step-navigation';
-import { LifeguardScenarioPresets } from '@/components/lifeguard/scenario-presets';
-import { LifeguardMealPlanner, type EmergencyRecipe } from '@/components/lifeguard/meal-planner';
+import { LifeguardLongevityMeter } from '@/components/admin/lifeguard/longevity-meter';
+import { LifeguardDeficitAnalysis } from '@/components/admin/lifeguard/deficit-analysis';
+import { LifeguardDiagnosticWarnings } from '@/components/admin/lifeguard/diagnostic-warnings';
+import { LifeguardScenarioComparison } from '@/components/admin/lifeguard/scenario-comparison';
+import { LifeguardSurvivalCalendar } from '@/components/admin/lifeguard/survival-calendar';
+import { LifeguardInventoryManager } from '@/components/admin/lifeguard/inventory-manager';
+import { LifeguardProtocolSuggestions } from '@/components/admin/lifeguard/protocol-suggestions';
+import { LifeguardBiologicalHierarchy } from '@/components/admin/lifeguard/biological-hierarchy';
+import { LifeguardSecurityAssessment } from '@/components/admin/lifeguard/security-assessment';
+import { LifeguardWaterAssessment } from '@/components/admin/lifeguard/water-assessment';
+import { LifeguardStepNavigation } from '@/components/admin/lifeguard/step-navigation';
+import { LifeguardScenarioPresets } from '@/components/admin/lifeguard/scenario-presets';
+import { LifeguardMealPlanner, type EmergencyRecipe } from '@/components/admin/lifeguard/meal-planner';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { parseRecipeText, parseIngredientsOnly } from '@/lib/utils/recipe-parser';
-import { RecipeFormDialog } from '@/components/ingredients/recipe-form-dialog';
+import { RecipeFormDialog } from '@/components/admin/ingredients/recipe-form-dialog';
 import { RecipeIngredient } from '@/components/recipe/ingredient-builder';
 
 interface ParsedRecipe {
