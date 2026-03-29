@@ -311,19 +311,19 @@ const COLUMN_MAP: Record<string, string> = {
 
 // ─── Component ────────────────────────────────────────────────
 
-interface NutridexViewProps {
+interface NutrientsViewProps {
     compact?: boolean;
     noContainer?: boolean;
     searchQuery?: string;
     onSearchChange?: (query: string) => void;
 }
 
-export function NutridexView({ 
+export function NutrientsView({ 
     compact = false, 
     noContainer = false,
     searchQuery: externalSearchQuery,
     onSearchChange
-}: NutridexViewProps) {
+}: NutrientsViewProps) {
     const router = useRouter();
     const { profile, dailyTargets, energyUnit } = useUserPreferences();
 
@@ -710,7 +710,7 @@ export function NutridexView({
                                     onClick={() => { setSelectedNutrient(null); setTopFoods([]); setDetailTab('foods'); }}
                                     className="flex items-center gap-2 h-9 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-full transition-all"
                                 >
-                                    <ChevronLeft size={14} /> Back to Nutridex
+                                    <ChevronLeft size={14} /> Back to Nutrients
                                 </button>
                             )}
                         </div>
@@ -769,7 +769,7 @@ export function NutridexView({
                                                 />
                                             </div>
                                         </div>
-                                        <div className="ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Nutridex Library</div>
+                                        <div className="ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Nutrients Library</div>
                                     </>
                                 ) : (
                                     <>
@@ -777,7 +777,7 @@ export function NutridexView({
                                             onClick={() => { setSelectedNutrient(null); setTopFoods([]); setDetailTab('foods'); }}
                                             className="flex items-center gap-2 h-9 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
                                         >
-                                            <ChevronLeft size={14} /> Back to Nutridex
+                                            <ChevronLeft size={14} /> Back to Nutrients
                                         </button>
                                         <div className="ml-auto flex items-center gap-3">
                                             <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">{selectedNutrient?.label}</h3>

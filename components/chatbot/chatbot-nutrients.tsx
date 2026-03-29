@@ -11,7 +11,7 @@ interface Nutrient {
     icon?: React.ReactNode;
 }
 
-export function ChatbotNutridex() {
+export function ChatbotNutrients() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedNutrient, setSelectedNutrient] = useState<string | null>(null);
     const [topFoods, setTopFoods] = useState<any[]>([]);
@@ -138,7 +138,7 @@ export function ChatbotNutridex() {
     return (
         <div className="flex-1 overflow-y-auto flex flex-col">
             <div className="p-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-900">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Nutridex</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Nutrients</h3>
                 <div className="relative">
                     <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
                     <input

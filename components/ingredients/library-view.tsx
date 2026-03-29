@@ -4,19 +4,19 @@ import React, { useState } from 'react';
 import { RecipesView } from './recipes-view';
 import { RecipeTabShell } from './recipe-tab-shell';
 
-interface MyRecipesViewProps {
+interface LibraryViewProps {
     onRecipeClick?: (recipeId: string) => void;
     isPremium?: boolean;
 }
 
-export function MyRecipesView({ onRecipeClick, isPremium }: MyRecipesViewProps) {
+export function LibraryView({ onRecipeClick, isPremium }: LibraryViewProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('title');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
     return (
         <RecipeTabShell
-            title="My Recipes"
+            title="Library"
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             sortField={sortField}
@@ -26,7 +26,6 @@ export function MyRecipesView({ onRecipeClick, isPremium }: MyRecipesViewProps) 
         >
             <RecipesView 
                 onRecipeClick={onRecipeClick}
-                onlyMyRecipes={true}
                 hideControls={true}
                 noContainer={true}
                 searchQuery={searchQuery}

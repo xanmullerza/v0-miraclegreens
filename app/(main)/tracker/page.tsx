@@ -6,7 +6,7 @@ import MealPlannerContent from '@/components/tracker/planner-content';
 import { ShoppingListView } from '@/components/tracker/shopping-list-view';
 import { PantryView } from '@/components/tracker/pantry-view';
 import { FoodsView } from '@/components/shared/foods-view';
-import { NutridexView } from '@/components/shared/nutridex-view';
+import { NutrientsView } from '@/components/shared/nutrients-view';
 import { cn } from '@/lib/utils';
 
 type TabId = 'shopping' | 'pantry' | 'planner' | 'foods' | 'nutrients';
@@ -68,7 +68,7 @@ export default function TrackerPage() {
                     )}
                     {activeTab === 'nutrients' && (
                         <div className="animate-in fade-in duration-300">
-                            <NutridexView compact={false} />
+                            <NutrientsView compact={false} />
                         </div>
                     )}
                 </div>

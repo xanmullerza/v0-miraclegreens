@@ -78,7 +78,7 @@ const TAB_CONFIG: TopTab[] = [
         adminOnly: true,
         subtabs: [
             { id: 'comparator', label: 'Comparator', href: '/users/admin/widgets/comparator', icon: Scale },
-            { id: 'nutridex', label: 'Nutridex', href: '/nutrients', icon: Activity },
+            { id: 'nutrients', label: 'Nutrients', href: '/nutrients', icon: Activity },
             { id: 'lifeguard', label: 'Life Guard', href: '/users/admin/widgets/lifeguard', icon: Wallet },
         ],
     },

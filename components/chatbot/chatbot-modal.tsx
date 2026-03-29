@@ -21,7 +21,7 @@ import { ChatbotRecipeDetail } from '@/components/chatbot/chatbot-recipe-detail'
 import { ChatbotShopping } from '@/components/chatbot/chatbot-shopping';
 import { ChatbotPantry } from '@/components/chatbot/chatbot-pantry';
 import { ChatbotPlanner } from '@/components/chatbot/chatbot-planner';
-import { NutridexView } from '@/components/shared/nutridex-view';
+import { NutrientsView } from '@/components/shared/nutrients-view';
 import { ChatbotComparatorFull } from '@/components/chatbot/chatbot-comparator-full';
 import { ChatbotLifeguardFullIntegration } from '@/components/chatbot/chatbot-lifeguard-full-integration';
 import { ChatbotHelpSection } from '@/components/chatbot/chatbot-help-section';
@@ -1020,9 +1020,9 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                     <ChatbotPlanner onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'planner')} />
                 )}
 
-                {/* Nutridex View */}
+                {/* Nutrients View */}
                 {!showRecipeBuilder && chatbotView === 'nutridex' && (
-                    <NutridexView compact={true} />
+                    <NutrientsView compact={true} />
                 )}
 
                 {/* Comparator View */}

@@ -19,7 +19,7 @@ import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { RecipesView, MEAL_TYPES } from '@/components/ingredients/recipes-view';
 import { RecipeFilterDialog } from '@/components/recipe/recipe-filter-dialog';
 import { FoodsView } from '@/components/shared/foods-view';
-import { NutridexView } from '@/components/shared/nutridex-view';
+import { NutrientsView } from '@/components/shared/nutrients-view';
 
 type TabId = 'recipes' | 'remixes' | 'mixes' | 'foods' | 'nutrients';
 
@@ -253,7 +253,7 @@ export function RecipesViewPremium({
                 {/* Nutrients View */}
                 {activeTab === 'nutrients' && (
                     <div className="flex-1 overflow-hidden animate-in fade-in duration-300 pt-8">
-                        <NutridexView 
+                        <NutrientsView 
                             compact={false} 
                             noContainer={true} 
                             searchQuery={searchQuery}

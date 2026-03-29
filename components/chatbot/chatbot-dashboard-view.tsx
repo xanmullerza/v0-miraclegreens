@@ -207,7 +207,7 @@ export function ChatbotDashboardView({
                         className="flex flex-col items-center justify-center gap-2 text-center transform transition duration-200 hover:scale-[1.05] active:scale-95 group"
                     >
                         <span className="text-3xl group-hover:drop-shadow-[0_0_8px_rgba(217,70,239,0.3)] transition-all">🧪</span>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-fuchsia-500 transition-colors">Nutridex</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-fuchsia-500 transition-colors">Nutrients Guide</span>
                     </button>
                     <button
                         onClick={() => setChatbotView('comparator')}

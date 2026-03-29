@@ -205,7 +205,7 @@ export function ChatbotQuickActions({
                             className="w-full text-left px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm transition-colors flex items-center gap-2"
                         >
                             <span className="text-lg">📊</span>
-                            Nutridex
+                            Nutrients Guide
                         </button>
                         <button
                             onClick={() => {
