@@ -698,6 +698,12 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
             sortOptions={sortOptions}
+            showFilters={true}
+            onFilterClick={() => {
+                // Filter by category
+                setSortField('category');
+            }}
+            hasActiveFilters={sortField === 'category'}
         >
             <div className="space-y-8">
             {/* Barcode Scanner Modal */}

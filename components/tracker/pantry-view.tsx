@@ -666,6 +666,12 @@ export function PantryView({
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
             sortOptions={sortOptions}
+            showFilters={true}
+            onFilterClick={() => {
+                // Filter by category
+                setSortField('category');
+            }}
+            hasActiveFilters={sortField === 'category'}
         >
             <div className="space-y-8 animate-in fade-in duration-500">
             {/* Login Prompt - Only shown if not loading and no user */}
