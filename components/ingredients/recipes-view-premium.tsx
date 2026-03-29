@@ -18,8 +18,8 @@ import { useChatbot } from '@/lib/context/chatbot-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { RecipesView, MEAL_TYPES } from '@/components/ingredients/recipes-view';
 import { RecipeFilterDialog } from '@/components/recipe/recipe-filter-dialog';
-import { FoodsView } from '@/components/tracker/foods-view';
-import { NutridexView } from '@/components/tracker/nutridex-view';
+import { FoodsView } from '@/components/shared/foods-view';
+import { NutridexView } from '@/components/shared/nutridex-view';
 
 type TabId = 'recipes' | 'remixes' | 'mixes' | 'foods' | 'nutrients';
 
