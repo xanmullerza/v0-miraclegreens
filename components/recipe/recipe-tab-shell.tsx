@@ -55,7 +55,7 @@ export function RecipeTabShell({
                                     "h-9 px-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-2 border",
                                     (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
                                         ? "bg-emerald-600 text-white border-emerald-500 shadow-emerald-500/20"
-                                        : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
                                 )}
                             >
                                 <Filter size={14} className={(hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters')) ? 'text-white' : 'text-slate-500'} />
@@ -65,29 +65,6 @@ export function RecipeTabShell({
                                 )}
                             </button>
 
-                            <div className="relative flex-1 min-w-[180px] sm:min-w-[260px] max-w-[520px] group">
-                                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                                    <Search size={16} className="text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
-                                </div>
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => onSearchChange(e.target.value)}
-                                    placeholder={`Search ${title.toLowerCase()}...`}
-                                    className="w-full h-9 pl-12 pr-10 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-full text-[10px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all shadow-sm"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        onClick={() => onSearchChange('')}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                                    >
-                                        <X size={16} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-2 justify-end">
                             <div className="relative">
                                 <button
                                     onClick={() => setShowSortOptions(!showSortOptions)}
@@ -95,7 +72,7 @@ export function RecipeTabShell({
                                         "h-9 px-4 rounded-full transition-all flex items-center gap-2 border text-[10px] font-black uppercase tracking-[0.2em]",
                                         showSortOptions
                                             ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-                                            : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                                            : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500"
                                     )}
                                 >
                                     <ArrowDownUp size={16} className={showSortOptions ? 'text-emerald-500' : 'text-slate-500'} />
@@ -133,9 +110,30 @@ export function RecipeTabShell({
                                 )}
                             </div>
 
-                            <div className="hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/70">
-                                {title === 'Library' ? 'Recipe Library' : title}
+                            <div className="relative flex-1 min-w-[180px] sm:min-w-[260px] max-w-[520px] group">
+                                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                    <Search size={16} className="text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => onSearchChange(e.target.value)}
+                                    placeholder={`Search ${title.toLowerCase()}...`}
+                                    className="w-full h-9 pl-12 pr-10 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-full text-[10px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all shadow-sm"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => onSearchChange('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
                             </div>
+                        </div>
+
+                        <div className="hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/70">
+                            {title === 'Library' ? 'Recipe Library' : title}
                         </div>
                     </div>
                 </div>
