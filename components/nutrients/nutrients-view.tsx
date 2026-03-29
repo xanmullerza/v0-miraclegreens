@@ -12,7 +12,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { useRDA } from '@/hooks/use-rda';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import { useChatbot } from '@/lib/context/chatbot-context';
 import { Switch } from '@/components/ui/switch';
 
 interface NutrientFilterPanelProps {
@@ -22,7 +22,7 @@ interface NutrientFilterPanelProps {
     setExcludeSupplements: (value: boolean) => void;
 }
 
-function NutrientFilterPanel({
+export function NutrientFilterPanel({
     excludeFlavour,
     setExcludeFlavour,
     excludeSupplements,
@@ -382,6 +382,7 @@ export function NutrientsView({
 }: NutrientsViewProps) {
     const router = useRouter();
     const { profile, dailyTargets, energyUnit } = useUserPreferences();
+    const { setChatbotView, setIsChatbotOpen, excludeFlavour, setExcludeFlavour, excludeSupplements, setExcludeSupplements } = useChatbot();
 
     // RDA hook
     const userRDAs = useRDA(
@@ -397,8 +398,6 @@ export function NutrientsView({
     const [topFoods, setTopFoods] = useState<FoodRanking[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [detailTab, setDetailTab] = useState<'foods' | 'learn'>('foods');
-    const [excludeFlavour, setExcludeFlavour] = useState(true);
-    const [excludeSupplements, setExcludeSupplements] = useState(true);
     const [nutrientSortField, setNutrientSortField] = useState<'section' | 'name'>('section');
     const [nutrientSortDirection, setNutrientSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -713,32 +712,26 @@ export function NutrientsView({
                         <div className="flex md:hidden items-center justify-between gap-2 px-4 py-3">
                             {!selectedNutrient && (
                                 <>
-                                    <Sheet>
-                                        <SheetTrigger asChild>
-                                            <button className={cn(
-                                                'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
-                                                (excludeFlavour || excludeSupplements)
-                                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                    : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
-                                            )}>
-                                                <Filter size={11} />
-                                                Filter
-                                                {(excludeFlavour || excludeSupplements) && (
-                                                    <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
-                                                        {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
-                                                    </span>
-                                                )}
-                                            </button>
-                                        </SheetTrigger>
-                                        <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl p-0">
-                                            <NutrientFilterPanel
-                                                excludeFlavour={excludeFlavour}
-                                                setExcludeFlavour={setExcludeFlavour}
-                                                excludeSupplements={excludeSupplements}
-                                                setExcludeSupplements={setExcludeSupplements}
-                                            />
-                                        </SheetContent>
-                                    </Sheet>
+                                    <button
+                                        onClick={() => {
+                                            setChatbotView('nutrient-filters');
+                                            setIsChatbotOpen(true);
+                                        }}
+                                        className={cn(
+                                            'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
+                                            (excludeFlavour || excludeSupplements)
+                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
+                                        )}
+                                    >
+                                        <Filter size={11} />
+                                        Filter
+                                        {(excludeFlavour || excludeSupplements) && (
+                                            <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
+                                                {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
+                                            </span>
+                                        )}
+                                    </button>
 
                                     <div className="relative">
                                         <button
@@ -815,33 +808,26 @@ export function NutrientsView({
                                 {!selectedNutrient ? (
                                     <>
                                         <div className="flex items-center gap-4">
-                                            <Sheet>
-                                                <SheetTrigger asChild>
-                                                    <button className={cn(
-                                                        'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
-                                                        (excludeFlavour || excludeSupplements)
-                                                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                            : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
-                                                    )}>
-                                                        <Filter size={13} />
-                                                        Filter
-                                                        {(excludeFlavour || excludeSupplements) && (
-                                                            <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
-                                                                {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                </SheetTrigger>
-
-                                                <SheetContent side="right" className="bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 p-0">
-                                                    <NutrientFilterPanel
-                                                        excludeFlavour={excludeFlavour}
-                                                        setExcludeFlavour={setExcludeFlavour}
-                                                        excludeSupplements={excludeSupplements}
-                                                        setExcludeSupplements={setExcludeSupplements}
-                                                    />
-                                                </SheetContent>
-                                            </Sheet>
+                                            <button
+                                                onClick={() => {
+                                                    setChatbotView('nutrient-filters');
+                                                    setIsChatbotOpen(true);
+                                                }}
+                                                className={cn(
+                                                    'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
+                                                    (excludeFlavour || excludeSupplements)
+                                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                        : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                                )}
+                                            >
+                                                <Filter size={13} />
+                                                Filter
+                                                {(excludeFlavour || excludeSupplements) && (
+                                                    <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
+                                                        {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
+                                                    </span>
+                                                )}
+                                            </button>
 
                                             <div className="relative">
                                                 <button

@@ -43,6 +43,7 @@ import { useZumAssistant, Message } from '@/lib/hooks/use-zum-assistant';
 import { structureRecipeForSaving } from '@/lib/utils/recipe-parser';
 import { ParsedRecipe } from '@/types/recipe';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
+import { NutrientFilterPanel } from '@/components/nutrients/nutrients-view';
 import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 
 interface ChatbotModalProps {
@@ -59,7 +60,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const { profile } = useUserPreferences();
     const { filters } = useRecipeFilter();
     const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories } = useFoodFilter();
-    const { isChatbotOpen, setIsChatbotOpen, chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack, recipeToRemix, setRecipeToRemix, recipeToShare, setRecipeToShare } = useChatbot();
+    const { isChatbotOpen, setIsChatbotOpen, chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack, recipeToRemix, setRecipeToRemix, recipeToShare, setRecipeToShare, excludeFlavour, setExcludeFlavour, excludeSupplements, setExcludeSupplements } = useChatbot();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
@@ -1246,6 +1247,29 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                                 setShowFavoritesOnly={setShowFavoritesOnly}
                                 selectedCategories={selectedCategories}
                                 setSelectedCategories={setSelectedCategories}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Nutrient Filters View */}
+                {!showRecipeBuilder && chatbotView === 'nutrient-filters' && (
+                    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar pb-20 animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Filter Nutrients</h2>
+                            <button
+                                onClick={() => handleGoHome(previousView)}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <NutrientFilterPanel
+                                excludeFlavour={excludeFlavour}
+                                setExcludeFlavour={setExcludeFlavour}
+                                excludeSupplements={excludeSupplements}
+                                setExcludeSupplements={setExcludeSupplements}
                             />
                         </div>
                     </div>
