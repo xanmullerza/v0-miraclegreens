@@ -36,12 +36,14 @@ import { toast } from 'sonner';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
+import { useFoodFilter } from '@/lib/context/food-filter-context';
 import { useChatbot, ChatbotViewType } from '@/lib/context/chatbot-context';
 import { useSplitView } from '@/lib/context/split-view-context';
 import { useZumAssistant, Message } from '@/lib/hooks/use-zum-assistant';
 import { structureRecipeForSaving } from '@/lib/utils/recipe-parser';
 import { ParsedRecipe } from '@/types/recipe';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
+import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 
 interface ChatbotModalProps {
     onClose: () => void;
@@ -56,6 +58,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const { user, saveRecipe } = useDataPersistence();
     const { profile } = useUserPreferences();
     const { filters } = useRecipeFilter();
+    const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories } = useFoodFilter();
     const { isChatbotOpen, setIsChatbotOpen, chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack, recipeToRemix, setRecipeToRemix, recipeToShare, setRecipeToShare } = useChatbot();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
     const builderRef = useRef<IngredientBuilderHandle>(null);
@@ -1221,6 +1224,29 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <RecipeFilterContent onClose={() => handleGoHome(previousView)} />
+                        </div>
+                    </div>
+                )}
+
+                {/* Food Filters View */}
+                {!showRecipeBuilder && chatbotView === 'food-filters' && (
+                    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar pb-20 animate-in fade-in duration-200">
+                        <div className="flex justify-between items-center p-4 pb-0 bg-white dark:bg-slate-900 sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-black italic uppercase tracking-wider text-slate-900 dark:text-white">Filter Foods</h2>
+                            <button
+                                onClick={() => handleGoHome(previousView)}
+                                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <FoodFiltersPanel
+                                showFavoritesOnly={showFavoritesOnly}
+                                setShowFavoritesOnly={setShowFavoritesOnly}
+                                selectedCategories={selectedCategories}
+                                setSelectedCategories={setSelectedCategories}
+                            />
                         </div>
                     </div>
                 )}

@@ -10,96 +10,15 @@ import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { useFoodFilter } from '@/lib/context/food-filter-context';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import { useChatbot } from '@/lib/context/chatbot-context';
+import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
 
-export const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements'];
 const PAGE_SIZE = 20;
-
-interface FoodFiltersPanelProps {
-    showFavoritesOnly: boolean;
-    setShowFavoritesOnly: (value: boolean) => void;
-    selectedCategories: string[];
-    setSelectedCategories: Dispatch<SetStateAction<string[]>>;
-}
-
-function FoodFiltersPanel({
-    showFavoritesOnly,
-    setShowFavoritesOnly,
-    selectedCategories,
-    setSelectedCategories,
-}: FoodFiltersPanelProps) {
-    const activeCount = selectedCategories.length + (showFavoritesOnly ? 1 : 0);
-
-    return (
-        <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950">
-            <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 p-5">
-                <div>
-                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Food Filters</p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Refine the ingredient library.</p>
-                </div>
-                {activeCount > 0 && (
-                    <button
-                        onClick={() => {
-                            setShowFavoritesOnly(false);
-                            setSelectedCategories([]);
-                        }}
-                        className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-500"
-                    >
-                        Clear
-                    </button>
-                )}
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 space-y-5">
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
-                    <div className="flex items-center justify-between gap-4">
-                        <div>
-                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Favorites only</p>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Show only saved favorite foods.</p>
-                        </div>
-                        <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
-                    </div>
-                </div>
-
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
-                    <div className="flex items-center justify-between gap-4 mb-4">
-                        <div>
-                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Categories</p>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Filter ingredients by food group.</p>
-                        </div>
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">{selectedCategories.length} selected</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        {CATEGORIES.map(category => {
-                            const active = selectedCategories.includes(category);
-                            return (
-                                <button
-                                    key={category}
-                                    onClick={() => {
-                                        if (active) setSelectedCategories(prev => prev.filter(item => item !== category));
-                                        else setSelectedCategories(prev => [...prev, category]);
-                                    }}
-                                    className={cn(
-                                        'h-9 px-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all',
-                                        active
-                                            ? 'bg-emerald-600 text-white border border-emerald-600'
-                                            : 'bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
-                                    )}
-                                >
-                                    {category}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 const FOOD_SORT_OPTIONS = [
     { id: 'name', label: 'A-Z' },
@@ -137,8 +56,8 @@ export function FoodsView({
     const [user, setUser] = useState<User | null>(null);
     const [authReady, setAuthReady] = useState(false);
 
-    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories } = useFoodFilter();
+    const { setIsChatbotOpen, setChatbotView } = useChatbot();
     const [sortField, setSortField] = useState<'name' | 'energy_kcal' | 'protein_g' | 'carbs_g' | 'fat_g'>('name');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -291,32 +210,26 @@ export function FoodsView({
                             <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-[2rem]">
                                 {/* Mobile filter bar */}
                                 <div className="flex md:hidden items-center justify-between gap-2 px-4 py-3">
-                                    <Sheet>
-                                        <SheetTrigger asChild>
-                                            <button className={cn(
-                                                'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
-                                                (showFavoritesOnly || selectedCategories.length > 0)
-                                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                    : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
-                                            )}>
-                                                <Filter size={11} />
-                                                Filter
-                                                {(showFavoritesOnly || selectedCategories.length > 0) && (
-                                                    <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
-                                                        {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
-                                                    </span>
-                                                )}
-                                            </button>
-                                        </SheetTrigger>
-                                        <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl p-0">
-                                    <FoodFiltersPanel
-                                        showFavoritesOnly={showFavoritesOnly}
-                                        setShowFavoritesOnly={setShowFavoritesOnly}
-                                        selectedCategories={selectedCategories}
-                                        setSelectedCategories={setSelectedCategories}
-                                    />
-                                </SheetContent>
-                                    </Sheet>
+                                    <button
+                                        onClick={() => {
+                                            setChatbotView('food-filters');
+                                            setIsChatbotOpen(true);
+                                        }}
+                                        className={cn(
+                                            'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
+                                            (showFavoritesOnly || selectedCategories.length > 0)
+                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
+                                        )}
+                                    >
+                                        <Filter size={11} />
+                                        Filter
+                                        {(showFavoritesOnly || selectedCategories.length > 0) && (
+                                            <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
+                                                {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                                            </span>
+                                        )}
+                                    </button>
 
                                     <div className="relative">
                                         <button
@@ -380,33 +293,26 @@ export function FoodsView({
                                 {/* Desktop header row */}
                                 <div className="hidden md:flex md:items-center gap-4 px-10 py-4 w-full">
                                     <div className="flex items-center gap-4">
-                                        <Sheet>
-                                            <SheetTrigger asChild>
-                                                <button className={cn(
-                                                    'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
-                                                    (showFavoritesOnly || selectedCategories.length > 0)
-                                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                        : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
-                                                )}>
-                                                    <Filter size={13} />
-                                                    Filter
-                                                    {(selectedCategories.length > 0 || showFavoritesOnly) && (
-                                                        <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
-                                                            {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
-                                                        </span>
-                                                    )}
-                                                </button>
-                                            </SheetTrigger>
-
-                                            <SheetContent side="right" className="bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 p-0">
-                                                <FoodFiltersPanel
-                                                    showFavoritesOnly={showFavoritesOnly}
-                                                    setShowFavoritesOnly={setShowFavoritesOnly}
-                                                    selectedCategories={selectedCategories}
-                                                    setSelectedCategories={setSelectedCategories}
-                                                />
-                                            </SheetContent>
-                                        </Sheet>
+                                        <button
+                                            onClick={() => {
+                                                setChatbotView('food-filters');
+                                                setIsChatbotOpen(true);
+                                            }}
+                                            className={cn(
+                                                'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
+                                                (showFavoritesOnly || selectedCategories.length > 0)
+                                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                    : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                            )}
+                                        >
+                                            <Filter size={13} />
+                                            Filter
+                                            {(selectedCategories.length > 0 || showFavoritesOnly) && (
+                                                <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
+                                                    {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                                                </span>
+                                            )}
+                                        </button>
 
                                         <div className="relative">
                                             <button
