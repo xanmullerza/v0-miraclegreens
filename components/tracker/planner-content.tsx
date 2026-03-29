@@ -97,9 +97,9 @@ import { usePantry } from '@/hooks/use-pantry';
 import { useShoppingList } from '@/hooks/use-shopping-list';
 import dynamic from 'next/dynamic';
 
-const FoodItemCreatorContent = dynamic(() => import('@/components/maker/food-item-creator').then(m => m.FoodItemCreatorContent), { ssr: false });
-const MealBuilderContent = dynamic(() => import('@/components/maker/meal-builder').then(m => m.MealBuilderContent), { ssr: false });
-const MixBuilderContent = dynamic(() => import('@/components/maker/mix-builder').then(m => m.MixBuilderContent), { ssr: false });
+const FoodItemCreatorContent = dynamic(() => import('@/components/admin/ingredients/food-item-creator').then(m => m.FoodItemCreatorContent), { ssr: false });
+const MealBuilderContent = dynamic(() => import('@/components/recipe/meal-builder').then(m => m.MealBuilderContent), { ssr: false });
+const MixBuilderContent = dynamic(() => import('@/components/recipe/mix-builder').then(m => m.MixBuilderContent), { ssr: false });
 
 
 const showShop = false;

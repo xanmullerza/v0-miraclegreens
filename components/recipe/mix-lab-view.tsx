@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { LabView } from '@/components/admin/ingredients/lab-view';
-import { MixBuilderContent } from '@/components/maker/mix-builder';
+import { MixBuilderContent } from '@/components/recipe/mix-builder';
 
 interface MixItem {
     id: string;

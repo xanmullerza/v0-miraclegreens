@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { FoodItemCreatorContent } from '@/components/maker/food-item-creator';
+import { FoodItemCreatorContent } from '@/components/admin/ingredients/food-item-creator';
 
 export default function DashboardFoodPage() {
     return (

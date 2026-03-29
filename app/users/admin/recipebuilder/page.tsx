@@ -1,6 +1,6 @@
 'use client';
 
-import { UserRecipeBuilder } from '@/components/maker/user-recipe-builder';
+import { UserRecipeBuilder } from '@/components/recipe/user-recipe-builder';
 import { useRouter } from 'next/navigation';
 
 export default function RecipeBuilderPage() {
