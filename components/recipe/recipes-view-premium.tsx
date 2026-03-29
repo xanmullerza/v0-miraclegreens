@@ -16,7 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/lib/context/chatbot-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
-import { RecipesView, MEAL_TYPES } from '@/components/ingredients/recipes-view';
+import { RecipesView, MEAL_TYPES } from '@/components/recipe/recipes-view';
 import { RecipeFilterDialog } from '@/components/recipe/recipe-filter-dialog';
 import { FoodsView } from '@/components/shared/foods-view';
 import { NutrientsView } from '@/components/shared/nutrients-view';

@@ -3,10 +3,10 @@
 import { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
-import { LibraryView } from '@/components/ingredients/library-view';
-import { MyRecipesView } from '@/components/ingredients/my-recipes-view';
-import { RemixesView } from '@/components/ingredients/remixes-view';
-import { MixesView } from '@/components/ingredients/mixes-view';
+import { LibraryView } from '@/components/recipe/library-view';
+import { MyRecipesView } from '@/components/recipe/my-recipes-view';
+import { RemixesView } from '@/components/recipe/remixes-view';
+import { MixesView } from '@/components/recipe/mixes-view';
 import { FoodsView } from '@/components/shared/foods-view';
 import { NutrientsView } from '@/components/shared/nutrients-view';
 import { useSearch } from '@/lib/context/search-context';
