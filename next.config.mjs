@@ -16,6 +16,11 @@ const nextConfig = {
         destination: '/dashboard/nutrients/welcome',
         permanent: false,
       },
+      {
+        source: '/mixes',
+        destination: '/recipes?tab=mixes',
+        permanent: true,
+      },
     ]
   },
 }

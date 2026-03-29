@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2, Wand2, Trash2, Tag, ChevronRight, Plus, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Activity, UtensilsCrossed, ShoppingBasket, Layers, Zap, Gem, Droplet, Battery, Dna, ChevronUp, ChevronDown, Sparkles, Check, RefreshCw, X, Info, Search, AlertCircle, AlertTriangle, Flame, Share2, Wand2, Trash2, Tag, ChevronRight, Plus, RotateCcw, Pencil } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -205,12 +205,13 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     const { setIsChatbotOpen, setChatbotView, setRecipeToRemix } = useChatbot();
     const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
+    const isOwner = user && recipe && (recipe as any).user_id === user.id;
 
     const handleEditClick = () => {
         if (!recipe) return;
         
-        // Determine if this is an "edit" (own recipe) or "remix" (someone else's)
-        const isEdit = user && (recipe as any).user_id === user.id;
+        // Use the calculated isOwner constant
+        const isEdit = isOwner;
 
         if (onRemix) {
             onRemix(recipe, ingredients, instructions);
@@ -2463,27 +2464,40 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
                                 <p className="font-black text-[9px] uppercase tracking-widest leading-none">Share</p>
                             </button>
 
-                            {/* Edit/Remix Button */}
                             <button
                                 onClick={handleEditClick}
-                                className="flex flex-col items-center justify-center p-4 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-500/30 hover:text-emerald-600 transition-all active:scale-95 text-center gap-3 group"
+                                className={cn(
+                                    "flex flex-col items-center justify-center p-4 rounded-2xl border transition-all active:scale-95 text-center gap-3 group",
+                                    isOwner 
+                                        ? "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-500/30 hover:text-emerald-600"
+                                        : "bg-indigo-500/10 border-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20"
+                                )}
                             >
-                                <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-emerald-500 transition-all">
-                                    <Wand2 size={18} />
+                                <div className={cn(
+                                    "w-10 h-10 rounded-full border flex items-center justify-center transition-all group-hover:scale-110 shadow-sm",
+                                    isOwner 
+                                        ? "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 group-hover:text-emerald-500" 
+                                        : "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/30"
+                                )}>
+                                    {isOwner ? <Pencil size={18} /> : <Wand2 size={18} />}
                                 </div>
-                                <p className="font-black text-[9px] uppercase tracking-widest leading-none">Edit</p>
+                                <p className="font-black text-[9px] uppercase tracking-widest leading-none">
+                                    {isOwner ? 'Edit' : 'Remix & Save'}
+                                </p>
                             </button>
 
-                            {/* Delete Button */}
-                            <div className="relative">
-                                <DeleteButton 
-                                    recipeId={recipe.id} 
-                                    onDeleted={() => {
-                                        toast.success('Recipe deleted successfully');
-                                        if (onBack) onBack();
-                                    }} 
-                                />
-                            </div>
+                            {/* Delete Button - Only shown to owner */}
+                            {isOwner && (
+                                <div className="relative">
+                                    <DeleteButton 
+                                        recipeId={recipe.id} 
+                                        onDeleted={() => {
+                                            toast.success('Recipe deleted successfully');
+                                            if (onBack) onBack();
+                                        }} 
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
