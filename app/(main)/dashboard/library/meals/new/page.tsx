@@ -288,7 +288,7 @@ function UserRecipeBuilder() {
             if (saved?.id) {
                 router.push(`/recipes/${saved.id}`);
             } else {
-                router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}`);
+                router.push(`/${isMix ? 'mixes' : 'meals'}`);
             }
         } catch (error: any) {
             toast.error(`Failed to save: ${error.message}`);

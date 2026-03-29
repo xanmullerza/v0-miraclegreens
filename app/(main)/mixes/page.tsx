@@ -37,9 +37,9 @@ export default function MixesPage() {
                         onSelect={noop}
                         hideResults
                         theme="emerald"
-                        placeholder="SEARCH MIXES LIBRARY..."
-                        idleTitle="Mixes Library"
-                        idleSubtitle="Browse and search our mixes library"
+                        placeholder="SEARCH MIXES..."
+                        idleTitle="Mixes"
+                        idleSubtitle="Browse and search our mixes collection"
                     />
 
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
