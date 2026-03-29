@@ -42,51 +42,52 @@ export function RecipeTabShell({
 
     return (
         <div className="space-y-0">
-            {/* Premium Controls Row */}
-            <div className="sticky top-[72px] z-10 bg-transparent backdrop-blur-md rounded-b-[2rem] shadow-xl">
-                <div className="px-6 py-3 flex items-center justify-center gap-4">
+            {/* Tab Search/Filter UI */}
+            <div className="bg-background/80 backdrop-blur-md py-8 px-6">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-5xl mx-auto">
                     {/* Search Bar */}
-                    <div className="relative w-full max-w-md">
-                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <div className="relative w-full sm:flex-1 max-w-2xl group">
+                        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                            <Search size={18} className="text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
+                        </div>
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => onSearchChange(e.target.value)}
                             placeholder={`Search ${title.toLowerCase()}...`}
-                            className="w-full pl-10 pr-10 py-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-800/20 text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 transition-all shadow-sm"
+                            className="w-full pl-14 pr-12 py-4 bg-slate-950/40 dark:bg-slate-900/60 border border-white/5 rounded-full text-xs font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-600 transition-all shadow-xl group-hover:border-white/10"
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => onSearchChange('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
                             >
-                                <X size={12} />
+                                <X size={16} />
                             </button>
                         )}
                     </div>
 
                     {/* Actions Group */}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
                         {/* Sort Button */}
                         <div className="relative">
                             <button
                                 onClick={() => setShowSortOptions(!showSortOptions)}
                                 className={cn(
-                                    "p-2 rounded-xl transition-all flex items-center gap-2 border shadow-sm outline-none",
+                                    "px-6 py-4 rounded-full transition-all flex items-center gap-3 border shadow-xl outline-none text-[10px] font-black uppercase tracking-[0.2em]",
                                     showSortOptions
-                                        ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200"
-                                        : "bg-white dark:bg-slate-800 border-emerald-800/20 text-slate-400 hover:text-indigo-500 hover:border-indigo-200"
+                                        ? "bg-slate-800 text-emerald-400 border-emerald-500/30"
+                                        : "bg-slate-950/40 dark:bg-slate-900/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800"
                                 )}
-                                title="Sort Options"
                             >
-                                <ArrowDownUp size={18} />
-                                <span className="text-[9px] font-black uppercase tracking-widest hidden lg:inline">
+                                <ArrowDownUp size={18} className={showSortOptions ? 'text-emerald-400' : 'text-slate-500'} />
+                                <span>
                                     {sortField === 'title' ? 'A-Z' : sortField === 'prep_time' ? 'Time' : sortField === 'calories' ? 'Cal' : 'Diff'}
                                 </span>
                             </button>
 
                             {showSortOptions && (
-                                <div className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] p-1.5 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="absolute top-full right-0 mt-3 w-48 bg-slate-900 rounded-[2rem] shadow-2xl border border-white/10 z-[100] p-2 animate-in fade-in zoom-in-95 duration-200">
                                     {[
                                         { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
                                         { id: 'prep_time', label: 'Prep Time', icon: <Clock size={14} /> },
@@ -100,10 +101,10 @@ export function RecipeTabShell({
                                                 setShowSortOptions(false);
                                             }}
                                             className={cn(
-                                                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                "w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mb-1 last:mb-0",
                                                 sortField === opt.id
-                                                    ? "bg-indigo-50 dark:bg-indigo-950 text-indigo-600"
-                                                    : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                    ? "bg-emerald-500/10 text-emerald-400"
+                                                    : "text-slate-500 hover:bg-white/5 hover:text-slate-200"
                                             )}
                                         >
                                             {opt.icon}
@@ -121,15 +122,14 @@ export function RecipeTabShell({
                                 setIsChatbotOpen(true);
                             }}
                             className={cn(
-                                "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
+                                "px-6 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-3 border shadow-xl outline-none",
                                 (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
-                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
-                                    : "bg-white dark:bg-slate-800 border-emerald-800/20 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
+                                    ? "bg-emerald-600 text-white border-emerald-500 shadow-emerald-500/20"
+                                    : "bg-slate-950/40 dark:bg-slate-900/60 border-white/5 text-slate-400 hover:bg-slate-800 hover:text-white"
                             )}
-                            title="Advanced Filters"
                         >
-                            <Filter size={18} />
-                            <span className="hidden lg:inline">Filters</span>
+                            <Filter size={18} className={(hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters')) ? 'text-white' : 'text-slate-500'} />
+                            <span>Filters</span>
                             {hasActiveFilters && (
                                 <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
                             )}

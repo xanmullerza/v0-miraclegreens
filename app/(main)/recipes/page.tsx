@@ -42,17 +42,17 @@ function RecipesPageContent() {
     return (
         <>
             {/* Tab Bar */}
-            <div className="sticky top-0 z-20 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent py-4 px-2 border-b border-slate-200 dark:border-slate-800">
-                <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 max-w-2xl mx-auto border border-emerald-800/10 shadow-sm overflow-x-auto no-scrollbar">
+            <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl py-6 px-4 border-b border-border/50">
+                <div className="flex items-center justify-between max-w-5xl mx-auto bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl overflow-x-auto no-scrollbar">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => handleTabChange(tab.id)}
                             className={cn(
-                                "flex-1 min-w-[70px] py-2 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all whitespace-nowrap",
+                                "flex-1 min-w-[100px] py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1.5rem] transition-all duration-300 whitespace-nowrap px-4",
                                 activeTab === tab.id
-                                    ? `bg-white dark:bg-slate-800 ${tab.activeColor} shadow-sm`
-                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                    ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
+                                    : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
                             )}
                         >
                             {tab.label}
