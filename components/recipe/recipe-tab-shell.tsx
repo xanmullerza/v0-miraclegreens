@@ -60,19 +60,19 @@ export function RecipeTabShell({
     return (
         <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
             <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-                <div className="px-4 py-5 sm:px-6 sm:py-6">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex flex-wrap items-center gap-2">
+                <div className="px-4 py-4 sm:px-6 sm:py-4">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex flex-wrap items-center gap-2 md:gap-4">
                             <button
                                 onClick={() => {
                                     setChatbotView('recipe-filters');
                                     setIsChatbotOpen(true);
                                 }}
                                 className={cn(
-                                    "h-9 px-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-2 border",
+                                    "h-9 px-4 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 border shadow-sm",
                                     (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
-                                        ? "bg-emerald-600 text-white border-emerald-500 shadow-emerald-500/20"
-                                        : "bg-white/10 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-300 hover:bg-white/20 dark:hover:bg-slate-900/60 hover:border-emerald-300 hover:text-emerald-400"
+                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
                                 )}
                             >
                                 <Filter size={14} className={(hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters')) ? 'text-white' : 'text-slate-300'} />
@@ -86,10 +86,10 @@ export function RecipeTabShell({
                                 <button
                                     onClick={() => setShowSortOptions(!showSortOptions)}
                                     className={cn(
-                                        "h-9 px-4 rounded-full transition-all flex items-center gap-2 border text-[10px] font-black uppercase tracking-[0.2em]",
+                                        "h-9 px-4 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm",
                                         showSortOptions
-                                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-                                            : "bg-white/10 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-300 hover:bg-white/20 dark:hover:bg-slate-900/60 hover:border-emerald-300 hover:text-emerald-400"
+                                            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200"
+                                            : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500"
                                     )}
                                 >
                                     <ArrowDownUp size={16} className={showSortOptions ? 'text-emerald-500' : 'text-slate-300'} />
@@ -122,16 +122,16 @@ export function RecipeTabShell({
                                 )}
                             </div>
 
-                            <div className="relative flex-1 min-w-[180px] sm:min-w-[260px] max-w-[520px] group">
-                                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                                    <Search size={16} className="text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
+                            <div className="relative flex-1 min-w-[180px] md:w-64 group">
+                                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                    <Search size={13} className="text-slate-400 dark:text-slate-500" />
                                 </div>
                                 <input
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => onSearchChange(e.target.value)}
                                     placeholder={`Search ${title.toLowerCase()}...`}
-                                    className="w-full h-9 pl-12 pr-10 bg-white/10 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-full text-[10px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all shadow-sm"
+                                    className="w-full h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0 shadow-sm"
                                 />
                                 {searchQuery && (
                                     <button
