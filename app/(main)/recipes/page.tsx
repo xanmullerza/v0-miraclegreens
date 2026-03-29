@@ -8,7 +8,7 @@ import { MyRecipesView } from '@/components/recipe/my-recipes-view';
 import { RemixesView } from '@/components/recipe/remixes-view';
 import { MixesView } from '@/components/recipe/mixes-view';
 import { FoodsView } from '@/components/foods/food-library-view';
-import { NutrientsView } from '@/components/foods/nutrients-view';
+import { NutrientsView } from '@/components/nutrients/nutrients-view';
 import { useSearch } from '@/lib/context/search-context';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';

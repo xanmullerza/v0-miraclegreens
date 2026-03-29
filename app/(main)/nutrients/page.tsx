@@ -1,6 +1,6 @@
 'use client';
 
-import { NutrientsView } from '@/components/foods/nutrients-view';
+import { NutrientsView } from '@/components/nutrients/nutrients-view';
 
 export default function NutrientsPage() {
     return (

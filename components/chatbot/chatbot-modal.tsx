@@ -21,7 +21,7 @@ import { ChatbotRecipeDetail } from '@/components/chatbot/chatbot-recipe-detail'
 import { ChatbotShopping } from '@/components/chatbot/chatbot-shopping';
 import { ChatbotPantry } from '@/components/chatbot/chatbot-pantry';
 import { ChatbotPlanner } from '@/components/chatbot/chatbot-planner';
-import { NutrientsView } from '@/components/foods/nutrients-view';
+import { NutrientsView } from '@/components/nutrients/nutrients-view';
 import { ChatbotComparatorFull } from '@/components/chatbot/chatbot-comparator-full';
 import { ChatbotLifeguardFullIntegration } from '@/components/chatbot/chatbot-lifeguard-full-integration';
 import { ChatbotHelpSection } from '@/components/chatbot/chatbot-help-section';
