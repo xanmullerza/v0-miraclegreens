@@ -14,7 +14,7 @@ import { useFoodFilter } from '@/lib/context/food-filter-context';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useChatbot } from '@/lib/context/chatbot-context';
-import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
+import { CATEGORIES, FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
 
