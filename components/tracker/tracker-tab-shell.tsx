@@ -25,6 +25,7 @@ interface TrackerTabShellProps {
     showFilters?: boolean;
     onFilterClick?: () => void;
     hasActiveFilters?: boolean;
+    activeFilterCount?: number;
 }
 
 export function TrackerTabShell({
@@ -40,7 +41,8 @@ export function TrackerTabShell({
     sortOptions,
     showFilters = false,
     onFilterClick,
-    hasActiveFilters = false
+    hasActiveFilters = false,
+    activeFilterCount = 0
 }: TrackerTabShellProps) {
     const { isChatbotOpen, chatbotView } = useChatbot();
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -138,7 +140,7 @@ export function TrackerTabShell({
                             onClick={onFilterClick}
                             className={cn(
                                 "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border relative shadow-sm",
-                                (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
+                                (hasActiveFilters || activeFilterCount > 0)
                                     ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20"
                                     : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
                             )}
@@ -146,8 +148,10 @@ export function TrackerTabShell({
                         >
                             <Filter size={13} />
                             Filter
-                            {hasActiveFilters && (
-                                <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
+                            {activeFilterCount > 0 && (
+                                <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
+                                    {activeFilterCount}
+                                </span>
                             )}
                         </button>
                     )}
