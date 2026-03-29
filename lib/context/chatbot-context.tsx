@@ -14,6 +14,8 @@ interface ChatbotContextType {
     viewStack: ChatbotViewType[];
     navigateTo: (view: ChatbotViewType) => void;
     goBack: (fallbackProvider?: () => void) => void;
+    recipeToRemix: any | null;
+    setRecipeToRemix: (recipe: any | null) => void;
 }
 
 const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
@@ -22,6 +24,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
     const [chatbotView, setChatbotView] = useState<ChatbotViewType>('desktop-guide');
     const [previousView, setPreviousView] = useState<ChatbotViewType | null>(null);
+    const [recipeToRemix, setRecipeToRemix] = useState<any | null>(null);
     const [viewStack, setViewStack] = useState<ChatbotViewType[]>([]);
 
     // Initialize correct default view based on screen size across all routes
@@ -71,6 +74,8 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
             viewStack,
             navigateTo,
             goBack,
+            recipeToRemix,
+            setRecipeToRemix,
         }}>
             {children}
         </ChatbotContext.Provider>

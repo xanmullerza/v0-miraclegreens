@@ -56,7 +56,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const { user, saveRecipe } = useDataPersistence();
     const { profile } = useUserPreferences();
     const { filters } = useRecipeFilter();
-    const { chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack } = useChatbot();
+    const { isChatbotOpen, setIsChatbotOpen, chatbotView, setChatbotView, previousView, setPreviousView, navigateTo, goBack, recipeToRemix, setRecipeToRemix } = useChatbot();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
     const builderRef = useRef<IngredientBuilderHandle>(null);
     
@@ -123,6 +123,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
     const [recipeStep, setRecipeStep] = useState(1);
     const [isMix, setIsMix] = useState(false);
     const [isRemix, setIsRemix] = useState(false);
+    const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
     const [cookbookTab, setCookbookTab] = useState<'recipes' | 'remixes' | 'mixes'>('recipes');
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -309,14 +310,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setRecipeImage('');
         setIsMix(false);
         setIsRemix(false);
+        setEditingRecipeId(null);
     };
 
-    const handleRemixRecipe = (recipe: any, ingredientsList?: any[], instructionsList?: any[]) => {
-        setIsRemix(true);
+    const handleRemixRecipe = (recipe: any, ingredientsList?: any[], instructionsList?: any[], isEdit: boolean = false) => {
+        setIsRemix(!isEdit);
+        setEditingRecipeId(isEdit ? recipe.id : null);
         setIsMix(recipe.is_mix || false);
         setIsCreatingRecipe(true);
         setShowRecipeBuilder(true);
-        setRecipeTitle(`${recipe.title} (Remix)`);
+        setRecipeTitle(isEdit ? recipe.title : `${recipe.title} (Remix)`);
         setRecipeStep(1);
         // Use either passed ingredients or joined ingredients from recipe
         const sourceIngredients = ingredientsList || recipe.ingredients || [];
@@ -324,7 +327,11 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         const servings = recipe.servings || 4;
 
         // Pre-fill states for builder
-        setRecipeTitle(`${recipe.title || 'Remix'} 🌈`);
+        if (!isEdit) {
+            setRecipeTitle(`${recipe.title || 'Remix'} 🌈`);
+        } else {
+            setRecipeTitle(recipe.title);
+        }
         setRecipeType(recipe.meal_type || recipe.type || 'dinner');
         setRecipePrepTime(recipe.prep_time || 30);
         setRecipeCookTime(recipe.cook_time || 0);
@@ -389,6 +396,16 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
         setShowRecipeBuilder(true);
         setRecipeStep(1); 
     };
+
+    // Auto-trigger remix when data is passed via context
+    useEffect(() => {
+        if (recipeToRemix) {
+            const { recipe, ingredients, instructions, isEdit } = recipeToRemix;
+            handleRemixRecipe(recipe, ingredients, instructions, isEdit);
+            // Clear it so it doesn't re-trigger
+            setRecipeToRemix(null);
+        }
+    }, [recipeToRemix, handleRemixRecipe, setRecipeToRemix]);
 
     const handleRecipeClick = (recipeId: string, fromView: 'view-recipes' | 'planner') => {
         setSelectedRecipeId(recipeId);
@@ -515,6 +532,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
                 is_favorite: true,
                 is_mix: finalIsMix,
                 is_remix: finalIsRemix,
+                id: editingRecipeId || undefined
             };
 
             await saveRecipe(recipeData, recipeIngredients, recipeInstructions);
@@ -533,6 +551,7 @@ export function ChatbotModal({ onClose, onRecipeDetected, isInline = false }: Ch
             setChatbotView('view-recipes');
             setShowRecipeBuilder(false);
             setIsCreatingRecipe(false);
+            setEditingRecipeId(null);
             
             // Re-trigger a refresh of the recipe library
             if ((window as any).refreshRecipeLibrary) {

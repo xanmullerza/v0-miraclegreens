@@ -23,6 +23,8 @@ import {
     formatNutrientValue 
 } from '@/lib/utils/nutrition-utils';
 import { useSmartMatch } from '@/hooks/use-smart-match';
+import { useChatbot } from '@/lib/context/chatbot-context';
+import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 
 function DeleteButton({ recipeId, onDeleted }: { recipeId: string, onDeleted: () => void }) {
     const [confirming, setConfirming] = useState(false);
@@ -200,7 +202,26 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
     // User preferences and RDA
     const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
+    const { setIsChatbotOpen, setChatbotView, setRecipeToRemix } = useChatbot();
+    const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
+
+    const handleEditClick = () => {
+        if (!recipe) return;
+        
+        // Determine if this is an "edit" (own recipe) or "remix" (someone else's)
+        const isEdit = user && (recipe as any).user_id === user.id;
+
+        if (onRemix) {
+            onRemix(recipe, ingredients, instructions);
+        } else {
+            // Global fallback for standalone mode
+            setRecipeToRemix({ recipe, ingredients, instructions, isEdit });
+            setChatbotView('recipe-builder');
+            setIsChatbotOpen(true);
+            toast.info(isEdit ? 'Opening recipe editor...' : 'Remixing recipe...');
+        }
+    };
 
     useEffect(() => {
         fetchRecipeDetails();
@@ -2444,7 +2465,7 @@ export function ChatbotRecipeDetail({ recipeId, onBack, onShare, onRemix, isStan
 
                             {/* Edit/Remix Button */}
                             <button
-                                onClick={() => recipe && onRemix && onRemix(recipe, ingredients, instructions)}
+                                onClick={handleEditClick}
                                 className="flex flex-col items-center justify-center p-4 rounded-2xl border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-500/30 hover:text-emerald-600 transition-all active:scale-95 text-center gap-3 group"
                             >
                                 <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:text-emerald-500 transition-all">
