@@ -93,6 +93,7 @@ import { useRouter } from 'next/navigation';
 import { useChatbot } from '@/lib/context/chatbot-context';
 import { useSearch } from '@/lib/context/search-context';
 import { HeroSearch } from '@/components/ui/hero-search';
+import { TrackerTabShell, SortOption } from '@/components/tracker/tracker-tab-shell';
 import { usePantry } from '@/hooks/use-pantry';
 import { useShoppingList } from '@/hooks/use-shopping-list';
 import dynamic from 'next/dynamic';
@@ -1322,6 +1323,14 @@ export default function MealPlannerContent({
   const setSelectedTypes =
     externalSetSelectedTypes !== undefined ? externalSetSelectedTypes : setLocalSelectedTypes;
 
+  // Sort state for planner header
+  const [sortField, setSortField] = useState('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const sortOptions: SortOption[] = [
+    { id: 'name', label: 'A-Z', icon: null },
+    { id: 'calories', label: 'Energy', icon: null },
+  ];
+
   // Nutrient breakdown definitions
   const NUTRIENT_BREAKDOWNS: Record<
     string,
@@ -1732,9 +1741,25 @@ export default function MealPlannerContent({
   };
 
   return (
-    <PageContainer maxWidth="max-w-7xl">
-      <div className="space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
-        {/* Hero Search */}
+    <div className="w-full space-y-6">
+      <TrackerTabShell
+        title="Planner"
+        searchQuery={heroSearchQuery}
+        onSearchChange={handleHeroInput}
+        sortField={sortField}
+        setSortField={setSortField}
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+        sortOptions={sortOptions}
+        showFilters={true}
+        onFilterClick={() => {
+          // Filter by meal type
+          setLocalSelectedTypes(selectedTypes.length === 3 ? ['breakfast'] : ['breakfast', 'lunch', 'dinner']);
+        }}
+        activeFilterCount={selectedTypes.length < 3 ? 1 : 0}
+      >
+        <div className="space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+          {/* Hero Search */}
         <HeroSearch
           searchQuery={heroSearchQuery}
           onQueryChange={handleHeroInput}
@@ -3750,7 +3775,8 @@ export default function MealPlannerContent({
           </div>
         )}
       </div>
-    </PageContainer>
+    </TrackerTabShell>
+    </div>
   );
 }
 
