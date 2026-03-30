@@ -9,7 +9,7 @@ export function DraggableFab() {
     const router = useRouter();
     
     // Only show on recipes and tracker pages (or add more if desired)
-    const isVisible = pathname === '/recipes' || pathname === '/tracker' || pathname === '/meals';
+    const isVisible = pathname === '/recipes' || pathname === '/tracker' || pathname === '/meals' || pathname.startsWith('/foods/');
     
     const [position, setPosition] = useState({ y: 0 }); // Offset from initial position
     const [isDragging, setIsDragging] = useState(false);
