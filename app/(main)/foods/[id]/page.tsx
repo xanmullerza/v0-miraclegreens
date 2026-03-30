@@ -770,9 +770,6 @@ export default function FoodDetailsPage() {
     return (
         <>
             <TabHeader
-                title="Food Details"
-                tabs={[]}
-                onBack={() => router.back()}
                 rightButtons={[
                     { label: 'Foods', onClick: () => router.push('/recipes?tab=foods') },
                     { label: 'Recipes', onClick: () => router.push('/recipes') },
