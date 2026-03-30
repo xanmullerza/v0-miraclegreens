@@ -63,10 +63,27 @@ export function TrackerTabShell({
             {/* Sticky Header */}
             <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-[2rem]">
                 <div className="flex items-center gap-4 px-6 py-4 w-full">
-                    {/* Title Pill */}
-                    <div className="flex items-center min-w-[120px] py-2 px-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 bg-slate-800/80 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10">
-                        {title}
-                    </div>
+                    {/* Filter Button (Optional) */}
+                    {showFilters && (
+                        <button 
+                            onClick={onFilterClick}
+                            className={cn(
+                                "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border relative shadow-sm",
+                                (hasActiveFilters || activeFilterCount > 0)
+                                    ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                                    : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
+                            )}
+                            title="Filters"
+                        >
+                            <Filter size={13} />
+                            Filter
+                            {activeFilterCount > 0 && (
+                                <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
+                                    {activeFilterCount}
+                                </span>
+                            )}
+                        </button>
+                    )}
 
                     {/* Sort Button */}
                     <div className="relative">
@@ -134,27 +151,10 @@ export function TrackerTabShell({
                         )}
                     </div>
 
-                    {/* Filter Button (Optional) */}
-                    {showFilters && (
-                        <button 
-                            onClick={onFilterClick}
-                            className={cn(
-                                "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border relative shadow-sm",
-                                (hasActiveFilters || activeFilterCount > 0)
-                                    ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20"
-                                    : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
-                            )}
-                            title="Filters"
-                        >
-                            <Filter size={13} />
-                            Filter
-                            {activeFilterCount > 0 && (
-                                <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
-                                    {activeFilterCount}
-                                </span>
-                            )}
-                        </button>
-                    )}
+                    {/* Title Label */}
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50 whitespace-nowrap ml-auto">
+                        {title.toUpperCase()} LIBRARY
+                    </div>
                 </div>
             </div>
 
