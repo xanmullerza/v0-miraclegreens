@@ -1759,73 +1759,7 @@ export default function MealPlannerContent({
         activeFilterCount={selectedTypes.length < 3 ? 1 : 0}
       >
         <div className="space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
-          {/* Hero Search */}
-        <HeroSearch
-          searchQuery={heroSearchQuery}
-          onQueryChange={handleHeroInput}
-          results={heroSearchResults}
-          isLoading={isHeroSearching}
-          isActive={isHeroActive}
-          setIsActive={setIsHeroActive}
-          onSelect={(item) => {
-            const base = item.is_mix ? 'mixes' : 'meals';
-            router.push(`/dashboard/library/${base}/${item.id}`);
-          }}
-          theme="amber"
-          placeholder="SEARCH RECIPES..."
-          powerButton={
-            <button
-              onClick={() => {
-                setPageMode(pageMode === 'maker' ? 'planner' : 'maker');
-                setMakerMode('menu');
-              }}
-              className={cn(
-                'w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shrink-0',
-                pageMode === 'maker'
-                  ? 'bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/30'
-                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-amber-500 hover:bg-amber-500/10',
-              )}
-              title="Open Maker"
-            >
-              <Plus
-                size={16}
-                className={
-                  pageMode === 'maker'
-                    ? 'text-white rotate-45 transition-transform'
-                    : 'text-slate-900 dark:text-white transition-transform'
-                }
-              />
-            </button>
-          }
-          noResultsMessage="No matching recipes found"
-          enterMessage="Enter recipe name to search"
-          searchingMessage="Searching Recipes..."
-          renderResult={(item: any) => (
-            <div className="flex items-center gap-4 min-w-0 w-full">
-              <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
-                {item.image ? (
-                  <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
-                ) : (
-                  <ChefHat className="m-auto opacity-10 h-full w-5" />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">
-                  {item.title}
-                </h4>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                  {formatEnergy(item.energy_kcal || 0, unit)}{' '}
-                  <span className="text-slate-200 dark:text-slate-700">|</span>{' '}
-                  {item.type || (item.is_mix ? 'Mix' : 'Meal')}
-                </p>
-              </div>
-              <ChevronRight
-                className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0"
-                size={20}
-              />
-            </div>
-          )}
-        />
+          {/* Hero Search hidden - search functionality now in header */}
 
         {/* Maker Overlay */}
         {pageMode === 'maker' && (
