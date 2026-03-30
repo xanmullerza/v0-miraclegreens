@@ -881,30 +881,6 @@ export default function FoodDetailsPage() {
                             <Star size={14} className={cn('shrink-0', food.is_favorite ? 'text-amber-400 fill-amber-400' : 'text-slate-300')} />
                         </button>
 
-                        {/* Edit & Delete — admin or food creator only */}
-                        {canEditDelete && (
-                            <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    onClick={() => router.push(`/foods/new?edit=${food.id}`)}
-                                    className="flex items-center gap-3 p-4 rounded-2xl border border-blue-200 dark:border-blue-800/50 bg-blue-50/50 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 transition-all group text-left"
-                                >
-                                    <div className="w-8 h-8 rounded-xl bg-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
-                                        <Pencil size={14} className="text-white" />
-                                    </div>
-                                    <span className="text-xs font-black uppercase tracking-[0.15em] text-blue-600 dark:text-blue-400">Edit</span>
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className="flex items-center gap-3 p-4 rounded-2xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/50 dark:bg-rose-900/10 hover:bg-rose-100/60 dark:hover:bg-rose-900/20 transition-all group text-left"
-                                >
-                                    <div className="w-8 h-8 rounded-xl bg-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20">
-                                        <Trash2 size={14} className="text-white" />
-                                    </div>
-                                    <span className="text-xs font-black uppercase tracking-[0.15em] text-rose-600 dark:text-rose-400">Delete</span>
-                                </button>
-                            </div>
-                        )}
-
                         {/* Pantry & Shopping Buttons */}
                         <div className="grid grid-cols-2 gap-3">
                             {/* Pantry Button */}
@@ -1151,6 +1127,30 @@ export default function FoodDetailsPage() {
                                         ))}
                                     </div>
                                 )}
+                            </div>
+                        )}
+
+                        {/* Edit & Delete — admin or food creator only */}
+                        {canEditDelete && (
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => router.push(`/foods/new?edit=${food.id}`)}
+                                    className="flex items-center gap-3 p-4 rounded-2xl border border-blue-200 dark:border-blue-800/50 bg-blue-100/60 dark:bg-blue-900/20 hover:bg-blue-200/60 dark:hover:bg-blue-900/30 transition-all group text-left"
+                                >
+                                    <div className="w-8 h-8 rounded-xl bg-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
+                                        <Pencil size={14} className="text-white" />
+                                    </div>
+                                    <span className="text-xs font-black uppercase tracking-[0.15em] text-blue-600 dark:text-blue-400">Edit</span>
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="flex items-center gap-3 p-4 rounded-2xl border border-rose-200 dark:border-rose-800/50 bg-rose-100/60 dark:bg-rose-900/20 hover:bg-rose-200/60 dark:hover:bg-rose-900/30 transition-all group text-left"
+                                >
+                                    <div className="w-8 h-8 rounded-xl bg-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20">
+                                        <Trash2 size={14} className="text-white" />
+                                    </div>
+                                    <span className="text-xs font-black uppercase tracking-[0.15em] text-rose-600 dark:text-rose-400">Delete</span>
+                                </button>
                             </div>
                         )}
                     </div>
