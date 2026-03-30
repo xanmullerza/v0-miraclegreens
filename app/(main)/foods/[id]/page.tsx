@@ -792,12 +792,12 @@ export default function FoodDetailsPage() {
                     {/* Wrapper Card Shell */}
                     <div className="bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
                         {/* Header with Pills */}
-                        <div className="sticky top-16 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-2">
+                        <div className="sticky top-[3.75rem] z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-1.5">
                             <div className="flex items-center justify-between gap-4">
                                 {/* Left: Title and Image */}
                                 <div className="flex items-center gap-4">
                                     {/* Image */}
-                                    <div className="w-16 h-16 shrink-0">
+                                    <div className="w-10 h-10 shrink-0">
                                         <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-xl">
                                             <div className="w-full h-full rounded-lg bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
                                                 {food.image ? (
