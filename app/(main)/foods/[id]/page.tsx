@@ -792,7 +792,7 @@ export default function FoodDetailsPage() {
                     {/* Wrapper Card Shell */}
                     <div className="bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
                         {/* Header with Pills */}
-                        <div className="sticky top-16 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+                        <div className="sticky top-16 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-2">
                             <div className="flex items-center justify-between gap-4">
                                 {/* Left: Title and Image */}
                                 <div className="flex items-center gap-4">
@@ -848,7 +848,7 @@ export default function FoodDetailsPage() {
                         </div>
 
                         {/* Content Area */}
-                        <div className="px-6 py-8 space-y-8">
+                        <div className="px-6 py-4 space-y-6">
                             <div className="space-y-3 animate-in slide-in-from-top-4 duration-700">
 
                 {activeSection === 'management' && (() => {
