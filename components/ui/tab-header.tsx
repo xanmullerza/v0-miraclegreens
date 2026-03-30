@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 interface TabHeaderProps {
     title: string;
-    tabs: Array<{
+    tabs?: Array<{
         id: string;
         label: string;
         activeColor?: string;
@@ -21,7 +21,7 @@ interface TabHeaderProps {
 
 export function TabHeader({
     title,
-    tabs,
+    tabs = [],
     activeTab,
     onTabChange,
     onBack,
@@ -46,46 +46,40 @@ export function TabHeader({
                     </div>
                 </div>
 
-                {/* Right side: Tabs or buttons */}
-                <div className="flex items-center gap-2">
-                    {/* If tabs are provided and this is for navigation */}
-                    {tabs.length > 0 && (
-                        <div className="flex items-center gap-2 bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl">
-                            {tabs.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => onTabChange?.(tab.id)}
-                                    className={cn(
-                                        "py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1.5rem] transition-all duration-300 whitespace-nowrap px-3",
-                                        activeTab === tab.id
-                                            ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
-                                            : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
-                                    )}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                {/* Right side: Tabs or buttons in styled shell */}
+                {tabs.length > 0 && (
+                    <div className="flex items-center gap-2 bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => onTabChange?.(tab.id)}
+                                className={cn(
+                                    "py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1.5rem] transition-all duration-300 whitespace-nowrap px-3",
+                                    activeTab === tab.id
+                                        ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
+                                        : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                                )}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
 
-                    {/* Alternative: Show right buttons */}
-                    {rightButtons && rightButtons.length > 0 && (
-                        <div className="flex items-center gap-2">
-                            {rightButtons.map((button, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={button.onClick}
-                                    className={cn(
-                                        "px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all duration-300",
-                                        "text-slate-500 hover:text-slate-300 hover:bg-white/5"
-                                    )}
-                                >
-                                    {button.label}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                {/* Alternative: Show right buttons in styled shell */}
+                {rightButtons && rightButtons.length > 0 && tabs.length === 0 && (
+                    <div className="flex items-center gap-2 bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl">
+                        {rightButtons.map((button, idx) => (
+                            <button
+                                key={idx}
+                                onClick={button.onClick}
+                                className="py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1.5rem] transition-all duration-300 whitespace-nowrap px-3 text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                            >
+                                {button.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
