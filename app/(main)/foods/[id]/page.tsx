@@ -770,10 +770,21 @@ export default function FoodDetailsPage() {
     return (
         <>
             <TabHeader
-                rightButtons={[
-                    { label: 'Foods', onClick: () => router.push('/recipes?tab=foods') },
-                    { label: 'Recipes', onClick: () => router.push('/recipes') },
+                tabs={[
+                    { id: 'recipes', label: 'Recipes' },
+                    { id: 'remixes', label: 'Remixes' },
+                    { id: 'mixes', label: 'Mixes' },
+                    { id: 'foods', label: 'Foods' },
+                    { id: 'nutrients', label: 'Nutrients' },
                 ]}
+                activeTab="foods"
+                onTabChange={(tabId) => {
+                    if (tabId === 'recipes') {
+                        router.push('/recipes');
+                    } else {
+                        router.push(`/recipes?tab=${tabId}`);
+                    }
+                }}
             />
 
             <PageContainer maxWidth="max-w-6xl">
