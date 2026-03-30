@@ -849,8 +849,6 @@ export default function FoodDetailsPage() {
 
                         {/* Content Area */}
                         <div className="px-6 py-4 space-y-6">
-                            <div className="space-y-3 animate-in slide-in-from-top-4 duration-700">
-
                 {activeSection === 'management' && (() => {
                     const canEditDelete = isAdmin || (food.user_id && food.user_id === user?.id);
                     return (
@@ -1333,8 +1331,7 @@ export default function FoodDetailsPage() {
                         </div>
                     )
                 }
-                            </div>
-                        </div>
+                        </div> {/* Close content area */}
                     </div> {/* Close card wrapper */}
                 </div> {/* Close space-y-6 */}
             </PageContainer>
