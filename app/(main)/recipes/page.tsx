@@ -3,8 +3,7 @@
 import { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
-import { LibraryView } from '@/components/recipe/library-view';
-import { MyRecipesView } from '@/components/recipe/my-recipes-view';
+import { RecipesCombinedView } from '@/components/recipe/recipes-combined-view';
 import { RemixesView } from '@/components/recipe/remixes-view';
 import { MixesView } from '@/components/recipe/mixes-view';
 import { FoodsView } from '@/components/foods/food-library-view';
@@ -14,19 +13,18 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { cn } from '@/lib/utils';
 
-type TabId = 'library' | 'mines' | 'remixes' | 'mixes' | 'foods' | 'nutrients';
+type TabId = 'recipes' | 'remixes' | 'mixes' | 'foods' | 'nutrients';
 
 function RecipesPageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { profile } = useUserPreferences();
     
-    const initialTab = (searchParams.get('tab') as TabId) || 'library';
+    const initialTab = (searchParams.get('tab') as TabId) || 'recipes';
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
 
     const tabs: { id: TabId; label: string; activeColor: string }[] = [
-        { id: 'library', label: 'Library', activeColor: 'text-emerald-500' },
-        { id: 'mines', label: 'My Recipes', activeColor: 'text-indigo-500' },
+        { id: 'recipes', label: 'Recipes', activeColor: 'text-emerald-500' },
         { id: 'remixes', label: 'Remixes', activeColor: 'text-violet-500' },
         { id: 'mixes', label: 'Mixes', activeColor: 'text-amber-500' },
         { id: 'foods', label: 'Foods', activeColor: 'text-cyan-500' },
@@ -35,7 +33,7 @@ function RecipesPageContent() {
 
     const handleTabChange = (id: TabId) => {
         setActiveTab(id);
-        if (id === 'library') router.push('/recipes');
+        if (id === 'recipes') router.push('/recipes');
         else router.push(`/recipes?tab=${id}`);
     };
 
@@ -65,13 +63,8 @@ function RecipesPageContent() {
             <PageContainer maxWidth="max-w-7xl">
                 <div className="space-y-6 animate-in fade-in duration-500 py-6">
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                        {activeTab === 'library' && (
-                            <LibraryView 
-                                isPremium={profile.isPremium}
-                            />
-                        )}
-                        {activeTab === 'mines' && (
-                            <MyRecipesView 
+                        {activeTab === 'recipes' && (
+                            <RecipesCombinedView 
                                 isPremium={profile.isPremium}
                             />
                         )}

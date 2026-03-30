@@ -15,6 +15,7 @@ interface RecipeTabShellProps {
     sortDirection: 'asc' | 'desc';
     setSortDirection: (dir: 'asc' | 'desc') => void;
     title: string;
+    additionalControls?: React.ReactNode;
 }
 
 const RECIPE_SORT_OPTIONS = [
@@ -42,7 +43,8 @@ export function RecipeTabShell({
     setSortField,
     sortDirection,
     setSortDirection,
-    title
+    title,
+    additionalControls
 }: RecipeTabShellProps) {
     const { setIsChatbotOpen, setChatbotView, isChatbotOpen, chatbotView } = useChatbot();
     const { hasActiveFilters } = useRecipeFilter();
@@ -143,6 +145,12 @@ export function RecipeTabShell({
                                 )}
                             </div>
                         </div>
+
+                        {additionalControls && (
+                            <div className="flex items-center">
+                                {additionalControls}
+                            </div>
+                        )}
 
                         <div className="hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/70">
                             {title === 'Library' ? 'Recipe Library' : title}
