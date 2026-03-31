@@ -192,6 +192,7 @@ export function RecipeFilterContent({ onClose }: { onClose?: () => void }) {
       selectedDifficulty: [],
       selectedTags: [],
       onlyMyRecipes: false,
+      nutritionViewMode: 'per-serving',
     });
     toast.info('Filters reset to profile defaults');
   };
