@@ -49,8 +49,8 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // Require login for Tracker
-    const protectedRoutes = ['/tracker'];
+    // Require login for protected routes (empty array allows all)
+    const protectedRoutes: string[] = [];
     if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
         if (!user) {
             const redirectUrl = new URL('/auth/login', request.url);
