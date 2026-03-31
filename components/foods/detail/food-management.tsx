@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, ShoppingBasket, ShoppingCart, MathIcon as Plus, MathIcon as Trash2, X, Pencil } from 'lucide-react';
+import { Star, ShoppingBasket, ShoppingCart, Plus, Trash2, X, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
