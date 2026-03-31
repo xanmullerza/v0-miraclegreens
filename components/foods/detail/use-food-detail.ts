@@ -273,27 +273,32 @@ export function useFoodDetail(): FoodDetailContextType {
 
     // ─── Edit Mode ─────────────────────────────────────────
     const handleEditStart = () => {
-        if (!food) return;
-        setEditName(food.name);
-        setEditCommonName(food.common_name || '');
-        setEditCategory(food.category || 'General');
-        setEditImage(food.image || '');
+        try {
+            if (!food) return;
+            setEditName(food.name || '');
+            setEditCommonName(food.common_name || '');
+            setEditCategory(food.category || 'General');
+            setEditImage(food.image || '');
 
-        let nutrientText = `Calories: ${food.energy_kcal}\n`;
-        nutrientText += `Protein: ${food.protein_g}g\n`;
-        nutrientText += `Carbs: ${food.carbs_g}g\n`;
-        nutrientText += `Fat: ${food.fat_g}g\n`;
-        if (food.micronutrients) {
-            Object.entries(food.micronutrients).forEach(([name, val]) => {
-                if (val > 0) nutrientText += `${name}: ${val}\n`;
-            });
+            let nutrientText = `Calories: ${food.energy_kcal || 0}\n`;
+            nutrientText += `Protein: ${food.protein_g || 0}g\n`;
+            nutrientText += `Carbs: ${food.carbs_g || 0}g\n`;
+            nutrientText += `Fat: ${food.fat_g || 0}g\n`;
+            if (food.micronutrients && typeof food.micronutrients === 'object') {
+                Object.entries(food.micronutrients).forEach(([name, val]) => {
+                    if (val && typeof val === 'number' && val > 0) nutrientText += `${name}: ${val}\n`;
+                });
+            }
+            setEditNutrientText(nutrientText);
+
+            const servingText = (food.portions || []).map(p => `1 ${p.label} = ${p.weight_g}g`).join('\n');
+            setEditServingText(servingText);
+
+            setIsEditing(true);
+        } catch (e: any) {
+            console.error('Error starting edit:', e);
+            toast.error('Failed to open edit dialog: ' + e.message);
         }
-        setEditNutrientText(nutrientText);
-
-        const servingText = (food.portions || []).map(p => `1 ${p.label} = ${p.weight_g}g`).join('\n');
-        setEditServingText(servingText);
-
-        setIsEditing(true);
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
