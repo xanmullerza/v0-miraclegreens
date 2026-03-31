@@ -280,13 +280,13 @@ export function useFoodDetail(): FoodDetailContextType {
             setEditCategory(food.category || 'General');
             setEditImage(food.image || '');
 
-            let nutrientText = `Calories: ${food.energy_kcal || 0}\n`;
+            let nutrientText = `Calories: ${food.energy_kcal || 0}kcal\n`;
             nutrientText += `Protein: ${food.protein_g || 0}g\n`;
             nutrientText += `Carbs: ${food.carbs_g || 0}g\n`;
             nutrientText += `Fat: ${food.fat_g || 0}g\n`;
             if (food.micronutrients && typeof food.micronutrients === 'object') {
                 Object.entries(food.micronutrients).forEach(([name, val]) => {
-                    if (val && typeof val === 'number' && val > 0) nutrientText += `${name}: ${val}\n`;
+                    if (val && typeof val === 'number' && val > 0) nutrientText += `${name}: ${val}mg\n`;
                 });
             }
             setEditNutrientText(nutrientText);
