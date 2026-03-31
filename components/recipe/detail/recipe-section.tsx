@@ -93,77 +93,69 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             const isFlipped = flippedCards[ing.id];
                             const isGenericItem = ing.amount?.toLowerCase().includes('item') || ing.amount?.toLowerCase().includes('unit');
                             const cleanAmount = isGenericItem && displayWeight > 0 
-                                ? '' 
+                                ? `${displayWeight}g` 
                                 : (nutritionViewMode === 'total' ? ing.amount : scaleIngredient(ing.amount || '', 1 / servings));
 
                             return (
                                 <div
                                     key={ing.id || idx}
-                                    className="relative h-32 cursor-pointer group"
+                                    className="relative h-14 group"
                                     onClick={() => setFlippedCards(prev => ({ ...prev, [ing.id]: !isFlipped }))}
                                 >
-                                    {/* Front of card */}
-                                    <div
-                                        className={cn(
-                                            "absolute inset-0 p-3 rounded-2xl border transition-all duration-300 flex flex-col justify-between",
-                                            "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800",
-                                            isFlipped ? "opacity-0 pointer-events-none" : "opacity-100",
-                                            "group-hover:border-emerald-400 dark:group-hover:border-emerald-600"
-                                        )}
-                                    >
-                                        <div>
-                                            <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{ing.base_ingredient || ing.item}</p>
-                                            {cleanAmount && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{cleanAmount}</p>}
+                                    {/* Front Side - Slim Card */}
+                                    <div className={cn(
+                                        "absolute inset-0 px-3 flex items-center gap-3 rounded-2xl border transition-all duration-300",
+                                        "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800",
+                                        isFlipped ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100",
+                                        "group-hover:border-emerald-400 dark:group-hover:border-emerald-600"
+                                    )}>
+                                        <div className="shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest min-w-[60px] text-center">
+                                            {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
                                         </div>
-                                        <div className="flex items-center justify-between">
-                                            {displayWeight > 0 && <p className="text-xs text-slate-500 dark:text-slate-400">{displayWeight}g</p>}
-                                            <button className="text-xs px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors">
+                                        <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[13px] truncate">
+                                            {(ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                        </p>
+                                        <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-500 text-[9px] font-black uppercase tracking-widest">
                                                 Macros
-                                            </button>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Back of card */}
-                                    <div
-                                        className={cn(
-                                            "absolute inset-0 p-3 rounded-2xl border transition-all duration-300 flex flex-col justify-between text-[11px]",
-                                            "bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-700",
-                                            isFlipped ? "opacity-100" : "opacity-0 pointer-events-none"
-                                        )}
-                                    >
-                                        <div>
-                                            {food ? (
-                                                <>
-                                                    <p className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px] mb-2">
-                                                        {food.name || food.common_name || 'Unknown'}
-                                                    </p>
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">{energyUnit}</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingProtein}g</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">protein</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingFat}g</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">fat</p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-emerald-600 dark:text-emerald-400 font-bold">{ingCarbs}g</p>
-                                                            <p className="text-emerald-700 dark:text-emerald-300 text-[9px]">carbs</p>
-                                                        </div>
+                                    {/* Back Side - Macro Breakdown */}
+                                    <div className={cn(
+                                        "absolute inset-0 px-4 flex items-center justify-between rounded-2xl border transition-all duration-300",
+                                        "bg-emerald-600 dark:bg-emerald-600 border-emerald-500 text-white",
+                                        isFlipped ? "opacity-100 scale-100 shadow-lg shadow-emerald-600/20" : "opacity-0 scale-95 pointer-events-none"
+                                    )}>
+                                        {food ? (
+                                            <>
+                                                <div className="flex-1 flex justify-around items-center">
+                                                    <div className="text-center">
+                                                        <p className="text-[10px] font-black">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
+                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">{energyUnit}</p>
                                                     </div>
-                                                </>
-                                            ) : (
-                                                <p className="text-amber-600 dark:text-amber-400 font-semibold">⚠ Not matched</p>
-                                            )}
-                                        </div>
-                                        {food && (
-                                            <div className="text-[9px] text-emerald-600 dark:text-emerald-400 border-t border-emerald-200 dark:border-emerald-700 pt-1 mt-1">
-                                                <p className="opacity-70">Per 100g: {energyUnit === 'kJ' ? Math.round((food.energy_kcal || 0) * 4.184) + 'kJ' : (food.energy_kcal || '?') + 'kcal'}, {food.protein_g || '?'}g prot</p>
-                                            </div>
+                                                    <div className="text-center border-l border-white/20 pl-4">
+                                                        <p className="text-[10px] font-black">{ingProtein}g</p>
+                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Prot</p>
+                                                    </div>
+                                                    <div className="text-center border-l border-white/20 pl-4">
+                                                        <p className="text-[10px] font-black">{ingFat}g</p>
+                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Fat</p>
+                                                    </div>
+                                                    <div className="text-center border-l border-white/20 pl-4">
+                                                        <p className="text-[10px] font-black">{ingCarbs}g</p>
+                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Carbs</p>
+                                                    </div>
+                                                </div>
+                                                <div className="shrink-0 ml-4 px-2.5 py-1 rounded-lg bg-white text-emerald-600 text-[9px] font-black uppercase tracking-widest">
+                                                    Close
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <p className="text-sm font-bold flex items-center gap-2">
+                                                <span className="opacity-70">⚠</span> Metadata Missing
+                                            </p>
                                         )}
                                     </div>
                                 </div>
