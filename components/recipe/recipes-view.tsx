@@ -506,25 +506,25 @@ export function RecipesView({
                                     </div>
                                     {(recipe.calories > 0 || recipe.protein > 0) && (
                                         <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
-                                            <span className="text-blue-500">{formatEnergy(recipe.calories, energyUnit)}</span>
+                                            <span className="text-blue-500">{formatEnergy(recipe.calories / (recipe.servings || 1), energyUnit)}</span>
                                             <span className="text-slate-300 text-[8px]">•</span>
-                                            <span className="text-amber-500">{Math.round(recipe.carbs)}g C</span>
+                                            <span className="text-amber-500">{Math.round(recipe.carbs / (recipe.servings || 1))}g C</span>
                                             <span className="text-slate-300 text-[8px]">•</span>
-                                            <span className="text-rose-500">{Math.round(recipe.fat)}g F</span>
+                                            <span className="text-rose-500">{Math.round(recipe.fat / (recipe.servings || 1))}g F</span>
                                             <span className="text-slate-300 text-[8px]">•</span>
-                                            <span className="text-emerald-500">{Math.round(recipe.protein)}g P</span>
+                                            <span className="text-emerald-500">{Math.round(recipe.protein / (recipe.servings || 1))}g P</span>
                                         </div>
                                     )}
                                 </div>
                                 {(recipe.calories > 0 || recipe.protein > 0) && (
                                     <div className="hidden lg:flex items-center justify-end gap-3">
-                                        <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(recipe.calories, energyUnit)}</span>
+                                        <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(recipe.calories / (recipe.servings || 1), energyUnit)}</span>
                                         <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{recipe.carbs.toFixed(1)}g</span>
+                                        <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{(recipe.carbs / (recipe.servings || 1)).toFixed(1)}g</span>
                                         <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{recipe.fat.toFixed(1)}g</span>
+                                        <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{(recipe.fat / (recipe.servings || 1)).toFixed(1)}g</span>
                                         <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{recipe.protein.toFixed(1)}g</span>
+                                        <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{(recipe.protein / (recipe.servings || 1)).toFixed(1)}g</span>
                                     </div>
                                 )}
                             </div>

@@ -212,8 +212,8 @@ export function useDataPersistence() {
                         
                         // Only scale down if we have actual weight data (raw imports won't have this)
                         const hasWeightData = ing.weight_g > 0;
-                        const scaledQty = hasWeightData ? Math.round((ing.quantity / servings) * 100) / 100 : ing.quantity;
-                        const scaledWeight = hasWeightData ? Math.round((ing.weight_g / servings) * 10) / 10 : 0;
+                        const scaledQty = ing.quantity;
+                        const scaledWeight = ing.weight_g;
 
                         if (unit && !['unit', 'item', 'whole', 'g', 'gram', 'grams', 'ml'].includes(unit.toLowerCase())) {
                             amountStr = `${scaledQty} ${unit}`;
@@ -232,8 +232,8 @@ export function useDataPersistence() {
                             food_item_id: ing.food_item_id && !ing.food_item_id.startsWith('raw-') && !ing.food_item_id.startsWith('temp-') ? ing.food_item_id : null, 
                             item: itemName,
                             amount: amountStr,
-                            weight_g: ing.weight_g / servings,
-                            quantity: ing.quantity / servings,
+                            weight_g: ing.weight_g,
+                            quantity: ing.quantity,
                             measure_label: ing.measure_label || 'item',
                             base_ingredient: itemName,
                             modifier: ing.modifier || null,
@@ -342,8 +342,8 @@ export function useDataPersistence() {
                 const mappedIngredients = ingredients?.map(ing => ({
                     ...ing,
                     item: ing.food_item_name || (ing as any).item || 'Ingredient', // Map to expected 'item' field
-                    weight_g: ing.weight_g / servings,
-                    quantity: ing.quantity / servings,
+                    weight_g: ing.weight_g,
+                    quantity: ing.quantity,
                     food_item: ing.food_item || {
                         id: ing.food_item_id,
                         name: ing.food_item_name,
