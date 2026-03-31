@@ -11,14 +11,14 @@ export const DietCard = ({
     <div
         onClick={onClick}
         className={cn(
-            'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-1.5 transition-all hover:shadow-md active:scale-95 text-center',
+            'cursor-pointer flex flex-row items-center justify-center gap-1.5 rounded-full border px-3 py-1 transition-all hover:shadow-md active:scale-95 text-center',
             selected
                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-lg ring-2 ring-emerald-500/20'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-500/20'
         )}
     >
-        <Icon className={cn('h-4 w-4 mb-0.5', selected ? 'text-white' : 'text-emerald-500/60')} />
-        <span className="text-[9px] font-black uppercase tracking-widest leading-tight">
+        <Icon className={cn('h-3 w-3', selected ? 'text-white' : 'text-emerald-500/60')} />
+        <span className="text-[8px] font-black uppercase tracking-widest leading-none">
             {label || (type === 'anything' ? 'Anything' : type)}
         </span>
     </div>
@@ -32,14 +32,14 @@ export const GoalCard = ({
     <div
         onClick={onClick}
         className={cn(
-            'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-1.5 transition-all hover:shadow-md active:scale-95 text-center',
+            'cursor-pointer flex flex-row items-center justify-center gap-1.5 rounded-full border px-4 py-1.5 transition-all hover:shadow-md active:scale-95 text-center',
             selected
                 ? 'bg-violet-600 text-white border-violet-700 shadow-lg ring-2 ring-violet-500/20'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-violet-500/20'
         )}
     >
-        <Icon className={cn('h-4 w-4 mb-0.5', selected ? 'text-white' : 'text-emerald-500/60')} />
-        <span className="text-[9px] font-black uppercase tracking-widest leading-tight">
+        <Icon className={cn('h-3.5 w-3.5', selected ? 'text-white' : 'text-emerald-500/60')} />
+        <span className="text-[9px] font-black uppercase tracking-widest leading-none">
             {label || type.replace('-', ' ')}
         </span>
     </div>
@@ -53,13 +53,13 @@ export const ActivityCard = ({
     <div
         onClick={onClick}
         className={cn(
-            'cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-1.5 transition-all hover:shadow-md active:scale-95 text-center',
+            'cursor-pointer flex flex-row items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 transition-all hover:shadow-md active:scale-95 text-center',
             selected
                 ? 'bg-blue-600 text-white border-blue-700 shadow-lg ring-2 ring-blue-500/20'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-500/20'
         )}
     >
-        <Icon className={cn('h-4 w-4 mb-0.5', selected ? 'text-white' : 'text-emerald-500/60')} />
-        <span className="text-[9px] font-black uppercase tracking-widest leading-tight">{label || type}</span>
+        <Icon className={cn('h-3.5 w-3.5', selected ? 'text-white' : 'text-emerald-500/60')} />
+        <span className="text-[9px] font-black uppercase tracking-widest leading-none">{label || type}</span>
     </div>
 );
