@@ -159,8 +159,9 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
                             </div>
                             <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                                 {ingredients.map((ing, idx) => {
-                                    const val = breakdownNutrient === 'Protein' ? ing.protein : breakdownNutrient === 'Carbs' ? ing.carbs : ing.fat;
-                                    const total = breakdownNutrient === 'Protein' ? totals.protein : breakdownNutrient === 'Carbs' ? totals.carbs : totals.fat;
+                                    const multiplier = (ing.weight_g || 0) / 100;
+                                    const val = (breakdownNutrient === 'Protein' ? ing.protein : breakdownNutrient === 'Carbs' ? ing.carbs : ing.fat) * multiplier;
+                                    const total = (breakdownNutrient === 'Protein' ? totals.protein : breakdownNutrient === 'Carbs' ? totals.carbs : totals.fat);
                                     const share = total > 0 ? Math.round((val / total) * 100) : 0;
                                     if (val <= 0) return null;
                                     return (

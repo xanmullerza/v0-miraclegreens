@@ -200,12 +200,14 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
                         food_item_id: match.id || 'temp-id',
                         food_item_name: finalName,
                         weight_g: weight, quantity, measure_label: unit, modifier: finalModifier,
-                        calories: base_nutrition.calories * ratio,
-                        energy_kj: base_nutrition.energy_kj * ratio,
-                        protein: base_nutrition.protein * ratio,
-                        fat: base_nutrition.fat * ratio,
-                        carbs: base_nutrition.carbs * ratio,
-                        micronutrients: Object.entries(base_nutrition.micronutrients).reduce((acc, [k, v]) => { acc[k] = (v as number) * ratio; return acc; }, {} as Record<string, number>),
+                        // Store BASE (per 100g) values here. 
+                        // The builder workspace will apply the weight multiplier (weight/100) for display.
+                        calories: base_nutrition.calories,
+                        energy_kj: base_nutrition.energy_kj,
+                        protein: base_nutrition.protein,
+                        fat: base_nutrition.fat,
+                        carbs: base_nutrition.carbs,
+                        micronutrients: base_nutrition.micronutrients,
                         base_nutrition,
                     });
                 } else {
@@ -228,12 +230,6 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
                 if (idx !== undefined) {
                     const existing = merged[idx];
                     existing.weight_g += ing.weight_g;
-                    existing.calories += ing.calories;
-                    existing.energy_kj += ing.energy_kj;
-                    existing.protein = Number((existing.protein + ing.protein).toFixed(1));
-                    existing.fat = Number((existing.fat + ing.fat).toFixed(1));
-                    existing.carbs = Number((existing.carbs + ing.carbs).toFixed(1));
-                    Object.entries(ing.micronutrients || {}).forEach(([k, v]) => { existing.micronutrients[k] = (existing.micronutrients[k] || 0) + (v as number); });
                     if (existing.measure_label === ing.measure_label) existing.quantity += ing.quantity;
                     else { existing.measure_label = 'g'; existing.quantity = existing.weight_g; }
                 } else {
@@ -275,14 +271,18 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
 
             const recipeId = `recipe-${Date.now()}`;
             const totals = updatedIngredients.reduce((acc, ing) => {
+                const multiplier = (ing.weight_g || 0) / 100;
                 const newM = { ...acc.micronutrients };
                 Object.entries(ing.micronutrients || {}).forEach(([k, v]) => {
                     const match = findNutrientMatch(newM, k) || k;
-                    newM[match] = (newM[match] || 0) + (v as number);
+                    newM[match] = (newM[match] || 0) + (v as number) * multiplier;
                 });
                 return {
-                    calories: acc.calories + ing.calories, energy_kj: acc.energy_kj + ing.energy_kj,
-                    protein: acc.protein + ing.protein, fat: acc.fat + ing.fat, carbs: acc.carbs + ing.carbs,
+                    calories: acc.calories + (ing.calories * multiplier),
+                    energy_kj: acc.energy_kj + (ing.energy_kj * multiplier),
+                    protein: acc.protein + (ing.protein * multiplier),
+                    fat: acc.fat + (ing.fat * multiplier),
+                    carbs: acc.carbs + (ing.carbs * multiplier),
                     micronutrients: newM
                 };
             }, { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> });
