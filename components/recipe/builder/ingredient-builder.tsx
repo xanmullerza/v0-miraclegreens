@@ -23,7 +23,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
         confirmPendingIngredient, confirmAllIngredients,
         handleUSDASearchForPending, rejectPendingIngredient,
         handleUpdateQuantity, handleRemoveIngredient,
-        handleUpdateName, totals, userRDAs, energyUnit
+        handleUpdateName, handleUpdateMeasure, totals, userRDAs, energyUnit
     } = useIngredientBuilder(props);
 
     useImperativeHandle(ref, () => ({
@@ -106,6 +106,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                                     setEditingNameIndex={setEditingNameIndex}
                                     handleUpdateName={handleUpdateName}
                                     handleUpdateQuantity={handleUpdateQuantity}
+                                    handleUpdateMeasure={handleUpdateMeasure}
                                     handleRemoveIngredient={handleRemoveIngredient}
                                     setShowPicker={setShowPicker}
                                 />

@@ -10,15 +10,22 @@ interface IngredientRowProps {
     setEditingNameIndex: (i: number | null) => void;
     handleUpdateName: (i: number, n: string) => void;
     handleUpdateQuantity: (i: number, q: number) => void;
+    handleUpdateMeasure: (i: number, m: string) => void;
     handleRemoveIngredient: (i: number) => void;
     setShowPicker: (s: boolean) => void;
 }
 
 export function IngredientRow({
     ingredient, index, editingNameIndex, setEditingNameIndex,
-    handleUpdateName, handleUpdateQuantity, handleRemoveIngredient, setShowPicker
+    handleUpdateName, handleUpdateQuantity, handleUpdateMeasure, 
+    handleRemoveIngredient, setShowPicker
 }: IngredientRowProps) {
     const ing = ingredient;
+    const measures = ing.available_measures || [];
+    
+    // Ensure "g" is always an option if not already there
+    const hasGrams = measures.some(m => ['g', 'G', 'gram', 'grams', 'Grams'].includes(m.label));
+    const allOptions = hasGrams ? measures : [{ label: 'g', weight_g: 1 }, ...measures];
 
     return (
         <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group">
@@ -64,9 +71,28 @@ export function IngredientRow({
                     min="0"
                     step="0.125"
                 />
-                <div className="px-2 h-8 flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
-                    {ing.measure_label}
-                </div>
+                
+                {allOptions.length > 1 ? (
+                    <select
+                        value={ing.measure_label}
+                        onChange={(e) => handleUpdateMeasure(index, e.target.value)}
+                        className="h-8 pl-2 pr-8 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 border-none outline-none appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='C19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 0.5rem center',
+                            backgroundSize: '0.75rem'
+                        }}
+                    >
+                        {allOptions.map((opt, oIdx) => (
+                            <option key={oIdx} value={opt.label}>{opt.label}</option>
+                        ))}
+                    </select>
+                ) : (
+                    <div className="px-2 h-8 flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
+                        {ing.measure_label}
+                    </div>
+                )}
             </div>
 
             {/* Add Button */}

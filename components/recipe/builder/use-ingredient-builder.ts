@@ -47,6 +47,7 @@ export function useIngredientBuilder(props: IngredientBuilderProps) {
             fat: item.fat_g || 0,
             carbs: item.carbs_g || 0,
             micronutrients: item.micronutrients || {},
+            available_measures: (item as any).portions || (item as any).available_measures || []
         };
 
         onChange([...ingredients, newIng]);
@@ -54,6 +55,27 @@ export function useIngredientBuilder(props: IngredientBuilderProps) {
 
     const handleRemoveIngredient = useCallback((index: number) => {
         onChange(ingredients.filter((_, i) => i !== index));
+    }, [ingredients, onChange]);
+
+    const handleUpdateMeasure = useCallback((index: number, newLabel: string) => {
+        onChange(ingredients.map((ing, i) => {
+            if (i !== index) return ing;
+
+            const isGrams = ['g', 'G', 'gram', 'grams', 'Grams'].includes(newLabel);
+            let newWeight = ing.weight_g;
+
+            if (isGrams) {
+                newWeight = ing.quantity; 
+            } else {
+                const measures = ing.available_measures || [];
+                const measure = measures.find(m => m.label === newLabel);
+                if (measure) {
+                    newWeight = measure.weight_g * ing.quantity;
+                }
+            }
+
+            return { ...ing, measure_label: newLabel, weight_g: newWeight };
+        }));
     }, [ingredients, onChange]);
 
     const handleUpdateQuantity = useCallback((index: number, newQuantity: number) => {
@@ -68,9 +90,15 @@ export function useIngredientBuilder(props: IngredientBuilderProps) {
             
             if (isGrams) {
                 newWeight = newQuantity;
-            } else if (ing.quantity > 0) {
-                // Scale existing weight by ratio of new to old quantity
-                newWeight = (newQuantity / ing.quantity) * ing.weight_g;
+            } else {
+                const measures = ing.available_measures || [];
+                const measure = measures.find(m => m.label === ing.measure_label);
+                if (measure) {
+                    newWeight = measure.weight_g * newQuantity;
+                } else if (ing.quantity > 0) {
+                    // Fallback to ratio scaling
+                    newWeight = (newQuantity / ing.quantity) * ing.weight_g;
+                }
             }
             
             return { ...ing, quantity: newQuantity, weight_g: newWeight };
@@ -150,6 +178,7 @@ export function useIngredientBuilder(props: IngredientBuilderProps) {
         handleUpdateQuantity,
         handleRemoveIngredient,
         handleUpdateName,
+        handleUpdateMeasure,
         totals,
         userRDAs,
         energyUnit

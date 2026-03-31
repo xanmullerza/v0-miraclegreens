@@ -235,6 +235,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
                     fat: food.fat_g || 0,
                     carbs: food.carbs_g || 0,
                     micronutrients: food.micronutrients || {},
+                    available_measures: food.portions || [],
                     base_nutrition: {
                         calories: food.energy_kcal || 0,
                         energy_kj: food.energy_kj || (food.energy_kcal || 0) * 4.184,
