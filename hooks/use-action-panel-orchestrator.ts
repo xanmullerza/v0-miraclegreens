@@ -1,13 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
+import { useFoodFilter } from '@/lib/context/food-filter-context';
 import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-context';
 import { useZumAssistant } from '@/lib/hooks/use-zum-assistant';
 import { structureRecipeForSaving } from '@/lib/utils/recipe-parser';
 import { ParsedRecipe } from '@/types/recipe';
 import { toast } from 'sonner';
-import { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
+import { RecipeIngredient } from '@/components/recipe/builder/types';
+import { useRecipeBuilderLogic } from '@/components/action-panel/hooks/use-recipe-builder-logic';
+import { useImportLogic } from '@/components/action-panel/hooks/use-import-logic';
 
 interface ActionPanelOrchestratorProps {
     onClose: () => void;
@@ -17,10 +20,13 @@ interface ActionPanelOrchestratorProps {
 export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: ActionPanelOrchestratorProps) {
     const { user, saveRecipe } = useDataPersistence();
     const { filters } = useRecipeFilter();
-    const { activeView, setActiveView, previousView, setPreviousView, navigateTo, goBack, recipeToRemix, setRecipeToRemix, recipeToShare, setRecipeToShare } = useActionPanel();
-    const builderRef = useRef<IngredientBuilderHandle>(null);
+    const { 
+        activeView, setActiveView, previousView, setPreviousView, 
+        navigateTo, goBack, recipeToRemix, setRecipeToRemix, 
+        recipeToShare, setRecipeToShare 
+    } = useActionPanel();
     
-    // Abstracted Zum Assistant Props
+    // Abstracted Zum Assistant Props (Directly from hook for primary conversation)
     const zumAssistant = useZumAssistant();
     const { 
         messages, setMessages, isLoading, setIsLoading, input, setInput, 
@@ -32,22 +38,6 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         conversationHistory, isLoadingHistory, loadHistory, startNewConversation,
         saveCurrentConversation
     } = zumAssistant;
-
-    // Local Orchestrator State
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [detectedURL, setDetectedURL] = useState<string | null>(null);
-    const [showQuickActions, setShowQuickActions] = useState(false);
-    const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
-    const [expandedAppsMenu, setExpandedAppsMenu] = useState(false);
-    const [expandedWidgetsMenu, setExpandedWidgetsMenu] = useState(false);
-    const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
-    const [pastedRecipeContent, setPastedRecipeContent] = useState('');
-    const [pastedRecipeURL, setPastedRecipeURL] = useState('');
-    const [videoURL, setVideoURL] = useState('');
-    const [isDragging, setIsDragging] = useState(false);
-    const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
-    const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
-    const [recipeSearchQuery, setRecipeSearchQuery] = useState('');
 
     // Navigation Sub-Handlers
     const handleGoHome = (fallback?: ActionPanelView | null) => {
@@ -67,30 +57,35 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         goBack(handleGoHome);
     };
 
-    // Recipe Builder Internal State
-    const [showRecipeBuilder, setShowRecipeBuilder] = useState(false);
-    const [recipeTitle, setRecipeTitle] = useState('');
-    const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
-    const [recipePrepTime, setRecipePrepTime] = useState(30);
-    const [recipeCookTime, setRecipeCookTime] = useState(0);
-    const [recipeServings, setRecipeServings] = useState(4);
-    const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredient[]>([]);
-    const [recipeInstructions, setRecipeInstructions] = useState<string[]>(['']);
-    const [recipeImage, setRecipeImage] = useState('');
-    const [recipeSaving, setRecipeSaving] = useState(false);
-    const [recipeUploading, setRecipeUploading] = useState(false);
-    const [recipeStep, setRecipeStep] = useState(1);
-    const [isMix, setIsMix] = useState(false);
-    const [isRemix, setIsRemix] = useState(false);
-    const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
-    const [cookbookTab, setCookbookTab] = useState<'recipes' | 'remixes' | 'mixes'>('recipes');
+    // --- Modular Logic Hooks ---
+
+    // 1. Recipe Builder Logic
+    const builder = useRecipeBuilderLogic({
+        onSaveSuccess: async (recipeData, ingredients, instructions) => {
+            await saveRecipe(recipeData, ingredients, instructions);
+            toast.success(`"${recipeData.title}" saved!`);
+        }
+    });
+
+    // 2. Import Logic
+    const importer = useImportLogic({
+        onImportSuccess: async (recipe) => {
+            // handle auto-view if needed
+        }
+    });
+
+    // --- Local Orchestrator State ---
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [showQuickActions, setShowQuickActions] = useState(false);
+    const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
+    const [expandedAppsMenu, setExpandedAppsMenu] = useState(false);
+    const [expandedWidgetsMenu, setExpandedWidgetsMenu] = useState(false);
+    const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(false);
+    const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
 
     // DOM Refs
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const audioInputRef = useRef<HTMLInputElement>(null);
-    const recipeContentRef = useRef<HTMLTextAreaElement>(null);
-    const recipeImageInputRef = useRef<HTMLInputElement>(null);
     const isInitialMount = useRef(true);
 
     const scrollToBottom = () => {
@@ -134,10 +129,10 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     }, [activeView]);
 
     useEffect(() => {
-        if (activeView === 'recipe-builder' && !showRecipeBuilder) {
-            handleManualRecipeCreation();
+        if (activeView === 'recipe-builder' && !builder.showRecipeBuilder) {
+            builder.handleManualRecipeCreation();
         }
-    }, [activeView, showRecipeBuilder]);
+    }, [activeView, builder.showRecipeBuilder]);
 
     useEffect(() => {
         const handlePopState = (e: PopStateEvent) => {
@@ -157,7 +152,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
     // Complex Handlers
     const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
-        setRecipeSaving(true);
+        importer.setIsLoading(true);
         try {
             const structured = structureRecipeForSaving(recipe);
             if (!structured) throw new Error('Failed to structure recipe data for saving');
@@ -170,43 +165,15 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
             setSelectedRecipeId(recipeId);
             setPreviousView('view-recipes');
             setActiveView('recipe-detail');
-            setSuccessRecipe(null);
-            setIsCreatingRecipe(false);
-            setPastedRecipeContent('');
-            setPastedRecipeURL('');
+            importer.setSuccessRecipe(null);
+            importer.setIsCreatingRecipe(false);
+            importer.setPastedRecipeContent('');
+            importer.setPastedRecipeURL('');
         } catch (error: any) {
             console.error('Error saving recipe:', error);
             toast.error('Failed to save recipe. Please try again.');
         } finally {
-            setRecipeSaving(false);
-        }
-    };
-
-    const handleViewSavedRecipe = async (recipe?: ParsedRecipe) => {
-        const recipeToView = recipe || successRecipe;
-        if (!recipeToView) return;
-
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user?.id) return;
-
-            const { data: savedRecipe, error } = await supabase
-                .from('recipes')
-                .select('id')
-                .eq('source_url', recipeToView.source_url)
-                .or(`user_id.eq.${user.id},and(is_curated.eq.true,user_id.is.null)`)
-                .single();
-
-            if (error || !savedRecipe) {
-                if (onRecipeDetected && !recipe) onRecipeDetected(recipeToView);
-                return;
-            }
-
-            setSelectedRecipeId(savedRecipe.id);
-            setPreviousView('view-recipes');
-            setActiveView('recipe-detail');
-        } catch (error) {
-            if (onRecipeDetected && !recipe) onRecipeDetected(recipeToView);
+            importer.setIsLoading(false);
         }
     };
 
@@ -218,48 +185,32 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     const handleCreateNewRecipe = () => {
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
-        setIsCreatingRecipe(true);
+        importer.setIsCreatingRecipe(true);
     };
 
-    const handleManualRecipeCreation = () => {
-        setShowRecipeBuilder(true);
-        setRecipeStep(1);
-        setRecipeTitle('');
-        setRecipeType('dinner');
-        setRecipePrepTime(30);
-        setRecipeCookTime(0);
-        setRecipeServings(4);
-        setRecipeIngredients([]);
-        setRecipeInstructions(['']);
-        setRecipeImage('');
-        setIsMix(false);
-        setIsRemix(false);
-        setEditingRecipeId(null);
-    };
-
-    const handleRemixRecipe = (recipe: any, ingredientsList?: any[], instructionsList?: any[], isEdit: boolean = false) => {
-        setIsRemix(!isEdit);
-        setEditingRecipeId(isEdit ? recipe.id : null);
-        setIsMix(recipe.is_mix || false);
-        setIsCreatingRecipe(true);
-        setShowRecipeBuilder(true);
-        setRecipeTitle(isEdit ? recipe.title : `${recipe.title} (Remix)`);
-        setRecipeStep(1);
+    const handleRemixRecipe = useCallback((recipe: any, ingredientsList?: any[], instructionsList?: any[], isEdit: boolean = false) => {
+        builder.setIsRemix(!isEdit);
+        builder.setEditingRecipeId(isEdit ? recipe.id : null);
+        builder.setIsMix(recipe.is_mix || false);
+        importer.setIsCreatingRecipe(false);
+        builder.setShowRecipeBuilder(true);
+        builder.setRecipeTitle(isEdit ? recipe.title : `${recipe.title} (Remix)`);
+        builder.setRecipeStep(1);
         
         const sourceIngredients = ingredientsList || recipe.ingredients || [];
         const sourceInstructions = instructionsList || recipe.instructions || [];
         const servings = recipe.servings || 4;
 
         if (!isEdit) {
-            setRecipeTitle(`${recipe.title || 'Remix'} 🌈`);
+            builder.setRecipeTitle(`${recipe.title || 'Remix'} 🌈`);
         } else {
-            setRecipeTitle(recipe.title);
+            builder.setRecipeTitle(recipe.title);
         }
-        setRecipeType(recipe.meal_type || recipe.type || 'dinner');
-        setRecipePrepTime(recipe.prep_time || 30);
-        setRecipeCookTime(recipe.cook_time || 0);
-        setRecipeServings(servings);
-        setRecipeImage(recipe.image || '');
+        builder.setRecipeType(recipe.meal_type || recipe.type || 'dinner');
+        builder.setRecipePrepTime(recipe.prep_time || 30);
+        builder.setRecipeCookTime(recipe.cook_time || 0);
+        builder.setRecipeServings(servings);
+        builder.setRecipeImage(recipe.image || '');
         
         if (sourceIngredients && Array.isArray(sourceIngredients)) {
             const mapped: RecipeIngredient[] = sourceIngredients.map((ing: any) => {
@@ -284,34 +235,23 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
                         acc[k] = (Number(v) || 0) * multiplier;
                         return acc;
                     }, {} as Record<string, number>),
-                    base_nutrition: {
-                        calories: food.energy_kcal || 0,
-                        energy_kj: food.energy_kj || (food.energy_kcal || 0) * 4.184,
-                        protein: food.protein_g || 0,
-                        fat: food.fat_g || 0,
-                        carbs: food.carbs_g || 0,
-                        micronutrients: food.micronutrients || {}
-                    },
-                    available_measures: food.portions || food.available_measures || [],
-                    modifier: ing.modifier || null
                 };
             });
-            setRecipeIngredients(mapped);
+            builder.setRecipeIngredients(mapped);
         } else {
-            setRecipeIngredients([]);
+            builder.setRecipeIngredients([]);
         }
 
         if (sourceInstructions && Array.isArray(sourceInstructions)) {
             const sortedInstructions = [...sourceInstructions].sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
-            setRecipeInstructions(sortedInstructions.map((ins: any) => typeof ins === 'string' ? ins : (ins.step_text || ins.text)));
+            builder.setRecipeInstructions(sortedInstructions.map((ins: any) => typeof ins === 'string' ? ins : (ins.step_text || ins.text)));
         } else {
-            setRecipeInstructions(['']);
+            builder.setRecipeInstructions(['']);
         }
 
-        setIsCreatingRecipe(false);
-        setShowRecipeBuilder(true);
-        setRecipeStep(1); 
-    };
+        builder.setShowRecipeBuilder(true);
+        builder.setRecipeStep(1); 
+    }, [builder, importer]);
 
     useEffect(() => {
         if (recipeToRemix) {
@@ -332,13 +272,6 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         setSelectedRecipeId(null);
     };
 
-    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        await processRecipeImage(file);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-
     const handleViewAllRecipes = () => {
         navigateTo('view-recipes');
         setShowOnlyMyRecipes(false);
@@ -353,158 +286,8 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         setExpandedRecipeMenu(false);
     };
 
-    const handleAddInstruction = () => setRecipeInstructions([...recipeInstructions, '']);
-    const handleUpdateInstruction = (index: number, value: string) => {
-        const updated = [...recipeInstructions];
-        updated[index] = value;
-        setRecipeInstructions(updated);
-    };
-    const handleRemoveInstruction = (index: number) => setRecipeInstructions(recipeInstructions.filter((_, i) => i !== index));
-
-    const handleRecipeImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setRecipeUploading(true);
-        try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-            const filePath = `user-uploads/${fileName}`;
-
-            const { data, error: uploadError } = await supabase.storage
-                .from('recipes')
-                .upload(filePath, file, { cacheControl: '3600', upsert: false });
-
-            if (uploadError) throw new Error("Upload Failed");
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('recipes')
-                .getPublicUrl(filePath);
-
-            setRecipeImage(publicUrl);
-        } catch (err: any) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setRecipeImage(reader.result as string);
-                setRecipeUploading(false);
-            };
-            reader.readAsDataURL(file);
-        } finally {
-            setRecipeUploading(false);
-        }
-    };
-
-    const handleSaveRecipe = async (forceIsMix?: boolean, forceIsRemix?: boolean) => {
-        const finalIsMix = forceIsMix !== undefined ? forceIsMix : isMix;
-        const finalIsRemix = forceIsRemix !== undefined ? forceIsRemix : isRemix;
-
-        if (!recipeTitle || recipeIngredients.length === 0 || recipeInstructions.filter(i => i.trim()).length === 0) {
-            toast.error('Please fill in all required fields');
-            return;
-        }
-
-        setRecipeSaving(true);
-        try {
-            const totals = recipeIngredients.reduce((acc, ing) => ({
-                calories: acc.calories + (ing.calories || 0),
-                protein: acc.protein + (ing.protein || 0),
-                fat: acc.fat + (ing.fat || 0),
-                carbs: acc.carbs + (ing.carbs || 0),
-            }), { calories: 0, protein: 0, fat: 0, carbs: 0 });
-
-            const recipeData = {
-                title: recipeTitle,
-                type: recipeType,
-                calories: Math.round(totals.calories / (recipeServings || 1)),
-                protein: Math.round((totals.protein / (recipeServings || 1)) * 10) / 10,
-                carbs: Math.round((totals.carbs / (recipeServings || 1)) * 10) / 10,
-                fat: Math.round((totals.fat / (recipeServings || 1)) * 10) / 10,
-                prep_time: recipePrepTime,
-                cook_time: recipeCookTime,
-                servings: recipeServings,
-                image: recipeImage,
-                source: 'manual',
-                is_favorite: true,
-                is_mix: finalIsMix,
-                is_remix: finalIsRemix,
-                id: editingRecipeId || undefined
-            };
-
-            await saveRecipe(recipeData, recipeIngredients, recipeInstructions);
-            toast.success(`"${recipeTitle}" saved to ${finalIsMix ? 'Mixes' : finalIsRemix ? 'Remixes' : 'Recipes'}`);
-            
-            if (filters.pantryMode === 'pantry-only') {
-                toast.info('💡 Your recipe is saved but hidden in Pantry-Only mode. Add ingredients to your pantry to see it!', { duration: 5000 });
-            }
-            
-            setCookbookTab(finalIsMix ? 'mixes' : finalIsRemix ? 'remixes' : 'recipes');
-            setActiveView('view-recipes');
-            setShowRecipeBuilder(false);
-            setIsCreatingRecipe(false);
-            setEditingRecipeId(null);
-            
-            if ((window as any).refreshRecipeLibrary) {
-                (window as any).refreshRecipeLibrary();
-            }
-        } catch (error: any) {
-            toast.error(`Failed to save: ${error.message}`);
-        } finally {
-            setRecipeSaving(false);
-        }
-    };
-
-    const handleCloseRecipeBuilder = () => {
-        handleBack();
-        setShowRecipeBuilder(false);
-        setRecipeTitle('');
-        setRecipeIngredients([]);
-        setRecipeInstructions(['']);
-        setRecipeImage('');
-        setRecipeStep(1);
-        setRecipeCookTime(0);
-        setIsMix(false);
-        setIsRemix(false);
-    };
-
-    const handlePasteRecipeContent = async () => {
-        if (!pastedRecipeContent.trim()) return;
-
-        setMessages(prev => [...prev, { id: Date.now().toString(), type: 'user', content: `📝 Pasted recipe content`, timestamp: new Date() }]);
-        setIsLoading(true);
-
-        try {
-            await handlePasteRecipeContentHook(pastedRecipeContent);
-            setIsCreatingRecipe(false);
-            setPastedRecipeContent('');
-            if (recipeContentRef.current) recipeContentRef.current.value = '';
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            setMessages(prev => [...prev.slice(0, -1), { id: (Date.now() + 1).toString(), type: 'bot', content: `❌ Sorry, I encountered an error: ${errorMessage}`, timestamp: new Date() }]);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handlePasteRecipeURL = async () => {
-        if (!pastedRecipeURL.trim()) return;
-
-        setMessages(prev => [...prev, { id: Date.now().toString(), type: 'user', content: `🔗 Pasted recipe URL`, timestamp: new Date() }]);
-        setIsLoading(true);
-
-        try {
-            await handlePasteRecipeURLHook(pastedRecipeURL);
-            setIsCreatingRecipe(false);
-            setPastedRecipeURL('');
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            setMessages(prev => [...prev.slice(0, -1), { id: (Date.now() + 1).toString(), type: 'bot', content: `❌ Sorry, I encountered an error: ${errorMessage}`, timestamp: new Date() }]);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const loadConversationFromHistory = async (conversation: any) => {
-        setIsLoading(true);
+        importer.setIsLoading(true);
         try {
             if (conversation.messages) {
                 setMessages(conversation.messages);
@@ -513,7 +296,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         } catch (error) {
             toast.error('Failed to load conversation');
         } finally {
-            setIsLoading(false);
+            importer.setIsLoading(false);
         }
     };
 
@@ -523,37 +306,55 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     };
 
     return {
-        // Expose underlying ZumAssistant logic
+        // Hooks
+        builder,
+        importer,
         zumAssistant,
-        messages, isLoading, isRecording, recordingTime, input, setInput,
-        handleSend, startAudioRecording, stopAudioRecording, successRecipe,
-        recipeLoading, conversationHistory, isLoadingHistory, startNewConversation,
+
+        // State directly
+        messages, isLoading: importer.isLoading, isRecording: importer.isRecording, 
+        recordingTime: importer.recordingTime, input, setInput,
+        handleSend, startAudioRecording: importer.startAudioRecording, 
+        stopAudioRecording: importer.stopAudioRecording, successRecipe: importer.successRecipe,
+        recipeLoading: importer.recipeLoading, conversationHistory, isLoadingHistory, startNewConversation,
         
         // Expose Refs
-        messagesEndRef, fileInputRef, audioInputRef, recipeContentRef, builderRef,
+        messagesEndRef, fileInputRef: importer.fileInputRef, audioInputRef, builderRef: builder.builderRef,
         
         // Expose Local State
         isAdmin, showQuickActions, setShowQuickActions, expandedRecipeMenu, setExpandedRecipeMenu,
         expandedAppsMenu, setExpandedAppsMenu, expandedWidgetsMenu, setExpandedWidgetsMenu,
-        isCreatingRecipe, setIsCreatingRecipe, pastedRecipeContent, setPastedRecipeContent,
-        pastedRecipeURL, setPastedRecipeURL, videoURL, setVideoURL, isDragging, setIsDragging,
-        showOnlyMyRecipes, setShowOnlyMyRecipes, selectedRecipeId,
+        isCreatingRecipe: importer.isCreatingRecipe, setIsCreatingRecipe: importer.setIsCreatingRecipe,
+        pastedRecipeContent: importer.pastedRecipeContent, setPastedRecipeContent: importer.setPastedRecipeContent,
+        pastedRecipeURL: importer.pastedRecipeURL, setPastedRecipeURL: importer.setPastedRecipeURL, 
+        videoURL: importer.videoURL, setVideoURL: importer.setVideoURL, isDragging: importer.isDragging, 
+        setIsDragging: importer.setIsDragging, showOnlyMyRecipes, setShowOnlyMyRecipes, selectedRecipeId,
         
-        // Recipe Builder Data Properties
-        showRecipeBuilder, recipeTitle, setRecipeTitle, recipeType, setRecipeType,
-        recipePrepTime, setRecipePrepTime, recipeCookTime, setRecipeCookTime,
-        recipeServings, setRecipeServings, recipeIngredients, setRecipeIngredients,
-        recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
-        recipeSaving, recipeUploading, recipeStep, setRecipeStep,
+        // Recipe Builder Data Properties (Pass-through from builder hook)
+        showRecipeBuilder: builder.showRecipeBuilder, recipeTitle: builder.recipeTitle, setRecipeTitle: builder.setRecipeTitle,
+        recipeType: builder.recipeType, setRecipeType: builder.setRecipeType,
+        recipePrepTime: builder.recipePrepTime, setRecipePrepTime: builder.setRecipePrepTime,
+        recipeCookTime: builder.recipeCookTime, setRecipeCookTime: builder.setRecipeCookTime,
+        recipeServings: builder.recipeServings, setRecipeServings: builder.setRecipeServings,
+        recipeIngredients: builder.recipeIngredients, setRecipeIngredients: builder.setRecipeIngredients,
+        recipeInstructions: builder.recipeInstructions, setRecipeInstructions: builder.setRecipeInstructions,
+        recipeImage: builder.recipeImage, setRecipeImage: builder.setRecipeImage,
+        recipeSaving: builder.recipeSaving, recipeUploading: builder.recipeUploading, recipeStep: builder.recipeStep, setRecipeStep: builder.setRecipeStep,
         
         // Expose Handlers
-        handleGoHome, handleBack, handleSaveAndViewRecipe, handleViewSavedRecipe,
-        handleCloseModal, handleCreateNewRecipe, handleManualRecipeCreation,
+        handleGoHome, handleBack, handleSaveAndViewRecipe, 
+        handleCloseModal, handleCreateNewRecipe, handleManualRecipeCreation: builder.handleManualRecipeCreation,
         handleRemixRecipe, handleRecipeClick, handleBackFromRecipeDetail,
-        handleImageUpload, handleViewAllRecipes, handleViewMyRecipes,
-        handleAddInstruction, handleUpdateInstruction, handleRemoveInstruction,
-        handleRecipeImageUpload, handleSaveRecipe, handleCloseRecipeBuilder,
-        handlePasteRecipeContent, handlePasteRecipeURL, loadConversationFromHistory,
-        handleLoadConversationHistory, processRecipeImage, setSuccessRecipe
+        handleViewAllRecipes, handleViewMyRecipes,
+        handleAddInstruction: builder.handleAddInstruction, 
+        handleUpdateInstruction: builder.handleUpdateInstruction, 
+        handleRemoveInstruction: builder.handleRemoveInstruction,
+        handleRecipeImageUpload: builder.handleRecipeImageUpload, 
+        handleSaveRecipe: (m?: boolean, r?: boolean) => builder.handleSaveRecipe(m, r), 
+        handleCloseRecipeBuilder: builder.resetBuilder,
+        handlePasteRecipeContent: () => importer.handlePasteRecipeContent(setMessages), 
+        handlePasteRecipeURL: () => importer.handlePasteRecipeURL(setMessages), 
+        loadConversationFromHistory,
+        handleLoadConversationHistory, processRecipeImage: importer.processRecipeImage, setSuccessRecipe: importer.setSuccessRecipe
     };
 }
