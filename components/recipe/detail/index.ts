@@ -7,6 +7,6 @@ export { RecipeNutrition } from './recipe-nutrition';
 export { RecipeSmartMatch } from './recipe-smart-match';
 export { RecipeRelated } from './recipe-related';
 export { RecipeManagement } from './recipe-management';
-export { RecipeTagsDialog } from './recipe-tags-dialog';
+
 
 export type { Recipe, Ingredient, Instruction, CalculatedNutrition, RecipeDetailData } from './types';

@@ -41,7 +41,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     </p>
                 </div>
                 <button 
-                    onClick={() => setShowTagsDialog(true)}
+                    onClick={() => ctx.navigateTo('recipe-tags')}
                     className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors flex items-center justify-between group"
                 >
                     <div>

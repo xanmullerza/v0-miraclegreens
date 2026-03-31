@@ -26,6 +26,7 @@ import { MenuExplorationView } from './views/MenuExplorationView';
 import { StaticPagesView } from './views/StaticPagesView';
 import { ExportPanel } from './export-panel';
 import { HelpSection } from './help-section';
+import { RecipeTagsPanel } from '@/components/recipe/detail/recipe-tags-panel';
 
 interface ActionPanelRouterProps {
     orchestrator: any; 
@@ -158,12 +159,18 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                     </div>
                 </PanelWrapper>
             );
-        case 'recipe-detail':
             return selectedRecipeId ? (
                 <RecipeDetail 
                     recipeId={selectedRecipeId} 
                     onBack={handleBackFromRecipeDetail} 
                     onRemix={handleRemixRecipe}
+                />
+            ) : null;
+        case 'recipe-tags':
+            return selectedRecipeId ? (
+                <RecipeTagsPanel 
+                    recipeId={selectedRecipeId} 
+                    onBack={handleBack} 
                 />
             ) : null;
         case 'recipe-share':

@@ -10,7 +10,6 @@ import {
     RecipeSmartMatch,
     RecipeRelated,
     RecipeManagement,
-    RecipeTagsDialog,
 } from '@/components/recipe/detail';
 
 interface RecipeDetailProps {
@@ -82,9 +81,6 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
                     <RecipeManagement ctx={ctx} />
                 )}
             </div>
-
-            {/* Tags Dialog (portal-like overlay) */}
-            <RecipeTagsDialog ctx={ctx} />
         </div>
     );
 }
