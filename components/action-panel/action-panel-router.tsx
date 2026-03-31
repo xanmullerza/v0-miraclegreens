@@ -163,20 +163,38 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                 </PanelWrapper>
             );
         case 'recipe-detail':
-            return effectiveRecipeId ? (
+            if (!effectiveRecipeId) {
+                return (
+                    <PanelWrapper title="Recipes" onClose={handleGoHome}>
+                        <div className="px-2 pb-20 mt-8">
+                            <RecipesViewPremium onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
+                        </div>
+                    </PanelWrapper>
+                );
+            }
+            return (
                 <RecipeDetail 
                     recipeId={effectiveRecipeId} 
                     onBack={handleBackFromRecipeDetail} 
                     onRemix={handleRemixRecipe}
                 />
-            ) : null;
+            );
         case 'recipe-tags':
-            return effectiveRecipeId ? (
+            if (!effectiveRecipeId) {
+                return (
+                    <PanelWrapper title="Recipes" onClose={handleGoHome}>
+                        <div className="px-2 pb-20 mt-8">
+                            <RecipesViewPremium onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
+                        </div>
+                    </PanelWrapper>
+                );
+            }
+            return (
                 <RecipeTagsPanel 
                     recipeId={effectiveRecipeId} 
                     onBack={handleBack} 
                 />
-            ) : null;
+            );
         case 'recipe-share':
             return recipeToShare ? <SharePanel recipe={recipeToShare} onClose={handleBack} isInline={true} /> : null;
         case 'shopping': return <ShoppingPanel />;
