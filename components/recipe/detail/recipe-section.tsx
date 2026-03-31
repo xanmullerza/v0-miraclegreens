@@ -48,28 +48,46 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                 </div>
                 <button 
                     onClick={() => ctx.navigateTo('recipe-tags')}
-                    className="col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors flex items-center justify-between group"
+                    className="col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors group"
                 >
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Tags</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[280px]">
-                            {recipe.tags && recipe.tags.length > 0 ? recipe.tags.join(', ') : 'Add Tags'}
-                        </p>
+                    <div className="flex items-center justify-between mb-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tags & Categories</p>
+                        <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
                     </div>
-                    <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                    
+                    <div className="flex flex-wrap gap-2">
+                        {/* Difficulty Tag */}
+                        <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest">
+                            #{recipe.difficulty || 'Medium'}
+                        </span>
+
+                        {/* Meal Type Tag */}
+                        {recipe.type && (
+                            <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">
+                                #{recipe.type}
+                            </span>
+                        )}
+
+                        {/* Diet Type Tags */}
+                        {recipe.diet && recipe.diet.map(d => (
+                            <span key={d} className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                                #{d}
+                            </span>
+                        ))}
+
+                        {/* Custom Tags */}
+                        {recipe.tags && recipe.tags.map(t => (
+                            <span key={t} className="px-3 py-1.5 rounded-xl bg-slate-500/10 border border-slate-500/20 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                                {t.startsWith('#') ? t : `#${t}`}
+                            </span>
+                        ))}
+
+                        {(!recipe.tags || recipe.tags.length === 0) && !recipe.type && (!recipe.diet || recipe.diet.length === 0) && (
+                            <span className="text-sm font-bold text-slate-400 italic">Add Tags</span>
+                        )}
+                    </div>
                 </button>
             </div>
-
-            {/* Diet Labels */}
-            {recipe.diet && recipe.diet.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                    {recipe.diet.map(d => (
-                        <span key={d} className="text-xs px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-medium">
-                            {d}
-                        </span>
-                    ))}
-                </div>
-            )}
 
             {/* Ingredients */}
             {ingredients.length > 0 && (

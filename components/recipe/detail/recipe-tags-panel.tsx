@@ -10,6 +10,7 @@ import { PanelWrapper } from '@/components/action-panel/panel-wrapper';
 
 const PREDEFINED_TAGS = ['#Quick', '#Budget', '#HighProtein', '#Vegan', '#Veggies', '#LowCarb', '#Bulk', '#MealPrep', '#Keto', '#GutHealth'];
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+const DIET_TYPES = ['Balanced', 'Pescatarian', 'Vegetarian', 'Vegan'];
 
 interface RecipeTagsPanelProps {
     recipeId: string;
@@ -140,6 +141,27 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
         }
     };
 
+    const handleDietToggle = async (d: string) => {
+        const curDiet = recipe.diet || [];
+        const isSelected = curDiet.includes(d);
+        const newDiet = isSelected ? curDiet.filter(item => item !== d) : [...curDiet, d];
+
+        const isLocal = String(recipe.id).startsWith('local-');
+        if (isLocal) {
+            const localData = localStorage.getItem('local_recipes');
+            if (localData) {
+                const recipes = JSON.parse(localData);
+                const updated = recipes.map((r: any) => r.id === recipe.id ? { ...r, diet: newDiet } : r);
+                localStorage.setItem('local_recipes', JSON.stringify(updated));
+            }
+            setRecipe({ ...recipe, diet: newDiet });
+        } else {
+            const { error } = await supabase.from('recipes').update({ diet: newDiet }).eq('id', recipe.id);
+            if (!error) setRecipe({ ...recipe, diet: newDiet });
+            else toast.error('Failed to update diet types');
+        }
+    };
+
     return (
         <PanelWrapper 
             title="Manage Tags" 
@@ -166,6 +188,30 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
                                     {t}
                                 </button>
                             ))}
+                        </div>
+                    </div>
+
+                    {/* Diet Type */}
+                    <div className="space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Diet Type</p>
+                        <div className="grid grid-cols-2 gap-2">
+                            {DIET_TYPES.map(d => {
+                                const isSelected = (recipe.diet || []).includes(d);
+                                return (
+                                    <button
+                                        key={d}
+                                        onClick={() => handleDietToggle(d)}
+                                        className={cn(
+                                            "py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border transition-all duration-300",
+                                            isSelected
+                                                ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-500"
+                                        )}
+                                    >
+                                        {d}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
