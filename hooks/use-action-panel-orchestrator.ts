@@ -215,9 +215,10 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         if (sourceIngredients && Array.isArray(sourceIngredients)) {
             const mapped: RecipeIngredient[] = sourceIngredients.map((ing: any) => {
                 const food = ing.food_item || ing.food_items || {};
-                const weight_g = (ing.weight_g || 0) * servings;
-                const quantity = (ing.quantity || (ing.amount ? parseFloat(ing.amount) : 1)) * servings;
-                const multiplier = weight_g / 100;
+                // Use the weight as stored in the DB (Total Weight)
+                // Do NOT multiply by servings here as it causes double-scaling.
+                const weight_g = ing.weight_g || 0;
+                const quantity = ing.quantity || (ing.amount ? parseFloat(ing.amount) : 1);
                 
                 return {
                     food_item_id: ing.food_item_id || 'temp-id',
@@ -226,15 +227,22 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
                     quantity,
                     measure_label: ing.measure_label || ing.unit || 'g',
                     image: food.image,
-                    calories: (food.energy_kcal || 0) * multiplier,
-                    energy_kj: (food.energy_kj || (food.energy_kcal || 0) * 4.184) * multiplier,
-                    protein: (food.protein_g || 0) * multiplier,
-                    fat: (food.fat_g || 0) * multiplier,
-                    carbs: (food.carbs_g || 0) * multiplier,
-                    micronutrients: Object.entries(food.micronutrients || {}).reduce((acc, [k, v]) => {
-                        acc[k] = (Number(v) || 0) * multiplier;
-                        return acc;
-                    }, {} as Record<string, number>),
+                    // Store BASE (per 100g) values.
+                    // The builder workspace will apply the weight multiplier (weight/100) for summary display.
+                    calories: food.energy_kcal || 0,
+                    energy_kj: food.energy_kj || (food.energy_kcal || 0) * 4.184,
+                    protein: food.protein_g || 0,
+                    fat: food.fat_g || 0,
+                    carbs: food.carbs_g || 0,
+                    micronutrients: food.micronutrients || {},
+                    base_nutrition: {
+                        calories: food.energy_kcal || 0,
+                        energy_kj: food.energy_kj || (food.energy_kcal || 0) * 4.184,
+                        protein: food.protein_g || 0,
+                        fat: food.fat_g || 0,
+                        carbs: food.carbs_g || 0,
+                        micronutrients: food.micronutrients || {}
+                    }
                 };
             });
             builder.setRecipeIngredients(mapped);
