@@ -278,11 +278,11 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
                     newM[match] = (newM[match] || 0) + (v as number) * multiplier;
                 });
                 return {
-                    calories: acc.calories + (ing.calories * multiplier),
-                    energy_kj: acc.energy_kj + (ing.energy_kj * multiplier),
-                    protein: acc.protein + (ing.protein * multiplier),
-                    fat: acc.fat + (ing.fat * multiplier),
-                    carbs: acc.carbs + (ing.carbs * multiplier),
+                    calories: acc.calories + ((ing.calories || 0) * multiplier),
+                    energy_kj: acc.energy_kj + ((ing.energy_kj || 0) * multiplier),
+                    protein: acc.protein + ((ing.protein || 0) * multiplier),
+                    fat: acc.fat + ((ing.fat || 0) * multiplier),
+                    carbs: acc.carbs + ((ing.carbs || 0) * multiplier),
                     micronutrients: newM
                 };
             }, { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> });

@@ -86,12 +86,15 @@ export function useRecipeBuilderLogic({
 
         setRecipeSaving(true);
         try {
-            const totals = recipeIngredients.reduce((acc, ing) => ({
-                calories: acc.calories + (ing.calories || 0),
-                protein: acc.protein + (ing.protein || 0),
-                fat: acc.fat + (ing.fat || 0),
-                carbs: acc.carbs + (ing.carbs || 0),
-            }), { calories: 0, protein: 0, fat: 0, carbs: 0 });
+            const totals = recipeIngredients.reduce((acc, ing) => {
+                const multiplier = (ing.weight_g || 0) / 100;
+                return {
+                    calories: acc.calories + ((ing.calories || 0) * multiplier),
+                    protein: acc.protein + ((ing.protein || 0) * multiplier),
+                    fat: acc.fat + ((ing.fat || 0) * multiplier),
+                    carbs: acc.carbs + ((ing.carbs || 0) * multiplier),
+                };
+            }, { calories: 0, protein: 0, fat: 0, carbs: 0 });
 
             const recipeData = {
                 title: recipeTitle,

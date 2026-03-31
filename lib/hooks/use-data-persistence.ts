@@ -274,13 +274,16 @@ export function useDataPersistence() {
                     if (totalWeight > 0) {
                         const density = 100 / totalWeight; // per 100g
 
-                        const totals = ingredients?.reduce((acc, ing) => ({
-                            calories: acc.calories + (ing.calories || 0),
-                            energy_kj: acc.energy_kj + (ing.energy_kj || 0),
-                            protein: acc.protein + (ing.protein || 0),
-                            fat: acc.fat + (ing.fat || 0),
-                            carbs: acc.carbs + (ing.carbs || 0),
-                        }), { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }) || { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 };
+                        const totals = ingredients?.reduce((acc, ing) => {
+                            const multiplier = (ing.weight_g || 0) / 100;
+                            return {
+                                calories: acc.calories + ((ing.calories || 0) * multiplier),
+                                energy_kj: acc.energy_kj + ((ing.energy_kj || 0) * multiplier),
+                                protein: acc.protein + ((ing.protein || 0) * multiplier),
+                                fat: acc.fat + ((ing.fat || 0) * multiplier),
+                                carbs: acc.carbs + ((ing.carbs || 0) * multiplier),
+                            };
+                        }, { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }) || { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 };
 
                         const foodItemData = {
                             name: recipeData.title,
