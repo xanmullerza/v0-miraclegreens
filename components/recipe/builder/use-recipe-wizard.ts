@@ -145,19 +145,28 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
         return { finalName, finalModifier };
     };
 
-    const handleAutoImport = async () => {
+    const handleAutoImport = async (mode: 'full' | 'ingredients' = 'full') => {
         if (!autoImportText.trim()) return;
         setIsImporting(true);
         try {
-            const parsed = parseRecipeText(autoImportText);
-            if (parsed.title) setTitle(parsed.title);
-            setServings(parsed.servings || 4);
-            setPrepTime(parsed.prepTime || 30);
-            setInstructions(parsed.instructions);
+            const parsed = mode === 'full' ? parseRecipeText(autoImportText) : { 
+                title: '', 
+                ingredients: autoImportText.split('\n').filter(l => l.trim()).map(l => ({ amount: l, item: '', modifier: '', weightG: undefined as number | undefined })), 
+                instructions: [], 
+                servings: 4, 
+                prepTime: 30 
+            };
+
+            if (mode === 'full') {
+                if (parsed.title) setTitle(parsed.title);
+                setServings(parsed.servings || 4);
+                setPrepTime(parsed.prepTime || 30);
+                setInstructions(parsed.instructions);
+            }
 
             const rawIngredients: RecipeIngredient[] = [];
             for (const ing of parsed.ingredients) {
-                const itemName = ing.item.trim();
+                const itemName = (ing.item || ing.amount).trim();
                 if (!itemName || itemName.length < 2 || /^\d+$/.test(itemName)) continue;
 
                 const searchQuery = itemName.replace(/[,;:]\s*$/, '').trim();
@@ -175,7 +184,7 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
                 }
 
                 const { quantity, unit } = parseAmount(ing.amount);
-                const { finalName, finalModifier } = cleanFoodName(match ? match.name : itemName, ing.modifier || '');
+                const { finalName, finalModifier } = cleanFoodName(match ? match.name : (ing.item || itemName), ing.modifier || '');
                 const isGrams = unit.includes('g') && !unit.includes('cup');
                 const weight = ing.weightG || (isGrams ? quantity : 100);
                 const ratio = weight / 100;
@@ -224,7 +233,7 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
                     existing.protein = Number((existing.protein + ing.protein).toFixed(1));
                     existing.fat = Number((existing.fat + ing.fat).toFixed(1));
                     existing.carbs = Number((existing.carbs + ing.carbs).toFixed(1));
-                    Object.entries(ing.micronutrients || {}).forEach(([k, v]) => { existing.micronutrients[k] = (existing.micronutrients[k] || 0) + v; });
+                    Object.entries(ing.micronutrients || {}).forEach(([k, v]) => { existing.micronutrients[k] = (existing.micronutrients[k] || 0) + (v as number); });
                     if (existing.measure_label === ing.measure_label) existing.quantity += ing.quantity;
                     else { existing.measure_label = 'g'; existing.quantity = existing.weight_g; }
                 } else {
@@ -235,10 +244,12 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
             setIngredients(merged);
             setAutoImportText('');
             setShowAutoImport(false);
-            setStep(3);
-            toast.success('Recipe imported successfully!');
-        } catch (error) { toast.error('Import failed.'); }
-        finally { setIsImporting(false); }
+            if (mode === 'full') setStep(3);
+            toast.success(mode === 'full' ? 'Recipe imported successfully!' : 'Ingredients imported successfully!');
+        } catch (error) { 
+            console.error('Import error:', error);
+            toast.error('Import failed.'); 
+        } finally { setIsImporting(false); }
     };
 
     const handleSave = async () => {

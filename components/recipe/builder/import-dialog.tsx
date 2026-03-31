@@ -2,6 +2,7 @@ import React from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Database, Loader2, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ImportDialogProps {
     open: boolean;
@@ -9,12 +10,14 @@ interface ImportDialogProps {
     autoImportText: string;
     setAutoImportText: (t: string) => void;
     isImporting: boolean;
-    handleAutoImport: () => void;
+    handleAutoImport: (mode: 'full' | 'ingredients') => void;
 }
 
 export function ImportDialog({
     open, onOpenChange, autoImportText, setAutoImportText, isImporting, handleAutoImport
 }: ImportDialogProps) {
+    const [importMode, setImportMode] = React.useState<'full' | 'ingredients'>('full');
+
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent side="right" className="w-full sm:max-w-xl bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 p-0">
@@ -27,16 +30,39 @@ export function ImportDialog({
                             <div>
                                 <SheetTitle className="text-2xl font-black uppercase tracking-tighter">Smart Protocol Import</SheetTitle>
                                 <SheetDescription className="text-slate-500 font-medium">
-                                    Paste a full recipe (Title, Ingredients, Instructions) below. Our clinical parser will attempt to isolate each component for rapid workspace population.
+                                    {importMode === 'full' 
+                                        ? "Paste a full recipe (Title, Ingredients, Instructions) below. Our clinical parser will attempt to isolate each component."
+                                        : "Paste just a list of ingredients. We'll attempt to match each one to our nutritional database automatically."}
                                 </SheetDescription>
                             </div>
                         </SheetHeader>
                     </div>
 
                     <div className="flex-1 p-8 space-y-6 overflow-y-auto">
+                        <div className="flex p-1 bg-slate-100 dark:bg-slate-900 rounded-xl">
+                            <button
+                                onClick={() => setImportMode('full')}
+                                className={cn(
+                                    "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                    importMode === 'full' ? "bg-white dark:bg-slate-800 text-violet-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                )}
+                            >
+                                Full Recipe
+                            </button>
+                            <button
+                                onClick={() => setImportMode('ingredients')}
+                                className={cn(
+                                    "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                    importMode === 'ingredients' ? "bg-white dark:bg-slate-800 text-violet-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                )}
+                            >
+                                Ingredients Only
+                            </button>
+                        </div>
+
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recipe Content Source</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Content Source</label>
                                 <div className="flex items-center gap-2 text-[10px] font-black text-violet-500 bg-violet-500/5 px-2 py-1 rounded-md">
                                     <Sparkles size={10} /> Clinical Parsing Active
                                 </div>
@@ -44,20 +70,20 @@ export function ImportDialog({
                             <textarea
                                 value={autoImportText}
                                 onChange={(e) => setAutoImportText(e.target.value)}
-                                className="w-full h-[400px] bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-violet-500/10 transition-all resize-none"
-                                placeholder="Paste the entire recipe here..."
+                                className="w-full h-[350px] bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-violet-500/10 transition-all resize-none"
+                                placeholder={importMode === 'full' ? "Paste the entire recipe here..." : "2 cups raw spinach\n500g chicken breast..."}
                             />
                         </div>
                     </div>
 
                     <div className="p-8 border-t border-slate-100 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-900/20">
                         <Button
-                            onClick={handleAutoImport}
+                            onClick={() => handleAutoImport(importMode)}
                             disabled={isImporting || !autoImportText.trim()}
                             className="w-full h-16 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-4 shadow-xl shadow-violet-500/20 disabled:opacity-50"
                         >
                             {isImporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Database size={18} />}
-                            <span>Initiate Clinical Analysis</span>
+                            <span>{importMode === 'full' ? 'Initiate Clinical Analysis' : 'Parse Ingredients'}</span>
                         </Button>
                     </div>
                 </div>

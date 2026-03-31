@@ -49,8 +49,9 @@ export interface RecipeIngredient {
 
 export interface PendingIngredient {
     raw: {
-        amount: string;
+        amount: number;
         item: string;
+        unit?: string;
         modifier?: string;
         weightG?: number;
     };
