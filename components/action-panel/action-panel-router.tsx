@@ -35,7 +35,8 @@ interface ActionPanelRouterProps {
 export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
     const { 
         activeView, previousView, navigateTo, excludeFlavour, 
-        setExcludeFlavour, excludeSupplements, setExcludeSupplements 
+        setExcludeFlavour, excludeSupplements, setExcludeSupplements,
+        contextRecipeId
     } = useActionPanel();
     
     const { filters } = useRecipeFilter();
@@ -70,6 +71,8 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
         handleViewAllRecipes, handleViewMyRecipes, handleCreateNewRecipe, isCreatingRecipe,
         handleGoHome
     } = orchestrator;
+
+    const effectiveRecipeId = contextRecipeId || (selectedRecipeId as string | null);
 
     // 1. Recipe Builder (Full Overlay Mode)
     if (showRecipeBuilder) {
@@ -160,17 +163,17 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                 </PanelWrapper>
             );
         case 'recipe-detail':
-            return selectedRecipeId ? (
+            return effectiveRecipeId ? (
                 <RecipeDetail 
-                    recipeId={selectedRecipeId} 
+                    recipeId={effectiveRecipeId} 
                     onBack={handleBackFromRecipeDetail} 
                     onRemix={handleRemixRecipe}
                 />
             ) : null;
         case 'recipe-tags':
-            return selectedRecipeId ? (
+            return effectiveRecipeId ? (
                 <RecipeTagsPanel 
-                    recipeId={selectedRecipeId} 
+                    recipeId={effectiveRecipeId} 
                     onBack={handleBack} 
                 />
             ) : null;

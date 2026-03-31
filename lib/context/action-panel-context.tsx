@@ -22,6 +22,8 @@ interface ActionPanelContextType {
     setExcludeFlavour: (value: boolean) => void;
     excludeSupplements: boolean;
     setExcludeSupplements: (value: boolean) => void;
+    contextRecipeId: string | null;
+    setContextRecipeId: (id: string | null) => void;
 }
 
 const ActionPanelContext = createContext<ActionPanelContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [viewStack, setViewStack] = useState<ActionPanelView[]>([]);
     const [excludeFlavour, setExcludeFlavour] = useState(true);
     const [excludeSupplements, setExcludeSupplements] = useState(true);
+    const [contextRecipeId, setContextRecipeId] = useState<string | null>(null);
 
     // Initialize correct default view based on screen size across all routes
     React.useEffect(() => {
@@ -92,6 +95,8 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             setExcludeFlavour,
             excludeSupplements,
             setExcludeSupplements,
+            contextRecipeId,
+            setContextRecipeId,
         }}>
             {children}
         </ActionPanelContext.Provider>

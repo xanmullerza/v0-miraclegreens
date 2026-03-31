@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { TabHeader } from '@/components/ui/tab-header';
 import { PageContainer } from '@/components/ui/page-container';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import {
     useRecipeDetail,
     RecipeHeader,
@@ -21,11 +22,18 @@ export default function RecipeDetailsPage() {
     const router = useRouter();
     const { id } = useParams();
     const { setCustomSegmentLabel } = useHeaderActions();
+    const { setContextRecipeId } = useActionPanel();
 
     const ctx = useRecipeDetail({
         recipeId: String(id),
         onBack: () => router.back(),
     });
+
+    // Sync contextRecipeId for side panel views (Tags, etc.)
+    useEffect(() => {
+        if (id) setContextRecipeId(String(id));
+        return () => setContextRecipeId(null);
+    }, [id, setContextRecipeId]);
 
     const { recipe, loading, activeSection } = ctx;
 
