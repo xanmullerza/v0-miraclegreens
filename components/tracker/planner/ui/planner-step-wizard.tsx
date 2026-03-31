@@ -33,7 +33,7 @@ export const PlannerStepWizard = ({ state, actions, handleGenerate }: any) => {
                                 onClick={() => setGender('female')}
                                 className={cn(
                                     "flex-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all",
-                                    gender === 'female' ? "bg-emerald-500 text-white shadow-sm" : "text-white/60 hover:text-emerald-400"
+                                    gender === 'female' ? "bg-rose-500 text-white shadow-sm" : "text-white/60 hover:text-rose-400"
                                 )}
                             >
                                 Female
@@ -42,7 +42,7 @@ export const PlannerStepWizard = ({ state, actions, handleGenerate }: any) => {
                                 onClick={() => setGender('male')}
                                 className={cn(
                                     "flex-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all",
-                                    gender === 'male' ? "bg-violet-500 text-white shadow-sm" : "text-white/60 hover:text-violet-400"
+                                    gender === 'male' ? "bg-blue-500 text-white shadow-sm" : "text-white/60 hover:text-blue-400"
                                 )}
                             >
                                 Male
