@@ -66,14 +66,17 @@ export function PlannerContent({
 
             <div className="space-y-8">
                 {step < 3 ? (
-                    <Card className="p-8">
-                        <PlannerStepWizard 
-                            state={state} 
-                            actions={actions} 
-                            handleGenerate={handleGenerate} 
-                        />
-                    </Card>
+                    <div className="flex justify-center w-full">
+                        <Card className="p-6 w-full max-w-2xl border-slate-200/60 dark:border-slate-800/60 shadow-2xl shadow-slate-900/5 dark:shadow-none">
+                            <PlannerStepWizard 
+                                state={state} 
+                                actions={actions} 
+                                handleGenerate={handleGenerate} 
+                            />
+                        </Card>
+                    </div>
                 ) : (
+
                     <div className="space-y-6">
                         {/* Day View Header */}
                         <div className="flex items-center justify-between px-2">
