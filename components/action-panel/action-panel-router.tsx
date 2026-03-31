@@ -159,6 +159,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                     </div>
                 </PanelWrapper>
             );
+        case 'recipe-detail':
             return selectedRecipeId ? (
                 <RecipeDetail 
                     recipeId={selectedRecipeId} 

@@ -15,7 +15,6 @@ import {
     RecipeSmartMatch,
     RecipeRelated,
     RecipeManagement,
-    RecipeTagsDialog,
 } from '@/components/recipe/detail';
 
 export default function RecipeDetailsPage() {
@@ -131,9 +130,6 @@ export default function RecipeDetailsPage() {
                     </div>
                 </div>
             </PageContainer>
-
-            {/* ── Tags Dialog (portal-like overlay) ─────────────── */}
-            <RecipeTagsDialog ctx={ctx} />
         </>
     );
 }

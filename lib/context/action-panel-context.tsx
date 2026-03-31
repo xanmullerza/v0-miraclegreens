@@ -48,6 +48,7 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             setPreviousView(activeView);
             setViewStack(prev => [...prev, activeView]);
             setActiveView(view);
+            setIsActionPanelOpen(true);
         }
     };
 
