@@ -10,15 +10,16 @@ import { useSearch } from '@/lib/context/search-context';
 import { parseTotalGrams, formatWeightStr } from './utils';
 import { Recipe, DietType, GoalType, ActivityLevel } from './types';
 
-export function usePlannerActions(state: any, setState: any) {
+export function usePlannerActions(state: any, actions: any) {
     const { pantryItems, quantities, updateQuantity } = usePantry();
     const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
     const { filters } = useRecipeFilter();
     const { searchQuery } = useSearch();
+    const { setGenerating, setStep } = actions;
     const { setPlan } = state;
 
     const handleGenerate = async () => {
-        setState((s: any) => ({ ...s, generating: true }));
+        setGenerating(true);
         try {
             const newPlan = await generateDailyPlan({
                 targetCalories: state.calories,
@@ -35,12 +36,12 @@ export function usePlannerActions(state: any, setState: any) {
                 strictPantry: filters.pantryMode === 'pantry-only'
             });
             setPlan(newPlan);
-            setState((s: any) => ({ ...s, step: 3 }));
+            setStep(3);
         } catch (error) {
             console.error('Generation error:', error);
             toast.error('Failed to generate plan');
         } finally {
-            setState((s: any) => ({ ...s, generating: false }));
+            setGenerating(false);
         }
     };
 
@@ -117,7 +118,7 @@ export function usePlannerActions(state: any, setState: any) {
             });
         }
 
-        setState((prev: any) => ({ ...prev, eatenMeals: new Set([...prev.eatenMeals, mealType]) }));
+        actions.setEatenMeals(new Set([...state.eatenMeals, mealType]));
         
         if (subtracted > 0) {
             toast.success(`Marked as eaten. ${subtracted} items updated.`);
