@@ -15,19 +15,19 @@ export const PlannerStepWizard = ({ state, actions, handleGenerate }: any) => {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="space-y-2 group">
-                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><User size={10}/> Age</Label>
-                        <Input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} className="h-10 bg-slate-50/5 dark:bg-slate-900 border-slate-100/10 dark:border-slate-800 font-bold text-xs rounded-full px-4 text-white focus:border-emerald-500 transition-all" />
+                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><User size={10}/> Age</Label>
+                        <Input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} className="h-10 bg-slate-50/5 dark:bg-slate-900 border-slate-100/10 dark:border-slate-800 font-bold text-xs rounded-full px-4 text-white text-center focus:border-emerald-500 transition-all" />
                     </div>
                     <div className="space-y-2 group">
-                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><Weight size={10}/> Weight</Label>
-                        <Input type="number" value={weight} onChange={(e) => setWeight(Number(e.target.value))} className="h-10 bg-slate-50/5 dark:bg-slate-900 border-slate-100/10 dark:border-slate-800 font-bold text-xs rounded-full px-4 text-white focus:border-emerald-500 transition-all" />
+                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><Weight size={10}/> Weight</Label>
+                        <Input type="number" value={weight} onChange={(e) => setWeight(Number(e.target.value))} className="h-10 bg-slate-50/5 dark:bg-slate-900 border-slate-100/10 dark:border-slate-800 font-bold text-xs rounded-full px-4 text-white text-center focus:border-emerald-500 transition-all" />
                     </div>
                     <div className="space-y-2 group">
-                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><Ruler size={10}/> Height</Label>
-                        <Input type="number" value={height} onChange={(e) => setHeight(Number(e.target.value))} className="h-10 bg-slate-50/5 dark:bg-slate-900 border-slate-100/10 dark:border-slate-800 font-bold text-xs rounded-full px-4 text-white focus:border-emerald-500 transition-all" />
+                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><Ruler size={10}/> Height</Label>
+                        <Input type="number" value={height} onChange={(e) => setHeight(Number(e.target.value))} className="h-10 bg-slate-50/5 dark:bg-slate-900 border-slate-100/10 dark:border-slate-800 font-bold text-xs rounded-full px-4 text-white text-center focus:border-emerald-500 transition-all" />
                     </div>
                     <div className="space-y-2 group">
-                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><Activity size={10}/> Gender</Label>
+                        <Label className="text-[9px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 px-1 transition-colors group-hover:text-emerald-400"><Activity size={10}/> Gender</Label>
                         <div className="flex p-1 bg-slate-100/5 dark:bg-slate-800/50 rounded-full h-10 border border-slate-100/10 dark:border-slate-800">
                             <button 
                                 onClick={() => setGender('female')}
@@ -42,7 +42,7 @@ export const PlannerStepWizard = ({ state, actions, handleGenerate }: any) => {
                                 onClick={() => setGender('male')}
                                 className={cn(
                                     "flex-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all",
-                                    gender === 'male' ? "bg-emerald-500 text-white shadow-sm" : "text-white/60 hover:text-emerald-400"
+                                    gender === 'male' ? "bg-violet-500 text-white shadow-sm" : "text-white/60 hover:text-violet-400"
                                 )}
                             >
                                 Male
