@@ -51,12 +51,21 @@ export function useIngredientBuilder(props: IngredientBuilderProps) {
 
     const totals = useMemo(() => {
         return ingredients.reduce((acc, ing) => {
-            acc.calories += ing.calories * (ing.weight_g / 100);
-            acc.protein += ing.protein * (ing.weight_g / 100);
-            acc.fat += ing.fat * (ing.weight_g / 100);
-            acc.carbs += ing.carbs * (ing.weight_g / 100);
+            const multiplier = ing.weight_g / 100;
+            acc.calories += ing.calories * multiplier;
+            acc.protein += ing.protein * multiplier;
+            acc.fat += ing.fat * multiplier;
+            acc.carbs += ing.carbs * multiplier;
+            
+            // Aggregate micronutrients
+            if (ing.micronutrients) {
+                Object.entries(ing.micronutrients).forEach(([key, value]) => {
+                    acc.micronutrients[key] = (acc.micronutrients[key] || 0) + (Number(value) || 0) * multiplier;
+                });
+            }
+            
             return acc;
-        }, { calories: 0, protein: 0, fat: 0, carbs: 0 });
+        }, { calories: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> });
     }, [ingredients]);
 
     const handleMagicParse = async () => { setIsParsing(true); /* logic */ setIsParsing(false); };
