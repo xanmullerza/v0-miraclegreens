@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Search, X, ArrowDownUp, Filter, Clock, ChefHat, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 
 interface RecipeTabShellProps {
@@ -46,7 +46,7 @@ export function RecipeTabShell({
     title,
     additionalControls
 }: RecipeTabShellProps) {
-    const { setIsChatbotOpen, setChatbotView, isChatbotOpen, chatbotView } = useChatbot();
+    const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
     const { hasActiveFilters } = useRecipeFilter();
     const [showSortOptions, setShowSortOptions] = useState(false);
 
@@ -67,17 +67,17 @@ export function RecipeTabShell({
                         <div className="flex flex-wrap items-center gap-2 md:gap-4">
                             <button
                                 onClick={() => {
-                                    setChatbotView('recipe-filters');
-                                    setIsChatbotOpen(true);
+                                    setActiveView('recipe-filters');
+                                    setIsActionPanelOpen(true);
                                 }}
                                 className={cn(
                                     "h-9 px-4 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 border shadow-sm",
-                                    (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
+                                    (hasActiveFilters || (isActionPanelOpen && activeView === 'recipe-filters'))
                                         ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
                                         : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
                                 )}
                             >
-                                <Filter size={14} className={(hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters')) ? 'text-white' : 'text-slate-300'} />
+                                <Filter size={14} className={(hasActiveFilters || (isActionPanelOpen && activeView === 'recipe-filters')) ? 'text-white' : 'text-slate-300'} />
                                 <span>Filters</span>
                                 {hasActiveFilters && (
                                     <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />

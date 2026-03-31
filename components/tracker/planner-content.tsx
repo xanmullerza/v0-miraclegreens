@@ -90,7 +90,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRouter } from 'next/navigation';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useSearch } from '@/lib/context/search-context';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { TrackerTabShell, SortOption } from '@/components/tracker/tracker-tab-shell';
@@ -849,7 +849,7 @@ export default function MealPlannerContent({
   onRecipeClick,
 }: MealPlannerContentProps) {
   const router = useRouter();
-  const { setChatbotView, setIsChatbotOpen } = useChatbot();
+  const { setActiveView, setIsActionPanelOpen } = useActionPanel();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [generating, setGenerating] = useState(false);
   
@@ -2054,8 +2054,8 @@ export default function MealPlannerContent({
                 <div className="flex items-center justify-between px-2">
                   <button
                     onClick={() => {
-                      setChatbotView('profile');
-                      setIsChatbotOpen(true);
+                      setActiveView('profile');
+                      setIsActionPanelOpen(true);
                     }}
                     className="text-xs font-bold text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1"
                   >
@@ -2114,8 +2114,8 @@ export default function MealPlannerContent({
                 <Button
                   size="lg"
                   onClick={() => {
-                    setChatbotView('profile');
-                    setIsChatbotOpen(true);
+                    setActiveView('profile');
+                    setIsActionPanelOpen(true);
                   }}
                   className="h-16 text-lg font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 group"
                 >

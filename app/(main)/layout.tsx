@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HeaderLogo } from '@/components/ui/header-logo';
-import { ChatbotModal } from '@/components/chatbot/chatbot-modal';
+import { ActionPanelContainer } from '@/components/action-panel/action-panel-container';
 import { RecipePreview } from '@/components/recipe/recipe-preview';
 import { Footer } from '@/components/ux/footer';
 import { RDADrawer } from '@/components/ux/rda-drawer';
@@ -13,7 +13,7 @@ import { DraggableFab } from '@/components/ux/draggable-fab';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
 import { SearchProvider } from '@/lib/context/search-context';
-import { ChatbotProvider, useChatbot } from '@/lib/context/chatbot-context';
+import { ActionPanelProvider, useActionPanel } from '@/lib/context/action-panel-context';
 import { SplitViewProvider, useSplitView } from '@/lib/context/split-view-context';
 import { RecipeFilterProvider } from '@/lib/context/recipe-filter-context';
 import { FoodFilterProvider } from '@/lib/context/food-filter-context';
@@ -36,7 +36,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
     const { profile, showRDADrawer } = useUserPreferences();
-    const { isChatbotOpen, setIsChatbotOpen } = useChatbot();
+    const { isActionPanelOpen, setIsActionPanelOpen } = useActionPanel();
     const { resizeMode, toggleResize } = useSplitView();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
@@ -147,7 +147,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         "flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative",
                         getChatWidth()
                     )}>
-                        <ChatbotModal
+                        <ActionPanelContainer
                             onClose={() => {}}
                             isInline={true}
                             onRecipeDetected={handleRecipeDetected}
@@ -167,9 +167,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 )}
 
                 {/* Mobile chatbot Modal */}
-                {isMobile && isChatbotOpen && (
-                    <ChatbotModal
-                        onClose={() => setIsChatbotOpen(false)}
+                {isMobile && isActionPanelOpen && (
+                    <ActionPanelContainer
+                        onClose={() => setIsActionPanelOpen(false)}
                         isInline={false}
                         onRecipeDetected={handleRecipeDetected}
                     />
@@ -199,7 +199,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <SplitViewProvider>
-            <ChatbotProvider>
+            <ActionPanelProvider>
                 <SearchProvider>
                     <HeaderActionsProvider>
                         <RecipeFilterProvider>
@@ -209,7 +209,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </RecipeFilterProvider>
                     </HeaderActionsProvider>
                 </SearchProvider>
-            </ChatbotProvider>
+            </ActionPanelProvider>
         </SplitViewProvider>
     );
 }

@@ -14,7 +14,7 @@ import {
     DropdownMenuCheckboxItem
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { RecipesView, MEAL_TYPES } from '@/components/recipe/recipes-view';
 import { RecipeFilterDialog } from '@/components/recipe/recipe-filter-dialog';
@@ -39,7 +39,7 @@ export function RecipesViewPremium({
     onSearchChange: externalOnSearchChange,
 }: RecipesViewPremiumProps) {
     const router = useRouter();
-    const { setIsChatbotOpen, setChatbotView, isChatbotOpen, chatbotView } = useChatbot();
+    const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
     const { filters, hasActiveFilters, resetAllFilters } = useRecipeFilter();
 
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
@@ -189,13 +189,13 @@ export function RecipesViewPremium({
                                     <button 
                                         onClick={() => {
                                             if (activeTab === 'recipes' || activeTab === 'remixes' || activeTab === 'mixes') {
-                                                setChatbotView('recipe-filters');
-                                                setIsChatbotOpen(true);
+                                                setActiveView('recipe-filters');
+                                                setIsActionPanelOpen(true);
                                             }
                                         }}
                                         className={cn(
                                             "p-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border shadow-sm outline-none",
-                                            (hasActiveFilters || (isChatbotOpen && chatbotView === 'recipe-filters'))
+                                            (hasActiveFilters || (isActionPanelOpen && activeView === 'recipe-filters'))
                                                 ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
                                                 : "bg-white dark:bg-slate-800 border-emerald-800/20 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-blue-200 hover:text-blue-600"
                                         )}

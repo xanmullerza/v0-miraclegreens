@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { PageContainer } from '@/components/ui/page-container';
 import { Shield, Scale, Globe, BookOpen, TrendingUp, Users, Settings, ChevronRight, MessageCircle } from 'lucide-react';
 import { Carousel } from '@/components/ui/carousel';
@@ -11,7 +11,7 @@ import { Carousel } from '@/components/ui/carousel';
 export default function AboutUsPage() {
     const router = useRouter();
     const { showHeroes } = useUserPreferences();
-    const { setChatbotView, setIsChatbotOpen } = useChatbot();
+    const { setActiveView, setIsActionPanelOpen } = useActionPanel();
     const [isMobile, setIsMobile] = useState(false);
     const [isReady, setIsReady] = useState(false);
 
@@ -20,11 +20,11 @@ export default function AboutUsPage() {
         const checkMobile = window.innerWidth < 768;
         setIsMobile(checkMobile);
         if (checkMobile) {
-            setIsChatbotOpen(true);
-            setChatbotView('dashboard');
+            setIsActionPanelOpen(true);
+            setActiveView('dashboard');
         }
         setIsReady(true);
-    }, [setIsChatbotOpen, setChatbotView]);
+    }, [setIsActionPanelOpen, setActiveView]);
 
     // Don't render about page on mobile
     if (!isReady || isMobile) {

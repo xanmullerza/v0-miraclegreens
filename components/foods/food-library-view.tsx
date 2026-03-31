@@ -13,7 +13,7 @@ import { supabase } from '@/lib/supabase';
 import { useFoodFilter } from '@/lib/context/food-filter-context';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { CATEGORIES, FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
@@ -57,7 +57,7 @@ export function FoodsView({
     const [authReady, setAuthReady] = useState(false);
 
     const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories } = useFoodFilter();
-    const { setIsChatbotOpen, setChatbotView } = useChatbot();
+    const { setIsActionPanelOpen, setActiveView } = useActionPanel();
     const [sortField, setSortField] = useState<'name' | 'energy_kcal' | 'protein_g' | 'carbs_g' | 'fat_g'>('name');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -212,8 +212,8 @@ export function FoodsView({
                                 <div className="flex md:hidden items-center justify-between gap-2 px-4 py-3">
                                     <button
                                         onClick={() => {
-                                            setChatbotView('food-filters');
-                                            setIsChatbotOpen(true);
+                                            setActiveView('food-filters');
+                                            setIsActionPanelOpen(true);
                                         }}
                                         className={cn(
                                             'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
@@ -295,8 +295,8 @@ export function FoodsView({
                                     <div className="flex items-center gap-4">
                                         <button
                                             onClick={() => {
-                                                setChatbotView('food-filters');
-                                                setIsChatbotOpen(true);
+                                                setActiveView('food-filters');
+                                                setIsActionPanelOpen(true);
                                             }}
                                             className={cn(
                                                 'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',

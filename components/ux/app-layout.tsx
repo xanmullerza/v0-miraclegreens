@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, ReactNode } from 'react';
 import { SplitLayout } from '@/components/ux/split-layout';
-import { ChatbotModal } from '@/components/chatbot/chatbot-modal';
+import { ActionPanelContainer } from '@/components/action-panel/action-panel-container';
 import { useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 
@@ -42,7 +42,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     isMobile
                         ? <div className="hidden" />
                         : isChatbotVisible ? (
-                            <ChatbotModal
+                            <ActionPanelContainer
                                 onClose={() => setIsChatbotVisible(false)}
                                 isInline={true}
                             />
@@ -71,7 +71,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             )}
 
             {isMobile && isMobileChatOpen && (
-                <ChatbotModal
+                <ActionPanelContainer
                     onClose={() => setIsMobileChatOpen(false)}
                     isInline={false}
                 />

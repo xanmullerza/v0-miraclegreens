@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Search, X, ArrowDownUp, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 
 export interface SortOption {
     id: string;
@@ -44,7 +44,7 @@ export function TrackerTabShell({
     hasActiveFilters = false,
     activeFilterCount = 0
 }: TrackerTabShellProps) {
-    const { isChatbotOpen, chatbotView } = useChatbot();
+    const { isActionPanelOpen, activeView } = useActionPanel();
     const [showSortOptions, setShowSortOptions] = useState(false);
 
     const handleSort = (field: string) => {

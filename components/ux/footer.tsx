@@ -3,13 +3,13 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { Home, Grid2x2, MessageCircle, Wand2, Smartphone, TabletSmartphone, Monitor as Computer } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useSplitView } from '@/lib/context/split-view-context';
 
 export function Footer() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isChatbotOpen, setIsChatbotOpen, setChatbotView } = useChatbot();
+  const { isActionPanelOpen, setIsActionPanelOpen, setActiveView } = useActionPanel();
   const { resizeMode, toggleResize, setResizeMode } = useSplitView();
 
 
@@ -25,7 +25,7 @@ export function Footer() {
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              setIsChatbotOpen(false);
+              setIsActionPanelOpen(false);
               router.push('/');
             }}
             className={cn(
@@ -38,7 +38,7 @@ export function Footer() {
           >
             <div className={cn(
               "w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-300",
-              (pathname === '/' || pathname === '/dashboard') && !isChatbotOpen
+              (pathname === '/' || pathname === '/dashboard') && !isActionPanelOpen
                 ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
                 : "bg-transparent text-slate-400 group-hover:text-emerald-500"
             )}>
@@ -50,12 +50,12 @@ export function Footer() {
           {/* Assistant Button - The main entry for all side-panel functionality */}
           <button
             onClick={() => {
-              setIsChatbotOpen(!isChatbotOpen);
-              if (!isChatbotOpen) setChatbotView('desktop-guide');
+              setIsActionPanelOpen(!isActionPanelOpen);
+              if (!isActionPanelOpen) setActiveView('desktop-guide');
             }}
             className={cn(
               "flex flex-col items-center justify-center gap-1 py-1.5 rounded-[2rem] transition-all duration-300 active:scale-95 group flex-1",
-              isChatbotOpen 
+              isActionPanelOpen 
                 ? "text-blue-500 bg-blue-50/50 dark:bg-blue-900/10"
                 : "text-slate-400 hover:text-blue-500 hover:bg-slate-50 dark:hover:bg-slate-800/50"
             )}
@@ -63,14 +63,14 @@ export function Footer() {
           >
             <div className={cn(
               "w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-300 font-bold",
-              isChatbotOpen
+              isActionPanelOpen
                 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                 : "bg-transparent text-slate-400 group-hover:text-blue-500"
             )}>
-              <Wand2 size={22} className={cn("transition-transform group-hover:scale-110", isChatbotOpen ? "rotate-12" : "")} />
+              <Wand2 size={22} className={cn("transition-transform group-hover:scale-110", isActionPanelOpen ? "rotate-12" : "")} />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest scale-[0.7] origin-top opacity-60">
-              {isChatbotOpen ? 'Close' : 'Assistant'}
+              {isActionPanelOpen ? 'Close' : 'Assistant'}
             </span>
           </button>
         </div>

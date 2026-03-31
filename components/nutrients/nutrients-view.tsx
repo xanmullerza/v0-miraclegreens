@@ -12,7 +12,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { useRDA } from '@/hooks/use-rda';
 import { cn } from '@/lib/utils';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { Switch } from '@/components/ui/switch';
 
 interface NutrientFilterPanelProps {
@@ -382,7 +382,7 @@ export function NutrientsView({
 }: NutrientsViewProps) {
     const router = useRouter();
     const { profile, dailyTargets, energyUnit } = useUserPreferences();
-    const { setChatbotView, setIsChatbotOpen, excludeFlavour, setExcludeFlavour, excludeSupplements, setExcludeSupplements } = useChatbot();
+    const { setActiveView, setIsActionPanelOpen, excludeFlavour, setExcludeFlavour, excludeSupplements, setExcludeSupplements } = useActionPanel();
 
     // RDA hook
     const userRDAs = useRDA(
@@ -714,8 +714,8 @@ export function NutrientsView({
                                 <>
                                     <button
                                         onClick={() => {
-                                            setChatbotView('nutrient-filters');
-                                            setIsChatbotOpen(true);
+                                            setActiveView('nutrient-filters');
+                                            setIsActionPanelOpen(true);
                                         }}
                                         className={cn(
                                             'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
@@ -810,8 +810,8 @@ export function NutrientsView({
                                         <div className="flex items-center gap-4">
                                             <button
                                                 onClick={() => {
-                                                    setChatbotView('nutrient-filters');
-                                                    setIsChatbotOpen(true);
+                                                    setActiveView('nutrient-filters');
+                                                    setIsActionPanelOpen(true);
                                                 }}
                                                 className={cn(
                                                     'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',

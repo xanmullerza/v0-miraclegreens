@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
     User,
@@ -195,7 +195,7 @@ function ProfilePageContent() {
         headerStyle,
         setHeaderStyle,
     } = useUserPreferences();
-    const { chatbotView, setChatbotView: setChatbotViewContext, setPreviousView, navigateTo, goBack } = useChatbot();
+    const { activeView, setActiveView: setActiveViewContext, setPreviousView, navigateTo, goBack } = useActionPanel();
     const { theme, setTheme } = useTheme();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -435,7 +435,7 @@ function ProfilePageContent() {
                             className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
                             onClick={() => {
                                 // If inside chatbot modal, open as a view; otherwise open drawer
-                                if (chatbotView !== undefined && chatbotView !== null) {
+                                if (activeView !== undefined && activeView !== null) {
                                     navigateTo('recommended-intake');
                                 } else {
                                     setShowRDADrawer(true);

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Beaker, Info, Shield, HelpCircle, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -26,7 +26,7 @@ export function HeaderLogo({
     const router = useRouter();
     const { theme, setTheme } = useTheme();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
-    const { isChatbotOpen, setIsChatbotOpen, setChatbotView } = useChatbot();
+    const { isActionPanelOpen, setIsActionPanelOpen, setActiveView } = useActionPanel();
     const { profile } = useUserPreferences();
     const [isMobile, setIsMobile] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -185,8 +185,8 @@ export function HeaderLogo({
                     ) : (
                         <button
                             onClick={() => {
-                                setChatbotView('profile');
-                                setIsChatbotOpen(true);
+                                setActiveView('profile');
+                                setIsActionPanelOpen(true);
                             }}
                             className="h-12 w-12 flex items-center justify-center hover:bg-muted dark:hover:bg-slate-800 transition-colors active:scale-95"
                             title="Profile"

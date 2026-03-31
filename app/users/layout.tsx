@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChatbotProvider } from '@/lib/context/chatbot-context';
+import { ActionPanelProvider } from '@/lib/context/action-panel-context';
 import { SearchProvider } from '@/lib/context/search-context';
 import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
 import { SplitViewProvider } from '@/lib/context/split-view-context';
@@ -14,7 +14,7 @@ export default function UsersLayout({
 }>) {
   return (
     <SplitViewProvider>
-      <ChatbotProvider>
+      <ActionPanelProvider>
         <SearchProvider>
           <HeaderActionsProvider>
             <RecipeFilterProvider>
@@ -22,7 +22,7 @@ export default function UsersLayout({
             </RecipeFilterProvider>
           </HeaderActionsProvider>
         </SearchProvider>
-      </ChatbotProvider>
+      </ActionPanelProvider>
     </SplitViewProvider>
   );
 }

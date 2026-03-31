@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { cn } from '@/lib/utils';
 
 const segmentIconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -57,7 +57,7 @@ export function BreadcrumbPillbox({
 }: BreadcrumbPillboxProps) {
     const router = useRouter();
     const pathname = usePathname();
-    const { setIsChatbotOpen, setChatbotView } = useChatbot();
+    const { setIsActionPanelOpen, setActiveView } = useActionPanel();
     const {
         customSegmentLabel,
         filterContent,
@@ -247,8 +247,8 @@ export function BreadcrumbPillbox({
                     ) : (
                         <button
                             onClick={() => {
-                                setChatbotView('profile');
-                                setIsChatbotOpen(true);
+                                setActiveView('profile');
+                                setIsActionPanelOpen(true);
                             }}
                             className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                             title="Profile"

@@ -8,7 +8,7 @@ import { useRDA } from '@/hooks/use-rda';
 import { isFlavoringIngredient } from '@/lib/services/nutrition';
 import { calculateAggregatedNutrition } from '@/lib/utils/nutrition-utils';
 import { useSmartMatch } from '@/hooks/use-smart-match';
-import { useChatbot } from '@/lib/context/chatbot-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import type { Recipe, Ingredient, Instruction, CalculatedNutrition } from './types';
 
@@ -63,7 +63,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // User preferences and RDA
     const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
-    const { setIsChatbotOpen, setChatbotView, setRecipeToRemix, setRecipeToShare, navigateTo } = useChatbot();
+    const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo } = useActionPanel();
     const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
     const isOwner = user && recipe && (recipe as any).user_id === user.id;
@@ -76,8 +76,8 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             onRemix(recipe, ingredients, instructions);
         } else {
             setRecipeToRemix({ recipe, ingredients, instructions, isEdit });
-            setChatbotView('recipe-builder');
-            setIsChatbotOpen(true);
+            setActiveView('recipe-builder');
+            setIsActionPanelOpen(true);
             toast.info(isEdit ? 'Opening recipe editor...' : 'Remixing recipe...');
         }
     };
