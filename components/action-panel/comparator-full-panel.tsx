@@ -259,7 +259,7 @@ export function ComparatorFullPanel() {
                             >
                                 <div className="flex items-center gap-2">
                                     {(food.image_url || food.image) && food.image_url && (
-                                        <img src={food.image_url} alt={food.name} className="w-6 h-6 rounded" />
+                                        <img src={food.image_url ?? undefined} alt={food.name} className="w-6 h-6 rounded" />
                                     )}
                                     <span className="font-medium truncate">{food.common_name || food.name}</span>
                                 </div>
@@ -282,7 +282,7 @@ export function ComparatorFullPanel() {
                                 </div>
                                 {selectedFoods[slot]?.image_url && (
                                     <img
-                                        src={selectedFoods[slot]?.image_url}
+                                        src={selectedFoods[slot]?.image_url ?? undefined}
                                         alt={selectedFoods[slot]?.name}
                                         className="w-full h-16 rounded object-cover mb-1"
                                     />
