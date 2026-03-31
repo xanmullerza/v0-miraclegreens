@@ -14,6 +14,7 @@ export interface RecipeFilterState {
   selectedDifficulty: string[];
   selectedTags: string[];
   onlyMyRecipes: boolean;
+  nutritionViewMode: 'per-serving' | 'total';
 }
 
 interface RecipeFilterContextType {
@@ -46,6 +47,7 @@ export function RecipeFilterProvider({
     selectedDifficulty: [],
     selectedTags: [],
     onlyMyRecipes: false,
+    nutritionViewMode: 'per-serving',
   });
 
   // Sync with profile changes
@@ -73,6 +75,7 @@ export function RecipeFilterProvider({
           selectedDifficulty: parsed.selectedDifficulty || [],
           selectedTags: parsed.selectedTags || [],
           onlyMyRecipes: parsed.onlyMyRecipes || false,
+          nutritionViewMode: parsed.nutritionViewMode || 'per-serving',
         }));
       } catch (e) {
         console.error('Failed to load recipe filters from localStorage', e);
@@ -92,9 +95,10 @@ export function RecipeFilterProvider({
         selectedDifficulty: filters.selectedDifficulty,
         selectedTags: filters.selectedTags,
         onlyMyRecipes: filters.onlyMyRecipes,
+        nutritionViewMode: filters.nutritionViewMode,
       })
     );
-  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements, filters.onlyMyRecipes]);
+  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements, filters.onlyMyRecipes, filters.nutritionViewMode]);
 
   const updateFilter = (key: keyof RecipeFilterState, value: any) => {
     setFilters((prev) => ({
@@ -115,6 +119,7 @@ export function RecipeFilterProvider({
       selectedDifficulty: [],
       selectedTags: [],
       onlyMyRecipes: false,
+      nutritionViewMode: 'per-serving',
     });
   };
 
@@ -130,6 +135,7 @@ export function RecipeFilterProvider({
       selectedDifficulty: [],
       selectedTags: [],
       onlyMyRecipes: false,
+      nutritionViewMode: 'per-serving',
     });
   };
 

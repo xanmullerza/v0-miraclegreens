@@ -5,6 +5,7 @@ import { Search, X, ArrowDownUp, Filter, Clock, ChefHat, Flame } from 'lucide-re
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
+import { Loader2 } from 'lucide-react';
 
 interface RecipeTabShellProps {
     children: React.ReactNode;
@@ -47,7 +48,7 @@ export function RecipeTabShell({
     additionalControls
 }: RecipeTabShellProps) {
     const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
-    const { hasActiveFilters } = useRecipeFilter();
+    const { filters, hasActiveFilters, updateFilter } = useRecipeFilter();
     const [showSortOptions, setShowSortOptions] = useState(false);
 
     const handleSort = (field: string) => {
@@ -152,8 +153,29 @@ export function RecipeTabShell({
                             </div>
                         )}
 
-                        <div className="hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/70">
-                            {title === 'Library' ? 'Recipe Library' : title}
+                        <div className="hidden sm:flex items-center bg-slate-200/50 dark:bg-slate-800/50 rounded-xl p-1 border border-slate-200 dark:border-slate-700 gap-1">
+                            <button 
+                                onClick={() => updateFilter('nutritionViewMode', 'per-serving')}
+                                className={cn(
+                                    "px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
+                                    filters.nutritionViewMode === 'per-serving'
+                                        ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
+                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                )}
+                            >
+                                Per Serving
+                            </button>
+                            <button 
+                                onClick={() => updateFilter('nutritionViewMode', 'total')}
+                                className={cn(
+                                    "px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
+                                    filters.nutritionViewMode === 'total'
+                                        ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
+                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                )}
+                            >
+                                Total
+                            </button>
                         </div>
                     </div>
                 </div>
