@@ -9,6 +9,7 @@ import { useRecipeDetail } from './use-recipe-detail';
 import { PanelWrapper } from '@/components/action-panel/panel-wrapper';
 
 const PREDEFINED_TAGS = ['#Quick', '#Budget', '#HighProtein', '#Vegan', '#Veggies', '#LowCarb', '#Bulk', '#MealPrep', '#Keto', '#GutHealth'];
+const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
 interface RecipeTagsPanelProps {
     recipeId: string;
@@ -116,6 +117,29 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
         }
     };
 
+    const handleTypeChange = async (t: string) => {
+        const dbValue = t.toLowerCase();
+        const isLocal = String(recipe.id).startsWith('local-');
+        if (isLocal) {
+            const localData = localStorage.getItem('local_recipes');
+            if (localData) {
+                const recipes = JSON.parse(localData);
+                const updated = recipes.map((r: any) => r.id === recipe.id ? { ...r, type: dbValue } : r);
+                localStorage.setItem('local_recipes', JSON.stringify(updated));
+            }
+            setRecipe({ ...recipe, type: dbValue });
+            toast.success(`Meal type set to ${t}`);
+        } else {
+            const { error } = await supabase.from('recipes').update({ type: dbValue }).eq('id', recipe.id);
+            if (!error) {
+                setRecipe({ ...recipe, type: dbValue });
+                toast.success(`Meal type set to ${t}`);
+            } else {
+                toast.error('Failed to update meal type');
+            }
+        }
+    };
+
     return (
         <PanelWrapper 
             title="Manage Tags" 
@@ -124,6 +148,27 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
         >
             <div className="flex flex-col h-full bg-white dark:bg-slate-900">
                 <div className="flex-1 overflow-y-auto p-4 space-y-8 pb-32">
+                    {/* Meal Type */}
+                    <div className="space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Meal Type</p>
+                        <div className="grid grid-cols-2 gap-2">
+                            {MEAL_TYPES.map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => handleTypeChange(t)}
+                                    className={cn(
+                                        "py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border transition-all duration-300",
+                                        (recipe.type || '').toLowerCase() === t.toLowerCase()
+                                            ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                            : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-500"
+                                    )}
+                                >
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Difficulty */}
                     <div className="space-y-4">
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Difficulty Level</p>

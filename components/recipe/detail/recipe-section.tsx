@@ -35,6 +35,12 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.servings} servings</p>
                 </div>
                 <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Meal Type</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">
+                        {recipe.type || 'Other'}
+                    </p>
+                </div>
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Difficulty</p>
                     <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">
                         {recipe.difficulty || 'Medium'}
@@ -42,11 +48,11 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                 </div>
                 <button 
                     onClick={() => ctx.navigateTo('recipe-tags')}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors flex items-center justify-between group"
+                    className="col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors flex items-center justify-between group"
                 >
                     <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Tags</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[100px]">
+                        <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[280px]">
                             {recipe.tags && recipe.tags.length > 0 ? recipe.tags.join(', ') : 'Add Tags'}
                         </p>
                     </div>
