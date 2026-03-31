@@ -54,65 +54,6 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                 </button>
             </div>
 
-            {/* Nutritional Info Summary */}
-            {(calculatedNutrition.calories > 0 || calculatedNutrition.protein > 0 || calculatedNutrition.fat > 0 || calculatedNutrition.carbs > 0) && (
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
-                    <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                            Nutritional Info ({nutritionViewMode === 'per-serving' ? `per serving (1 of ${recipe.servings})` : `total (${recipe.servings} servings)`})
-                        </p>
-                        <div className="flex bg-slate-100 dark:bg-slate-800 rounded-md p-0.5 border border-slate-200 dark:border-slate-700 gap-0.5">
-                            <button 
-                                onClick={() => setNutritionViewMode('per-serving')}
-                                className={cn(
-                                    "px-2 py-0.5 text-[7px] font-bold uppercase tracking-widest rounded transition-all",
-                                    nutritionViewMode === 'per-serving' 
-                                        ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                                )}
-                            >
-                                Per Serving
-                            </button>
-                            <button 
-                                onClick={() => setNutritionViewMode('total')}
-                                className={cn(
-                                    "px-2 py-0.5 text-[7px] font-bold uppercase tracking-widest rounded transition-all",
-                                    nutritionViewMode === 'total' 
-                                        ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                                )}
-                            >
-                                Total
-                            </button>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-4 gap-3">
-                        <div>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">{energyUnit === 'kJ' ? 'Energy' : 'Calories'}</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">
-                                {formatEnergyValue(
-                                    nutritionViewMode === 'per-serving' ? calculatedNutrition.calories / (recipe.servings || 1) : calculatedNutrition.calories,
-                                    energyUnit,
-                                    nutritionViewMode === 'per-serving' ? (calculatedNutrition.energyKj || calculatedNutrition.calories * 4.184) / (recipe.servings || 1) : (calculatedNutrition.energyKj || calculatedNutrition.calories * 4.184)
-                                )}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">Protein</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.protein / recipe.servings : calculatedNutrition.protein) * 10) / 10}g</p>
-                        </div>
-                        <div>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">Fat</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.fat / recipe.servings : calculatedNutrition.fat) * 10) / 10}g</p>
-                        </div>
-                        <div>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">Carbs</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round((nutritionViewMode === 'per-serving' ? calculatedNutrition.carbs / recipe.servings : calculatedNutrition.carbs) * 10) / 10}g</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Diet Labels */}
             {recipe.diet && recipe.diet.length > 0 && (
                 <div className="flex flex-wrap gap-2">
