@@ -4,6 +4,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { formatEnergyValue } from '@/lib/utils/nutrition-utils';
+import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
@@ -150,7 +151,9 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
                             const isFlipped = flippedCards[ing.id];
                             const isGenericItem = ing.amount?.toLowerCase().includes('item') || ing.amount?.toLowerCase().includes('unit');
-                            const cleanAmount = isGenericItem && displayWeight > 0 ? '' : ing.amount;
+                            const cleanAmount = isGenericItem && displayWeight > 0 
+                                ? '' 
+                                : (nutritionViewMode === 'total' ? ing.amount : scaleIngredient(ing.amount || '', 1 / servings));
 
                             return (
                                 <div

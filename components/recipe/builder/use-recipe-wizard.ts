@@ -289,17 +289,17 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
 
             const s = servings || 1;
             const { error: rErr } = await supabase.from('recipes').insert({
-                id: recipeId, title, type, calories: Math.round(totals.calories / s), energy_kj: Math.round(totals.energy_kj / s),
-                protein: Number((totals.protein / s).toFixed(1)), fat: Number((totals.fat / s).toFixed(1)), carbs: Number((totals.carbs / s).toFixed(1)),
+                id: recipeId, title, type, calories: Math.round(totals.calories), energy_kj: Math.round(totals.energy_kj),
+                protein: Number((totals.protein).toFixed(1)), fat: Number((totals.fat).toFixed(1)), carbs: Number((totals.carbs).toFixed(1)),
                 diet, prep_time: prepTime, servings: s, image, source, is_favorite: isFavorite,
-                micronutrients: Object.entries(totals.micronutrients).reduce((acc, [k, v]) => { acc[k] = v / s; return acc; }, {} as Record<string, number>)
+                micronutrients: Object.entries(totals.micronutrients).reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {} as Record<string, number>)
             });
             if (rErr) throw rErr;
 
             await supabase.from('ingredients').insert(updatedIngredients.map(ing => ({
                 recipe_id: recipeId, food_item_id: ing.food_item_id, item: ing.food_item_name,
-                amount: `${scaleIngredient(`${ing.quantity} ${ing.measure_label}`, 1 / s)}${ing.modifier ? ' ' + ing.modifier : ''}`.trim(),
-                weight_g: ing.weight_g / s, quantity: ing.quantity / s, measure_label: ing.measure_label,
+                amount: `${ing.quantity} ${ing.measure_label}${ing.modifier ? ' ' + ing.modifier : ''}`.trim(),
+                weight_g: ing.weight_g, quantity: ing.quantity, measure_label: ing.measure_label,
                 base_ingredient: ing.food_item_name, modifier: ing.modifier,
             })));
 

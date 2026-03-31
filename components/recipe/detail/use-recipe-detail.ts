@@ -374,14 +374,14 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             const nutrition = calculateAggregatedNutrition(updatedIngs || []);
             
             const servings = recipe?.servings || 1;
-            const finalCals = Math.round(nutrition.calories / servings);
-            const finalCarbs = Math.round((nutrition.carbs / servings) * 10) / 10;
-            const finalFat = Math.round((nutrition.fat / servings) * 10) / 10;
-            const finalProtein = Math.round((nutrition.protein / servings) * 10) / 10;
-            const finalKj = Math.round(nutrition.energyKj / servings);
+            const finalCals = Math.round(nutrition.calories);
+            const finalCarbs = Math.round((nutrition.carbs) * 10) / 10;
+            const finalFat = Math.round((nutrition.fat) * 10) / 10;
+            const finalProtein = Math.round((nutrition.protein) * 10) / 10;
+            const finalKj = Math.round(nutrition.energyKj);
             
             const finalMicros = Object.fromEntries(
-                Object.entries(nutrition.micronutrients || {}).map(([key, val]) => [key, val / servings])
+                Object.entries(nutrition.micronutrients || {}).map(([key, val]) => [key, val])
             );
 
             const { error: updateError } = await supabase
