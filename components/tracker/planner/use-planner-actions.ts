@@ -15,8 +15,7 @@ export function usePlannerActions(state: any, actions: any) {
     const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
     const { filters } = useRecipeFilter();
     const { searchQuery } = useSearch();
-    const { setGenerating, setStep } = actions;
-    const { setPlan } = state;
+    const { setGenerating, setStep, setPlan, setEatenMeals } = actions;
 
     const handleGenerate = async () => {
         setGenerating(true);
@@ -118,7 +117,7 @@ export function usePlannerActions(state: any, actions: any) {
             });
         }
 
-        actions.setEatenMeals(new Set([...state.eatenMeals, mealType]));
+        setEatenMeals(new Set([...state.eatenMeals, mealType]));
         
         if (subtracted > 0) {
             toast.success(`Marked as eaten. ${subtracted} items updated.`);
