@@ -17,45 +17,36 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
             {(relatedRecipes.length > 0 || loadingRelated) ? (
                 <div className="space-y-4">
-                    <div className="pb-2">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 italic flex items-center gap-2">
-                            Related Meals
-                        </h3>
-                        <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Recipes with shared ingredients</p>
-                    </div>
-
                     {loadingRelated ? (
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-3">
                             {[0, 1, 2, 3].map((i) => (
-                                <div key={i} className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" />
+                                <div key={i} className="h-24 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" />
                             ))}
                         </div>
                     ) : (
-                        <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-3">
                             {relatedRecipes.map((meal) => (
                                 <a
                                     key={meal.id}
                                     href={`/recipes/${meal.id}`}
-                                    className="group flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:border-emerald-500/30 hover:bg-muted transition-all"
+                                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/60 transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden"
                                 >
-                                    <div className="w-16 h-16 rounded-md overflow-hidden bg-muted border border-border flex-shrink-0">
+                                    <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-all duration-500">
                                         {meal.image ? (
-                                            <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
+                                            <img src={meal.image} className="w-16 h-16 object-cover rounded-lg filter grayscale" alt="" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                                <Layers size={14} className="opacity-20" />
-                                            </div>
+                                            <Layers size={32} />
                                         )}
                                     </div>
-
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2">
+                                    <div className="relative z-10">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 mb-1">
+                                            {(meal as any).overlapMatch} Shared
+                                        </p>
+                                        <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
                                             {meal.title}
                                         </h4>
-                                        <div className="mt-1 inline-block px-2 py-0.5 bg-emerald-600 text-white rounded text-[8px] font-bold uppercase tracking-wider">
-                                            {(meal as any).overlapMatch} Shared
-                                        </div>
                                     </div>
+                                    <Layers size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors relative z-10" />
                                 </a>
                             ))}
                         </div>
