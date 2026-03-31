@@ -363,6 +363,9 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         handlePasteRecipeContent: () => importer.handlePasteRecipeContent(setMessages), 
         handlePasteRecipeURL: () => importer.handlePasteRecipeURL(setMessages), 
         loadConversationFromHistory,
-        handleLoadConversationHistory, processRecipeImage: importer.processRecipeImage, setSuccessRecipe: importer.setSuccessRecipe
+        handleLoadConversationHistory, processRecipeImage: importer.processRecipeImage, setSuccessRecipe: importer.setSuccessRecipe,
+        
+        // Share and Remix state
+        recipeToShare, setRecipeToShare, recipeToRemix, setRecipeToRemix
     };
 }
