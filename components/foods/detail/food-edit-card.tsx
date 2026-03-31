@@ -8,6 +8,8 @@ import { FoodDetailContextType } from './types';
 import { CATEGORIES } from '@/components/foods/food-filters-panel';
 import { useSplitView } from '@/lib/context/split-view-context';
 
+import { createPortal } from 'react-dom';
+
 export function FoodEditCard({ ctx }: { ctx: FoodDetailContextType }) {
     const { 
         isEditing, setIsEditing, editName, setEditName, editCommonName, setEditCommonName,
@@ -36,9 +38,9 @@ export function FoodEditCard({ ctx }: { ctx: FoodDetailContextType }) {
         }
     };
 
-    return (
+    return createPortal(
         <div className={cn(
-            "fixed inset-0 md:inset-auto md:top-0 md:bottom-0 md:right-0 z-[120] transition-all duration-300 animate-in slide-in-from-right-8 fade-in flex flex-col bg-slate-950/80 backdrop-blur-3xl md:border-l md:border-slate-800 shadow-2xl pt-safe md:pt-[3.5rem]",
+            "fixed inset-0 md:inset-auto md:top-0 md:bottom-0 md:right-0 z-[1000] transition-all duration-300 animate-in slide-in-from-right-8 fade-in flex flex-col bg-slate-950/80 backdrop-blur-3xl md:border-l md:border-slate-800 shadow-2xl pt-safe md:pt-[3.5rem]",
             getChatWidth()
         )}>
             {/* Header */}
@@ -168,6 +170,7 @@ export function FoodEditCard({ ctx }: { ctx: FoodDetailContextType }) {
                     </Button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
