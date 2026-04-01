@@ -7,6 +7,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
 import { isFlavoringIngredient } from '@/lib/services/nutrition';
 import { calculateAggregatedNutrition } from '@/lib/utils/nutrition-utils';
+import { parseRecipeAmount } from '@/lib/utils/parsing-utils';
 import { useSmartMatch } from '@/hooks/use-smart-match';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
@@ -171,6 +172,21 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     useEffect(() => {
         fetchRecipeDetails();
     }, [recipeId]);
+
+    // Initialize stepTwoInputs with original quantities when ingredients load
+    useEffect(() => {
+        if (ingredients.length > 0 && Object.keys(stepTwoInputs).length === 0) {
+            const initialized: Record<string, { multiplier: string; measure: string }> = {};
+            ingredients.forEach(ing => {
+                const { quantity } = parseRecipeAmount(ing.amount, ing.item);
+                initialized[ing.id] = {
+                    multiplier: String(Math.round(quantity * 100) / 100),
+                    measure: ''
+                };
+            });
+            setStepTwoInputs(initialized);
+        }
+    }, [ingredients]);
 
     // Auto-transition to Step 2 once all ingredients are decided
     useEffect(() => {

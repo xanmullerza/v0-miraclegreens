@@ -571,9 +571,12 @@ function PortionRow({
     const dbItem = matchedIngredients[ing.id];
     const isAccepted = !!stepTwoSaved[ing.id];
 
-    const inputs = stepTwoInputs[ing.id] || {
-        multiplier: String(Math.round(originalDetails.quantity * 100) / 100),
-        measure: ''
+    // Ensure multiplier always has a value (original quantity)
+    const baseInputs = stepTwoInputs[ing.id];
+    const inputs = {
+        multiplier: baseInputs?.multiplier || String(Math.round(originalDetails.quantity * 100) / 100),
+        measure: baseInputs?.measure || '',
+        isSaving: baseInputs?.isSaving || false
     };
 
     const liveUnitWeight = !isNaN(Number(inputs.measure)) ? Number(inputs.measure) : 0;
