@@ -41,23 +41,6 @@ function singularize(word: string): string {
 }
 
 /**
- * Helper to fetch portions for a food item
- */
-async function fetchPortionsForItem(foodItemId: string): Promise<any[]> {
-    try {
-        const { data } = await supabase
-            .from('food_measures')
-            .select('id, label, weight_g')
-            .eq('food_item_id', foodItemId)
-            .order('weight_g', { ascending: false });
-        return data || [];
-    } catch (err) {
-        console.error(`[Portions Fetch] Error fetching portions for ${foodItemId}:`, err);
-        return [];
-    }
-}
-
-/**
  * Searches for food items in the local Supabase database.
  */
 export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
@@ -127,30 +110,22 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
 
     if (error || !data) return [];
 
-    // Fetch portions for all items in parallel
-    const itemsWithPortions = await Promise.all(
-        data.map(async (item) => {
-            const portions = await fetchPortionsForItem(item.id);
-            return {
-                id: item.id,
-                name: item.name,
-                common_name: item.common_name,
-                category: item.category || null,
-                image: item.image || null,
-                energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
-                energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
-                protein_g: item.protein_g,
-                carbs_g: item.carbs_g,
-                fat_g: item.fat_g,
-                micronutrients: item.micronutrients || {},
-                phytonutrients: item.phytonutrients || {},
-                portions: portions,
-                source: 'local' as const
-            };
-        })
-    );
-
-    return itemsWithPortions.sort((a, b) => {
+    return data.map(item => ({
+        id: item.id,
+        name: item.name,
+        common_name: item.common_name,
+        category: item.category || null,
+        image: item.image || null,
+        energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
+        energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
+        protein_g: item.protein_g,
+        carbs_g: item.carbs_g,
+        fat_g: item.fat_g,
+        micronutrients: item.micronutrients || {},
+        phytonutrients: item.phytonutrients || {},
+        portions: (item.portions || []) as FoodMeasure[],
+        source: 'local' as const
+    })).sort((a, b) => {
         const aName = a.name.toLowerCase();
         const bName = b.name.toLowerCase();
         const aCommon = (a.common_name || "").toLowerCase();
