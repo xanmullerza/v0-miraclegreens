@@ -248,6 +248,7 @@ export function PortionMatchPanel({
                 <CustomMeasurementDialog
                     unmappedIngredients={unmappedIngredients}
                     onComplete={handleMeasurementDialogComplete}
+                    onCancel={() => setShowMeasurementDialog(false)}
                     isOpen={showMeasurementDialog}
                 />
             </div>

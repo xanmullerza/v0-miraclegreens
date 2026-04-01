@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Loader2, ChevronRight, ChevronLeft, Scale, Check } from 'lucide-react';
+import { Loader2, ChevronRight, ChevronLeft, Scale, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { parseRecipeAmount } from '@/lib/utils/parsing-utils';
@@ -17,12 +17,14 @@ interface UnmappedIngredient {
 interface CustomMeasurementDialogProps {
     unmappedIngredients: UnmappedIngredient[];
     onComplete: () => void;
+    onCancel?: () => void;
     isOpen: boolean;
 }
 
 export function CustomMeasurementDialog({
     unmappedIngredients,
     onComplete,
+    onCancel,
     isOpen
 }: CustomMeasurementDialogProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -98,14 +100,23 @@ export function CustomMeasurementDialog({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-200">
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-in scale-in-95 duration-200">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 rounded-t-2xl">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Scale size={20} className="text-white" />
-                        <h2 className="text-lg font-bold text-white">Measure Portion</h2>
+                <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 rounded-t-2xl flex items-start justify-between">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Scale size={20} className="text-white" />
+                            <h2 className="text-lg font-bold text-white">Measure Portion</h2>
+                        </div>
+                        <p className="text-indigo-100 text-sm">
+                            Step {currentIndex + 1} of {unmappedIngredients.length}
+                        </p>
                     </div>
-                    <p className="text-indigo-100 text-sm">
-                        Step {currentIndex + 1} of {unmappedIngredients.length}
-                    </p>
+                    <button
+                        onClick={onCancel}
+                        className="p-1 hover:bg-indigo-500/50 rounded-lg transition-colors text-white"
+                        title="Close"
+                    >
+                        <X size={20} />
+                    </button>
                 </div>
 
                 {/* Content */}
@@ -183,6 +194,14 @@ export function CustomMeasurementDialog({
                         className="flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600"
                     >
                         Skip
+                    </button>
+
+                    {/* Cancel Button */}
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 hover:bg-rose-200 dark:hover:bg-rose-900/50"
+                    >
+                        Cancel
                     </button>
 
                     {/* Save/Next Button */}
