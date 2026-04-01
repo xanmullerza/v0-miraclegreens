@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Loader2, ChevronRight, ChevronLeft, Scale, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { parseRecipeAmount } from '@/lib/utils/parsing-utils';
 
 interface UnmappedIngredient {
     id: string;
@@ -35,6 +36,10 @@ export function CustomMeasurementDialog({
     const weight = weightsGrams[current.id] || '';
     const isSkipped = skipped.has(current.id);
 
+    // Parse the recipe amount to extract measure unit (e.g., "4 tbsp" → "tbsp")
+    const originalDetails = parseRecipeAmount(current.amount, current.item);
+    const measureUnit = originalDetails.measure_label || current.amount;
+
     const handleSaveMeasurement = async () => {
         if (!weight || isNaN(Number(weight))) {
             toast.error('Please enter a valid weight in grams');
@@ -43,8 +48,9 @@ export function CustomMeasurementDialog({
 
         setSavingIndex(currentIndex);
         try {
-            // Generate label from original amount text
-            const label = `${current.amount} (measured)`;
+            // Generate label from measure unit (e.g., "tbsp" instead of "4 tbsp")
+            // This way "4 tbsp" and "5 tbsp" both use the same "tbsp" measure
+            const label = `${measureUnit}`;
 
             const { error } = await supabase
                 .from('food_measures')
@@ -56,7 +62,7 @@ export function CustomMeasurementDialog({
 
             if (error) throw error;
 
-            toast.success(`✓ Saved: ${label}`);
+            toast.success(`✓ Saved: 1 ${measureUnit} = ${weight}g`);
             moveToNext();
         } catch (err: any) {
             console.error('Error saving measurement:', err);
@@ -105,11 +111,11 @@ export function CustomMeasurementDialog({
                     {/* Instructions */}
                     <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                            Please measure <span className="font-bold">{current.amount}</span> of{' '}
+                            Please measure <span className="font-bold">1 {measureUnit}</span> of{' '}
                             <span className="font-bold">{current.item}</span> on a scale and enter the weight below.
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
-                            This custom portion will be saved for future recipe matching.
+                            The recipe calls for {current.amount}, but we're measuring 1 unit so it can be reused for future recipes.
                         </p>
                     </div>
 
@@ -119,9 +125,9 @@ export function CustomMeasurementDialog({
                             <Scale size={18} className="text-indigo-600 dark:text-indigo-300" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-indigo-600 dark:text-indigo-300 uppercase tracking-widest">Original</p>
+                            <p className="text-xs font-bold text-indigo-600 dark:text-indigo-300 uppercase tracking-widest">Measure</p>
                             <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-100">
-                                {current.amount} {current.item}
+                                1 {measureUnit} of {current.item}
                             </p>
                         </div>
                     </div>
