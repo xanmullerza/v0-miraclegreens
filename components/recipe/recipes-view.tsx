@@ -139,6 +139,10 @@ export function RecipesView({
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
+        setShowOnlyMyRecipes(onlyMyRecipes);
+    }, [onlyMyRecipes]);
+
+    useEffect(() => {
         if (user) {
             const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
             setIsAdmin(user.email?.toLowerCase() === adminEmail.toLowerCase());
@@ -151,7 +155,7 @@ export function RecipesView({
         if (!authLoading) {
             fetchRecipes(0, true);
         }
-    }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty, showOnlyMyRecipes, isMix, isRemix]);
+    }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty, showOnlyMyRecipes, isMix, isRemix, user];
 
 
     const fetchRecipes = async (pageToLoad: number, isNewSearch = false) => {
