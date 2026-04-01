@@ -18,6 +18,7 @@ import { NutrientFilterPanel } from '@/components/nutrients/nutrients-view';
 import { Loader2, X } from 'lucide-react';
 import { PanelWrapper } from './panel-wrapper';
 import { PortionMatchPanel } from '@/components/recipe/detail/portion-match-panel';
+import { IngredientMatchDialog } from '@/components/recipe/detail/ingredient-match-dialog';
 
 // New View Components
 import { AssistantView } from './views/AssistantView';
@@ -38,7 +39,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
     const { 
         activeView, previousView, navigateTo, excludeFlavour, 
         setExcludeFlavour, excludeSupplements, setExcludeSupplements,
-        contextRecipeId, smartMatchPicker, setSmartMatchPicker, smartMatchPortion
+        contextRecipeId, smartMatchPicker, setSmartMatchPicker, smartMatchPortion, ingredientMatch
     } = useActionPanel();
     
     const { filters } = useRecipeFilter();
@@ -223,6 +224,16 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                     state={smartMatchPortion}
                     onBack={() => { smartMatchPortion.onBack(); handleBack(); }}
                     onFinalize={smartMatchPortion.onFinalize}
+                />
+            );
+        case 'ingredient-match':
+            if (!ingredientMatch) return null;
+            return (
+                <IngredientMatchDialog
+                    unmatchedIngredients={ingredientMatch.unmatchedIngredients}
+                    onComplete={ingredientMatch.onComplete}
+                    onMatched={ingredientMatch.onMatched}
+                    isOpen={activeView === 'ingredient-match'}
                 />
             );
         case 'shopping': return <ShoppingPanel />;

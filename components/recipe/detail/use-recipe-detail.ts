@@ -5,9 +5,9 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
-import { isFlavoringIngredient } from '@/lib/services/nutrition';
+import { isFlavoringIngredient, searchFoodItem } from '@/lib/services/nutrition';
 import { calculateAggregatedNutrition } from '@/lib/utils/nutrition-utils';
-import { parseRecipeAmount } from '@/lib/utils/parsing-utils';
+import { parseRecipeAmount, extractCoreName } from '@/lib/utils/parsing-utils';
 import { useSmartMatch } from '@/hooks/use-smart-match';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
@@ -64,7 +64,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // User preferences and RDA
     const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
-    const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo, setSmartMatchPicker, setSmartMatchPortion } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo, setSmartMatchPicker, setSmartMatchPortion, setIngredientMatch } = useActionPanel();
     const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
     
@@ -458,6 +458,89 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         }
     };
 
+    const runAutoMatch = async () => {
+        setSmartMatchRunning(true);
+        const loadingToastId = toast.loading("Auto-matching ingredients...");
+        
+        try {
+            const autoMatched: Record<string, any> = {};
+            const unmatchable: typeof ingredients = [];
+            const autoSkipped: string[] = [];
+
+            for (const ing of ingredients) {
+                const ingName = ing.base_ingredient || ing.item;
+                
+                // Auto-skip flavorings
+                if (isFlavoringIngredient({ name: ingName } as any)) {
+                    autoSkipped.push(ing.id);
+                    continue;
+                }
+
+                // Search for first match
+                const searchTerm = extractCoreName(ingName);
+                if (!searchTerm || searchTerm.length < 2) {
+                    unmatchable.push(ing);
+                    continue;
+                }
+
+                const results = await searchFoodItem(searchTerm);
+                
+                if (results && results.length > 0) {
+                    // Auto-accept first result (highest confidence)
+                    autoMatched[ing.id] = results[0];
+                    setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
+                } else {
+                    // No match found - needs manual selection
+                    unmatchable.push(ing);
+                }
+            }
+
+            // Update matched ingredients
+            setMatchedIngredients(prev => ({ ...prev, ...autoMatched }));
+
+            // Mark auto-skipped flavorings
+            autoSkipped.forEach(id => {
+                setSkippedIngredients(prev => ({ ...prev, [id]: true }));
+            });
+
+            toast.dismiss(loadingToastId);
+
+            // Show dialog for unmatchable items if any
+            if (unmatchable.length > 0) {
+                const unmatchableForDialog = unmatchable.map(ing => ({
+                    id: ing.id,
+                    item: ing.item,
+                    base_ingredient: ing.base_ingredient,
+                    amount: ing.amount
+                }));
+
+                setIngredientMatch({
+                    unmatchedIngredients: unmatchableForDialog,
+                    onComplete: () => {
+                        setIngredientMatch(null);
+                        // Transition to portion match
+                        setMappingStep('PORTION_MATCH');
+                    },
+                    onMatched: (ingId: string, foodItem: any) => {
+                        setMatchedIngredients(prev => ({ ...prev, [ingId]: foodItem }));
+                        setAcceptedMatches(prev => ({ ...prev, [ingId]: true }));
+                    }
+                });
+                navigateTo('ingredient-match');
+                toast.success(`Auto-matched ${Object.keys(autoMatched).length} ingredients. ${unmatchable.length} need manual selection.`, { duration: 2000 });
+            } else {
+                toast.success(`✓ Successfully auto-matched all ${Object.keys(autoMatched).length} ingredients!`, { id: loadingToastId });
+                // No unmatchable items - proceed to portion matching
+                setMappingStep('PORTION_MATCH');
+            }
+        } catch (err: any) {
+            console.error('Auto-match error:', err);
+            toast.error('Auto-match failed');
+        } finally {
+            setSmartMatchRunning(false);
+        }
+    };
+
     const finalizeRecipeNutrition = async () => {
         if (!recipe) return;
         
@@ -707,6 +790,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         
         toggleFavorite,
         runSmartMatch,
+        runAutoMatch,
         finalizeRecipeNutrition,
         processAcceptIngredient,
         handleEditClick,

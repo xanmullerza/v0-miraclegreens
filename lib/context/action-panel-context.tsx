@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type ActionPanelView = 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters';
+export type ActionPanelView = 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'ingredient-match' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters';
 
 export interface SmartMatchPickerState {
     initialSearchQuery: string;
@@ -25,6 +25,12 @@ export interface SmartMatchPortionState {
     onBack: () => void;
     onFinalize?: () => Promise<void>;
     onSkipIngredients?: (ingIds: string[]) => void;
+}
+
+export interface IngredientMatchState {
+    unmatchedIngredients: Array<{ id: string; item: string; base_ingredient: string; amount: string }>;
+    onComplete: () => void;
+    onMatched: (ingId: string, foodItem: any) => void;
 }
 
 interface ActionPanelContextType {
@@ -51,6 +57,8 @@ interface ActionPanelContextType {
     setSmartMatchPicker: (state: SmartMatchPickerState | null) => void;
     smartMatchPortion: SmartMatchPortionState | null;
     setSmartMatchPortion: (state: SmartMatchPortionState | null) => void;
+    ingredientMatch: IngredientMatchState | null;
+    setIngredientMatch: (state: IngredientMatchState | null) => void;
 }
 
 const ActionPanelContext = createContext<ActionPanelContextType | undefined>(undefined);
@@ -67,6 +75,7 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [contextRecipeId, setContextRecipeId] = useState<string | null>(null);
     const [smartMatchPicker, setSmartMatchPicker] = useState<SmartMatchPickerState | null>(null);
     const [smartMatchPortion, setSmartMatchPortion] = useState<SmartMatchPortionState | null>(null);
+    const [ingredientMatch, setIngredientMatch] = useState<IngredientMatchState | null>(null);
 
     // Initialize correct default view based on screen size across all routes
     React.useEffect(() => {
@@ -130,6 +139,8 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             setSmartMatchPicker,
             smartMatchPortion,
             setSmartMatchPortion,
+            ingredientMatch,
+            setIngredientMatch,
         }}>
             {children}
         </ActionPanelContext.Provider>

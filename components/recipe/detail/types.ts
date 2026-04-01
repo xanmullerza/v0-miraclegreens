@@ -119,6 +119,7 @@ export interface RecipeDetailData {
     // Actions
     toggleFavorite: () => Promise<void>;
     runSmartMatch: () => Promise<void>;
+    runAutoMatch: () => Promise<void>;
     finalizeRecipeNutrition: () => Promise<void>;
     processAcceptIngredient: (ing: Ingredient, matchedItem: any) => void;
     handleEditClick: () => void;

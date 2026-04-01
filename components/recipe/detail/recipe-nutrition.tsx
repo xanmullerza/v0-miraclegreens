@@ -83,7 +83,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         mineralThreshold, setMineralThreshold, waterSolubleThreshold, setWaterSolubleThreshold,
         storedVitaminThreshold, setStoredVitaminThreshold,
         findNutrientMatch, energyUnit, nutrientDisplayMode, userRDAs, profile,
-        runSmartMatch, smartMatchRunning
+        runAutoMatch, smartMatchRunning
     } = ctx;
 
     if (!recipe) return null;
@@ -103,7 +103,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                         <p className="text-sm text-indigo-700/80 dark:text-indigo-400/80 mb-4 leading-relaxed">
                             This recipe hasn&apos;t been analyzed yet. Run Smart Match to map ingredients to our nutrition database.
                         </p>
-                        <button onClick={runSmartMatch} disabled={smartMatchRunning}
+                        <button onClick={runAutoMatch} disabled={smartMatchRunning}
                             className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-70">
                             {smartMatchRunning ? <><Loader2 size={16} className="animate-spin" /> Analyzing...</> : <><Zap size={16} className="fill-current" /> Run Smart Match</>}
                         </button>
