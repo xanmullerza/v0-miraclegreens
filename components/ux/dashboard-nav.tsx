@@ -13,13 +13,17 @@ export function DashboardNav() {
 
     // Determine active button
     const getActiveButton = () => {
-        if (pathname.includes('/tracker')) {
-            if (typeof window !== 'undefined') {
-                const searchParams = new URLSearchParams(window.location.search);
-                const tab = searchParams.get('tab');
-                if (tab === 'shopping') return 'shopping';
-                if (tab === 'pantry') return 'pantry';
-                if (tab === 'planner') return 'planner';
+        if (pathname.includes('/recipes')) {
+            const searchParams = new URLSearchParams(window.location.search);
+            const tab = searchParams.get('tab');
+            const view = searchParams.get('view');
+            
+            if (pathname === '/recipes/planner') return 'planner';
+            if (tab === 'planner') return 'planner';
+            if (tab === 'foods') {
+                if (view === 'list') return 'shopping';
+                if (view === 'pantry') return 'pantry';
+                return 'foods';
             }
         }
         return null;
@@ -30,9 +34,9 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/tracker?tab=shopping', color: 'amber' },
-        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/tracker?tab=pantry', color: 'sky' },
-        { id: 'planner', icon: Calendar, label: 'Planner', path: '/tracker?tab=planner', color: 'purple' },
+        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/recipes?tab=foods&view=list', color: 'amber' },
+        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/recipes?tab=foods&view=pantry', color: 'sky' },
+        { id: 'planner', icon: Calendar, label: 'Planner', path: '/recipes/planner', color: 'purple' },
     ];
 
     return (

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { PageContainer } from '@/components/ui/page-container';
-import { Shield, Scale, Globe, BookOpen, TrendingUp, Users, Settings, ChevronRight, MessageCircle } from 'lucide-react';
+import { Shield, Scale, Globe, BookOpen, Calendar, TrendingUp, Users, Settings, ChevronRight, MessageCircle } from 'lucide-react';
 import { Carousel } from '@/components/ui/carousel';
 
 export default function AboutUsPage() {
@@ -142,30 +142,30 @@ export default function AboutUsPage() {
                                 </div>
                             </div>
 
-                            {/* Tracker Card */}
-                            <div className="bg-green-500/10 dark:bg-green-500/20 rounded-3xl p-6 border border-green-500/20 shadow-sm relative overflow-hidden group">
+                            {/* Planner Card */}
+                            <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
-                                    <TrendingUp size={120} className="text-green-500 -rotate-12" />
+                                    <Calendar size={120} className="text-blue-500 -rotate-12" />
                                 </div>
                                 <div className="flex items-center gap-2 mb-6">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Tracker</h3>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Planner</h3>
                                 </div>
                                 <div className="flex flex-col gap-4 relative z-10">
                                     <button
-                                        onClick={() => router.push('/tracker')}
-                                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-green-500/20 hover:border-green-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
+                                        onClick={() => router.push('/recipes/planner')}
+                                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-blue-500/20 hover:border-blue-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center group-hover/btn:bg-green-500 group-hover/btn:text-white transition-all">
-                                                <TrendingUp size={24} className="text-green-600 dark:text-green-400 group-hover/btn:text-white" />
+                                            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover/btn:bg-blue-500 group-hover/btn:text-white transition-all">
+                                                <Calendar size={24} className="text-blue-600 dark:text-blue-400 group-hover/btn:text-white" />
                                             </div>
                                             <div className="text-left">
-                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Open Tracker</h4>
-                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Monitor your nutritional intake</p>
+                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Open Planner</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Plan your weekly molecular meals</p>
                                             </div>
                                         </div>
-                                        <ChevronRight size={20} className="text-slate-300 group-hover/btn:text-green-500 group-hover/btn:translate-x-1 transition-all" />
+                                        <ChevronRight size={20} className="text-slate-300 group-hover/btn:text-blue-500 group-hover/btn:translate-x-1 transition-all" />
                                     </button>
                                 </div>
                             </div>

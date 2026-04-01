@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Beaker, Info, Shield, HelpCircle, BookOpen } from 'lucide-react';
+import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Calendar, Info, Shield, HelpCircle, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -81,7 +81,7 @@ export function HeaderLogo({
                         { label: 'Mission', path: '/', icon: Info, color: 'text-purple-500' },
                         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
                         { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-                        { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500' },
+                        { label: 'Planner', path: '/recipes/planner', icon: Calendar, color: 'text-emerald-500' },
                     ].map((item: any) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');

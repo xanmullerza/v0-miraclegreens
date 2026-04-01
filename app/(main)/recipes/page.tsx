@@ -23,11 +23,26 @@ function RecipesPageContent() {
     const { profile } = useUserPreferences();
     
     const initialTab = (searchParams.get('tab') as TabId) || 'recipes';
+    const initialView = (searchParams.get('view') as InventoryView) || 'foods';
+    
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
-    const [inventoryView, setInventoryView] = useState<InventoryView>('foods');
+    const [inventoryView, setInventoryView] = useState<InventoryView>(initialView);
     const [showInventoryMenu, setShowInventoryMenu] = useState(false);
     const [scannerOpen, setScannerOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+
+    // Sync state with URL params
+    useEffect(() => {
+        const tab = searchParams.get('tab') as TabId;
+        if (tab && tab !== activeTab) {
+            setActiveTab(tab);
+        }
+        
+        const view = searchParams.get('view') as InventoryView;
+        if (view && view !== inventoryView) {
+            setInventoryView(view);
+        }
+    }, [searchParams]);
 
     const tabs: { id: TabId; label: string; activeColor: string }[] = [
         { id: 'recipes', label: 'Recipes', activeColor: 'text-emerald-500' },
@@ -39,7 +54,16 @@ function RecipesPageContent() {
         setActiveTab(id);
         if (id === 'recipes') router.push('/recipes');
         else if (id === 'planner') router.push('/recipes/planner');
-        else router.push(`/recipes?tab=${id}`);
+        else {
+            const viewQuery = id === 'foods' && inventoryView !== 'foods' ? `&view=${inventoryView}` : '';
+            router.push(`/recipes?tab=${id}${viewQuery}`);
+        }
+    };
+
+    const handleViewChange = (view: InventoryView) => {
+        setInventoryView(view);
+        setShowInventoryMenu(false);
+        router.push(`/recipes?tab=foods&view=${view}`);
     };
 
     return (
@@ -104,10 +128,7 @@ function RecipesPageContent() {
                                         {showInventoryMenu && (
                                             <div className="absolute top-full mt-2 left-0 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xl z-50 p-1 min-w-[140px]">
                                                 <button
-                                                    onClick={() => {
-                                                        setInventoryView('foods');
-                                                        setShowInventoryMenu(false);
-                                                    }}
+                                                    onClick={() => handleViewChange('foods')}
                                                     className={cn(
                                                         "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                         inventoryView === 'foods'
@@ -119,10 +140,7 @@ function RecipesPageContent() {
                                                     Foods
                                                 </button>
                                                 <button
-                                                    onClick={() => {
-                                                        setInventoryView('list');
-                                                        setShowInventoryMenu(false);
-                                                    }}
+                                                    onClick={() => handleViewChange('list')}
                                                     className={cn(
                                                         "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                         inventoryView === 'list'
@@ -134,10 +152,7 @@ function RecipesPageContent() {
                                                     List
                                                 </button>
                                                 <button
-                                                    onClick={() => {
-                                                        setInventoryView('pantry');
-                                                        setShowInventoryMenu(false);
-                                                    }}
+                                                    onClick={() => handleViewChange('pantry')}
                                                     className={cn(
                                                         "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                         inventoryView === 'pantry'
@@ -149,10 +164,7 @@ function RecipesPageContent() {
                                                     Pantry
                                                 </button>
                                                 <button
-                                                    onClick={() => {
-                                                        setInventoryView('cart');
-                                                        setShowInventoryMenu(false);
-                                                    }}
+                                                    onClick={() => handleViewChange('cart')}
                                                     className={cn(
                                                         "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                         inventoryView === 'cart'
