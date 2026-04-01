@@ -63,6 +63,8 @@ export function FoodsView({
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
 
+    const currentSortLabel = FOOD_SORT_OPTIONS.find(opt => opt.id === sortField)?.label || 'Sort';
+
     const handleAddToCart = (e: React.MouseEvent, food: FoodItem) => {
         e.preventDefault();
         e.stopPropagation();
