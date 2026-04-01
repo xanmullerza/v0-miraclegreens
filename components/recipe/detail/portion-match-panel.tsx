@@ -38,11 +38,19 @@ export function PortionMatchPanel({
         // Auto-skip ingredients with no food item match OR items where auto-match has very low confidence
         const noMatch = ingredients.filter(ing => {
             // No food item match at all
-            if (!matchedIngredients[ing.id]) return true;
+            if (!matchedIngredients[ing.id]) {
+                console.log(`[Skip Debug] ${ing.item}: NO matchedIngredients entry`);
+                return true;
+            }
             
             // Has food item, but check auto-match confidence
             const dbItem = matchedIngredients[ing.id];
-            if (!dbItem?.portions || dbItem.portions.length === 0) return true; // No available measures
+            if (!dbItem?.portions || dbItem.portions.length === 0) {
+                console.log(`[Skip Debug] ${ing.item}: Matched to "${dbItem?.name}" but NO portions (${dbItem?.portions?.length || 0})`);
+                return true; // No available measures
+            }
+            
+            console.log(`[Skip Debug] ${ing.item}: Matched to "${dbItem.name}" with ${dbItem.portions.length} portions`);
             
             // Try auto-matching to see if confidence is high enough (>= 75)
             const originalDetails = parseRecipeAmount(ing.amount, ing.item);
@@ -51,6 +59,10 @@ export function PortionMatchPanel({
                 originalDetails.quantity,
                 dbItem.portions
             );
+            
+            if (!bestMatch) {
+                console.log(`[Skip Debug]   → No high-confidence measure match for "${originalDetails.measure_label}"`);
+            }
             
             // If no high-confidence match found (confidence < 75), auto-skip for manual measurement
             return !bestMatch;
