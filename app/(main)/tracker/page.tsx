@@ -90,7 +90,13 @@ export default function TrackerPage() {
                                             className={cn(
                                                 "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                 inventoryView === option.value
-                                                    ? `bg-${option.color}-600 text-white`
+                                                    ? option.value === 'foods'
+                                                        ? "bg-cyan-600 text-white"
+                                                        : option.value === 'list'
+                                                        ? "bg-emerald-600 text-white"
+                                                        : option.value === 'pantry'
+                                                        ? "bg-amber-600 text-white"
+                                                        : "bg-violet-600 text-white"
                                                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                                             )}
                                         >
