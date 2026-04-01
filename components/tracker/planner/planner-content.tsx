@@ -244,8 +244,12 @@ export function PlannerContent({
                                     <Calendar size={20}/>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-lg uppercase tracking-tight">Today's Protocol</h3>
-                                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Molecular Schedule</p>
+                                    <h3 className="font-bold text-lg uppercase tracking-tight">
+                                        {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                    </h3>
+                                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">
+                                        {new Date().toLocaleDateString('en-US', { weekday: 'long' })} Protocol
+                                    </p>
                                 </div>
                             </div>
                         </div>
