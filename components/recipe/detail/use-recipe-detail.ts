@@ -448,6 +448,23 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         ? calculateAggregatedNutrition(ingredients) 
         : { calories: 0, energyKj: 0, protein: 0, carbs: 0, fat: 0, micronutrients: {}, phytonutrients: {} };
 
+    const deleteIngredient = async (ingredientId: string) => {
+        try {
+            if (!String(recipeId).startsWith('local-')) {
+                const { error } = await supabase
+                    .from('ingredients')
+                    .delete()
+                    .eq('id', ingredientId);
+                if (error) throw error;
+            }
+            setIngredients(prev => prev.filter(i => i.id !== ingredientId));
+            toast.success('Ingredient removed from recipe');
+        } catch (error: any) {
+            console.error('Error deleting ingredient:', error);
+            toast.error('Failed to remove ingredient');
+        }
+    };
+
     return {
         recipe,
         setRecipe,
@@ -507,6 +524,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         processAcceptIngredient,
         handleEditClick,
         fetchRecipeDetails,
+        deleteIngredient,
         
         findNutrientMatch,
         

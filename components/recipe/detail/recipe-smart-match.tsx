@@ -4,7 +4,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import {
     ArrowLeft, Loader2, Activity, UtensilsCrossed, Layers, Sparkles,
-    Check, RefreshCw, X, Search, AlertTriangle, Flame, RotateCcw
+    Check, RefreshCw, X, Search, AlertTriangle, Flame, RotateCcw, Trash2
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -31,6 +31,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
         usdaExpanded, setUsdaExpanded,
         smartMatchRunning, processAcceptIngredient,
         finalizeRecipeNutrition, setIngredients,
+        deleteIngredient,
     } = ctx;
 
     if (!recipe) return null;
@@ -79,6 +80,25 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
         }
     };
 
+    const handleSmartMatchDelete = async () => {
+        const currentItem = smartMatch.queue[smartMatch.currentIdx];
+        if (!currentItem) return;
+        
+        if (confirm(`Are you sure you want to permanently delete "${currentItem.ingredient.base_ingredient || currentItem.ingredient.item}" from this recipe?`)) {
+            await deleteIngredient(currentItem.ingredient.id);
+            
+            // Advance queue
+            const nextIdx = smartMatch.currentIdx + 1;
+            if (nextIdx < smartMatch.queue.length) {
+                smartMatch.setCurrentIdx(nextIdx);
+                smartMatch.setResults(smartMatch.queue[nextIdx].results);
+            } else {
+                smartMatch.setShowPicker(false);
+                smartMatch.reset();
+            }
+        }
+    };
+
     return (
         <>
             {/* Smart Match Picker Modal */}
@@ -86,6 +106,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                 <FoodItemPicker
                     onSelect={handleSmartMatchPickerSelect}
                     onSkip={handleSmartMatchSkip}
+                    onDelete={handleSmartMatchDelete}
                     onClose={() => smartMatch.reset()}
                     mode="all"
                     isAdmin={false}
@@ -114,6 +135,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                     usdaExpanded={usdaExpanded}
                     setUsdaExpanded={setUsdaExpanded}
                     processAcceptIngredient={processAcceptIngredient}
+                    deleteIngredient={deleteIngredient}
                 />
             )}
 
@@ -149,6 +171,7 @@ function StepOneFoodMatch({
     usdaResults, setUsdaResults, usdaLoading, setUsdaLoading,
     usdaExpanded, setUsdaExpanded,
     processAcceptIngredient,
+    deleteIngredient,
 }: {
     ingredients: Ingredient[];
     matchedIngredients: Record<string, any>;
@@ -166,6 +189,7 @@ function StepOneFoodMatch({
     usdaExpanded: Record<string, boolean>;
     setUsdaExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
     processAcceptIngredient: (ing: Ingredient, matchedItem: any) => void;
+    deleteIngredient: (id: string) => Promise<void>;
 }) {
     return (
         <div className="space-y-4">
@@ -212,6 +236,7 @@ function StepOneFoodMatch({
                         usdaExpanded={usdaExpanded}
                         setUsdaExpanded={setUsdaExpanded}
                         processAcceptIngredient={processAcceptIngredient}
+                        deleteIngredient={deleteIngredient}
                     />
                 ))}
             </div>
@@ -228,6 +253,7 @@ function IngredientMatchCard({
     usdaResults, setUsdaResults, usdaLoading, setUsdaLoading,
     usdaExpanded, setUsdaExpanded,
     processAcceptIngredient,
+    deleteIngredient,
 }: {
     ing: Ingredient;
     matchedIngredients: Record<string, any>;
@@ -245,6 +271,7 @@ function IngredientMatchCard({
     usdaExpanded: Record<string, boolean>;
     setUsdaExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
     processAcceptIngredient: (ing: Ingredient, matchedItem: any) => void;
+    deleteIngredient: (id: string) => Promise<void>;
 }) {
     const isMatched = !!matchedIngredients[ing.id];
     const isFlipped = !!flippedCards[ing.id];
@@ -372,6 +399,12 @@ function IngredientMatchCard({
                                     className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" title="Restore">
                                     <RotateCcw size={12} />
                                     RESTORE
+                                </button>
+                            )}
+                            {!isAccepted && (
+                                <button onClick={() => { if(confirm('Delete this ingredient?')) deleteIngredient(ing.id); }}
+                                    className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-full transition-colors" title="Delete Ingredient">
+                                    <Trash2 size={16} />
                                 </button>
                             )}
                         </div>

@@ -1,6 +1,6 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Search, X, Database, Loader2, Sparkles, Plus, SkipForward } from 'lucide-react';
+import { Search, X, Database, Loader2, Sparkles, Plus, SkipForward, Trash2 } from 'lucide-react';
 import { searchFoodItem, getUSDAFoodDetails, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
@@ -22,6 +22,7 @@ interface FoodItemPickerProps {
     onSelect: (foodItem: FoodItem) => void;
     onClose: () => void;
     onSkip?: () => void;
+    onDelete?: () => void;
     mode?: 'all' | 'usda-only';
     isAdmin?: boolean;
     inline?: boolean;
@@ -35,6 +36,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [sourceFilter, setSourceFilter] = useState<'all' | 'usda' | 'local'>('all');
+    const isSmartMatch = !!onSkip;
     const [hasInitialResults] = useState(!!initialResults && initialResults.length > 0);
     
     // User preferences
@@ -258,7 +260,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                         <div className="flex items-center gap-2">
                             <Database className="w-5 h-5 text-violet-500" />
                             <h2 className="text-lg font-black uppercase tracking-tighter text-foreground italic">
-                                {hasInitialResults ? `Matching: ${initialSearchQuery}` : 'Food Database (USDA + Local)'}
+                                {isSmartMatch ? `Matching: ${initialSearchQuery}` : 'Food Database (USDA + Local)'}
                             </h2>
                         </div>
                         <button
@@ -318,7 +320,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                         </div>
 
                         {/* Action Buttons (Smart Match Mode) */}
-                        {hasInitialResults && (
+                        {isSmartMatch && (
                             <div className="flex gap-2 pt-2">
                                 <button
                                     onClick={() => setShowManualEntry(true)}
@@ -334,6 +336,15 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                                     <SkipForward size={12} />
                                     Skip
                                 </button>
+                                {onDelete && (
+                                    <button
+                                        onClick={onDelete}
+                                        className="w-9 h-9 text-rose-600 rounded-lg bg-rose-500/10 border border-rose-300 hover:bg-rose-500/20 transition-all flex items-center justify-center"
+                                        title="Delete Ingredient"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -458,7 +469,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                             <div className="flex items-center gap-2">
                                 <Database className="w-5 h-5 text-violet-500" />
                                 <h2 className="text-xl font-black uppercase tracking-tighter text-foreground italic">
-                                    {hasInitialResults ? `Matching: ${initialSearchQuery}` : 'Food Database (USDA + Local)'}
+                                    {isSmartMatch ? `Matching: ${initialSearchQuery}` : 'Food Database (USDA + Local)'}
                                 </h2>
                             </div>
                             <button
@@ -518,7 +529,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                             </div>
 
                             {/* Action Buttons (Smart Match Mode) */}
-                            {hasInitialResults && (
+                            {isSmartMatch && (
                                 <div className="flex gap-2 pt-2">
                                     <button
                                         onClick={() => setShowManualEntry(true)}
@@ -534,6 +545,15 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all'
                                         <SkipForward size={12} />
                                         Skip
                                     </button>
+                                    {onDelete && (
+                                        <button
+                                            onClick={onDelete}
+                                            className="w-9 h-9 text-rose-600 rounded-lg bg-rose-500/10 border border-rose-300 hover:bg-rose-500/20 transition-all flex items-center justify-center"
+                                            title="Delete Ingredient"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>
