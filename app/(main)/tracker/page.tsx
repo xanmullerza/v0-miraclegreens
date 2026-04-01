@@ -73,30 +73,121 @@ export default function TrackerPage() {
                         <MealPlannerContent />
                     )}
                     {activeTab === 'foods' && (
-                        <div className="animate-in fade-in duration-300">
-                            {inventoryView === 'foods' && (
-                                <FoodsView 
-                                    inventoryView={inventoryView}
-                                    onInventoryViewChange={setInventoryView}
-                                    showInventoryMenu={showInventoryMenu}
-                                    onShowInventoryMenuChange={setShowInventoryMenu}
-                                />
-                            )}
-                            {inventoryView === 'list' && (
-                                <ShoppingListView
-                                    scannerOpen={scannerOpen}
-                                    onScannerOpenChange={setScannerOpen}
-                                />
-                            )}
-                            {inventoryView === 'pantry' && (
-                                <PantryView refreshKey={refreshKey} />
-                            )}
-                            {inventoryView === 'cart' && (
-                                <ShoppingListView
-                                    scannerOpen={scannerOpen}
-                                    onScannerOpenChange={setScannerOpen}
-                                />
-                            )}
+                        <div className="space-y-4 animate-in fade-in duration-300">
+                            {/* Inventory View Dropdown */}
+                            <div className="flex justify-start px-4">
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowInventoryMenu(!showInventoryMenu)}
+                                        className={cn(
+                                            "h-10 px-4 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border",
+                                            inventoryView === 'foods'
+                                                ? "bg-cyan-600 text-white border-cyan-600 shadow-lg shadow-cyan-500/20"
+                                                : inventoryView === 'list'
+                                                ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                                                : inventoryView === 'pantry'
+                                                ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
+                                                : "bg-violet-600 text-white border-violet-600 shadow-lg shadow-violet-500/20"
+                                        )}
+                                    >
+                                        {inventoryView === 'foods' && <Leaf size={12} />}
+                                        {inventoryView === 'list' && <List size={12} />}
+                                        {inventoryView === 'pantry' && <Package size={12} />}
+                                        {inventoryView === 'cart' && <ShoppingCart size={12} />}
+                                        <span>
+                                            {inventoryView === 'foods' ? 'Foods' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
+                                        </span>
+                                        <ChevronDown size={10} className={cn("transition-transform", showInventoryMenu && "rotate-180")} />
+                                    </button>
+
+                                    {showInventoryMenu && (
+                                        <div className="absolute top-full mt-2 left-0 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xl z-50 p-1 min-w-[140px]">
+                                            <button
+                                                onClick={() => {
+                                                    setInventoryView('foods');
+                                                    setShowInventoryMenu(false);
+                                                }}
+                                                className={cn(
+                                                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                    inventoryView === 'foods'
+                                                        ? "bg-cyan-600 text-white"
+                                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                <Leaf size={12} />
+                                                Foods
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setInventoryView('list');
+                                                    setShowInventoryMenu(false);
+                                                }}
+                                                className={cn(
+                                                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                    inventoryView === 'list'
+                                                        ? "bg-emerald-600 text-white"
+                                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                <List size={12} />
+                                                List
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setInventoryView('pantry');
+                                                    setShowInventoryMenu(false);
+                                                }}
+                                                className={cn(
+                                                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                    inventoryView === 'pantry'
+                                                        ? "bg-amber-600 text-white"
+                                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                <Package size={12} />
+                                                Pantry
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setInventoryView('cart');
+                                                    setShowInventoryMenu(false);
+                                                }}
+                                                className={cn(
+                                                    "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                    inventoryView === 'cart'
+                                                        ? "bg-violet-600 text-white"
+                                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                <ShoppingCart size={12} />
+                                                Cart
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* View Content */}
+                            <div>
+                                {inventoryView === 'foods' && (
+                                    <FoodsView />
+                                )}
+                                {inventoryView === 'list' && (
+                                    <ShoppingListView
+                                        scannerOpen={scannerOpen}
+                                        onScannerOpenChange={setScannerOpen}
+                                    />
+                                )}
+                                {inventoryView === 'pantry' && (
+                                    <PantryView refreshKey={refreshKey} />
+                                )}
+                                {inventoryView === 'cart' && (
+                                    <ShoppingListView
+                                        scannerOpen={scannerOpen}
+                                        onScannerOpenChange={setScannerOpen}
+                                    />
+                                )}
+                            </div>
                         </div>
                     )}
                     {activeTab === 'nutrients' && (
