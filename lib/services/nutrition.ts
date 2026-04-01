@@ -628,14 +628,35 @@ export async function searchFoodItem(query: string): Promise<FoodItemMatch[]> {
     });
 
     // Combine: Local results first (prefer local DB), then deduplicated USDA results
-    const combined = [
+    let combined = [
         ...dedupedLocal,
         ...usdaResults
     ];
 
     console.log(`[Unified Search] After dedup: ${combined.length} results`);
 
-    return combined;
+    // Fetch portions for USDA results (at least for the top few that will be shown/auto-matched)
+    // This is important for auto-matching to work when ingredients are auto-accepted
+    combined = await Promise.all(
+        combined.map(async (item) => {
+            // Only fetch for USDA items (local items already have portions)
+            if (item.source === 'usda' && item.fdcId && (!item.portions || item.portions.length === 0)) {
+                try {
+                    const details = await getUSDAFoodDetails(item.fdcId);
+                    return {
+                        ...item,
+                        portions: details.portions || []
+                    };
+                } catch (err) {
+                    console.warn(`[Portions Fetch] Could not fetch portions for USDA item ${item.fdcId}:`, err);
+                    return item;
+                }
+            }
+            return item;
+        })
+    );
+
+    return combined.slice(0, 15);
 }
 
 /**
