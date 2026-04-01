@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search } from 'lucide-react';
+import { ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search, ShoppingCart } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
@@ -55,6 +55,7 @@ export function FoodsView({
     const [hasMore, setHasMore] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [authReady, setAuthReady] = useState(false);
+    const [cartLoading, setCartLoading] = useState<string | null>(null);
 
     const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories } = useFoodFilter();
     const { setIsActionPanelOpen, setActiveView } = useActionPanel();
@@ -62,7 +63,17 @@ export function FoodsView({
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
 
-    const currentSortLabel = FOOD_SORT_OPTIONS.find(opt => opt.id === sortField)?.label || 'Sort';
+    const handleAddToCart = (e: React.MouseEvent, food: FoodItem) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCartLoading(food.id);
+        
+        // Simulate adding to cart
+        setTimeout(() => {
+            toast.success(`${food.common_name || food.name} added to cart (R${food.price?.toFixed(2) || '0.00'})`);
+            setCartLoading(null);
+        }, 300);
+    };
 
     // Use external searchQuery if provided, otherwise use internal from useSearch
     const effectiveSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
@@ -445,6 +456,20 @@ export function FoodsView({
                                             <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
                                             <span className="text-slate-300 text-[8px]">•</span>
                                             <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
+                                            {food.stocked && (
+                                                <button
+                                                    onClick={(e) => handleAddToCart(e, food)}
+                                                    className="ml-4 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-all shadow-sm"
+                                                    disabled={cartLoading === food.id}
+                                                >
+                                                    {cartLoading === food.id ? (
+                                                        <Loader2 size={12} className="animate-spin" />
+                                                    ) : (
+                                                        <ShoppingCart size={12} />
+                                                    )}
+                                                    R{food.price?.toFixed(2) || '0.00'}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </Link>
@@ -520,6 +545,20 @@ export function FoodsView({
                                     <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
                                     <span className="text-slate-300 text-[8px]">•</span>
                                     <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
+                                    {food.stocked && (
+                                        <button
+                                            onClick={(e) => handleAddToCart(e, food)}
+                                            className="ml-4 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-all shadow-sm"
+                                            disabled={cartLoading === food.id}
+                                        >
+                                            {cartLoading === food.id ? (
+                                                <Loader2 size={12} className="animate-spin" />
+                                            ) : (
+                                                <ShoppingCart size={12} />
+                                            )}
+                                            R{food.price?.toFixed(2) || '0.00'}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </Link>

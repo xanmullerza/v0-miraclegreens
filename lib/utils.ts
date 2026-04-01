@@ -28,6 +28,8 @@ export interface FoodItem {
   quantity?: string;
   user_id?: string | null;
   is_curated?: boolean;
+  price?: number | null;
+  stocked?: boolean | null;
 }
 
 // Replaces cooking method words in food names with 🔥 for display purposes.
