@@ -45,6 +45,7 @@ export default function RecipeDetailsPage() {
 
     const handleTabChange = (tabId: string) => {
         if (tabId === 'recipes') router.push('/recipes');
+        else if (tabId === 'planner') router.push('/recipes/planner');
         else router.push(`/recipes?tab=${tabId}`);
     };
 
@@ -55,10 +56,8 @@ export default function RecipeDetailsPage() {
                 <TabHeader
                     tabs={[
                         { id: 'recipes', label: 'Recipes' },
-                        { id: 'remixes', label: 'Remixes' },
-                        { id: 'mixes', label: 'Mixes' },
                         { id: 'foods', label: 'Foods' },
-                        { id: 'nutrients', label: 'Nutrients' },
+                        { id: 'planner', label: 'Planner' },
                     ]}
                     activeTab="recipes"
                     onTabChange={handleTabChange}
@@ -83,10 +82,8 @@ export default function RecipeDetailsPage() {
             <TabHeader
                 tabs={[
                     { id: 'recipes', label: 'Recipes' },
-                    { id: 'remixes', label: 'Remixes' },
-                    { id: 'mixes', label: 'Mixes' },
                     { id: 'foods', label: 'Foods' },
-                    { id: 'nutrients', label: 'Nutrients' },
+                    { id: 'planner', label: 'Planner' },
                 ]}
                 activeTab="recipes"
                 onTabChange={handleTabChange}

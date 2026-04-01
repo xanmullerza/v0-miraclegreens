@@ -5,13 +5,13 @@ import { Loader2 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesCombinedView } from '@/components/recipe/recipes-combined-view';
 import { FoodsView } from '@/components/foods/food-library-view';
-import { NutrientsView } from '@/components/nutrients/nutrients-view';
+import MealPlannerContent from '@/components/tracker/planner-content';
 import { useSearch } from '@/lib/context/search-context';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { cn } from '@/lib/utils';
 
-type TabId = 'recipes' | 'foods' | 'nutrients';
+type TabId = 'recipes' | 'foods' | 'planner';
 
 function RecipesPageContent() {
     const searchParams = useSearchParams();
@@ -24,12 +24,13 @@ function RecipesPageContent() {
     const tabs: { id: TabId; label: string; activeColor: string }[] = [
         { id: 'recipes', label: 'Recipes', activeColor: 'text-emerald-500' },
         { id: 'foods', label: 'Foods', activeColor: 'text-cyan-500' },
-        { id: 'nutrients', label: 'Nutrients', activeColor: 'text-violet-500' },
+        { id: 'planner', label: 'Planner', activeColor: 'text-blue-500' },
     ];
 
     const handleTabChange = (id: TabId) => {
         setActiveTab(id);
         if (id === 'recipes') router.push('/recipes');
+        else if (id === 'planner') router.push('/recipes/planner');
         else router.push(`/recipes?tab=${id}`);
     };
 
@@ -69,9 +70,9 @@ function RecipesPageContent() {
                                 <FoodsView />
                             </div>
                         )}
-                        {activeTab === 'nutrients' && (
+                        {activeTab === 'planner' && (
                             <div className="animate-in fade-in duration-300">
-                                <NutrientsView compact={false} />
+                                <MealPlannerContent />
                             </div>
                         )}
                     </div>

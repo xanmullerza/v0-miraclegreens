@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ChefHat, Leaf, Beaker } from 'lucide-react';
+import { Home, ChefHat, Leaf, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 
@@ -15,7 +15,7 @@ export function ContentNav() {
         { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
         { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-        { label: 'Nutrients', path: '/nutrients', icon: Beaker, color: 'text-emerald-500' },
+        { label: 'Planner', path: '/recipes/planner', icon: Calendar, color: 'text-emerald-500' },
     ];
 
     return (
