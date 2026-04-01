@@ -31,7 +31,8 @@ import {
     Box,
     Minus,
     List,
-    CheckCircle2
+    CheckCircle2,
+    ShoppingCart as ShoppingCartIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -83,6 +84,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [enriching, setEnriching] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
     const [viewMode, setViewMode] = useState<'list' | 'cart'>('list');
+    const [cartLoading, setCartLoading] = useState<string | null>(null);
 
     // Barcode scanner state
     const [internalScannerOpen, setInternalScannerOpen] = useState(false);
@@ -848,6 +850,29 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                 </span>
                                                             </div>
                                                         </div>
+
+                                                        {/* Buy Now Button */}
+                                                        {item.stocked && item.price && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setCartLoading(item.id);
+                                                                    setTimeout(() => {
+                                                                        toast.success(`${item.common_name || item.name} added to cart (R${item.price?.toFixed(2) || '0.00'})`);
+                                                                        setCartLoading(null);
+                                                                    }, 300);
+                                                                }}
+                                                                disabled={cartLoading === item.id}
+                                                                className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-all shadow-sm flex-shrink-0"
+                                                            >
+                                                                {cartLoading === item.id ? (
+                                                                    <Loader2 size={12} className="animate-spin" />
+                                                                ) : (
+                                                                    <ShoppingCartIcon size={12} />
+                                                                )}
+                                                                R{item.price?.toFixed(2) || '0.00'}
+                                                            </button>
+                                                        )}
 
                                                         {/* Pantry tick button — green only when a real weight exists */}
                                                         {(() => {
