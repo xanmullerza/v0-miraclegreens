@@ -63,7 +63,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // User preferences and RDA
     const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
-    const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo, setSmartMatchPicker } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo, setSmartMatchPicker, setSmartMatchPortion } = useActionPanel();
     const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
     
@@ -534,6 +534,79 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         ? calculateAggregatedNutrition(ingredients) 
         : { calories: 0, energyKj: 0, protein: 0, carbs: 0, fat: 0, micronutrients: {}, phytonutrients: {} };
 
+    // --- Portion Matching Handlers ---
+    const handlePortionInputChange = (ingId: string, field: 'multiplier' | 'measure', value: string) => {
+        setStepTwoInputs(prev => ({
+            ...prev,
+            [ingId]: { ...(prev[ingId] || { multiplier: '', measure: '' }), [field]: value }
+        }));
+    };
+
+    const handlePortionSave = async (ingId: string) => {
+        const inputs = stepTwoInputs[ingId];
+        if (!inputs) return;
+
+        if (!inputs.multiplier || isNaN(Number(inputs.multiplier))) {
+            toast.error('Please enter a valid multiplier');
+            return;
+        }
+        if (!inputs.measure) {
+            toast.error('Please select a unit/measure');
+            return;
+        }
+
+        setStepTwoInputs(prev => ({ ...prev, [ingId]: { ...prev[ingId], isSaving: true } }));
+        try {
+            let unitWeight = 0;
+            if (!isNaN(Number(inputs.measure))) unitWeight = Number(inputs.measure);
+            else if (['g', 'gram', 'grams'].includes(inputs.measure)) unitWeight = 1;
+            else if (['oz', 'ounce', 'ounces'].includes(inputs.measure)) unitWeight = 28.3495;
+            else if (['lb', 'lbs', 'pound', 'pounds'].includes(inputs.measure)) unitWeight = 453.592;
+            else if (['ml', 'milliliters'].includes(inputs.measure)) unitWeight = 1;
+            else throw new Error(`Cannot parse unit weight for measure: ${inputs.measure}`);
+
+            const totalWeight = Math.round(Number(inputs.multiplier) * unitWeight * 10) / 10;
+            const dbItem = matchedIngredients[ingId];
+
+            if (!String(recipeId).startsWith('local-')) {
+                const { error: ingError } = await supabase
+                    .from('ingredients')
+                    .update({ food_item_id: dbItem.id, weight_g: totalWeight })
+                    .eq('id', ingId);
+
+                if (ingError) throw ingError;
+            }
+
+            setIngredients(prev => prev.map(p => p.id === ingId ? { ...p, weight_g: totalWeight, food_item_id: dbItem.id } : p));
+            setStepTwoSaved(prev => ({ ...prev, [ingId]: true }));
+            toast.success('Saved!', { duration: 1500 });
+        } catch (err: any) {
+            console.error('Save step two error:', err);
+            toast.error(err.message || 'Failed to save mapping');
+        } finally {
+            setStepTwoInputs(prev => ({ ...prev, [ingId]: { ...prev[ingId], isSaving: false } }));
+        }
+    };
+
+    // Sync portion matching state → sidebar
+    useEffect(() => {
+        if (mappingStep === 'PORTION_MATCH' && ingredients.length > 0 && recipe) {
+            setSmartMatchPortion({
+                ingredients,
+                matchedIngredients,
+                skippedIngredients,
+                stepTwoInputs,
+                stepTwoSaved,
+                recipe,
+                onInputChange: handlePortionInputChange,
+                onSave: handlePortionSave,
+                onBack: () => setMappingStep('FOOD_MATCH'),
+                onFinalize: finalizeRecipeNutrition,
+            });
+            navigateTo('portion-match-picker');
+        }
+    }, [mappingStep, ingredients, matchedIngredients, skippedIngredients, stepTwoInputs, stepTwoSaved, recipe]);
+
     const deleteIngredient = async (ingredientId: string) => {
         try {
             if (!String(recipeId).startsWith('local-')) {
@@ -624,6 +697,10 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         handleSmartMatchPickerSelect,
         handleSmartMatchSkip,
         handleSmartMatchDelete,
+        
+        // Portion matching
+        handlePortionInputChange,
+        handlePortionSave,
         
         onBack,
         onShare,

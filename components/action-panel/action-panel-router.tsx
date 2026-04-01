@@ -17,6 +17,7 @@ import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 import { NutrientFilterPanel } from '@/components/nutrients/nutrients-view';
 import { Loader2, X } from 'lucide-react';
 import { PanelWrapper } from './panel-wrapper';
+import { PortionMatchPanel } from '@/components/recipe/detail/portion-match-panel';
 
 // New View Components
 import { AssistantView } from './views/AssistantView';
@@ -37,7 +38,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
     const { 
         activeView, previousView, navigateTo, excludeFlavour, 
         setExcludeFlavour, excludeSupplements, setExcludeSupplements,
-        contextRecipeId, smartMatchPicker, setSmartMatchPicker
+        contextRecipeId, smartMatchPicker, setSmartMatchPicker, smartMatchPortion
     } = useActionPanel();
     
     const { filters } = useRecipeFilter();
@@ -214,6 +215,15 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                         initialResults={smartMatchPicker.initialResults}
                     />
                 </PanelWrapper>
+            );
+        case 'portion-match-picker':
+            if (!smartMatchPortion) return null;
+            return (
+                <PortionMatchPanel
+                    state={smartMatchPortion}
+                    onBack={() => { smartMatchPortion.onBack(); handleBack(); }}
+                    onFinalize={smartMatchPortion.onFinalize}
+                />
             );
         case 'shopping': return <ShoppingPanel />;
         case 'pantry': return <PantryPanel />;
