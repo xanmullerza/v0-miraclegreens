@@ -125,7 +125,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         </div>
                         {pathname !== '/dashboard' && !isDesktop && <Footer />}
                     </main>
-                    {isDesktop && <DraggableFab />}
                 </div>
 
                 {/* Divider + Resize Button */}
