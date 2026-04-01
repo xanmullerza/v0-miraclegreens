@@ -44,7 +44,7 @@ export function PortionMatchPanel({
             const dbItem = matchedIngredients[ing.id];
             if (!dbItem?.portions || dbItem.portions.length === 0) return true; // No available measures
             
-            // Try auto-matching to see if confidence is too low
+            // Try auto-matching to see if confidence is high enough (>= 75)
             const originalDetails = parseRecipeAmount(ing.amount, ing.item);
             const bestMatch = findBestMeasureMatch(
                 originalDetails.measure_label,
@@ -52,7 +52,7 @@ export function PortionMatchPanel({
                 dbItem.portions
             );
             
-            // If no good match found (confidence < 50), auto-skip for manual measurement
+            // If no high-confidence match found (confidence < 75), auto-skip for manual measurement
             return !bestMatch;
         }).map(ing => ing.id);
         

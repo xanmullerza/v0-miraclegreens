@@ -234,7 +234,8 @@ function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, original
 
 /**
  * Find best measure match from database
- * Returns the matched measure or null if no good match found (confidence < 50)
+ * Returns the matched measure or null if no good match found (confidence < 75)
+ * Higher threshold to avoid false positives like "cubic inch" for cheese
  */
 export function findBestMeasureMatch(
     originalMeasure: string,
@@ -256,8 +257,8 @@ export function findBestMeasureMatch(
     
     const bestMatch = scores[0];
     
-    // Only return if confidence is > 50
-    if (bestMatch.score >= 50) {
+    // Only return if confidence is >= 75 (high confidence threshold to prevent false matches)
+    if (bestMatch.score >= 75) {
         return {
             ...bestMatch,
             confidence: bestMatch.score,
