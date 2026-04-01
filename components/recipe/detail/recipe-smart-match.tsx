@@ -36,86 +36,8 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
 
     if (!recipe) return null;
 
-    // ── Smart Match Picker Handlers ───────────────────────────
-    const handleSmartMatchPickerSelect = async (foodItem: any) => {
-        if (smartMatch.queue.length === 0) return;
-        const currentItem = smartMatch.queue[smartMatch.currentIdx];
-        const newMatches = { ...matchedIngredients, [currentItem.ingredient.id]: foodItem };
-        const newFlipped = { ...flippedCards, [currentItem.ingredient.id]: true };
-
-        const nextIdx = smartMatch.currentIdx + 1;
-        if (nextIdx < smartMatch.queue.length) {
-            smartMatch.setCurrentIdx(nextIdx);
-            smartMatch.setResults(smartMatch.queue[nextIdx].results);
-            setMatchedIngredients(newMatches);
-            setFlippedCards(newFlipped);
-            toast.success(`✓ Matched "${foodItem.name}" - showing next ingredient`, { duration: 2000 });
-        } else {
-            setMatchedIngredients(newMatches);
-            setFlippedCards(newFlipped);
-            smartMatch.setShowPicker(false);
-            smartMatch.reset();
-            toast.success(`Smart Match completed! All ${smartMatch.queue.length} ingredients matched.`, { id: 'smart-match' });
-        }
-    };
-
-    const handleSmartMatchSkip = () => {
-        const currentItem = smartMatch.queue[smartMatch.currentIdx];
-        const newSkipped = { ...skippedIngredients, [currentItem.ingredient.id]: true };
-        setSkippedIngredients(newSkipped);
-
-        const nextIdx = smartMatch.currentIdx + 1;
-        const name = currentItem.ingredient.base_ingredient || currentItem.ingredient.item;
-
-        if (nextIdx < smartMatch.queue.length) {
-            smartMatch.setCurrentIdx(nextIdx);
-            smartMatch.setResults(smartMatch.queue[nextIdx].results);
-            toast.info(`⊘ Skipped "${name}" - showing next ingredient`, { duration: 2000 });
-        } else {
-            const matchedCount = Object.keys(matchedIngredients).length;
-            const skippedCount = Object.keys(newSkipped).length;
-            smartMatch.setShowPicker(false);
-            smartMatch.reset();
-            toast.success(`Smart Match completed: ${matchedCount} matched, ${skippedCount} skipped`, { id: 'smart-match', duration: 3000 });
-        }
-    };
-
-    const handleSmartMatchDelete = async () => {
-        const currentItem = smartMatch.queue[smartMatch.currentIdx];
-        if (!currentItem) return;
-        
-        if (confirm(`Are you sure you want to permanently delete "${currentItem.ingredient.base_ingredient || currentItem.ingredient.item}" from this recipe?`)) {
-            await deleteIngredient(currentItem.ingredient.id);
-            
-            // Advance queue
-            const nextIdx = smartMatch.currentIdx + 1;
-            if (nextIdx < smartMatch.queue.length) {
-                smartMatch.setCurrentIdx(nextIdx);
-                smartMatch.setResults(smartMatch.queue[nextIdx].results);
-            } else {
-                smartMatch.setShowPicker(false);
-                smartMatch.reset();
-            }
-        }
-    };
-
     return (
         <>
-            {/* Smart Match Picker Modal */}
-            {smartMatch.showPicker && smartMatch.queue.length > 0 && (
-                <FoodItemPicker
-                    onSelect={handleSmartMatchPickerSelect}
-                    onSkip={handleSmartMatchSkip}
-                    onDelete={handleSmartMatchDelete}
-                    onClose={() => smartMatch.reset()}
-                    mode="all"
-                    isAdmin={false}
-                    inline={false}
-                    initialSearchQuery={smartMatch.queue[smartMatch.currentIdx]?.ingredient?.base_ingredient || smartMatch.queue[smartMatch.currentIdx]?.ingredient?.item || ''}
-                    initialResults={smartMatch.results}
-                />
-            )}
-
             {/* STEP 1: FOOD MATCH */}
             {mappingStep === 'FOOD_MATCH' && (
                 <StepOneFoodMatch
