@@ -10,6 +10,8 @@ interface MeasureMatch {
     confidence: number; // 0-100 score
 }
 
+type MeasureType = 'weight' | 'volume' | 'count' | 'unknown';
+
 // Common measure conversions
 const MEASURE_CONVERSIONS: Record<string, number> = {
     'tsp': 5,
@@ -24,6 +26,38 @@ const MEASURE_CONVERSIONS: Record<string, number> = {
     'lb': 453.59,
     'mg': 0.001,
     'mcg': 0.000001,
+};
+
+const MEASURE_TYPES: Record<string, MeasureType> = {
+    // Weight measures
+    'g': 'weight',
+    'kg': 'weight',
+    'mg': 'weight',
+    'mcg': 'weight',
+    'oz': 'weight',
+    'lb': 'weight',
+    // Volume measures
+    'tsp': 'volume',
+    'tbsp': 'volume',
+    'cup': 'volume',
+    'ml': 'volume',
+    'l': 'volume',
+    'floz': 'volume',
+    // Count measures
+    'item': 'count',
+    'bunch': 'count',
+    'handful': 'count',
+    'sprig': 'count',
+    'clove': 'count',
+    'stalk': 'count',
+    'pinch': 'count',
+    'dash': 'count',
+    'slice': 'count',
+    'wedge': 'count',
+    'fillet': 'count',
+    'piece': 'count',
+    'whole': 'count',
+    'unit': 'count',
 };
 
 const MEASURE_ALIASES: Record<string, string[]> = {
@@ -56,6 +90,15 @@ const MEASURE_ALIASES: Record<string, string[]> = {
  */
 function normalizeMeasure(text: string): string {
     return text.trim().toLowerCase().replace(/s$/, ''); // Remove trailing 's' for plurals
+}
+
+/**
+ * Get the type of measure (weight, volume, count, or unknown)
+ */
+function getMeasureType(measure: string): MeasureType {
+    const canonical = getCanonicalMeasure(measure);
+    if (!canonical) return 'unknown';
+    return MEASURE_TYPES[canonical] || 'unknown';
 }
 
 /**
@@ -134,34 +177,48 @@ function measureToGrams(quantity: number, measure: string): number | null {
 
 /**
  * Score how well a database measure matches the original
+ * Prioritizes measurement TYPE first (weight, volume, count)
  */
 function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, originalQuantity: number): number {
     let score = 0;
-    const originalCanonical = getCanonicalMeasure(originalMeasure);
+    
+    const originalType = getMeasureType(originalMeasure);
     const dbMeasureLabel = extractMeasureLabel(dbMeasure.label);
+    const dbType = getMeasureType(dbMeasureLabel);
+    
+    const originalCanonical = getCanonicalMeasure(originalMeasure);
     const dbCanonical = getCanonicalMeasure(dbMeasureLabel);
     
-    // 1. CANONICAL MATCH (most important - prevents false positives like "g" in "cup spaghetti (9g)")
-    if (originalCanonical && dbCanonical && originalCanonical === dbCanonical) {
-        score += 80; // Massive boost for exact canonical match
+    // CRITICAL: Measure type mismatch = almost automatic rejection
+    if (originalType !== 'unknown' && dbType !== 'unknown' && originalType !== dbType) {
+        // Different type (weight vs volume vs count) - very low score
+        score += 5;
+    } else {
+        // SAME TYPE - strong boost
+        score += 60;
+        
+        // 1. Canonical match (same unit family like "g" = "gram")
+        if (originalCanonical && dbCanonical && originalCanonical === dbCanonical) {
+            score += 30; // Exact canonical match
+        }
+        
+        // 2. Text similarity (handles "tbsp" vs "tablespoon")
+        const textSim = stringSimilarity(originalMeasure, dbMeasure.label);
+        if (textSim > 0.7) {
+            score += 20 * textSim;
+        }
+        
+        // 3. Weight/quantity match (secondary - helps with similar measures)
+        const originalGrams = measureToGrams(originalQuantity, originalMeasure);
+        if (originalGrams !== null) {
+            const ratio = dbMeasure.weight_g / originalGrams;
+            // Ideal is 1:1 ratio (exact match)
+            const weightSim = Math.max(0, 1 - Math.abs(ratio - 1) / 2);
+            score += 10 * weightSim;
+        }
     }
     
-    // 2. Direct text match (still important for variations like "tbsp" vs "tablespoon")
-    const textSim = stringSimilarity(originalMeasure, dbMeasure.label);
-    if (textSim > 0.7) {
-        score += 40 * textSim;
-    }
-    
-    // 3. Weight/quantity match (helps distinguish between similar measures)
-    const originalGrams = measureToGrams(originalQuantity, originalMeasure);
-    if (originalGrams !== null) {
-        const ratio = dbMeasure.weight_g / originalGrams;
-        // Ideal is 1:1 ratio (exact match)
-        const weightSim = Math.max(0, 1 - Math.abs(ratio - 1) / 2);
-        score += 20 * weightSim;
-    }
-    
-    // 4. Label length penalty (prefer concise matches)
+    // Label length penalty (prefer concise matches)
     const labelLength = dbMeasureLabel.length;
     if (labelLength > 30) score *= 0.9;
     
