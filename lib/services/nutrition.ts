@@ -41,24 +41,20 @@ function singularize(word: string): string {
 }
 
 /**
- * Helper to fetch food items with their portions/measures
+ * Helper to fetch portions for a food item
  */
-async function fetchFoodItemsWithMeasures(query: string, searchFields: string): Promise<any[]> {
-    const { data, error } = await supabase
-        .from('food_items')
-        .select(`
-            *,
-            food_measures (
-                id,
-                label,
-                weight_g,
-                food_item_id
-            )
-        `)
-        .or(searchFields)
-        .limit(10);
-    
-    return data || [];
+async function fetchPortionsForItem(foodItemId: string): Promise<any[]> {
+    try {
+        const { data } = await supabase
+            .from('food_measures')
+            .select('id, label, weight_g')
+            .eq('food_item_id', foodItemId)
+            .order('weight_g', { ascending: false });
+        return data || [];
+    } catch (err) {
+        console.error(`[Portions Fetch] Error fetching portions for ${foodItemId}:`, err);
+        return [];
+    }
 }
 
 /**
@@ -76,20 +72,23 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
 
     // 1. Literal ilike match (First Choice)
     // This handles "Olive Oil" matching "Olive Oil" or "Some Olive Oil"
-    let data = await fetchFoodItemsWithMeasures(
-        cleanQuery,
-        `name.ilike.%${cleanQuery}%,common_name.ilike.%${cleanQuery}%`
-    );
+    let { data, error } = await supabase
+        .from('food_items')
+        .select('*')
+        .or(`name.ilike.%${cleanQuery}%,common_name.ilike.%${cleanQuery}%`)
+        .limit(10);
 
     // 2. Singularization Fallback
     // If "Potatoes" yields nothing, try "Potato"
     if (!data || data.length === 0) {
         const singular = singularize(cleanQuery);
         if (singular !== cleanQuery && singular.length >= 3) {
-            data = await fetchFoodItemsWithMeasures(
-                singular,
-                `name.ilike.%${singular}%,common_name.ilike.%${singular}%`
-            );
+            const { data: sData } = await supabase
+                .from('food_items')
+                .select('*')
+                .or(`name.ilike.%${singular}%,common_name.ilike.%${singular}%`)
+                .limit(10);
+            if (sData && sData.length > 0) data = sData;
         }
     }
 
@@ -99,20 +98,13 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
     if (!data || data.length === 0) {
         const words = cleanQuery.split(/\s+/).filter(w => w.length >= 2); // Allow 2+ char words
         if (words.length > 1) {
-            // For AND queries, we need to build them differently as we can't use the helper
-            let query = supabase.from('food_items').select(`
-                *,
-                food_measures (
-                    id,
-                    label,
-                    weight_g,
-                    food_item_id
-                )
-            `);
+            let andChain = supabase.from('food_items').select('*');
             words.forEach(w => {
-                query = query.ilike('name', `%${w}%`);
+                // Postgrest allows multiple filters on same column to be ANDed
+                andChain = andChain.ilike('name', `%${w}%`);
             });
-            const { data: andData } = await query.limit(10);
+
+            const { data: andData } = await andChain.limit(10);
             if (andData && andData.length > 0) data = andData;
         }
     }
@@ -124,35 +116,41 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         if (words.length > 0) {
             // Use the longest word (most specific/meaningful) regardless of length
             const longestWord = words.sort((a, b) => b.length - a.length)[0];
-            data = await fetchFoodItemsWithMeasures(
-                longestWord,
-                `name.ilike.%${longestWord}%,common_name.ilike.%${longestWord}%`
-            );
+            const { data: lwData } = await supabase
+                .from('food_items')
+                .select('*')
+                .or(`name.ilike.%${longestWord}%,common_name.ilike.%${longestWord}%`)
+                .limit(10);
+            if (lwData && lwData.length > 0) data = lwData;
         }
     }
 
-    if (!data) return [];
+    if (error || !data) return [];
 
-    return data.map(item => ({
-        id: item.id,
-        name: item.name,
-        common_name: item.common_name,
-        category: item.category || null,
-        image: item.image || null,
-        energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
-        energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
-        protein_g: item.protein_g,
-        carbs_g: item.carbs_g,
-        fat_g: item.fat_g,
-        micronutrients: item.micronutrients || {},
-        phytonutrients: item.phytonutrients || {},
-        portions: (item.food_measures || []).map((m: any) => ({
-            id: m.id,
-            label: m.label,
-            weight_g: m.weight_g
-        })),
-        source: 'local' as const
-    })).sort((a, b) => {
+    // Fetch portions for all items in parallel
+    const itemsWithPortions = await Promise.all(
+        data.map(async (item) => {
+            const portions = await fetchPortionsForItem(item.id);
+            return {
+                id: item.id,
+                name: item.name,
+                common_name: item.common_name,
+                category: item.category || null,
+                image: item.image || null,
+                energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
+                energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
+                protein_g: item.protein_g,
+                carbs_g: item.carbs_g,
+                fat_g: item.fat_g,
+                micronutrients: item.micronutrients || {},
+                phytonutrients: item.phytonutrients || {},
+                portions: portions,
+                source: 'local' as const
+            };
+        })
+    );
+
+    return itemsWithPortions.sort((a, b) => {
         const aName = a.name.toLowerCase();
         const bName = b.name.toLowerCase();
         const aCommon = (a.common_name || "").toLowerCase();
