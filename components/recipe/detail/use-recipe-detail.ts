@@ -476,7 +476,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     const runAutoMatch = async () => {
         setSmartMatchRunning(true);
-        const loadingToastId = toast.loading("Auto-searching ingredients...");
+        const loadingToastId = toast.loading("Auto-matching ingredients...");
         
         try {
             const autoMatched: Record<string, any> = {};
@@ -502,16 +502,16 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 const results = await searchFoodItem(searchTerm);
                 
                 if (results && results.length > 0) {
-                    // Populate first result for review (don't auto-accept yet)
+                    // Auto-accept first result (highest confidence)
                     autoMatched[ing.id] = results[0];
-                    // NOTE: NOT setting acceptedMatches[id] = true - user must review in FOOD_MATCH step
+                    setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
                 } else {
                     // No match found - needs manual selection
                     unmatchable.push(ing);
                 }
             }
 
-            // Update matched ingredients for display in side panel
+            // Update matched ingredients
             setMatchedIngredients(prev => ({ ...prev, ...autoMatched }));
 
             // Mark auto-skipped flavorings
@@ -534,15 +534,20 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     unmatchedIngredients: unmatchableForDialog,
                     onComplete: () => {
                         setIngredientMatch(null);
+                        // Transition to REVIEW step (not directly to portions)
+                        setMappingStep('INGREDIENT_REVIEW');
                     },
                     onMatched: (ingId: string, foodItem: any) => {
                         setMatchedIngredients(prev => ({ ...prev, [ingId]: foodItem }));
+                        setAcceptedMatches(prev => ({ ...prev, [ingId]: true }));
                     }
                 });
                 navigateTo('ingredient-match');
-                toast.success(`Found ${Object.keys(autoMatched).length} ingredient matches. ${unmatchable.length} need manual selection.`, { duration: 2000 });
+                toast.success(`Auto-matched ${Object.keys(autoMatched).length} ingredients. ${unmatchable.length} need manual selection.`, { duration: 2000 });
             } else {
-                toast.success(`✓ Found matches for all ${Object.keys(autoMatched).length} ingredients! Review them below.`, { id: loadingToastId });
+                toast.success(`✓ Successfully auto-matched all ${Object.keys(autoMatched).length} ingredients!`, { id: loadingToastId });
+                // No unmatchable items - proceed to review
+                setMappingStep('INGREDIENT_REVIEW');
             }
         } catch (err: any) {
             console.error('Auto-match error:', err);
@@ -832,6 +837,5 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         // Chatbot context forwarding
         setRecipeToShare,
         navigateTo,
-        setIsActionPanelOpen,
     };
 }
