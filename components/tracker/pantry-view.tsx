@@ -82,6 +82,7 @@ interface PantryViewProps {
     setSelectedCategories?: React.Dispatch<React.SetStateAction<string[]>>;
     hideControls?: boolean;
     refreshKey?: number;
+    dropdownContent?: React.ReactNode;
 }
 
 export function PantryView({
@@ -90,7 +91,8 @@ export function PantryView({
     selectedCategories: externalSelectedCategories,
     setSelectedCategories: externalSetSelectedCategories,
     hideControls = false,
-    refreshKey = 0
+    refreshKey = 0,
+    dropdownContent
 }: PantryViewProps) {
     const router = useRouter();
     const { quantities, pantryItems: dbPantryItems, loading: pantryLoading, updateQuantity, addToPantry, removeFromPantry: dbRemoveFromPantry } = usePantry();
@@ -672,6 +674,7 @@ export function PantryView({
                 setSortField('category');
             }}
             hasActiveFilters={sortField === 'category'}
+            dropdownContent={dropdownContent}
         >
             <div className="space-y-8 animate-in fade-in duration-500">
             {/* Login Prompt - Only shown if not loading and no user */}

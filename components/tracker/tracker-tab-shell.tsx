@@ -26,8 +26,7 @@ interface TrackerTabShellProps {
     onFilterClick?: () => void;
     hasActiveFilters?: boolean;
     activeFilterCount?: number;
-    viewMode?: 'list' | 'cart';
-    onViewModeChange?: (mode: 'list' | 'cart') => void;
+    dropdownContent?: React.ReactNode;
 }
 
 export function TrackerTabShell({
@@ -45,8 +44,7 @@ export function TrackerTabShell({
     onFilterClick,
     hasActiveFilters = false,
     activeFilterCount = 0,
-    viewMode = 'list',
-    onViewModeChange
+    dropdownContent
 }: TrackerTabShellProps) {
     const { isActionPanelOpen, activeView } = useActionPanel();
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -155,38 +153,10 @@ export function TrackerTabShell({
                         )}
                     </div>
 
-                    {/* List/Cart Toggle */}
-                    {(title.toUpperCase() === 'SHOPPING' || title.toUpperCase() === 'FOODS') && (
-                        <div className="flex items-center gap-2 ml-auto">
-                            <button
-                                onClick={() => onViewModeChange?.('list')}
-                                className={cn(
-                                    "h-8 px-3 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all",
-                                    viewMode === 'list'
-                                        ? "bg-emerald-600 text-white shadow-sm"
-                                        : "bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
-                                )}
-                            >
-                                <List size={12} />
-                                List
-                            </button>
-                            <button
-                                onClick={() => onViewModeChange?.('cart')}
-                                className={cn(
-                                    "h-8 px-3 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all",
-                                    viewMode === 'cart'
-                                        ? "bg-emerald-600 text-white shadow-sm"
-                                        : "bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
-                                )}
-                            >
-                                <ShoppingCart size={12} />
-                                Cart
-                            </button>
-                        </div>
-                    )}
-                    {title.toUpperCase() !== 'SHOPPING' && title.toUpperCase() !== 'FOODS' && (
-                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50 whitespace-nowrap ml-auto">
-                            {title.toUpperCase()} LIBRARY
+                    {/* Dropdown Action Slot */}
+                    {dropdownContent && (
+                        <div className="ml-auto shrink-0">
+                            {dropdownContent}
                         </div>
                     )}
                 </div>

@@ -17,6 +17,7 @@ import { useActionPanel } from '@/lib/context/action-panel-context';
 import { CATEGORIES, FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
+import { TrackerTabShell, SortOption } from '@/components/tracker/tracker-tab-shell';
 
 const PAGE_SIZE = 20;
 
@@ -35,6 +36,7 @@ interface FoodsViewProps {
     onSearchChange?: (query: string) => void;
     hideControls?: boolean;
     noContainer?: boolean;
+    dropdownContent?: React.ReactNode;
 }
 
 export function FoodsView({ 
@@ -43,7 +45,8 @@ export function FoodsView({
     searchQuery: externalSearchQuery, 
     onSearchChange,
     hideControls = false,
-    noContainer = false
+    noContainer = false,
+    dropdownContent
 }: FoodsViewProps) {
     const { energyUnit } = useUserPreferences();
     const { searchQuery } = useSearch();
@@ -209,363 +212,112 @@ export function FoodsView({
         return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
     }, [effectiveSearchQuery, authReady, showFavoritesOnly, selectedCategories, user, sortField, sortDirection, fetchFoods]);
 
+    const foodList = (
+        <div className="space-y-2">
+            {loading && foods.length === 0 && (
+                <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
+                    <Loader2 size={24} className="animate-spin text-emerald-500" />
+                    <p className="text-[10px] font-black uppercase tracking-widest">Loading Library...</p>
+                </div>
+            )}
+
+            {!loading && foods.length === 0 && (
+                <div className="py-16 text-center">
+                    <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
+                        <Leaf size={22} className="opacity-20" />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        {(showFavoritesOnly || selectedCategories.length > 0 || effectiveSearchQuery)
+                            ? 'No ingredients match your filters'
+                            : 'Library is empty'}
+                    </p>
+                </div>
+            )}
+
+            {foods.map((food) => (
+                <Link
+                    key={food.id}
+                    href={`/foods/${food.id}`}
+                    className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                >
+                    <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
+                        <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
+                            {food.image ? (
+                                <Image src={food.image} alt={food.name} fill className="object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                    <Beef size={24} className="opacity-10" />
+                                </div>
+                            )}
+                            {food.is_in_pantry && (
+                                <div className="absolute top-1 right-1 bg-emerald-500 text-white rounded-full p-0.5 shadow-md">
+                                    <Check size={8} strokeWidth={4} />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
+                                {formatFoodName(food.common_name || food.name)}
+                            </h3>
+                            <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
+                                <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                <span className="text-slate-300 text-[8px]">•</span>
+                                <span className="text-amber-500">{food.carbs_g.toFixed(0)}g C</span>
+                                <span className="text-slate-300 text-[8px]">•</span>
+                                <span className="text-rose-500">{food.fat_g.toFixed(0)}g F</span>
+                                <span className="text-slate-300 text-[8px]">•</span>
+                                <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
+                            </div>
+                        </div>
+
+                        <div className="hidden lg:flex items-center justify-end gap-3">
+                            <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                            <span className="text-slate-300 text-[8px]">•</span>
+                            <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{food.carbs_g.toFixed(1)}g</span>
+                            <span className="text-slate-300 text-[8px]">•</span>
+                            <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
+                            <span className="text-slate-300 text-[8px]">•</span>
+                            <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
+                        </div>
+                    </div>
+                </Link>
+            ))}
+        </div>
+    );
+
     return (
         <div className={cn("space-y-8 animate-in fade-in duration-500", noContainer && "space-y-0")}>
             {/* List Container */}
             {!noContainer ? (
-            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
-                {showAddFood && setShowAddFood ? (
-                    <FoodFormDialog onClose={() => setShowAddFood(false)} />
-                ) : (
-                    <>
-                        {/* Sticky Header */}
-                        {!hideControls && (
-                            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-[2rem]">
-                                {/* Mobile filter bar */}
-                                <div className="flex md:hidden items-center justify-between gap-2 px-4 py-3">
-                                    <button
-                                        onClick={() => {
-                                            setActiveView('food-filters');
-                                            setIsActionPanelOpen(true);
-                                        }}
-                                        className={cn(
-                                            'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
-                                            (showFavoritesOnly || selectedCategories.length > 0)
-                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
-                                        )}
-                                    >
-                                        <Filter size={11} />
-                                        Filter
-                                        {(showFavoritesOnly || selectedCategories.length > 0) && (
-                                            <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
-                                                {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
-                                            </span>
-                                        )}
-                                    </button>
-
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setShowSortOptions(prev => !prev)}
-                                            className={cn(
-                                                "h-9 px-4 rounded-full flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
-                                                showSortOptions
-                                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
-                                                    : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
-                                            )}
-                                            title="Sort Options"
-                                        >
-                                            <ArrowDownUp size={13} />
-                                            <span className="hidden sm:inline">{currentSortLabel}</span>
-                                        </button>
-                                        {showSortOptions && (
-                                            <div className="absolute left-0 top-full mt-2 w-40 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
-                                                {FOOD_SORT_OPTIONS.map(option => (
-                                                    <button
-                                                        key={option.id}
-                                                        onClick={() => {
-                                                            if (sortField === option.id) {
-                                                                setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                                            } else {
-                                                                setSortField(option.id);
-                                                                setSortDirection('asc');
-                                                            }
-                                                            setShowSortOptions(false);
-                                                        }}
-                                                        className={cn(
-                                                            "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                            sortField === option.id
-                                                                ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
-                                                                : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                                        )}
-                                                    >
-                                                        {option.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex-1 relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
-                                        <input
-                                            type="text"
-                                            value={externalSearchQuery ?? ''}
-                                            onChange={(e) => onSearchChange?.(e.target.value)}
-                                            placeholder="Search ingredients..."
-                                            className={cn(
-                                                "w-full h-9 pl-9 pr-4 rounded-full border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
-                                                "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
-                                                "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
-                                                "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
-                                            )}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Desktop header row */}
-                                <div className="hidden md:flex md:items-center gap-4 px-10 py-4 w-full">
-                                    <div className="flex items-center gap-4">
-                                        <button
-                                            onClick={() => {
-                                                setActiveView('food-filters');
-                                                setIsActionPanelOpen(true);
-                                            }}
-                                            className={cn(
-                                                'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
-                                                (showFavoritesOnly || selectedCategories.length > 0)
-                                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                    : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
-                                            )}
-                                        >
-                                            <Filter size={13} />
-                                            Filter
-                                            {(selectedCategories.length > 0 || showFavoritesOnly) && (
-                                                <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
-                                                    {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
-                                                </span>
-                                            )}
-                                        </button>
-
-                                        <div className="relative">
-                                            <button
-                                                onClick={() => setShowSortOptions(prev => !prev)}
-                                                className={cn(
-                                                    "h-9 px-4 rounded-xl flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
-                                                    showSortOptions
-                                                        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
-                                                        : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
-                                                )}
-                                                title="Sort Options"
-                                            >
-                                                <ArrowDownUp size={13} />
-                                                <span>{currentSortLabel}</span>
-                                            </button>
-                                            {showSortOptions && (
-                                                <div className="absolute left-0 top-full mt-2 w-44 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
-                                                    {FOOD_SORT_OPTIONS.map(option => (
-                                                        <button
-                                                            key={option.id}
-                                                            onClick={() => {
-                                                                if (sortField === option.id) {
-                                                                    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                                                } else {
-                                                                    setSortField(option.id);
-                                                                    setSortDirection('asc');
-                                                                }
-                                                                setShowSortOptions(false);
-                                                            }}
-                                                            className={cn(
-                                                                "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                                sortField === option.id
-                                                                    ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
-                                                                    : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                                            )}
-                                                        >
-                                                            {option.label}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
-                                            <input
-                                                type="text"
-                                                value={externalSearchQuery ?? ''}
-                                                onChange={(e) => onSearchChange?.(e.target.value)}
-                                                placeholder="Search ingredients..."
-                                                className={cn(
-                                                    "w-64 h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
-                                                    "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
-                                                    "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
-                                                    "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
-                                                )}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Ingredients Library</div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* List */}
-                        <div className="space-y-2 p-4">
-                            {loading && foods.length === 0 && (
-                                <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
-                                    <Loader2 size={24} className="animate-spin text-emerald-500" />
-                                    <p className="text-[10px] font-black uppercase tracking-widest">Loading Library...</p>
-                                </div>
-                            )}
-
-                            {!loading && foods.length === 0 && (
-                                <div className="py-16 text-center">
-                                    <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
-                                        <Leaf size={22} className="opacity-20" />
-                                    </div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                        {(showFavoritesOnly || selectedCategories.length > 0 || effectiveSearchQuery)
-                                            ? 'No ingredients match your filters'
-                                            : 'Library is empty'}
-                                    </p>
-                                </div>
-                            )}
-
-                            {foods.map((food) => (
-                                <Link
-                                    key={food.id}
-                                    href={`/foods/${food.id}`}
-                                    className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
-                                >
-                                    <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
-                                        <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
-                                            {food.image ? (
-                                                <Image src={food.image} alt={food.name} fill className="object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <Beef size={24} className="opacity-10" />
-                                                </div>
-                                            )}
-                                            {food.is_in_pantry && (
-                                                <div className="absolute top-1 right-1 bg-emerald-500 text-white rounded-full p-0.5 shadow-md">
-                                                    <Check size={8} strokeWidth={4} />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
-                                                {formatFoodName(food.common_name || food.name)}
-                                            </h3>
-                                            <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
-                                                <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
-                                                <span className="text-slate-300 text-[8px]">•</span>
-                                                <span className="text-amber-500">{food.carbs_g.toFixed(0)}g C</span>
-                                                <span className="text-slate-300 text-[8px]">•</span>
-                                                <span className="text-rose-500">{food.fat_g.toFixed(0)}g F</span>
-                                                <span className="text-slate-300 text-[8px]">•</span>
-                                                <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="hidden lg:flex items-center justify-end gap-3">
-                                            <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(food.energy_kcal, energyUnit)}</span>
-                                            <span className="text-slate-300 text-[8px]">•</span>
-                                            <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{food.carbs_g.toFixed(1)}g</span>
-                                            <span className="text-slate-300 text-[8px]">•</span>
-                                            <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
-                                            <span className="text-slate-300 text-[8px]">•</span>
-                                            <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
-                                            {food.stocked && (
-                                                <button
-                                                    onClick={(e) => handleAddToCart(e, food)}
-                                                    className="ml-4 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-all shadow-sm"
-                                                    disabled={cartLoading === food.id}
-                                                >
-                                                    {cartLoading === food.id ? (
-                                                        <Loader2 size={12} className="animate-spin" />
-                                                    ) : (
-                                                        <ShoppingCart size={12} />
-                                                    )}
-                                                    R{food.price?.toFixed(2) || '0.00'}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </>
-                )}
-            </div>
+                <TrackerTabShell
+                    title="Foods"
+                    searchQuery={effectiveSearchQuery}
+                    onSearchChange={(q) => onSearchChange?.(q)}
+                    sortField={sortField}
+                    setSortField={(f: any) => setSortField(f)}
+                    sortDirection={sortDirection}
+                    setSortDirection={setSortDirection}
+                    sortOptions={[
+                        { id: 'name', label: 'A-Z', icon: <ArrowDownUp size={14} /> },
+                        { id: 'energy_kcal', label: 'Energy', icon: <ArrowDownUp size={14} /> },
+                        { id: 'protein_g', label: 'Protein', icon: <ArrowDownUp size={14} /> },
+                        { id: 'carbs_g', label: 'Carbs', icon: <ArrowDownUp size={14} /> },
+                        { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={14} /> },
+                    ]}
+                    showFilters={!hideControls}
+                    onFilterClick={() => {
+                        setActiveView('food-filters');
+                        setIsActionPanelOpen(true);
+                    }}
+                    hasActiveFilters={showFavoritesOnly || selectedCategories.length > 0}
+                    activeFilterCount={selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                    dropdownContent={dropdownContent}
+                >
+                    {foodList}
+                </TrackerTabShell>
             ) : (
-                <div className="space-y-2 p-4">
-                    {loading && foods.length === 0 && (
-                        <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
-                            <Loader2 size={24} className="animate-spin text-emerald-500" />
-                            <p className="text-[10px] font-black uppercase tracking-widest">Loading Library...</p>
-                        </div>
-                    )}
-
-                    {!loading && foods.length === 0 && (
-                        <div className="py-16 text-center">
-                            <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
-                                <Leaf size={22} className="opacity-20" />
-                            </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                {(showFavoritesOnly || selectedCategories.length > 0 || effectiveSearchQuery)
-                                    ? 'No ingredients match your filters'
-                                    : 'Library is empty'}
-                            </p>
-                        </div>
-                    )}
-
-                    {foods.map((food) => (
-                        <Link
-                            key={food.id}
-                            href={`/foods/${food.id}`}
-                            className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
-                        >
-                            <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
-                                <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
-                                    {food.image ? (
-                                        <Image src={food.image} alt={food.name} fill className="object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                            <Beef size={24} className="opacity-10" />
-                                        </div>
-                                    )}
-                                    {food.is_in_pantry && (
-                                        <div className="absolute top-1 right-1 bg-emerald-500 text-white rounded-full p-0.5 shadow-md">
-                                            <Check size={8} strokeWidth={4} />
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
-                                        {formatFoodName(food.common_name || food.name)}
-                                    </h3>
-                                    <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
-                                        <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
-                                        <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="text-amber-500">{food.carbs_g.toFixed(0)}g C</span>
-                                        <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="text-rose-500">{food.fat_g.toFixed(0)}g F</span>
-                                        <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
-                                    </div>
-                                </div>
-
-                                <div className="hidden lg:flex items-center justify-end gap-3">
-                                    <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(food.energy_kcal, energyUnit)}</span>
-                                    <span className="text-slate-300 text-[8px]">•</span>
-                                    <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{food.carbs_g.toFixed(1)}g</span>
-                                    <span className="text-slate-300 text-[8px]">•</span>
-                                    <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
-                                    <span className="text-slate-300 text-[8px]">•</span>
-                                    <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
-                                    {food.stocked && (
-                                        <button
-                                            onClick={(e) => handleAddToCart(e, food)}
-                                            className="ml-4 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-all shadow-sm"
-                                            disabled={cartLoading === food.id}
-                                        >
-                                            {cartLoading === food.id ? (
-                                                <Loader2 size={12} className="animate-spin" />
-                                            ) : (
-                                                <ShoppingCart size={12} />
-                                            )}
-                                            R{food.price?.toFixed(2) || '0.00'}
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                foodList
             )}
 
             {hasMore && (
