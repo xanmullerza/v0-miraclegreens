@@ -281,9 +281,15 @@ function IngredientMatchCard({
     const isUsdaExpanded = !!usdaExpanded[ing.id];
     const isUsdaLoading = !!usdaLoading[ing.id];
     const ingUsdaResults = usdaResults[ing.id] || [];
+    const [usdaQuery, setUsdaQuery] = React.useState('');
 
-    const handleUsdaSearch = async () => {
-        const searchTerm = extractCoreName(ing.base_ingredient || ing.item);
+    const handleUsdaButtonClick = async () => {
+        const term = extractCoreName(ing.base_ingredient || ing.item);
+        setUsdaQuery(term);
+        executeUsdaSearch(term);
+    };
+
+    const executeUsdaSearch = async (searchTerm: string) => {
         if (!searchTerm || searchTerm.length < 2) { toast.error('Search term is too short'); return; }
         setUsdaLoading(prev => ({ ...prev, [ing.id]: true }));
         setUsdaExpanded(prev => ({ ...prev, [ing.id]: true }));
@@ -388,7 +394,7 @@ function IngredientMatchCard({
                                 </button>
                             )}
                             {!isMatched && !isAccepted && !isSkipped && (
-                                <button onClick={handleUsdaSearch} disabled={isUsdaLoading}
+                                <button onClick={handleUsdaButtonClick} disabled={isUsdaLoading}
                                     className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full border border-amber-400/50 text-amber-500 hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all disabled:opacity-50" title="Search USDA Database">
                                     {isUsdaLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
                                     USDA
@@ -469,6 +475,30 @@ function IngredientMatchCard({
                         </p>
                         <button onClick={handleDismissUsda} className="w-6 h-6 flex items-center justify-center rounded-full border border-rose-300 dark:border-rose-700 text-rose-400 hover:bg-rose-500 hover:text-white transition-all" title="Dismiss">
                             <X size={11} />
+                        </button>
+                    </div>
+
+                    <div className="flex gap-2 mb-2 px-1">
+                        <div className="relative flex-1 group">
+                            <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
+                            <input
+                                type="text"
+                                value={usdaQuery}
+                                onChange={(e) => setUsdaQuery(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') executeUsdaSearch(usdaQuery);
+                                }}
+                                placeholder="Refine search term..."
+                                className="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-[11px] placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-amber-500 transition-all"
+                            />
+                        </div>
+                        <button
+                            onClick={() => executeUsdaSearch(usdaQuery)}
+                            disabled={isUsdaLoading}
+                            className="h-8 px-4 bg-amber-500 hover:bg-amber-600 text-white text-[10px] uppercase font-bold tracking-widest rounded-lg flex items-center gap-1.5 transition-all disabled:opacity-50"
+                        >
+                            {isUsdaLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+                            Search
                         </button>
                     </div>
 
