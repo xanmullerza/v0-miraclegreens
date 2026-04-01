@@ -82,6 +82,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [loading, setLoading] = useState(true);
     const [enriching, setEnriching] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
+    const [viewMode, setViewMode] = useState<'list' | 'cart'>('list');
 
     // Barcode scanner state
     const [internalScannerOpen, setInternalScannerOpen] = useState(false);
@@ -704,6 +705,8 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 setSortField('category');
             }}
             hasActiveFilters={sortField === 'category'}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
         >
             <div className="space-y-8">
             {/* Barcode Scanner Modal */}
