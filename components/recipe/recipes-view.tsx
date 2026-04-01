@@ -155,7 +155,7 @@ export function RecipesView({
         if (!authLoading) {
             fetchRecipes(0, true);
         }
-    }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty, showOnlyMyRecipes, isMix, isRemix, user];
+    }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty, showOnlyMyRecipes, isMix, isRemix, user]);
 
 
     const fetchRecipes = async (pageToLoad: number, isNewSearch = false) => {
