@@ -221,7 +221,7 @@ function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, original
         
         // 4. For count measures, prefer "medium" size (safest default assumption)
         if (originalType === 'count' && dbMeasureLabel.toLowerCase().includes('medium')) {
-            score += 15; // Boost for medium-sized items
+            score += 25; // Strong boost for medium-sized items (safe default for singular items)
         }
     }
     
