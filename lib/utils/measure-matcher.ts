@@ -176,8 +176,10 @@ function measureToGrams(quantity: number, measure: string): number | null {
 }
 
 /**
+/**
  * Score how well a database measure matches the original
  * Prioritizes measurement TYPE first (weight, volume, count)
+ * For count measures, prefers "medium" size as the safest default
  */
 function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, originalQuantity: number): number {
     let score = 0;
@@ -215,6 +217,11 @@ function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, original
             // Ideal is 1:1 ratio (exact match)
             const weightSim = Math.max(0, 1 - Math.abs(ratio - 1) / 2);
             score += 10 * weightSim;
+        }
+        
+        // 4. For count measures, prefer "medium" size (safest default assumption)
+        if (originalType === 'count' && dbMeasureLabel.toLowerCase().includes('medium')) {
+            score += 15; // Boost for medium-sized items
         }
     }
     
