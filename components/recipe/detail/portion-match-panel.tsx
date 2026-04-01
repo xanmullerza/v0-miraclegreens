@@ -8,6 +8,7 @@ import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { CustomMeasurementDialog } from './custom-measurement-dialog';
 import type { SmartMatchPortionState } from '@/lib/context/action-panel-context';
 
 interface PortionMatchPanelProps {
@@ -29,11 +30,42 @@ export function PortionMatchPanel({
         onInputChange, onSave, onFinalize: stateFinalize
     } = state;
 
+    const [showMeasurementDialog, setShowMeasurementDialog] = useState(false);
+    const [unmappedIngredients, setUnmappedIngredients] = useState<any[]>([]);
+
     const nonSkippedIngredients = ingredients.filter(ing => !skippedIngredients[ing.id]);
     const allVerified = ingredients.every(ing => stepTwoSaved[ing.id] || skippedIngredients[ing.id]);
 
     // Use finalize callback from state if provided as prop
     const finalizeHandler = onFinalize || stateFinalize;
+
+    // Find ingredients without measures and show measurement dialog
+    const handleShowMeasurementDialog = () => {
+        const unmapped = nonSkippedIngredients.filter(ing => {
+            const inputs = stepTwoInputs[ing.id];
+            return !inputs || !inputs.measure; // No measure selected
+        }).map(ing => ({
+            id: ing.id,
+            item: ing.item,
+            amount: ing.amount,
+            food_item_id: matchedIngredients[ing.id]?.id
+        }));
+
+        if (unmapped.length === 0) {
+            // All have measures, proceed to finalize
+            finalizeHandler?.();
+        } else {
+            setUnmappedIngredients(unmapped);
+            setShowMeasurementDialog(true);
+        }
+    };
+
+    const handleMeasurementDialogComplete = () => {
+        setShowMeasurementDialog(false);
+        setUnmappedIngredients([]);
+        // Proceed to finalize
+        finalizeHandler?.();
+    };
 
     return (
         <div className="w-full h-full overflow-y-auto overflow-x-hidden">
@@ -103,7 +135,7 @@ export function PortionMatchPanel({
                             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Ready to finalize nutrition calculations.</p>
                         </div>
                         <button
-                            onClick={finalizeHandler}
+                            onClick={handleShowMeasurementDialog}
                             disabled={finalizeLoading}
                             className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                         >
@@ -121,6 +153,13 @@ export function PortionMatchPanel({
                         </button>
                     </div>
                 )}
+
+                {/* Custom Measurement Dialog */}
+                <CustomMeasurementDialog
+                    unmappedIngredients={unmappedIngredients}
+                    onComplete={handleMeasurementDialogComplete}
+                    isOpen={showMeasurementDialog}
+                />
             </div>
         </div>
     );
