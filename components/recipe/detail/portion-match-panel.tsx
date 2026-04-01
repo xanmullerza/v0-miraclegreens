@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Loader2, AlertTriangle, Check, RefreshCw, ArrowLeft, Sparkles } from 'lucide-react';
+import { Loader2, AlertTriangle, Check, RefreshCw, ArrowLeft, Sparkles, Plus } from 'lucide-react';
 import { parseRecipeAmount, cleanIngredientDisplay } from '@/lib/utils/parsing-utils';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import type { SmartMatchPortionState } from '@/lib/context/action-panel-context';
 
 interface PortionMatchPanelProps {
@@ -140,35 +141,75 @@ function PortionCard({
     stepTwoInputs, stepTwoSaved,
     onInputChange, onSave, isLast
 }: PortionCardProps) {
+    const [showCustomInput, setShowCustomInput] = useState(false);
+    const [customLabel, setCustomLabel] = useState('');
+    const [customWeightG, setCustomWeightG] = useState('');
+    const [savingCustomMeasure, setSavingCustomMeasure] = useState(false);
+
     const originalDetails = parseRecipeAmount(ing.amount, ing.item);
     const dbItem = matchedIngredients[ing.id];
     const isAccepted = !!stepTwoSaved[ing.id];
 
     const inputs = stepTwoInputs[ing.id] || {
         multiplier: String(Math.round(originalDetails.quantity * 100) / 100),
-        measure: originalDetails.measure_label
+        measure: '' // Start empty, require selection
     };
 
     let liveUnitWeight = 0;
-    if (!isNaN(Number(inputs.measure))) liveUnitWeight = Number(inputs.measure);
-    else if (['g', 'gram', 'grams', '1'].includes(inputs.measure)) liveUnitWeight = 1;
-    else if (['oz', 'ounce', 'ounces', '28.35'].includes(inputs.measure)) liveUnitWeight = 28.3495;
-    else if (['lb', 'lbs', 'pound', 'pounds', '453.59'].includes(inputs.measure)) liveUnitWeight = 453.592;
-    else if (['ml', 'milliliters'].includes(inputs.measure)) liveUnitWeight = 1;
+    if (!isNaN(Number(inputs.measure))) {
+        liveUnitWeight = Number(inputs.measure);
+    }
 
-    const liveTotalWeight = Math.round(Number(inputs.multiplier) * liveUnitWeight * 10) / 10;
+    const liveTotalWeight = inputs.measure ? Math.round(Number(inputs.multiplier) * liveUnitWeight * 10) / 10 : 0;
 
-    const isOutlier = (dbItem?.micronutrients?.Iron || dbItem?.micronutrients?.['Iron, Fe'] || 0) * (liveTotalWeight / 100) > 50 ||
-                     (dbItem?.micronutrients?.Calcium || 0) * (liveTotalWeight / 100) > 1000 ||
-                     (dbItem?.energy_kcal || 0) * (liveTotalWeight / 100) > 2000;
+    const isOutlier = inputs.measure && (
+        (dbItem?.micronutrients?.Iron || dbItem?.micronutrients?.['Iron, Fe'] || 0) * (liveTotalWeight / 100) > 50 ||
+        (dbItem?.micronutrients?.Calcium || 0) * (liveTotalWeight / 100) > 1000 ||
+        (dbItem?.energy_kcal || 0) * (liveTotalWeight / 100) > 2000
+    );
+
+    const handleSaveCustomMeasure = async () => {
+        if (!customLabel.trim() || !customWeightG || isNaN(Number(customWeightG))) {
+            toast.error('Please enter a label and valid weight in grams');
+            return;
+        }
+
+        setSavingCustomMeasure(true);
+        try {
+            const { error } = await supabase
+                .from('food_measures')
+                .insert({
+                    food_item_id: dbItem.id,
+                    label: customLabel.trim(),
+                    weight_g: parseFloat(customWeightG)
+                });
+
+            if (error) throw error;
+
+            // Update the measure selection
+            onInputChange(ing.id, 'measure', customWeightG);
+            
+            // Reset form
+            setShowCustomInput(false);
+            setCustomLabel('');
+            setCustomWeightG('');
+            
+            toast.success(`Added measure: ${customLabel}`);
+        } catch (err: any) {
+            console.error('Error saving custom measure:', err);
+            toast.error(err.message || 'Failed to save measure');
+        } finally {
+            setSavingCustomMeasure(false);
+        }
+    };
 
     const handleSave = async () => {
         if (!inputs.multiplier || isNaN(Number(inputs.multiplier))) {
-            toast.error('Please enter a valid multiplier');
+            toast.error('Please enter a valid quantity');
             return;
         }
         if (!inputs.measure) {
-            toast.error('Please select a unit/measure');
+            toast.error('Please select or create a measure');
             return;
         }
         await onSave();
@@ -217,30 +258,77 @@ function PortionCard({
                     <label className={cn(
                         "text-[9px] uppercase font-bold mb-1 block",
                         isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-600 dark:text-slate-400"
-                    )}>Unit Type</label>
-                    <select
-                        value={inputs.measure}
-                        disabled={isAccepted}
-                        onChange={e => onInputChange(ing.id, 'measure', e.target.value)}
-                        className={cn(
-                            "w-full h-8 rounded px-2 text-xs focus:outline-none cursor-pointer transition-colors",
-                            isAccepted
-                                ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 cursor-not-allowed"
-                                : "bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:ring-indigo-500"
-                        )}
-                    >
-                        <option value={originalDetails.measure_label}>{originalDetails.measure_label} (Default)</option>
-                        <option disabled>--- Database Portions ---</option>
-                        {dbItem?.portions?.map((p: any, idx: number) => (
-                            <option key={idx} value={p.weight_g}>{p.label} ({p.weight_g}g unit)</option>
-                        ))}
-                        <option disabled>--- Standard Units ---</option>
-                        <option value="1">gram (1g)</option>
-                        <option value="1000">kilogram (1000g)</option>
-                        <option value="28.35">ounce (28.35g)</option>
-                        <option value="453.59">pound (453.59g)</option>
-                        <option value="1">milliliter (1g approx)</option>
-                    </select>
+                    )}>Unit Type (from database)</label>
+                    {showCustomInput ? (
+                        <div className="space-y-2">
+                            <input
+                                type="text"
+                                placeholder="Label (e.g., 'serving', 'cup')"
+                                value={customLabel}
+                                onChange={e => setCustomLabel(e.target.value)}
+                                className="w-full h-8 rounded px-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            />
+                            <input
+                                type="number"
+                                placeholder="Weight in grams"
+                                value={customWeightG}
+                                onChange={e => setCustomWeightG(e.target.value)}
+                                step="0.1"
+                                className="w-full h-8 rounded px-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            />
+                            <div className="flex gap-1">
+                                <button
+                                    onClick={handleSaveCustomMeasure}
+                                    disabled={savingCustomMeasure}
+                                    className="flex-1 h-7 rounded text-[9px] font-bold transition-colors bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 flex items-center justify-center gap-1"
+                                >
+                                    {savingCustomMeasure ? <Loader2 size={10} className="animate-spin" /> : <Plus size={10} />}
+                                    Add
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShowCustomInput(false);
+                                        setCustomLabel('');
+                                        setCustomWeightG('');
+                                    }}
+                                    className="flex-1 h-7 rounded text-[9px] font-bold transition-colors bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <select
+                            value={inputs.measure}
+                            disabled={isAccepted}
+                            onChange={e => onInputChange(ing.id, 'measure', e.target.value)}
+                            className={cn(
+                                "w-full h-8 rounded px-2 text-xs focus:outline-none cursor-pointer transition-colors",
+                                isAccepted
+                                    ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 cursor-not-allowed"
+                                    : "bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:ring-indigo-500"
+                            )}
+                        >
+                            <option value="">-- Select a measure --</option>
+                            {dbItem?.portions && dbItem.portions.length > 0 ? (
+                                dbItem.portions.map((p: any, idx: number) => (
+                                    <option key={idx} value={p.weight_g}>{p.label} ({p.weight_g}g)</option>
+                                ))
+                            ) : (
+                                <option disabled>No measures available</option>
+                            )}
+                            <option disabled>---</option>
+                            <option value="__custom__">+ Create custom measure</option>
+                        </select>
+                    )}
+                    {!showCustomInput && inputs.measure === '__custom__' && (
+                        <button
+                            onClick={() => setShowCustomInput(true)}
+                            className="mt-1 w-full h-7 rounded text-[9px] font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors border border-indigo-200 dark:border-indigo-800"
+                        >
+                            Enter custom measure
+                        </button>
+                    )}
                 </div>
                 <div className="pl-2 border-l border-slate-200 dark:border-slate-700 flex flex-col justify-end items-center gap-1">
                     <div className={cn(
