@@ -141,20 +141,54 @@ export function PlannerContent({
 
                         {/* List of Meals */}
                         <div className="space-y-3">
-                            {plan && Object.entries(plan as any).map(([mealType, recipe]: [string, any]) => {
-                                if (!recipe || typeof recipe !== 'object') return null;
-                                return (
-                                    <RecipeListItem
-                                        key={recipe.id}
-                                        recipe={recipe}
-                                        mealLabel={mealType}
-                                        unit={unit as any}
-                                        onMarkEaten={() => handleMarkEaten(recipe, mealType)}
-                                        isEaten={eatenMeals.has(mealType)}
-                                        pantryItems={pantryItems}
-                                    />
-                                );
-                            })}
+                            {plan && (
+                                <>
+                                    {plan.breakfast && (
+                                        <RecipeListItem
+                                            key={plan.breakfast.id}
+                                            recipe={plan.breakfast}
+                                            mealLabel="breakfast"
+                                            unit={unit as any}
+                                            onMarkEaten={() => handleMarkEaten(plan.breakfast, 'breakfast')}
+                                            isEaten={eatenMeals.has('breakfast')}
+                                            pantryItems={pantryItems}
+                                        />
+                                    )}
+                                    {plan.lunch && (
+                                        <RecipeListItem
+                                            key={plan.lunch.id}
+                                            recipe={plan.lunch}
+                                            mealLabel="lunch"
+                                            unit={unit as any}
+                                            onMarkEaten={() => handleMarkEaten(plan.lunch, 'lunch')}
+                                            isEaten={eatenMeals.has('lunch')}
+                                            pantryItems={pantryItems}
+                                        />
+                                    )}
+                                    {plan.dinner && (
+                                        <RecipeListItem
+                                            key={plan.dinner.id}
+                                            recipe={plan.dinner}
+                                            mealLabel="dinner"
+                                            unit={unit as any}
+                                            onMarkEaten={() => handleMarkEaten(plan.dinner, 'dinner')}
+                                            isEaten={eatenMeals.has('dinner')}
+                                            pantryItems={pantryItems}
+                                        />
+                                    )}
+                                    {plan.snacks && Array.isArray(plan.snacks) && plan.snacks.map((snack: any, idx: number) => (
+                                        <RecipeListItem
+                                            key={snack.id || `snack-${idx}`}
+                                            recipe={snack}
+                                            mealLabel={`snack-${idx + 1}`}
+                                            unit={unit as any}
+                                            onMarkEaten={() => handleMarkEaten(snack, `snack-${idx + 1}`)}
+                                            isEaten={eatenMeals.has(`snack-${idx + 1}`)}
+                                            pantryItems={pantryItems}
+                                        />
+                                    ))}
+                                </>
+                            )}
                         </div>
 
                         {/* Analysis Section */}
