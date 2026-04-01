@@ -41,6 +41,27 @@ function singularize(word: string): string {
 }
 
 /**
+ * Helper to fetch food items with their portions/measures
+ */
+async function fetchFoodItemsWithMeasures(query: string, searchFields: string): Promise<any[]> {
+    const { data, error } = await supabase
+        .from('food_items')
+        .select(`
+            *,
+            food_measures (
+                id,
+                label,
+                weight_g,
+                food_item_id
+            )
+        `)
+        .or(searchFields)
+        .limit(10);
+    
+    return data || [];
+}
+
+/**
  * Searches for food items in the local Supabase database.
  */
 export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
@@ -55,23 +76,20 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
 
     // 1. Literal ilike match (First Choice)
     // This handles "Olive Oil" matching "Olive Oil" or "Some Olive Oil"
-    let { data, error } = await supabase
-        .from('food_items')
-        .select('*')
-        .or(`name.ilike.%${cleanQuery}%,common_name.ilike.%${cleanQuery}%`)
-        .limit(10);
+    let data = await fetchFoodItemsWithMeasures(
+        cleanQuery,
+        `name.ilike.%${cleanQuery}%,common_name.ilike.%${cleanQuery}%`
+    );
 
     // 2. Singularization Fallback
     // If "Potatoes" yields nothing, try "Potato"
     if (!data || data.length === 0) {
         const singular = singularize(cleanQuery);
         if (singular !== cleanQuery && singular.length >= 3) {
-            const { data: sData } = await supabase
-                .from('food_items')
-                .select('*')
-                .or(`name.ilike.%${singular}%,common_name.ilike.%${singular}%`)
-                .limit(10);
-            if (sData && sData.length > 0) data = sData;
+            data = await fetchFoodItemsWithMeasures(
+                singular,
+                `name.ilike.%${singular}%,common_name.ilike.%${singular}%`
+            );
         }
     }
 
@@ -81,13 +99,20 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
     if (!data || data.length === 0) {
         const words = cleanQuery.split(/\s+/).filter(w => w.length >= 2); // Allow 2+ char words
         if (words.length > 1) {
-            let andChain = supabase.from('food_items').select('*');
+            // For AND queries, we need to build them differently as we can't use the helper
+            let query = supabase.from('food_items').select(`
+                *,
+                food_measures (
+                    id,
+                    label,
+                    weight_g,
+                    food_item_id
+                )
+            `);
             words.forEach(w => {
-                // Postgrest allows multiple filters on same column to be ANDed
-                andChain = andChain.ilike('name', `%${w}%`);
+                query = query.ilike('name', `%${w}%`);
             });
-
-            const { data: andData } = await andChain.limit(10);
+            const { data: andData } = await query.limit(10);
             if (andData && andData.length > 0) data = andData;
         }
     }
@@ -99,16 +124,14 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         if (words.length > 0) {
             // Use the longest word (most specific/meaningful) regardless of length
             const longestWord = words.sort((a, b) => b.length - a.length)[0];
-            const { data: lwData } = await supabase
-                .from('food_items')
-                .select('*')
-                .or(`name.ilike.%${longestWord}%,common_name.ilike.%${longestWord}%`)
-                .limit(10);
-            if (lwData && lwData.length > 0) data = lwData;
+            data = await fetchFoodItemsWithMeasures(
+                longestWord,
+                `name.ilike.%${longestWord}%,common_name.ilike.%${longestWord}%`
+            );
         }
     }
 
-    if (error || !data) return [];
+    if (!data) return [];
 
     return data.map(item => ({
         id: item.id,
@@ -123,7 +146,11 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         fat_g: item.fat_g,
         micronutrients: item.micronutrients || {},
         phytonutrients: item.phytonutrients || {},
-        portions: item.portions || [], // Use JSONB column
+        portions: (item.food_measures || []).map((m: any) => ({
+            id: m.id,
+            label: m.label,
+            weight_g: m.weight_g
+        })),
         source: 'local' as const
     })).sort((a, b) => {
         const aName = a.name.toLowerCase();
