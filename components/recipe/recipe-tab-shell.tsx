@@ -79,7 +79,7 @@ export function RecipeTabShell({
                                 )}
                             >
                                 <Filter size={14} className={(hasActiveFilters || (isActionPanelOpen && activeView === 'recipe-filters')) ? 'text-white' : 'text-slate-300'} />
-                                <span>Filters</span>
+                                <span>Filter</span>
                                 {hasActiveFilters && (
                                     <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                                 )}
