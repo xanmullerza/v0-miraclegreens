@@ -32,23 +32,59 @@ export function PortionMatchPanel({
 
     const [showMeasurementDialog, setShowMeasurementDialog] = useState(false);
     const [unmappedIngredients, setUnmappedIngredients] = useState<any[]>([]);
+    const [autoSkippedIds, setAutoSkippedIds] = useState<Set<string>>(new Set());
 
-    const nonSkippedIngredients = ingredients.filter(ing => !skippedIngredients[ing.id]);
-    const allVerified = ingredients.every(ing => stepTwoSaved[ing.id] || skippedIngredients[ing.id]);
+    useEffect(() => {
+        // Auto-skip ingredients with no food item match OR items where auto-match has very low confidence
+        const noMatch = ingredients.filter(ing => {
+            // No food item match at all
+            if (!matchedIngredients[ing.id]) return true;
+            
+            // Has food item, but check auto-match confidence
+            const dbItem = matchedIngredients[ing.id];
+            if (!dbItem?.portions || dbItem.portions.length === 0) return true; // No available measures
+            
+            // Try auto-matching to see if confidence is too low
+            const originalDetails = parseRecipeAmount(ing.amount, ing.item);
+            const bestMatch = findBestMeasureMatch(
+                originalDetails.measure_label,
+                originalDetails.quantity,
+                dbItem.portions
+            );
+            
+            // If no good match found (confidence < 50), auto-skip for manual measurement
+            return !bestMatch;
+        }).map(ing => ing.id);
+        
+        setAutoSkippedIds(new Set(noMatch));
+    }, [ingredients, matchedIngredients]);
+
+    const nonSkippedIngredients = ingredients.filter(ing => 
+        !skippedIngredients[ing.id] && !autoSkippedIds.has(ing.id)
+    );
+    const allUnskippedVerified = nonSkippedIngredients.every(ing => stepTwoSaved[ing.id]);
 
     // Use finalize callback from state if provided as prop
     const finalizeHandler = onFinalize || stateFinalize;
 
     // Find ingredients without measures and show measurement dialog
     const handleShowMeasurementDialog = () => {
-        const unmapped = nonSkippedIngredients.filter(ing => {
+        // Include both unskipped items without measures AND auto-skipped items
+        const unmapped = ingredients.filter(ing => {
+            // Auto-skipped items always need measurement
+            if (autoSkippedIds.has(ing.id)) return true;
+            
+            // Manually skipped items also need measurement
+            if (skippedIngredients[ing.id]) return true;
+            
+            // Non-skipped items without measures need it too
             const inputs = stepTwoInputs[ing.id];
-            return !inputs || !inputs.measure; // No measure selected
+            return !inputs || !inputs.measure;
         }).map(ing => ({
             id: ing.id,
             item: ing.item,
             amount: ing.amount,
-            food_item_id: matchedIngredients[ing.id]?.id
+            food_item_id: matchedIngredients[ing.id]?.id || ing.id // Use ingredient ID as fallback for auto-skipped
         }));
 
         if (unmapped.length === 0) {
@@ -59,6 +95,14 @@ export function PortionMatchPanel({
             setShowMeasurementDialog(true);
         }
     };
+
+    // Auto-open measurement dialog once all unskipped are verified
+    useEffect(() => {
+        if (allUnskippedVerified && nonSkippedIngredients.length > 0) {
+            // Auto-show the measurement dialog for skipped items
+            handleShowMeasurementDialog();
+        }
+    }, [allUnskippedVerified, nonSkippedIngredients.length]);
 
     const handleMeasurementDialogComplete = () => {
         setShowMeasurementDialog(false);
@@ -88,18 +132,18 @@ export function PortionMatchPanel({
                 </p>
 
                 {/* Skipped Ingredients Warning */}
-                {Object.keys(skippedIngredients).length > 0 && (
-                    <div className="p-4 bg-rose-50 dark:bg-rose-900/10 rounded-xl border border-rose-200 dark:border-rose-800/50 flex items-start gap-3">
-                        <X size={16} className="flex-shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
+                {(Object.keys(skippedIngredients).length > 0 || autoSkippedIds.size > 0) && (
+                    <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-200 dark:border-amber-800/50 flex items-start gap-3">
+                        <AlertTriangle size={16} className="flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
                         <div className="flex-1 text-sm">
-                            <p className="font-semibold text-rose-900 dark:text-rose-200 mb-1">Skipped Ingredients</p>
-                            <p className="text-rose-700 dark:text-rose-300 text-xs">
-                                The following {Object.keys(skippedIngredients).length} ingredient{Object.keys(skippedIngredients).length !== 1 ? 's' : ''} will be excluded:
+                            <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">Skipped Portions</p>
+                            <p className="text-amber-700 dark:text-amber-300 text-xs">
+                                The following ingredient{(Object.keys(skippedIngredients).length + autoSkippedIds.size) !== 1 ? 's' : ''} will be measured manually:
                             </p>
                             <div className="mt-2 space-y-1">
-                                {ingredients.filter(ing => skippedIngredients[ing.id]).map(ing => (
-                                    <p key={ing.id} className="text-xs text-rose-700 dark:text-rose-300">
-                                        • {cleanIngredientDisplay(ing.base_ingredient || ing.item)} ({ing.amount})
+                                {ingredients.filter(ing => skippedIngredients[ing.id] || autoSkippedIds.has(ing.id)).map(ing => (
+                                    <p key={ing.id} className="text-xs text-amber-700 dark:text-amber-300">
+                                        • {cleanIngredientDisplay(ing.base_ingredient || ing.item)} — {ing.amount}
                                     </p>
                                 ))}
                             </div>
@@ -109,6 +153,7 @@ export function PortionMatchPanel({
 
                 {/* Portion Cards */}
                 <div className="space-y-3">
+                    {/* Editable portion cards for non-skipped ingredients */}
                     {nonSkippedIngredients.map((ing, idx) => (
                         <PortionCard
                             key={ing.id}
@@ -120,19 +165,46 @@ export function PortionMatchPanel({
                             onInputChange={onInputChange}
                             onSave={() => onSave(ing.id)}
                             isLast={idx === nonSkippedIngredients.length - 1}
+                            isAutoSkipped={false}
                         />
+                    ))}
+
+                    {/* Skipped ingredients (auto-skipped or manually skipped) */}
+                    {ingredients.filter(ing => autoSkippedIds.has(ing.id) || skippedIngredients[ing.id]).map((ing) => (
+                        <div
+                            key={ing.id}
+                            className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/10 p-3 shadow-sm flex flex-col gap-2"
+                        >
+                            {/* Original Text */}
+                            <div className="rounded p-2 text-xs border bg-amber-100/50 dark:bg-amber-800/20 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800/50 flex items-center gap-2">
+                                <span className="font-semibold uppercase tracking-widest text-[9px] opacity-70">Original</span>
+                                <span className="italic text-xs">&quot;{ing.amount} {ing.item}&quot;</span>
+                            </div>
+
+                            {/* Skipped Badge */}
+                            <div className="flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-800 rounded-lg border border-amber-200 dark:border-amber-700">
+                                <span className="text-xs font-semibold text-amber-600 dark:text-amber-300">Will be measured manually</span>
+                                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 uppercase tracking-widest">
+                                    SKIPPED
+                                </span>
+                            </div>
+                        </div>
                     ))}
                 </div>
 
-                {/* Finalize Section */}
-                {allVerified && finalizeHandler && (
+                {/* Review/Finalize Section */}
+                {allUnskippedVerified ? (
                     <div className="p-4 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800/50 flex flex-col items-center gap-3 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 shadow-sm">
                             <Sparkles size={20} className="fill-current" />
                         </div>
                         <div className="text-center">
-                            <h4 className="font-bold text-slate-900 dark:text-white text-sm">All Complete!</h4>
-                            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Ready to finalize nutrition calculations.</p>
+                            <h4 className="font-bold text-slate-900 dark:text-white text-sm">Ready to Measure Custom Portions</h4>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                                {unmappedIngredients.length > 0 
+                                    ? `${unmappedIngredients.length} ingredient${unmappedIngredients.length !== 1 ? 's' : ''} need${unmappedIngredients.length === 1 ? 's' : ''} manual measurement`
+                                    : 'All portions verified. Ready to calculate nutrition.'}
+                            </p>
                         </div>
                         <button
                             onClick={handleShowMeasurementDialog}
@@ -147,9 +219,21 @@ export function PortionMatchPanel({
                             ) : (
                                 <>
                                     <Sparkles size={16} />
-                                    Finish & Calculate Nutrition
+                                    {unmappedIngredients.length > 0 ? 'Measure Custom Portions' : 'Finish & Calculate Nutrition'}
                                 </>
                             )}
+                        </button>
+                    </div>
+                ) : (
+                    <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center gap-3 mt-6">
+                        <p className="text-sm text-slate-600 dark:text-slate-300">
+                            Verify all portions above, then review skipped items for manual measurement.
+                        </p>
+                        <button
+                            onClick={handleShowMeasurementDialog}
+                            className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-bold text-sm transition-all"
+                        >
+                            Review All & Measure Skipped
                         </button>
                     </div>
                 )}
@@ -174,12 +258,13 @@ interface PortionCardProps {
     onInputChange: (ingId: string, field: 'multiplier' | 'measure', value: string) => void;
     onSave: () => Promise<void>;
     isLast?: boolean;
+    isAutoSkipped?: boolean;
 }
 
 function PortionCard({
     ing, recipe, matchedIngredients,
     stepTwoInputs, stepTwoSaved,
-    onInputChange, onSave, isLast
+    onInputChange, onSave, isLast, isAutoSkipped = false
 }: PortionCardProps) {
     const [showCustomInput, setShowCustomInput] = useState(false);
     const [customLabel, setCustomLabel] = useState('');
