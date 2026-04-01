@@ -34,11 +34,11 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
             case 'remixes':
                 return { isRemix: true, onlyMyRecipes: false, isMix: false };
             case 'my-recipes':
-                return { isRemix: false, onlyMyRecipes: true, isMix: false };
+                return { isRemix: undefined, onlyMyRecipes: true, isMix: undefined };
             case 'mixes':
                 return { isRemix: false, onlyMyRecipes: false, isMix: true };
             default:
-                return { isRemix: false, onlyMyRecipes: false, isMix: false };
+                return { isRemix: undefined, onlyMyRecipes: false, isMix: undefined };
         }
     };
 
