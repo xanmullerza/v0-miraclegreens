@@ -225,6 +225,46 @@ export function RecipeFilterContent({ onClose }: { onClose?: () => void }) {
           </div>
         </div>
 
+        {/* Nutrition View Mode Section */}
+        <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+          <div className="p-4 bg-white dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-sm font-bold text-slate-900 dark:text-white">
+                  Nutrition Display
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Per serving vs total recipe nutrients
+                </p>
+              </div>
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700 gap-1 shrink-0">
+                <button 
+                  onClick={() => setLocalFilters(prev => ({ ...prev, nutritionViewMode: 'per-serving' }))}
+                  className={cn(
+                    "px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
+                    localFilters.nutritionViewMode === 'per-serving'
+                      ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
+                      : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  )}
+                >
+                  Per Serving
+                </button>
+                <button 
+                  onClick={() => setLocalFilters(prev => ({ ...prev, nutritionViewMode: 'total' }))}
+                  className={cn(
+                    "px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
+                    localFilters.nutritionViewMode === 'total'
+                      ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
+                      : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  )}
+                >
+                  Total
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Cooking Setup Section */}
         <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
           <button
