@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DietType } from '@/lib/data/recipes';
 import { GoalType, ActivityLevel } from './types';
+import { supabase } from '@/lib/supabase';
 
 export interface PlannerState {
     step: 1 | 2 | 3;
@@ -106,6 +107,51 @@ export function usePlannerState() {
     useEffect(() => {
         if (plan && step === 1) setStep(3);
     }, [plan, step]);
+
+    // Validate plan recipes against DB to handle deleted recipes
+    useEffect(() => {
+        if (!plan) return;
+
+        const validatePlan = async () => {
+            try {
+                const recipeIds = [
+                    plan.breakfast?.id,
+                    plan.lunch?.id,
+                    plan.dinner?.id,
+                    ...(plan.snacks || []).map((s: any) => s.id)
+                ].filter(Boolean);
+
+                if (recipeIds.length === 0) return;
+
+                const { data, error } = await supabase
+                    .from('recipes')
+                    .select('id')
+                    .in('id', recipeIds);
+
+                if (error) {
+                    console.error('Error validating plan recipes:', error);
+                    return;
+                }
+
+                const existingIds = new Set(data.map((r: any) => r.id));
+                const allExist = recipeIds.every(id => existingIds.has(id));
+
+                if (!allExist) {
+                    console.warn('Current plan contains deleted recipes. Clearing plan.');
+                    setPlan(null);
+                    setStep(1);
+                    // Import toast if needed, but for now we'll just use setPlan(null) 
+                    // and usePlannerActions will handle errors if they happen during interactions
+                }
+            } catch (e) {
+                console.error('Failed to validate plan:', e);
+            }
+        };
+
+        // Delay slightly to avoid race conditions with profile loading
+        const timer = setTimeout(validatePlan, 500);
+        return () => clearTimeout(timer);
+    }, [plan, setPlan, setStep]);
 
     return {
         state: {
