@@ -156,7 +156,7 @@ export function TrackerTabShell({
                     </div>
 
                     {/* List/Cart Toggle */}
-                    {title.toUpperCase() === 'SHOPPING' && (
+                    {(title.toUpperCase() === 'SHOPPING' || title.toUpperCase() === 'FOODS') && (
                         <div className="flex items-center gap-2 ml-auto">
                             <button
                                 onClick={() => onViewModeChange?.('list')}
@@ -184,7 +184,7 @@ export function TrackerTabShell({
                             </button>
                         </div>
                     )}
-                    {title.toUpperCase() !== 'SHOPPING' && (
+                    {title.toUpperCase() !== 'SHOPPING' && title.toUpperCase() !== 'FOODS' && (
                         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50 whitespace-nowrap ml-auto">
                             {title.toUpperCase()} LIBRARY
                         </div>

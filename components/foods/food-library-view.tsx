@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search, ShoppingCart } from 'lucide-react';
+import { ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search, ShoppingCart, List } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
@@ -35,6 +35,8 @@ interface FoodsViewProps {
     onSearchChange?: (query: string) => void;
     hideControls?: boolean;
     noContainer?: boolean;
+    viewMode?: 'list' | 'cart';
+    onViewModeChange?: (mode: 'list' | 'cart') => void;
 }
 
 export function FoodsView({ 
@@ -43,7 +45,9 @@ export function FoodsView({
     searchQuery: externalSearchQuery, 
     onSearchChange,
     hideControls = false,
-    noContainer = false
+    noContainer = false,
+    viewMode = 'list',
+    onViewModeChange
 }: FoodsViewProps) {
     const { energyUnit } = useUserPreferences();
     const { searchQuery } = useSearch();
@@ -386,7 +390,32 @@ export function FoodsView({
                                         </div>
                                     </div>
 
-                                    <div className="ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Ingredients Library</div>
+                                    <div className="ml-auto flex items-center gap-2">
+                                        <button
+                                            onClick={() => onViewModeChange?.('list')}
+                                            className={cn(
+                                                "h-8 px-3 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all",
+                                                viewMode === 'list'
+                                                    ? "bg-emerald-600 text-white shadow-sm"
+                                                    : "bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
+                                            )}
+                                        >
+                                            <List size={12} />
+                                            List
+                                        </button>
+                                        <button
+                                            onClick={() => onViewModeChange?.('cart')}
+                                            className={cn(
+                                                "h-8 px-3 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all",
+                                                viewMode === 'cart'
+                                                    ? "bg-emerald-600 text-white shadow-sm"
+                                                    : "bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
+                                            )}
+                                        >
+                                            <ShoppingCart size={12} />
+                                            Cart
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}

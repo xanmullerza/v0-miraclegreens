@@ -15,6 +15,7 @@ export default function TrackerPage() {
     const [activeTab, setActiveTab] = useState<TabId>('shopping');
     const [scannerOpen, setScannerOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [viewMode, setViewMode] = useState<'list' | 'cart'>('list');
 
     const tabs: { id: TabId; label: string; activeColor: string }[] = [
         { id: 'shopping', label: 'Shopping', activeColor: 'text-emerald-500' },
@@ -63,7 +64,10 @@ export default function TrackerPage() {
                     )}
                     {activeTab === 'foods' && (
                         <div className="animate-in fade-in duration-300">
-                            <FoodsView />
+                            <FoodsView 
+                                viewMode={viewMode}
+                                onViewModeChange={setViewMode}
+                            />
                         </div>
                     )}
                     {activeTab === 'nutrients' && (
