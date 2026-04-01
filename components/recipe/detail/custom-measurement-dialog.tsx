@@ -54,10 +54,12 @@ export function CustomMeasurementDialog({
 
             const { error } = await supabase
                 .from('food_measures')
-                .insert({
+                .upsert({
                     food_item_id: current.food_item_id,
                     label: label.trim(),
                     weight_g: parseFloat(weight)
+                }, {
+                    onConflict: 'food_item_id,label'
                 });
 
             if (error) throw error;

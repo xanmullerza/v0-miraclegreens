@@ -328,10 +328,12 @@ function PortionCard({
         try {
             const { error } = await supabase
                 .from('food_measures')
-                .insert({
+                .upsert({
                     food_item_id: dbItem.id,
                     label: customLabel.trim(),
                     weight_g: parseFloat(customWeightG)
+                }, {
+                    onConflict: 'food_item_id,label'
                 });
 
             if (error) throw error;
