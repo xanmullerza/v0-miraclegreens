@@ -73,7 +73,7 @@ interface ShoppingListViewProps {
 }
 
 // Module-level cache for enrichment data to avoid re-fetching on re-renders
-const enrichmentCache = new Map<string, { id: string; category: string; image: string; common_name: string }>();
+const enrichmentCache = new Map<string, { id: string; category: string; image: string; common_name: string; price?: number; stocked?: boolean }>();
 
 export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOpenChange }: ShoppingListViewProps = {}) {
     const router = useRouter();
@@ -150,20 +150,22 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     if (!item.image && cached.image) u.image = cached.image;
                     if (!item.common_name && cached.common_name) u.common_name = cached.common_name;
                     if (!item.food_item_id && cached.id) u.food_item_id = cached.id;
+                    if (!item.price && cached.price) u.price = cached.price;
+                    if (item.stocked === undefined && cached.stocked !== undefined) u.stocked = cached.stocked;
                     return u;
                 }
                 return item;
             });
 
-            const needEnrichById = combined.filter(i => i.food_item_id && (!i.category || !i.image));
-            const needEnrichByName = combined.filter(i => !i.food_item_id && !i.category);
+            const needEnrichById = combined.filter(i => i.food_item_id && (!i.category || !i.image || !i.price || i.stocked === undefined));
+            const needEnrichByName = combined.filter(i => !i.food_item_id && (!i.category || !i.price || i.stocked === undefined));
 
             if (needEnrichById.length > 0 || needEnrichByName.length > 0) {
                 setEnriching(true);
                 const idToData = new Map<string, any>();
                 if (needEnrichById.length > 0) {
                     const ids = needEnrichById.map(i => i.food_item_id).filter(Boolean) as string[];
-                    const { data } = await supabase.from('food_items').select('id, category, image, common_name').in('id', ids);
+                    const { data } = await supabase.from('food_items').select('id, category, image, common_name, price, stocked').in('id', ids);
                     data?.forEach((d: any) => { idToData.set(d.id, d); enrichmentCache.set(d.id, d); });
                 }
                 
@@ -171,7 +173,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 if (needEnrichByName.length > 0 && !isCancelled) {
                     const uniqueNames = [...new Set(needEnrichByName.map(i => i.name.toLowerCase()))];
                     const orConditions = uniqueNames.map(name => `name.ilike.%${name}%,common_name.ilike.%${name}%`).join(',');
-                    const { data } = await supabase.from('food_items').select('id, name, common_name, category, image').or(orConditions).limit(uniqueNames.length * 5);
+                    const { data } = await supabase.from('food_items').select('id, name, common_name, category, image, price, stocked').or(orConditions).limit(uniqueNames.length * 5);
                     if (data) {
                         for (const searchName of uniqueNames) {
                             let bestMatch: any = null, bestScore = 0;
@@ -193,11 +195,11 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     combined = combined.map(item => {
                         if (item.food_item_id && idToData.has(item.food_item_id)) {
                             const d = idToData.get(item.food_item_id);
-                            return { ...item, category: item.category || d.category, image: item.image || d.image, common_name: item.common_name || d.common_name };
+                            return { ...item, category: item.category || d.category, image: item.image || d.image, common_name: item.common_name || d.common_name, price: item.price || d.price, stocked: item.stocked ?? d.stocked };
                         }
                         if (!item.category && nameToData.has(item.name.toLowerCase())) {
                             const d = nameToData.get(item.name.toLowerCase());
-                            return { ...item, category: d.category, image: d.image, common_name: d.common_name, food_item_id: d.id };
+                            return { ...item, category: d.category, image: d.image, common_name: d.common_name, food_item_id: d.id, price: d.price, stocked: d.stocked };
                         }
                         return item;
                     });
