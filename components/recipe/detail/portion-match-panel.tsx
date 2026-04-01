@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Loader2, AlertTriangle, Check, RefreshCw, ArrowLeft, Sparkles, Plus, Zap } from 'lucide-react';
 import { parseRecipeAmount, cleanIngredientDisplay } from '@/lib/utils/parsing-utils';
-import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
+import { findBestMeasureMatch, getMeasureMatchSuggestions } from '@/lib/utils/measure-matcher';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -50,10 +50,12 @@ export function PortionMatchPanel({
                 return true; // No available measures
             }
             
-            console.log(`[Skip Debug] ${ing.item}: Matched to "${dbItem.name}" with ${dbItem.portions.length} portions`);
+            console.log(`[Skip Debug] ${ing.item}: Matched to "${dbItem.name}" with ${dbItem.portions.length} portions:`, dbItem.portions.map((p: any) => p.label).join(', '));
             
             // Try auto-matching to see if confidence is high enough (>= 75)
             const originalDetails = parseRecipeAmount(ing.amount, ing.item);
+            console.log(`[Skip Debug]   Original: "${originalDetails.measure_label}" x ${originalDetails.quantity}`);
+            
             const bestMatch = findBestMeasureMatch(
                 originalDetails.measure_label,
                 originalDetails.quantity,
@@ -61,7 +63,16 @@ export function PortionMatchPanel({
             );
             
             if (!bestMatch) {
-                console.log(`[Skip Debug]   → No high-confidence measure match for "${originalDetails.measure_label}"`);
+                // Show top 3 suggestions to understand why it didn't match
+                const suggestions = getMeasureMatchSuggestions(
+                    originalDetails.measure_label,
+                    originalDetails.quantity,
+                    dbItem.portions,
+                    3
+                );
+                console.log(`[Skip Debug]   No high-confidence match. Top suggestions:`, suggestions.map((s: any) => `${s.label} (${s.confidence.toFixed(0)}%)`).join(', '));
+            } else {
+                console.log(`[Skip Debug]   ✓ Auto-matched to: ${bestMatch.label} (${bestMatch.confidence.toFixed(0)}%)`);
             }
             
             // If no high-confidence match found (confidence < 75), auto-skip for manual measurement
