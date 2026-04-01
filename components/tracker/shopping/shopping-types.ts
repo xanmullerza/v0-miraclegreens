@@ -17,6 +17,7 @@ export interface ShoppingItem {
     source?: 'manual' | 'mealplan' | 'scanned';
     barcode?: string;
     price?: number;
+    stocked?: boolean;
     image_url?: string;
     image?: string;
     common_name?: string;
