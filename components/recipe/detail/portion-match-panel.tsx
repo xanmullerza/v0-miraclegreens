@@ -107,6 +107,12 @@ export function PortionMatchPanel({
     const handleMeasurementDialogComplete = () => {
         setShowMeasurementDialog(false);
         setUnmappedIngredients([]);
+        
+        // Mark all auto-skipped items as skipped in parent state before finalizing
+        if (state.onSkipIngredients && autoSkippedIds.size > 0) {
+            state.onSkipIngredients(Array.from(autoSkippedIds));
+        }
+        
         // Proceed to finalize
         finalizeHandler?.();
     };

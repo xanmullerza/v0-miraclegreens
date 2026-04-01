@@ -24,6 +24,7 @@ export interface SmartMatchPortionState {
     onSave: (ingId: string) => Promise<void>;
     onBack: () => void;
     onFinalize?: () => Promise<void>;
+    onSkipIngredients?: (ingIds: string[]) => void;
 }
 
 interface ActionPanelContextType {

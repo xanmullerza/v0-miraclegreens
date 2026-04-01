@@ -623,6 +623,13 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 onSave: handlePortionSave,
                 onBack: () => setMappingStep('FOOD_MATCH'),
                 onFinalize: finalizeRecipeNutrition,
+                onSkipIngredients: (ingIds: string[]) => {
+                    const newSkipped = { ...skippedIngredients };
+                    ingIds.forEach(id => {
+                        newSkipped[id] = true;
+                    });
+                    setSkippedIngredients(newSkipped);
+                },
             });
             navigateTo('portion-match-picker');
         }
