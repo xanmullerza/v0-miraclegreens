@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
 import { cleanIngredientDisplay, extractCoreName, parseRecipeAmount } from '@/lib/utils/parsing-utils';
 import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
+import { IngredientReviewPanel } from './ingredient-review-panel';
 import type { Ingredient } from './types';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -61,7 +62,19 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                 />
             )}
 
-            {/* STEP 2: PORTION MATCH */}
+            {/* STEP 2: INGREDIENT REVIEW */}
+            {mappingStep === 'INGREDIENT_REVIEW' && (
+                <IngredientReviewPanel
+                    ingredients={ingredients}
+                    matchedIngredients={matchedIngredients}
+                    setMatchedIngredients={setMatchedIngredients}
+                    skippedIngredients={skippedIngredients}
+                    setSkippedIngredients={setSkippedIngredients}
+                    setMappingStep={setMappingStep}
+                />
+            )}
+
+            {/* STEP 3: PORTION MATCH */}
             {mappingStep === 'PORTION_MATCH' && (
                 <StepTwoPortionMatch
                     recipe={recipe}

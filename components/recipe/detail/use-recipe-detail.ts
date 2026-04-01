@@ -44,7 +44,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     const [customPortions, setCustomPortions] = useState<Record<string, string>>({});
     
     // Phase 4: Two-Step Workflow
-    const [mappingStep, setMappingStep] = useState<'FOOD_MATCH' | 'PORTION_MATCH'>('FOOD_MATCH');
+    const [mappingStep, setMappingStep] = useState<'FOOD_MATCH' | 'INGREDIENT_REVIEW' | 'PORTION_MATCH'>('FOOD_MATCH');
     
     // Step 2 State
     const [stepTwoInputs, setStepTwoInputs] = useState<Record<string, { multiplier: string, measure: string, isSaving?: boolean }>>({});
@@ -188,12 +188,28 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         }
     }, [ingredients]);
 
-    // Auto-transition to Step 2 once all ingredients are decided
+    // Auto-transition to review once all ingredients are decided (matched or skipped)
     useEffect(() => {
         if (mappingStep === 'FOOD_MATCH' && ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id])) {
-            setMappingStep('PORTION_MATCH');
+            setMappingStep('INGREDIENT_REVIEW');
         }
     }, [ingredients, acceptedMatches, skippedIngredients, mappingStep]);
+
+    // Auto-transition from review to portions once all ingredients are accepted
+    useEffect(() => {
+        if (mappingStep === 'INGREDIENT_REVIEW' && ingredients.length > 0) {
+            // Only proceed if all matched ingredients have verified food items
+            const allVerified = ingredients.every(ing => {
+                // Skipped ingredients are OK
+                if (skippedIngredients[ing.id]) return true;
+                // Matched ingredients must have a food item
+                return matchedIngredients[ing.id]?.id;
+            });
+            if (allVerified) {
+                setMappingStep('PORTION_MATCH');
+            }
+        }
+    }, [mappingStep, ingredients, matchedIngredients, skippedIngredients]);
 
     const fetchRecipeDetails = async () => {
         try {
@@ -518,8 +534,8 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     unmatchedIngredients: unmatchableForDialog,
                     onComplete: () => {
                         setIngredientMatch(null);
-                        // Transition to portion match
-                        setMappingStep('PORTION_MATCH');
+                        // Transition to REVIEW step (not directly to portions)
+                        setMappingStep('INGREDIENT_REVIEW');
                     },
                     onMatched: (ingId: string, foodItem: any) => {
                         setMatchedIngredients(prev => ({ ...prev, [ingId]: foodItem }));
@@ -530,8 +546,8 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 toast.success(`Auto-matched ${Object.keys(autoMatched).length} ingredients. ${unmatchable.length} need manual selection.`, { duration: 2000 });
             } else {
                 toast.success(`✓ Successfully auto-matched all ${Object.keys(autoMatched).length} ingredients!`, { id: loadingToastId });
-                // No unmatchable items - proceed to portion matching
-                setMappingStep('PORTION_MATCH');
+                // No unmatchable items - proceed to review
+                setMappingStep('INGREDIENT_REVIEW');
             }
         } catch (err: any) {
             console.error('Auto-match error:', err);

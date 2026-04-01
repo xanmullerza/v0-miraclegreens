@@ -92,7 +92,7 @@ export interface RecipeDetailData {
     setSkippedIngredients: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
     acceptedMatches: Record<string, boolean>;
     setAcceptedMatches: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-    mappingStep: 'FOOD_MATCH' | 'PORTION_MATCH';
+    mappingStep: 'FOOD_MATCH' | 'INGREDIENT_REVIEW' | 'PORTION_MATCH';
     setMappingStep: React.Dispatch<React.SetStateAction<'FOOD_MATCH' | 'PORTION_MATCH'>>;
     stepTwoInputs: Record<string, { multiplier: string; measure: string; isSaving?: boolean }>;
     setStepTwoInputs: React.Dispatch<React.SetStateAction<Record<string, { multiplier: string; measure: string; isSaving?: boolean }>>>;
