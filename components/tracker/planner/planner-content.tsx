@@ -248,7 +248,7 @@ export function PlannerContent({
                                         {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                                     </h3>
                                     <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">
-                                        {new Date().toLocaleDateString('en-US', { weekday: 'long' })} Protocol
+                                        {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
                                     </p>
                                 </div>
                             </div>
