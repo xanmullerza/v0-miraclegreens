@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
 import { cleanIngredientDisplay, extractCoreName, parseRecipeAmount } from '@/lib/utils/parsing-utils';
+import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
 import type { Ingredient } from './types';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -566,6 +567,8 @@ function PortionRow({
     const [customLabel, setCustomLabel] = React.useState('');
     const [customWeightG, setCustomWeightG] = React.useState('');
     const [savingCustomMeasure, setSavingCustomMeasure] = React.useState(false);
+    const [autoMatchedConfidence, setAutoMatchedConfidence] = React.useState<number | null>(null);
+    const [hasAutoMatched, setHasAutoMatched] = React.useState(false);
 
     const originalDetails = parseRecipeAmount(ing.amount, ing.item);
     const dbItem = matchedIngredients[ing.id];
@@ -578,6 +581,26 @@ function PortionRow({
         measure: baseInputs?.measure || '',
         isSaving: baseInputs?.isSaving || false
     };
+
+    // Auto-match measure on mount
+    React.useEffect(() => {
+        if (!hasAutoMatched && dbItem?.portions && dbItem.portions.length > 0 && !inputs.measure) {
+            const bestMatch = findBestMeasureMatch(
+                originalDetails.measure_label,
+                originalDetails.quantity,
+                dbItem.portions
+            );
+            
+            if (bestMatch) {
+                // Auto-select the best match
+                setStepTwoInputs(prev => ({ ...prev, [ing.id]: { ...inputs, measure: String(bestMatch.weight_g) } }));
+                setAutoMatchedConfidence(bestMatch.confidence);
+                toast.success(`✓ Auto-matched: ${bestMatch.label}`, { duration: 2000 });
+            }
+            
+            setHasAutoMatched(true);
+        }
+    }, [dbItem?.portions, hasAutoMatched, inputs.measure, ing.id]);
 
     const liveUnitWeight = !isNaN(Number(inputs.measure)) ? Number(inputs.measure) : 0;
     const liveTotalWeight = inputs.measure ? Math.round(Number(inputs.multiplier) * liveUnitWeight * 10) / 10 : 0;
@@ -680,7 +703,15 @@ function PortionRow({
                     />
                 </div>
                 <div>
-                    <label className={cn("text-[9px] uppercase font-bold mb-1 block", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-muted-foreground")}>Unit Type (from DB)</label>
+                    <label className={cn("text-[9px] uppercase font-bold mb-1 flex items-center gap-2", isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-muted-foreground")}>
+                        Unit Type (from DB)
+                        {autoMatchedConfidence && autoMatchedConfidence >= 50 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                <Zap size={8} className="fill-emerald-700 dark:fill-emerald-400" />
+                                Auto ({Math.round(autoMatchedConfidence)}%)
+                            </span>
+                        )}
+                    </label>
                     {showCustomInput ? (
                         <div className="space-y-2">
                             <input
@@ -724,6 +755,8 @@ function PortionRow({
                             onChange={e => setStepTwoInputs(prev => ({ ...prev, [ing.id]: { ...inputs, measure: e.target.value } }))}
                             className={cn("w-full h-8 rounded px-2 text-xs focus:outline-none cursor-pointer",
                                 isAccepted ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300"
+                                    : inputs.measure && autoMatchedConfidence
+                                    ? "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300"
                                     : "bg-muted border border-border text-foreground"
                             )}>
                             <option value="">-- Select measure --</option>

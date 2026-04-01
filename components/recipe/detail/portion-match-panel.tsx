@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Loader2, AlertTriangle, Check, RefreshCw, ArrowLeft, Sparkles, Plus } from 'lucide-react';
+import { Loader2, AlertTriangle, Check, RefreshCw, ArrowLeft, Sparkles, Plus, Zap } from 'lucide-react';
 import { parseRecipeAmount, cleanIngredientDisplay } from '@/lib/utils/parsing-utils';
+import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -145,6 +146,8 @@ function PortionCard({
     const [customLabel, setCustomLabel] = useState('');
     const [customWeightG, setCustomWeightG] = useState('');
     const [savingCustomMeasure, setSavingCustomMeasure] = useState(false);
+    const [autoMatchedConfidence, setAutoMatchedConfidence] = useState<number | null>(null);
+    const [hasAutoMatched, setHasAutoMatched] = useState(false);
 
     const originalDetails = parseRecipeAmount(ing.amount, ing.item);
     const dbItem = matchedIngredients[ing.id];
@@ -157,6 +160,26 @@ function PortionCard({
         measure: baseInputs?.measure || '',
         isSaving: baseInputs?.isSaving || false
     };
+
+    // Auto-match measure on mount
+    useEffect(() => {
+        if (!hasAutoMatched && dbItem?.portions && dbItem.portions.length > 0 && !inputs.measure) {
+            const bestMatch = findBestMeasureMatch(
+                originalDetails.measure_label,
+                originalDetails.quantity,
+                dbItem.portions
+            );
+            
+            if (bestMatch) {
+                // Auto-select the best match
+                onInputChange(ing.id, 'measure', String(bestMatch.weight_g));
+                setAutoMatchedConfidence(bestMatch.confidence);
+                toast.success(`✓ Auto-matched: ${bestMatch.label}`, { duration: 2000 });
+            }
+            
+            setHasAutoMatched(true);
+        }
+    }, [dbItem?.portions, hasAutoMatched, inputs.measure, ing.id]);
 
     let liveUnitWeight = 0;
     if (!isNaN(Number(inputs.measure))) {
@@ -259,9 +282,17 @@ function PortionCard({
                 </div>
                 <div>
                     <label className={cn(
-                        "text-[9px] uppercase font-bold mb-1 block",
+                        "text-[9px] uppercase font-bold mb-1 flex items-center gap-2",
                         isAccepted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-600 dark:text-slate-400"
-                    )}>Unit Type (from database)</label>
+                    )}>
+                        Unit Type (from database)
+                        {autoMatchedConfidence && autoMatchedConfidence >= 50 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                <Zap size={8} className="fill-emerald-700 dark:fill-emerald-400" />
+                                Auto ({Math.round(autoMatchedConfidence)}%)
+                            </span>
+                        )}
+                    </label>
                     {showCustomInput ? (
                         <div className="space-y-2">
                             <input
@@ -309,6 +340,8 @@ function PortionCard({
                                 "w-full h-8 rounded px-2 text-xs focus:outline-none cursor-pointer transition-colors",
                                 isAccepted
                                     ? "bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 cursor-not-allowed"
+                                    : inputs.measure && autoMatchedConfidence
+                                    ? "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300"
                                     : "bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:ring-indigo-500"
                             )}
                         >
