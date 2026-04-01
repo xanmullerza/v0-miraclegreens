@@ -30,7 +30,7 @@ interface FoodItemPickerProps {
     initialResults?: any[];
 }
 
-export default function FoodItemPicker({ onSelect, onClose, onSkip, mode = 'all', isAdmin = false, inline = false, initialSearchQuery = '', initialResults }: FoodItemPickerProps) {
+export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mode = 'all', isAdmin = false, inline = false, initialSearchQuery = '', initialResults }: FoodItemPickerProps) {
     const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
     const [results, setResults] = useState<FoodItemMatch[]>(initialResults || []);
     const [loading, setLoading] = useState(false);
