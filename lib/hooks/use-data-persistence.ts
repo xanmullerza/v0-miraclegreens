@@ -55,7 +55,8 @@ export function useDataPersistence() {
         sortDirection?: 'asc' | 'desc',
         includeDetails?: boolean,
         isMix?: boolean,
-        isRemix?: boolean
+        isRemix?: boolean,
+        onlyMyRecipes?: boolean
     } = {}) => {
         const {
             searchQuery = '',
@@ -67,7 +68,8 @@ export function useDataPersistence() {
             sortDirection = 'asc',
             includeDetails = false,
             isMix = undefined,
-            isRemix = undefined
+            isRemix = undefined,
+            onlyMyRecipes = false
         } = options;
 
         try {
@@ -83,12 +85,21 @@ export function useDataPersistence() {
             }
 
             // Filtering
-            if (user) {
-                // If logged in, get curated OR user's own
-                query = query.or(`is_curated.eq.true,user_id.eq.${user.id}`);
+            if (onlyMyRecipes) {
+                // ONLY show user's own recipes
+                if (user) {
+                    query = query.eq('user_id', user.id);
+                } else {
+                    // Anonymous users can't have "My Recipes"
+                    query = query.eq('id', ''); // Returns empty result
+                }
             } else {
-                // If not logged in, only get curated from cloud
-                query = query.eq('is_curated', true);
+                // Show public recipes + user's own (for logged in users)
+                if (user) {
+                    query = query.or(`is_curated.eq.true,user_id.eq.${user.id}`);
+                } else {
+                    query = query.eq('is_curated', true);
+                }
             }
 
             if (searchQuery.trim()) {
@@ -119,29 +130,8 @@ export function useDataPersistence() {
             let finalRecipes = (cloudRecipes as Recipe[]) || [];
             let finalCount = count || 0;
 
-            // 2. If NOT logged in, merge with LocalStorage recipes
-            if (!user) {
-                const localData = localStorage.getItem('local_recipes');
-                if (localData) {
-                    let localRecipes: Recipe[] = JSON.parse(localData);
-
-                    // Apply local filters/search
-                    if (searchQuery.trim()) {
-                        localRecipes = localRecipes.filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()));
-                    }
-                    if (selectedTypes.length > 0) {
-                        localRecipes = localRecipes.filter(r => selectedTypes.includes(r.type));
-                    }
-                    if (showFavoritesOnly) {
-                        localRecipes = localRecipes.filter(r => r.is_favorite);
-                    }
-
-                    // For now, local storage doesn't support sophisticated pagination/sorting in this hook
-                    // but we can merge them. To keep it simple, we'll just prepend local recipes.
-                    finalRecipes = [...localRecipes, ...finalRecipes];
-                    finalCount += localRecipes.length;
-                }
-            }
+            // Don't cache recipe lists in localStorage - it causes cross-user pollution
+            // Users should only see their own recipes via database, not cached data
 
             return { recipes: finalRecipes, count: finalCount };
         } catch (error) {

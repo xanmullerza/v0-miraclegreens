@@ -182,20 +182,15 @@ export function RecipesView({
                 sortDirection,
                 isMix,
                 isRemix,
+                onlyMyRecipes: showOnlyMyRecipes,
                 includeDetails: needsIngredients
             });
 
             // LOCAL FILTERING (for things we can't do easily in Supabase)
             let filteredItems = fetchedRecipes.filter(r => {
-                // 1. Ownership check
-                if (showOnlyMyRecipes) {
-                    const isMine = user 
-                        ? (r.user_id === user.id && !r.is_curated)
-                        : (r.id.toString().startsWith('local-') || !r.user_id);
-                    if (!isMine) return false;
-                }
+                // Ownership check is now handled in fetchRecipesBridge with onlyMyRecipes param
                 
-                // 2. Tab filtering (Remixes, Mixes, or base Recipes)
+                // Tab filtering (Remixes, Mixes, or base Recipes)
                 if (isRemix !== undefined) {
                     const rIsRemix = !!(r as any).is_remix;
                     if (rIsRemix !== isRemix) return false;
