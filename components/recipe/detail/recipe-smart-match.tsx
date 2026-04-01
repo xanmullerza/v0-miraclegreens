@@ -10,7 +10,6 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
 import { cleanIngredientDisplay, extractCoreName, parseRecipeAmount } from '@/lib/utils/parsing-utils';
-import FoodItemPicker from '@/components/recipe/food-item-picker';
 import type { Ingredient } from './types';
 import type { useRecipeDetail } from './use-recipe-detail';
 

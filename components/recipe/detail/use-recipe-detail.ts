@@ -63,7 +63,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // User preferences and RDA
     const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
-    const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo, setSmartMatchPicker } = useActionPanel();
     const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
     
@@ -86,6 +86,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             setFlippedCards(newFlipped);
             smartMatch.setShowPicker(false);
             smartMatch.reset();
+            setSmartMatchPicker(null);
             toast.success(`Smart Match completed! All ${smartMatch.queue.length} ingredients matched.`, { id: 'smart-match' });
         }
     };
@@ -107,6 +108,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             const skippedCount = Object.keys(newSkipped).length;
             smartMatch.setShowPicker(false);
             smartMatch.reset();
+            setSmartMatchPicker(null);
             toast.success(`Smart Match completed: ${matchedCount} matched, ${skippedCount} skipped`, { id: 'smart-match', duration: 3000 });
         }
     };
@@ -126,9 +128,29 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             } else {
                 smartMatch.setShowPicker(false);
                 smartMatch.reset();
+                setSmartMatchPicker(null);
             }
         }
     };
+
+    // Sync smart match picker state → sidebar
+    useEffect(() => {
+        if (smartMatch.showPicker && smartMatch.queue.length > 0) {
+            const currentItem = smartMatch.queue[smartMatch.currentIdx];
+            if (!currentItem) return;
+            setSmartMatchPicker({
+                initialSearchQuery: currentItem.ingredient.base_ingredient || currentItem.ingredient.item || '',
+                initialResults: smartMatch.results,
+                onSelect: handleSmartMatchPickerSelect,
+                onSkip: handleSmartMatchSkip,
+                onDelete: handleSmartMatchDelete,
+                onClose: () => { smartMatch.reset(); setSmartMatchPicker(null); },
+            });
+            navigateTo('smart-match-picker');
+        } else {
+            // picker closed — don't clear context here, let goBack handle navigation
+        }
+    }, [smartMatch.showPicker, smartMatch.currentIdx, smartMatch.results]);
 
     const isOwner = user && recipe && (recipe as any).user_id === user.id;
 

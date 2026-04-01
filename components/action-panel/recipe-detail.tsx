@@ -11,7 +11,6 @@ import {
     RecipeRelated,
     RecipeManagement,
 } from '@/components/recipe/detail';
-import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 interface RecipeDetailProps {
     recipeId: string;
@@ -55,7 +54,7 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
 
     // ── Main render ──────────────────────────────────────────
     return (
-        <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-slate-900 relative">
+        <div className="flex-1 overflow-y-auto flex flex-col bg-white dark:bg-slate-900">
             {/* Chatbot-style header (sticky title bar + image grid) */}
             <RecipeHeader ctx={ctx} standalone={false} />
 
@@ -82,23 +81,6 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
                     <RecipeManagement ctx={ctx} />
                 )}
             </div>
-
-            {/* Smart Match Picker Sidebar Overlay */}
-            {ctx.smartMatch.showPicker && ctx.smartMatch.queue.length > 0 && (
-                <div className="absolute inset-0 z-[100] bg-white dark:bg-slate-900 animate-in fade-in slide-in-from-right-4 duration-300 flex flex-col">
-                    <FoodItemPicker
-                        onSelect={ctx.handleSmartMatchPickerSelect}
-                        onSkip={ctx.handleSmartMatchSkip}
-                        onDelete={ctx.handleSmartMatchDelete}
-                        onClose={() => ctx.smartMatch.reset()}
-                        mode="all"
-                        isAdmin={false}
-                        inline={true}
-                        initialSearchQuery={ctx.smartMatch.queue[ctx.smartMatch.currentIdx]?.ingredient?.base_ingredient || ctx.smartMatch.queue[ctx.smartMatch.currentIdx]?.ingredient?.item || ''}
-                        initialResults={ctx.smartMatch.results}
-                    />
-                </div>
-            )}
         </div>
     );
 }

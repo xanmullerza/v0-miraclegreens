@@ -27,6 +27,7 @@ import { StaticPagesView } from './views/StaticPagesView';
 import { ExportPanel } from './export-panel';
 import { HelpSection } from './help-section';
 import { RecipeTagsPanel } from '@/components/recipe/detail/recipe-tags-panel';
+import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 interface ActionPanelRouterProps {
     orchestrator: any; 
@@ -36,7 +37,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
     const { 
         activeView, previousView, navigateTo, excludeFlavour, 
         setExcludeFlavour, excludeSupplements, setExcludeSupplements,
-        contextRecipeId
+        contextRecipeId, smartMatchPicker, setSmartMatchPicker
     } = useActionPanel();
     
     const { filters } = useRecipeFilter();
@@ -197,6 +198,23 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
             );
         case 'recipe-share':
             return recipeToShare ? <SharePanel recipe={recipeToShare} onClose={handleBack} isInline={true} /> : null;
+        case 'smart-match-picker':
+            if (!smartMatchPicker) return null;
+            return (
+                <PanelWrapper title={`Matching: ${smartMatchPicker.initialSearchQuery}`} onClose={() => { smartMatchPicker.onClose(); handleBack(); }} noPadding>
+                    <FoodItemPicker
+                        onSelect={smartMatchPicker.onSelect}
+                        onSkip={smartMatchPicker.onSkip}
+                        onDelete={smartMatchPicker.onDelete}
+                        onClose={() => { smartMatchPicker.onClose(); handleBack(); }}
+                        mode="all"
+                        isAdmin={false}
+                        inline={true}
+                        initialSearchQuery={smartMatchPicker.initialSearchQuery}
+                        initialResults={smartMatchPicker.initialResults}
+                    />
+                </PanelWrapper>
+            );
         case 'shopping': return <ShoppingPanel />;
         case 'pantry': return <PantryPanel />;
         case 'planner': return <PlannerPanel onRecipeClick={(id) => handleRecipeClick(id, 'planner')} />;

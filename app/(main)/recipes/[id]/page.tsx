@@ -17,7 +17,6 @@ import {
     RecipeRelated,
     RecipeManagement,
 } from '@/components/recipe/detail';
-import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 export default function RecipeDetailsPage() {
     const router = useRouter();
@@ -93,7 +92,7 @@ export default function RecipeDetailsPage() {
             <PageContainer maxWidth="max-w-6xl">
                 <div className="space-y-6 pb-20 animate-in fade-in duration-700">
                     {/* ─── Card Shell (mirrors foods page) ─────────────── */}
-                    <div className="bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden relative">
+                    <div className="bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden">
 
                         {/* ── Compact Header with inline pills ──────── */}
                         <RecipeHeader ctx={ctx} standalone />
@@ -133,23 +132,6 @@ export default function RecipeDetailsPage() {
                                 </div>
                             )}
                         </div>
-
-                        {/* Smart Match Picker Page Overlay */}
-                        {ctx.smartMatch.showPicker && ctx.smartMatch.queue.length > 0 && (
-                            <div className="absolute inset-x-0 bottom-0 top-[220px] z-[100] bg-white dark:bg-slate-900 animate-in fade-in slide-in-from-right-4 duration-300 flex flex-col border-t border-slate-200 dark:border-slate-800">
-                                <FoodItemPicker
-                                    onSelect={ctx.handleSmartMatchPickerSelect}
-                                    onSkip={ctx.handleSmartMatchSkip}
-                                    onDelete={ctx.handleSmartMatchDelete}
-                                    onClose={() => ctx.smartMatch.reset()}
-                                    mode="all"
-                                    isAdmin={false}
-                                    inline={true}
-                                    initialSearchQuery={ctx.smartMatch.queue[ctx.smartMatch.currentIdx]?.ingredient?.base_ingredient || ctx.smartMatch.queue[ctx.smartMatch.currentIdx]?.ingredient?.item || ''}
-                                    initialResults={ctx.smartMatch.results}
-                                />
-                            </div>
-                        )}
                     </div>
                 </div>
             </PageContainer>
