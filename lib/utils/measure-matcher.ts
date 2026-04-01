@@ -59,11 +59,19 @@ function normalizeMeasure(text: string): string {
 }
 
 /**
+ * Extract measure label without weight info (e.g., "tbsp (15g)" → "tbsp")
+ */
+function extractMeasureLabel(fullLabel: string): string {
+    // Remove anything in parentheses at the end
+    return fullLabel.replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+
+/**
  * Calculate similarity between two strings (0-1)
  */
 function stringSimilarity(str1: string, str2: string): number {
     const s1 = normalizeMeasure(str1);
-    const s2 = normalizeMeasure(str2);
+    const s2 = normalizeMeasure(extractMeasureLabel(str2)); // Extract label without weight
     
     if (s1 === s2) return 1;
     
@@ -129,32 +137,32 @@ function measureToGrams(quantity: number, measure: string): number | null {
  */
 function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, originalQuantity: number): number {
     let score = 0;
-    const canonical = getCanonicalMeasure(originalMeasure);
+    const originalCanonical = getCanonicalMeasure(originalMeasure);
+    const dbMeasureLabel = extractMeasureLabel(dbMeasure.label);
+    const dbCanonical = getCanonicalMeasure(dbMeasureLabel);
     
-    // 1. Direct text match (highest priority)
-    const textSim = stringSimilarity(originalMeasure, dbMeasure.label);
-    if (textSim > 0.7) {
-        score += 50 * textSim;
+    // 1. CANONICAL MATCH (most important - prevents false positives like "g" in "cup spaghetti (9g)")
+    if (originalCanonical && dbCanonical && originalCanonical === dbCanonical) {
+        score += 80; // Massive boost for exact canonical match
     }
     
-    // 2. Weight/quantity match
+    // 2. Direct text match (still important for variations like "tbsp" vs "tablespoon")
+    const textSim = stringSimilarity(originalMeasure, dbMeasure.label);
+    if (textSim > 0.7) {
+        score += 40 * textSim;
+    }
+    
+    // 3. Weight/quantity match (helps distinguish between similar measures)
     const originalGrams = measureToGrams(originalQuantity, originalMeasure);
     if (originalGrams !== null) {
         const ratio = dbMeasure.weight_g / originalGrams;
         // Ideal is 1:1 ratio (exact match)
         const weightSim = Math.max(0, 1 - Math.abs(ratio - 1) / 2);
-        score += 35 * weightSim;
-    }
-    
-    // 3. Canonical match (tbsp matches tbsp-like measures)
-    if (canonical) {
-        if (dbMeasure.label.toLowerCase().includes(canonical)) {
-            score += 15;
-        }
+        score += 20 * weightSim;
     }
     
     // 4. Label length penalty (prefer concise matches)
-    const labelLength = dbMeasure.label.length;
+    const labelLength = dbMeasureLabel.length;
     if (labelLength > 30) score *= 0.9;
     
     return Math.min(100, score);
