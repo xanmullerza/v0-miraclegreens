@@ -4,8 +4,6 @@ import { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesCombinedView } from '@/components/recipe/recipes-combined-view';
-import { RemixesView } from '@/components/recipe/remixes-view';
-import { MixesView } from '@/components/recipe/mixes-view';
 import { FoodsView } from '@/components/foods/food-library-view';
 import { NutrientsView } from '@/components/nutrients/nutrients-view';
 import { useSearch } from '@/lib/context/search-context';
@@ -13,7 +11,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { cn } from '@/lib/utils';
 
-type TabId = 'recipes' | 'remixes' | 'mixes' | 'foods' | 'nutrients';
+type TabId = 'recipes' | 'foods' | 'nutrients';
 
 function RecipesPageContent() {
     const searchParams = useSearchParams();
@@ -25,8 +23,6 @@ function RecipesPageContent() {
 
     const tabs: { id: TabId; label: string; activeColor: string }[] = [
         { id: 'recipes', label: 'Recipes', activeColor: 'text-emerald-500' },
-        { id: 'remixes', label: 'Remixes', activeColor: 'text-violet-500' },
-        { id: 'mixes', label: 'Mixes', activeColor: 'text-amber-500' },
         { id: 'foods', label: 'Foods', activeColor: 'text-cyan-500' },
         { id: 'nutrients', label: 'Nutrients', activeColor: 'text-violet-500' },
     ];
@@ -65,16 +61,6 @@ function RecipesPageContent() {
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                         {activeTab === 'recipes' && (
                             <RecipesCombinedView 
-                                isPremium={profile.isPremium}
-                            />
-                        )}
-                        {activeTab === 'remixes' && (
-                            <RemixesView 
-                                isPremium={profile.isPremium}
-                            />
-                        )}
-                        {activeTab === 'mixes' && (
-                            <MixesView 
                                 isPremium={profile.isPremium}
                             />
                         )}
