@@ -485,7 +485,7 @@ function StepTwoPortionMatch({
     setStepTwoInputs: React.Dispatch<React.SetStateAction<Record<string, { multiplier: string; measure: string; isSaving?: boolean }>>>;
     stepTwoSaved: Record<string, boolean>;
     setStepTwoSaved: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-    setMappingStep: React.Dispatch<React.SetStateAction<'FOOD_MATCH' | 'PORTION_MATCH'>>;
+    setMappingStep: React.Dispatch<React.SetStateAction<'FOOD_MATCH' | 'INGREDIENT_REVIEW' | 'PORTION_MATCH'>>;
     smartMatchRunning: boolean;
     finalizeRecipeNutrition: () => Promise<void>;
     setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
