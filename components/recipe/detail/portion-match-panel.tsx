@@ -141,12 +141,11 @@ function PortionCard({
     onInputChange, onSave, isLast
 }: PortionCardProps) {
     const originalDetails = parseRecipeAmount(ing.amount, ing.item);
-    const servings = recipe?.servings || 1;
     const dbItem = matchedIngredients[ing.id];
     const isAccepted = !!stepTwoSaved[ing.id];
 
     const inputs = stepTwoInputs[ing.id] || {
-        multiplier: String(Math.round(originalDetails.quantity * servings * 100) / 100),
+        multiplier: String(Math.round(originalDetails.quantity * 100) / 100),
         measure: originalDetails.measure_label
     };
 
