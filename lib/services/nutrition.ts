@@ -392,6 +392,13 @@ export async function getUSDAFoodDetails(fdcId: number): Promise<{ portions: Foo
     try {
         const url = `${USDA_BASE_URL}/food/${fdcId}?api_key=${USDA_API_KEY}`;
         const response = await fetch(url);
+        
+        // Check if response is OK before trying to parse JSON
+        if (!response.ok) {
+            console.warn(`[USDA Details] FDC ID ${fdcId} not found (${response.status})`);
+            return { portions: [], micronutrients: {} };
+        }
+        
         const data = await response.json();
 
         // Parse Portions
