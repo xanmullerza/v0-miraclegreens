@@ -4,7 +4,9 @@ import { usePlannerActions } from './use-planner-actions';
 import { PlannerStepWizard } from './ui/planner-step-wizard';
 import { RecipeListItem } from './ui/recipe-list-item';
 import { NutrientSummary } from './ui/nutrient-summary';
+import { DailyNutrition } from './ui/daily-nutrition';
 import { usePantry } from '@/hooks/use-pantry';
+import { useRDA } from '@/hooks/use-rda';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -79,6 +81,13 @@ export function PlannerContent({
     }, []);
 
     const isProfileIncomplete = !profile.age || !profile.weight || !profile.height;
+
+    // Calculate RDAs for daily nutrition
+    const userRDAs = useRDA(
+        typeof profile.age === 'number' ? profile.age : 30,
+        profile.gender || 'female',
+        state.calories || 2000
+    );
 
     const getFilteredMeals = () => {
         if (!plan) return [];
@@ -324,11 +333,12 @@ export function PlannerContent({
 
                             {showDailyNutrients && (
                                 <div className="mt-8 p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
-                                    <NutrientSummary 
+                                    <DailyNutrition 
                                         plan={plan} 
-                                        userRDAs={state.unit === 'kJ' ? { Energy: state.calories * 4.184 } : { Energy: state.calories }} 
-                                        unit={unit} 
-                                        eatenMeals={eatenMeals} 
+                                        userRDAs={userRDAs}
+                                        profile={profile}
+                                        energyUnit={unit}
+                                        nutrientDisplayMode="both"
                                     />
                                 </div>
                             )}
