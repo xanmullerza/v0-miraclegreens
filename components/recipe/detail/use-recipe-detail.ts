@@ -586,7 +586,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             
             await fetchRecipeDetails();
             setActiveSection('nutrition');
-            setMappingStep('FOOD_MATCH');
+            // Don't reset mappingStep - Step 2 workflow is complete, stay on nutrition view
             
         } catch (err: any) {
             console.error("Finalize error:", err);
