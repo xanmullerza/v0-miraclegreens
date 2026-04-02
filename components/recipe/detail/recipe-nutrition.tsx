@@ -117,7 +117,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         carbs: recipe.carbs > 0 ? recipe.carbs : calculatedNutrition.carbs,
         fat: recipe.fat > 0 ? recipe.fat : calculatedNutrition.fat,
         energyKj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
-        micronutrients: calculatedNutrition.micronutrients || {}
+        micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
+        phytonutrients: recipe.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 ? recipe.phytonutrients : calculatedNutrition.phytonutrients || {}
     };
 
     const micro = nutrition.micronutrients || {};
