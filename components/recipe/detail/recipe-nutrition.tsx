@@ -151,6 +151,11 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         .map(({ l, fn, sub }) => { let v = 0; const m = findNutrientMatch(micro, l); if (m != null && micro[m] != null) v = micro[m] * sf; const r = userRDAs?.[l] || 0; return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 }; });
     const stData = [{ l: 'Vitamin A', fn: 'Vitamin A', sub: 'Retinol' }, { l: 'Vitamin D', fn: 'Vitamin D', sub: 'Calciferol' }, { l: 'Vitamin E', fn: 'Vitamin E', sub: 'Tocopherol' }, { l: 'Vitamin K', fn: 'Vitamin K', sub: 'Phylloquinone' }, { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' }]
         .map(({ l, fn, sub }) => { let v = 0; const m = findNutrientMatch(micro, l); if (m != null && micro[m] != null) v = micro[m] * sf; const r = userRDAs?.[l] || 0; return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 }; });
+    
+    // Choline data for minerals section
+    const cholineVal = nv(['Choline', 'choline_mg']);
+    const cholineRDA = userRDAs?.['Choline'] || 0;
+    const cholineData = { label: 'Choline', val: cholineVal, pct: cholineRDA > 0 ? Math.round((cholineVal / cholineRDA) * 100) : 0 };
 
     const ndm = nutrientDisplayMode;
 
@@ -221,13 +226,21 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                         {[...wsData, ...stData].map(d => (
                             <div key={d.label} className="flex items-center justify-between">
                                 <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
-                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>{d.pct}%</span>
+                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>
+                                    {ndm === 'value' && `${d.val.toFixed(1)}`}
+                                    {ndm === 'percentage' && `${d.pct}%`}
+                                    {ndm === 'both' && `${d.val.toFixed(1)} (${d.pct}%)`}
+                                </span>
                             </div>
                         ))}
                         <div className="border-t border-slate-200 dark:border-slate-800 pt-2 mt-2">
                             <div className="flex items-center justify-between">
                                 <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Choline</span>
-                                <span className="text-[10px] text-slate-400">{nv(['Choline', 'choline_mg']).toFixed(1)} mg</span>
+                                <span className={cn("text-[10px] font-bold", cholineData.pct >= 100 ? 'text-emerald-500' : cholineData.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>
+                                    {ndm === 'value' && `${cholineData.val.toFixed(1)} mg`}
+                                    {ndm === 'percentage' && `${cholineData.pct}%`}
+                                    {ndm === 'both' && `${cholineData.val.toFixed(1)} mg (${cholineData.pct}%)`}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -243,7 +256,11 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                         {[...elData, ...trData].map(d => (
                             <div key={d.label} className="flex items-center justify-between">
                                 <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
-                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>{d.pct}%</span>
+                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>
+                                    {ndm === 'value' && `${d.val.toFixed(1)} mg`}
+                                    {ndm === 'percentage' && `${d.pct}%`}
+                                    {ndm === 'both' && `${d.val.toFixed(1)} mg (${d.pct}%)`}
+                                </span>
                             </div>
                         ))}
                     </div>
