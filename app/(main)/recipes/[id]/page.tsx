@@ -21,18 +21,21 @@ export default function RecipeDetailsPage() {
     const router = useRouter();
     const { id } = useParams();
     const { setCustomSegmentLabel } = useHeaderActions();
-    const { setContextRecipeId } = useActionPanel();
+    const { setContextRecipeId, navigateTo } = useActionPanel();
 
     const ctx = useRecipeDetail({
         recipeId: String(id),
         onBack: () => router.back(),
     });
 
-    // Sync contextRecipeId for side panel views (Tags, etc.)
+    // Sync contextRecipeId and activeView for side panel (display RecipeSmartMatch workflow)
     useEffect(() => {
-        if (id) setContextRecipeId(String(id));
+        if (id) {
+            setContextRecipeId(String(id));
+            navigateTo('recipe-detail'); // Show RecipeDetail in side panel
+        }
         return () => setContextRecipeId(null);
-    }, [id, setContextRecipeId]);
+    }, [id, setContextRecipeId, navigateTo]);
 
     const { recipe, loading, activeSection } = ctx;
 
