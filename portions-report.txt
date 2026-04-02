@@ -1,0 +1,1568 @@
+﻿[dotenv@17.3.1] injecting env (8) from .env.local -- tip: ≡ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+≡ƒöì PORTIONS vs FOOD_MEASURES ANALYSIS
+
+≡ƒôè Query 1: Food items with portions in column
+============================================================
+Found 134 food items with portions:
+
+  Margarine (Homemade):
+    - Cup: 227g
+    - gram: 1g
+    - kilogram: 1000g
+    - Pat: 4.73g
+    - Stick: 113.5g
+    - Tbsp: 14.19g
+  Spinach, Raw:
+    - Baby Leaf: 0.95g
+    - Bunch: 340g
+    - Cup: 30g
+    - gram: 1g
+    - kilogram: 1000g
+    - Leaf: 10g
+    - Tbsp: 1.88g
+    - Tsp: 0.63g
+  Fish oil, salmon:
+    - pound: 453.59g
+    - ounce: 28.35g
+    - kilogram: 1000g
+    - gram: 1g
+    - tsp: 4.5g
+    - tbsp: 13.6g
+    - cup: 218g
+  Peanut Butter, Regular, Salted:
+    - Container: 42.52g
+    - Cup: 258g
+    - gram: 1g
+    - kilogram: 1000g
+    - Pouch: 32g
+    - Tbsp: 16.12g
+    - Tsp: 5.37g
+  Nutmeg:
+    - Cup: 112.01g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 7g
+    - Tsp: 2.33g
+  Parsley, Dried:
+    - Cup: 25.6g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 1.6g
+    - Tsp: 0.53g
+  Canola Oil:
+    - Cup: 218.01g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 13.63g
+    - Tsp: 4.54g
+  Paprika:
+    - gram: 1g
+    - kilogram: 1000g
+  Raspberries, Fresh, Red:
+    - Cup: 256.01g
+    - Each: 1.9g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 16g
+    - Tsp: 5.33g
+  Green Bell Peppers, Raw:
+    - Cup: 149g
+    - gram: 1g
+    - kilogram: 1000g
+    - Large: 164g
+    - Medium: 119g
+    - Miniature Size: 30g
+    - Ring: 10g
+    - Small: 74g
+    - Strip: 2.7g
+    - Tbsp: 5.75g
+    - Tsp: 3.1g
+  Cheddar Cheese, Natural:
+    - gram: 1g
+    - kilogram: 1000g
+  Chives, Raw:
+    - gram: 1g
+    - kilogram: 1000g
+  Mushrooms, Raw:
+    - large: 23g
+    - medium: 18g
+    - small: 10g
+    - slice: 6g
+    - gram: 1g
+    - kilogram: 1000g
+  Kale, Cooked from Fresh:
+    - Cup: 118g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 7.37g
+    - Tsp: 2.46g
+  Lemon juice bottled:
+    - gram: 1g
+    - kilogram: 1000g
+  Coriander (cilantro) leaves, raw:
+    - gram: 1g
+    - kilogram: 1000g
+  vegetables, squash, zucchini, cooked from fresh:
+    - Cup: 239.99g
+    - gram: 1g
+    - kilogram: 1000g
+    - Large: 275g
+    - Medium: 167g
+    - Slice: 10g
+    - Small: 100g
+    - Tbsp: 15g
+    - Tsp: 5g
+  Grapes, Fresh:
+    - Cup: 151g
+    - Each: 7g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 9.44g
+    - Tsp: 3.15g
+  Quinoa, Dry:
+    - Cup: 170g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 10.63g
+    - Tsp: 3.54g
+  Split Peas, Yellow or Green, Cooked From Dried:
+    - Cup: 196g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tbsp: 12.25g
+    - Tsp: 4.08g
+  ... and 114 more
+
+
+≡ƒôï Query 2: All food_measures entries
+============================================================
+Found 313 entries in food_measures:
+
+  Food Item 0378b666-c6a9-4b6f-8ffd-500e70532c5b:
+    - Cup: 152g
+    - Extra Large: 27g
+    - Large: 18g
+    - Medium: 12g
+    - Slice: 4g
+    - Small: 7g
+    - Tbsp: 9.5g
+    - Tsp: 4.83g
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 280dfb32-5c94-44bb-9fd9-3a32afe19a1e:
+    - Cup: 118g
+    - G: 1g
+    - Oz: 28g
+    - Tbsp: 7g
+    - Tsp: 2g
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 307f57e3-7ad4-447f-aed1-4745136256ef:
+    - Cup: 148g
+    - Each: 1.36g
+    - G: 1g
+    - Tbsp: 9.25g
+    - Tsp: 3.08g
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 3cc6bfa7-2aba-496b-a597-ab14d23801b6:
+    - Cup: 144g
+    - Each: 5g
+    - Tbsp: 9g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tsp: 3g
+  Food Item 4f4a813a-0c5b-4bbd-bda5-d5bb0e987f14:
+    - Cup: 158g
+    - G: 1g
+    - Oz: 28g
+    - Tbsp: 10g
+    - Tsp: 3g
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 6ca3343d-9083-4da8-a434-120a8d364f9d:
+    - Cup: 122.99g
+    - Each: 1.9g
+    - Tbsp: 16g
+    - gram: 1g
+    - kilogram: 1000g
+    - Tsp: 5.33g
+  Food Item 7b59d2ea-a8ad-4b7d-b7a6-5790562a45d9:
+    - gram: 1g
+    - kilogram: 1000g
+    - Cup: 254g
+    - G: 1g
+    - Oz: 28g
+    - Tbsp: 16g
+    - Tsp: 5g
+  Food Item 9644af5f-4e84-498f-a853-bbb0e7cbe877:
+    - kilogram: 1000g
+    - Cup: 149g
+    - Gram: 1g
+    - Large: 164g
+    - Medium: 119g
+    - Miniature: 30g
+    - Oz: 28g
+    - Ring: 10g
+    - Small: 74g
+    - Strip: 3g
+    - Tbsp: 6g
+    - Tsp: 3g
+  Food Item a82b8a77-7dcb-4279-8a4d-b03854df20d5:
+    - gram: 1g
+    - kilogram: 1000g
+    - Cup: 180g
+    - G: 1g
+    - Oz: 28g
+    - Tbsp: 11g
+    - Tsp: 4g
+  Food Item dc022ed7-f593-4160-acb6-b72eafa0d7c8:
+    - gram: 1g
+    - kilogram: 1000g
+    - Cup: 160g
+    - G: 1g
+    - Oz: 28g
+    - Tbsp: 10g
+    - Tsp: 3g
+  Food Item 136100ac-37d1-4ae6-ad61-2ec52cd14d9d:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item f0025d34-7db0-43eb-98b1-b541244b5e43:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 2d77d3e3-ccf2-45f4-aa8a-d3f25da0cd15:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item cc5a7bf5-f998-4240-8f83-dbf962bbc370:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 82df62de-8891-48f3-a351-65d3aba2c767:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item d93a80f8-91bc-4477-8089-a17973eb951c:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 1881dd83-8dcb-46a6-8418-94cacadf4043:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item cb13a961-d4ce-4be4-b903-ade0a00e5237:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item f6635c23-a4af-4cd5-8c94-a26b0f6a5e78:
+    - gram: 1g
+    - kilogram: 1000g
+  Food Item 1dfdcfec-8357-4f20-be4c-1b159bd51186:
+    - gram: 1g
+    - kilogram: 1000g
+  ... and 108 more food items
+
+
+ΓÜá∩╕Å  Query 3: Items with BOTH portions column AND food_measures
+============================================================
+Found 120 items with data in BOTH sources:
+
+  Margarine (Homemade):
+    Portions column: 6 entries
+      - Cup: 227g
+      - gram: 1g
+      - kilogram: 1000g
+      - Pat: 4.73g
+      - Stick: 113.5g
+      - Tbsp: 14.19g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Spinach, Raw:
+    Portions column: 8 entries
+      - Baby Leaf: 0.95g
+      - Bunch: 340g
+      - Cup: 30g
+      - gram: 1g
+      - kilogram: 1000g
+      - Leaf: 10g
+      - Tbsp: 1.88g
+      - Tsp: 0.63g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Peanut Butter, Regular, Salted:
+    Portions column: 7 entries
+      - Container: 42.52g
+      - Cup: 258g
+      - gram: 1g
+      - kilogram: 1000g
+      - Pouch: 32g
+      - Tbsp: 16.12g
+      - Tsp: 5.37g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Nutmeg:
+    Portions column: 5 entries
+      - Cup: 112.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 7g
+      - Tsp: 2.33g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Parsley, Dried:
+    Portions column: 5 entries
+      - Cup: 25.6g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 1.6g
+      - Tsp: 0.53g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Canola Oil:
+    Portions column: 5 entries
+      - Cup: 218.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 13.63g
+      - Tsp: 4.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Paprika:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Raspberries, Fresh, Red:
+    Portions column: 6 entries
+      - Cup: 256.01g
+      - Each: 1.9g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 16g
+      - Tsp: 5.33g
+    food_measures table: 6 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 122.99g
+      - Each: 1.9g
+      - Tbsp: 16g
+      - Tsp: 5.33g
+  Green Bell Peppers, Raw:
+    Portions column: 11 entries
+      - Cup: 149g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 164g
+      - Medium: 119g
+      - Miniature Size: 30g
+      - Ring: 10g
+      - Small: 74g
+      - Strip: 2.7g
+      - Tbsp: 5.75g
+      - Tsp: 3.1g
+    food_measures table: 12 entries
+      - kilogram: 1000g
+      - Cup: 149g
+      - Gram: 1g
+      - Large: 164g
+      - Medium: 119g
+      - Miniature: 30g
+      - Oz: 28g
+      - Ring: 10g
+      - Small: 74g
+      - Strip: 3g
+      - Tbsp: 6g
+      - Tsp: 3g
+  Kale, Cooked from Fresh:
+    Portions column: 5 entries
+      - Cup: 118g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 7.37g
+      - Tsp: 2.46g
+    food_measures table: 7 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 118g
+      - G: 1g
+      - Oz: 28g
+      - Tbsp: 7g
+      - Tsp: 2g
+  Lemon juice bottled:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Coriander (cilantro) leaves, raw:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  vegetables, squash, zucchini, cooked from fresh:
+    Portions column: 9 entries
+      - Cup: 239.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 275g
+      - Medium: 167g
+      - Slice: 10g
+      - Small: 100g
+      - Tbsp: 15g
+      - Tsp: 5g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Grapes, Fresh:
+    Portions column: 6 entries
+      - Cup: 151g
+      - Each: 7g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 9.44g
+      - Tsp: 3.15g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Quinoa, Dry:
+    Portions column: 5 entries
+      - Cup: 170g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 10.63g
+      - Tsp: 3.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Split Peas, Yellow or Green, Cooked From Dried:
+    Portions column: 5 entries
+      - Cup: 196g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 12.25g
+      - Tsp: 4.08g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Black peppercorns whole, ground:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Beef Liver:
+    Portions column: 9 entries
+      - cup: 317.63g
+      - cup, cut pieces: 140g
+      - gram: 1g
+      - kilogram: 1000g
+      - slice - 6 1/2" x 2 3/8" x 3/8": 85g
+      - tbsp: 19.85g
+      - tbsp, cut pieces: 8.75g
+      - tsp: 6.62g
+      - tsp, cut pieces: 2.92g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cabbage, Green, Cooked:
+    Portions column: 11 entries
+      - cup: 150.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - large: 1198g
+      - large leaf: 31g
+      - medium: 872g
+      - medium leaf: 21g
+      - small: 686g
+      - small leaf: 13g
+      - tbsp: 9.38g
+      - tsp: 3.13g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Salt, table, iodized:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Lettuce, Iceberg:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Honey:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Yellow mustard:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Sesame Seeds, Unhulled, Dried:
+    Portions column: 5 entries
+      - Cup: 144g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 9g
+      - Tsp: 3g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Chia Seeds:
+    Portions column: 5 entries
+      - Cup: 160g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 10g
+      - Tsp: 3.33g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Kale, Raw:
+    Portions column: 7 entries
+      - Baby Leaf: 1g
+      - Cup: 21.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - Leaf: 10g
+      - Tbsp: 1.31g
+      - Tsp: 0.44g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Chicken Liver:
+    Portions column: 6 entries
+      - Cup: 140g
+      - Each: 44g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 8.75g
+      - Tsp: 2.92g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Potato, Boiled with Skin:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Chinese Cabbage, Pak-Choi, Cooked:
+    Portions column: 7 entries
+      - cup, cut pieces: 170g
+      - gram: 1g
+      - head: 823.2g
+      - kilogram: 1000g
+      - leaf: 14g
+      - tbsp, cut pieces: 10.63g
+      - tsp, cut pieces: 3.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Tomato sauce unsalted:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cinnamon ground:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Parboiled Rice, Converted, Cooked in Salted Water:
+    Portions column: 7 entries
+      - Cup: 158g
+      - G: 1g
+      - gram: 1g
+      - kilogram: 1000g
+      - Oz: 28g
+      - Tbsp: 10g
+      - Tsp: 3g
+    food_measures table: 7 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 158g
+      - G: 1g
+      - Oz: 28g
+      - Tbsp: 10g
+      - Tsp: 3g
+  Mandarin Orange, Fresh:
+    Portions column: 8 entries
+      - Cup: 194.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 120g
+      - Medium: 88g
+      - Section: 11g
+      - Small: 76g
+      - Tsp: 4.06g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Olive Oil:
+    Portions column: 5 entries
+      - Cup: 216g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 13.5g
+      - Tsp: 4.5g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  White Bread, Store Bought:
+    Portions column: 10 entries
+      - Cup: 35g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large Slice: 43g
+      - Medium Slice: 28g
+      - Snack Size: 10g
+      - Tbsp: 2.53g
+      - Thick Slice: 43g
+      - Thin Slice: 24g
+      - Tsp: 0.84g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  South African Pilchard:
+    Portions column: 5 entries
+      - Cup: 245.44g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 15.34g
+      - Tsp: 5.11g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Soybean Oil, Unhydrogenated:
+    Portions column: 5 entries
+      - Cup: 218.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 13.63g
+      - Tsp: 4.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Baking Powder:
+    Portions column: 5 entries
+      - Cup: 220.81g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 13.8g
+      - Tsp: 4.6g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Papaya, Fresh:
+    Portions column: 9 entries
+      - Cup: 259.88g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 380g
+      - Medium: 330g
+      - Slice: 40g
+      - Small: 157g
+      - Tbsp: 16.24g
+      - Tsp: 5.41g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Flax Seeds, Not Fortified:
+    Portions column: 5 entries
+      - Cup: 167.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 10.5g
+      - Tsp: 3.5g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Green Peas, Cooked from Frozen:
+    Portions column: 7 entries
+      - Cup: 160g
+      - G: 1g
+      - gram: 1g
+      - kilogram: 1000g
+      - Oz: 28g
+      - Tbsp: 10g
+      - Tsp: 3g
+    food_measures table: 7 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 160g
+      - G: 1g
+      - Oz: 28g
+      - Tbsp: 10g
+      - Tsp: 3g
+  Spinach, Cooked from Fresh:
+    Portions column: 5 entries
+      - cup, chopped: 180.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - tbsp, chopped: 11.25g
+      - tsp, chopped: 3.75g
+    food_measures table: 7 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 180g
+      - G: 1g
+      - Oz: 28g
+      - Tbsp: 11g
+      - Tsp: 4g
+  Turmeric, Ground:
+    Portions column: 5 entries
+      - Cup: 150.4g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 9.4g
+      - Tsp: 3.13g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Baking Yeast, Active Dry:
+    Portions column: 7 entries
+      - Cake: 17g
+      - Cup: 192g
+      - gram: 1g
+      - kilogram: 1000g
+      - Package: 7.2g
+      - Tbsp: 12g
+      - Tsp: 4g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cabbage, Green, Raw:
+    Portions column: 5 entries
+      - Cup: 70g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 4.38g
+      - Tsp: 1.46g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cashews, Raw:
+    Portions column: 5 entries
+      - Cup: 130g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 8.12g
+      - Tsp: 2.71g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Almonds, Raw:
+    Portions column: 6 entries
+      - Cup: 130g
+      - Each: 1.23g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 8.12g
+      - Tsp: 2.71g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Lentil Sprouts, Raw:
+    Portions column: 5 entries
+      - Cup: 77g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 4.81g
+      - Tsp: 1.6g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cornmeal, White, Whole Grain, Dry:
+    Portions column: 5 entries
+      - Cup: 122g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 7.62g
+      - Tsp: 2.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Vanilla extract:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Brown sugar:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cumin seed:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Tomato Raw, Includes Cherry, Grape, Roma:
+    Portions column: 15 entries
+      - Cherry: 17g
+      - Cup: 180g
+      - gram: 1g
+      - Grape: 8g
+      - kilogram: 1000g
+      - Large: 182g
+      - Medium: 123g
+      - Medium Slice: 20g
+      - Roma: 53.36g
+      - Small: 91g
+      - Tbsp: 11.25g
+      - Thick Slice: 27g
+      - Thin Slice: 15g
+      - Tsp: 3.75g
+      - Wedge: 15.38g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Blueberries, Fresh:
+    Portions column: 7 entries
+      - Cup: 148g
+      - Each: 1.36g
+      - G: 1g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 9.25g
+      - Tsp: 3.08g
+    food_measures table: 7 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 148g
+      - Each: 1.36g
+      - G: 1g
+      - Tbsp: 9.25g
+      - Tsp: 3.08g
+  Zucchini, Cooked from Fresh:
+    Portions column: 9 entries
+      - Cup: 239.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 275g
+      - Medium: 167g
+      - Slice: 10g
+      - Small: 100g
+      - Tbsp: 15g
+      - Tsp: 5g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Pear, Fresh:
+    Portions column: 9 entries
+      - Cup: 314.13g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 230g
+      - Medium: 178g
+      - Slice: 25g
+      - Small: 148g
+      - Tbsp: 19.63g
+      - Tsp: 6.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Beets, Raw:
+    Portions column: 6 entries
+      - Cup: 282.61g
+      - Each: 82g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 17.66g
+      - Tsp: 5.89g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Watermelon, Fresh:
+    Portions column: 11 entries
+      - Ball: 12.2g
+      - Chunk: 32g
+      - Cup: 98.43g
+      - Extra Large Slice: 286g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large Slice: 143g
+      - Medium Slice: 71.5g
+      - Small Slice: 35.75g
+      - Tbsp: 9.5g
+      - Tsp: 3.17g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Lemon, Fresh:
+    Portions column: 10 entries
+      - Cup: 212g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 84g
+      - Medium: 58g
+      - Slice: 7g
+      - Small: 40g
+      - Tbsp: 13.25g
+      - Tsp: 4.42g
+      - Wedge: 7g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Avocado Oil:
+    Portions column: 5 entries
+      - Cup: 218.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 13.63g
+      - Tsp: 4.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Yellow Bell Pepper, Raw:
+    Portions column: 11 entries
+      - Cup: 149g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 186g
+      - Medium: 119g
+      - Miniature Size: 30g
+      - Ring: 10g
+      - Small: 74g
+      - Strip: 5.2g
+      - Tbsp: 6.33g
+      - Tsp: 3.1g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Mace:
+    Portions column: 5 entries
+      - Cup: 84.81g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 5.3g
+      - Tsp: 1.77g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Fennel Seed:
+    Portions column: 5 entries
+      - Cup: 92.8g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 5.8g
+      - Tsp: 1.93g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cumin, Seed:
+    Portions column: 5 entries
+      - Cup: 95.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 6g
+      - Tsp: 2g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Chinese Cabbage, Pak-Choi, Raw:
+    Portions column: 7 entries
+      - Cup: 69.99g
+      - gram: 1g
+      - Head: 840g
+      - kilogram: 1000g
+      - Leaf: 14g
+      - Tbsp: 4.37g
+      - Tsp: 1.46g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cumin, Ground:
+    Portions column: 5 entries
+      - Cup: 95.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 6g
+      - Tsp: 2g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Raw Egg:
+    Portions column: 11 entries
+      - Cup: 245g
+      - Extra Large: 56g
+      - gram: 1g
+      - Jumbo: 63g
+      - kilogram: 1000g
+      - Large: 50g
+      - Medium: 44g
+      - Small: 38g
+      - Tbsp: 15.31g
+      - Tsp: 5.1g
+      - Unknown Size: 50g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Apple, Fresh, With Skin:
+    Portions column: 11 entries
+      - Cup: 125g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 223g
+      - Medium: 182g
+      - Package: 56.7g
+      - Slice: 25g
+      - Small: 149g
+      - Tbsp: 12.35g
+      - Tsp: 4.12g
+      - Very Small: 101g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cornmeal Mush, Plain:
+    Portions column: 5 entries
+      - Cup: 239.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 15g
+      - Tsp: 5g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Banana, Fresh:
+    Portions column: 11 entries
+      - Cup: 224.99g
+      - Extra Large: 152g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 136g
+      - Medium: 118g
+      - Slice: 6g
+      - Small: 101g
+      - Tbsp: 14.06g
+      - Tsp: 4.69g
+      - Very Small: 81g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Brazil Nuts, Unsalted:
+    Portions column: 6 entries
+      - Cup: 133g
+      - Each: 4.73g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 8.31g
+      - Tsp: 2.77g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Butternut Squash:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Coriander, Seed:
+    Portions column: 5 entries
+      - Cup: 80g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 5g
+      - Tsp: 1.67g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  nuts and seeds, coconut, cream (liquid from grated meat):
+    Portions column: 5 entries
+      - Cup: 239.99g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 15g
+      - Tsp: 5g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Lamb Kidney:
+    Portions column: 9 entries
+      - cup: 245.44g
+      - cup, cut pieces: 140g
+      - each: 28g
+      - gram: 1g
+      - kilogram: 1000g
+      - tbsp: 15.34g
+      - tbsp, cut pieces: 8.75g
+      - tsp: 5.11g
+      - tsp, cut pieces: 2.92g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Extra Virgin Olive Oil:
+    Portions column: 5 entries
+      - Cup: 216g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 13.5g
+      - Tsp: 4.5g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Balsamic vinegar:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Chicken Breast, Skin Removed Before Cooking:
+    Portions column: 9 entries
+      - Cup: 245.44g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 135g
+      - Medium: 120g
+      - Small: 105g
+      - Tbsp: 15.34g
+      - Tender: 45g
+      - Tsp: 5.11g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Broccoli, Cooked From Fresh:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Parsley, Fresh:
+    Portions column: 6 entries
+      - Cup: 60g
+      - gram: 1g
+      - kilogram: 1000g
+      - Sprig: 1g
+      - Tbsp: 3.75g
+      - Tsp: 1.25g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Blackberries, Fresh:
+    Portions column: 6 entries
+      - Cup: 144g
+      - Each: 5g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 9g
+      - Tsp: 3g
+    food_measures table: 6 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 144g
+      - Each: 5g
+      - Tbsp: 9g
+      - Tsp: 3g
+  Sunflower Seeds, Raw:
+    Portions column: 6 entries
+      - Cup: 140g
+      - Each: 0.08g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 8.75g
+      - Tsp: 2.92g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Lentils, Pink or Red, Raw:
+    Portions column: 4 entries
+      - Cup: 192g
+      - gram: 1g
+      - kilogram: 1000g
+      - Lb: 454g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Thyme dried:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Onion powder:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Pumpkin, Cooked from Fresh:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Chili powder:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Strawberries, Fresh:
+    Portions column: 10 entries
+      - Cup: 232g
+      - Extra Large: 27g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 18g
+      - Medium: 12g
+      - Slice: 4g
+      - Small: 7g
+      - Tbsp: 14.5g
+      - Tsp: 4.83g
+    food_measures table: 10 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 152g
+      - Extra Large: 27g
+      - Large: 18g
+      - Medium: 12g
+      - Slice: 4g
+      - Small: 7g
+      - Tbsp: 9.5g
+      - Tsp: 4.83g
+  Cardamom:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Orange, Fresh:
+    Portions column: 9 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 184g
+      - Medium: 131g
+      - Section: 15g
+      - Slice: 15g
+      - Small: 96g
+      - Tbsp: 11.25g
+      - Tsp: 3.75g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Apricot, Fresh:
+    Portions column: 6 entries
+      - Cup: 155g
+      - Each: 35g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 9.69g
+      - Tsp: 3.23g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Macadamia Nuts, Raw:
+    Portions column: 6 entries
+      - Cup: 133.99g
+      - Each: 2.58g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 8.37g
+      - Tsp: 2.29g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Peach, Fresh:
+    Portions column: 9 entries
+      - Extra Large: 224g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 175g
+      - Medium: 150g
+      - Slice: 20g
+      - Small: 130g
+      - Tbsp: 14.34g
+      - Tsp: 4.78g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Filberts, Raw:
+    Portions column: 6 entries
+      - Cup: 135.01g
+      - Each: 1.4g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 8.44g
+      - Tsp: 2.81g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Moringa, 100% Organic Leaf Powder:
+    Portions column: 3 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Teaspoon: 4g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Pecans, Raw:
+    Portions column: 6 entries
+      - Cup: 109g
+      - gram: 1g
+      - Half: 1.49g
+      - kilogram: 1000g
+      - Tbsp: 6.81g
+      - Tsp: 2.27g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Plum, Fresh:
+    Portions column: 8 entries
+      - Cup: 189.67g
+      - gram: 1g
+      - kilogram: 1000g
+      - Large: 107.49g
+      - Medium: 66g
+      - Small: 55.06g
+      - Tbsp: 11.85g
+      - Tsp: 3.95g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Sunflower Oil:
+    Portions column: 5 entries
+      - Cup: 218.01g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 13.63g
+      - Tsp: 4.54g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  White All-Purpose Flour, Unenriched:
+    Portions column: 5 entries
+      - Cup: 125g
+      - gram: 1g
+      - kilogram: 1000g
+      - Tbsp: 7.81g
+      - Tsp: 2.6g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  PNP No Name Baked Beans:
+    Portions column: 7 entries
+      - cup: 254g
+      - g: 1g
+      - gram: 1g
+      - kilogram: 1000g
+      - oz: 28g
+      - tbsp: 16g
+      - tsp: 5g
+    food_measures table: 7 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - Cup: 254g
+      - G: 1g
+      - Oz: 28g
+      - Tbsp: 16g
+      - Tsp: 5g
+  Ground ginger:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Mayonnaise regular, salted:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 4 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - tbsp, heaped: 25g
+      - heaped tablespoon: 25g
+  Basil dried:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Curry powder:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Rosemary dried:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Nutmeg ground:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Coriander seed:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Bay leaf dried:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Allspice ground:
+    Portions column: 5 entries
+      - gram: 1g
+      - kilogram: 1000g
+      - cup: 95.99g
+      - tbsp: 6g
+      - tsp: 2g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Apricot jam:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cloves ground:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Black peppercorns whole:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Anise seed:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Sweet Potato, Raw:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cauliflower, Cooked from Fresh:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Cucumber, Raw, With Peel:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Garlic powder:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Hot cocoa mix powder:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Tomato paste canned, salted:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+  Spearmint dried:
+    Portions column: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+    food_measures table: 2 entries
+      - gram: 1g
+      - kilogram: 1000g
+
+
+≡ƒÑä Query 4: Food items with "tbsp" in food_measures
+============================================================
+Found 14 "tbsp" measures:
+
+  Tbsp (9.5g) - food_item_id: 0378b666-c6a9-4b6f-8ffd-500e70532c5b
+  Tbsp (7g) - food_item_id: 280dfb32-5c94-44bb-9fd9-3a32afe19a1e
+  Tbsp (9.25g) - food_item_id: 307f57e3-7ad4-447f-aed1-4745136256ef
+  Tbsp (9g) - food_item_id: 3cc6bfa7-2aba-496b-a597-ab14d23801b6
+  Tbsp (10g) - food_item_id: 4f4a813a-0c5b-4bbd-bda5-d5bb0e987f14
+  Tbsp (16g) - food_item_id: 6ca3343d-9083-4da8-a434-120a8d364f9d
+  Tbsp (16g) - food_item_id: 7b59d2ea-a8ad-4b7d-b7a6-5790562a45d9
+  Tbsp (6g) - food_item_id: 9644af5f-4e84-498f-a853-bbb0e7cbe877
+  Tbsp (11g) - food_item_id: a82b8a77-7dcb-4279-8a4d-b03854df20d5
+  Tbsp (10g) - food_item_id: dc022ed7-f593-4160-acb6-b72eafa0d7c8
+  4 tbsp (measured) (16g) - food_item_id: 329756e8-4d1c-4f00-a07c-5a04237f6215
+  tbsp (15g) - food_item_id: aa181f8b-ea9f-4f05-93b5-a3083183bd1c
+  tbsp (15g) - food_item_id: 329756e8-4d1c-4f00-a07c-5a04237f6215
+  tbsp, heaped (25g) - food_item_id: 89ee01b8-9e29-4468-a8e0-570aaf4cb18f
+
+
+≡ƒôê SUMMARY
+============================================================
+Food items with portions column data: 134
+Total entries in food_measures: 313
+Food items with conflicting data: 120
+"tbsp" measures in food_measures: 14

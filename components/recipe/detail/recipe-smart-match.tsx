@@ -760,13 +760,26 @@ function PortionRow({
 
         setSavingCustomMeasure(true);
         try {
+            // Update portions column directly
+            const { data: foodItem, error: fetchErr } = await supabase
+                .from('food_items')
+                .select('portions')
+                .eq('id', dbItem.id)
+                .single();
+
+            if (fetchErr) throw fetchErr;
+
+            const existingPortions = Array.isArray(foodItem?.portions) ? foodItem.portions : [];
+            const newMeasure = { label: customLabel.trim(), weight_g: parseFloat(customWeightG) };
+            const measureExists = existingPortions.some(p => p.label === newMeasure.label);
+            const updatedPortions = measureExists
+                ? existingPortions.map(p => p.label === newMeasure.label ? newMeasure : p)
+                : [...existingPortions, newMeasure];
+
             const { error } = await supabase
-                .from('food_measures')
-                .insert({
-                    food_item_id: dbItem.id,
-                    label: customLabel.trim(),
-                    weight_g: parseFloat(customWeightG)
-                });
+                .from('food_items')
+                .update({ portions: updatedPortions })
+                .eq('id', dbItem.id);
 
             if (error) throw error;
 

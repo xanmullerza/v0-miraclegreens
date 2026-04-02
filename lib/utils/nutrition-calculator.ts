@@ -491,17 +491,7 @@ export async function fetchFoodMeasures(foodItemId: string): Promise<FoodMeasure
         return itemData.portions as FoodMeasure[];
     }
 
-    // 2. Fallback to reading from food_measures table (Legacy System)
-    const { data, error } = await supabase
-        .from('food_measures')
-        .select('*')
-        .eq('food_item_id', foodItemId)
-        .order('label');
-
-    if (error) {
-        console.error('Error fetching measures:', error);
-        return [];
-    }
-
-    return data || [];
+    // No fallback - portions column is the only source of truth
+    console.warn(`No portions found for food_item_id: ${foodItemId}`);
+    return [];
 }
