@@ -581,6 +581,27 @@ function StepTwoPortionMatch({
                 ))}
             </div>
 
+            {/* Accept All Button */}
+            {!ingredients.every(ing => stepTwoSaved[ing.id] || skippedIngredients[ing.id]) && (
+                <div className="mt-6">
+                    <button
+                        onClick={() => {
+                            const newSaved = { ...stepTwoSaved };
+                            ingredients.forEach(ing => {
+                                if (!skippedIngredients[ing.id]) {
+                                    newSaved[ing.id] = true;
+                                }
+                            });
+                            setStepTwoSaved(newSaved);
+                            toast.success('All portions verified and accepted!');
+                        }}
+                        className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                    >
+                        <Check size={16} /> Accept All Portions
+                    </button>
+                </div>
+            )}
+
             {/* Finalize */}
             {ingredients.every(ing => stepTwoSaved[ing.id] || skippedIngredients[ing.id]) && (
                 <div className="mt-8 p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800/50 flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
