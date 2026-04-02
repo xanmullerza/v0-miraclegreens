@@ -205,32 +205,63 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                             <circle cx="48" cy="48" r={R} fill="none" stroke="#f59e0b" strokeWidth={STR} strokeLinecap="butt" style={{ ...fS, transition: 'all 0.7s ease' }} />
                             <circle cx="48" cy="48" r={R} fill="none" stroke="#f43f5e" strokeWidth={STR} strokeLinecap="butt" style={{ ...pS, transition: 'all 0.7s ease' }} />
                         </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-base font-black text-slate-900 dark:text-white leading-none">{Math.round(energyUnit === 'kJ' ? eV * 4.184 : eV)}</span>
+                            <span className="text-[8px] text-slate-400 font-bold mt-0.5">{energyUnit}</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Macro Cards Grid */}
                 <div className="flex-1 grid grid-cols-3 gap-3">
                     {/* Carbohydrates */}
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between">
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col gap-3">
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbohydrates</p>
                             <p className="text-sm font-bold text-slate-900 dark:text-white">{cV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({cP}%)</span></p>
                         </div>
+                        <div className="space-y-1">
+                            <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(cP, 100)}%`, backgroundColor: '#3b82f6' }} />
+                            </div>
+                            <div className="flex items-center justify-between text-[9px] font-semibold text-slate-600 dark:text-slate-400">
+                                <span>{cV.toFixed(1)}g</span>
+                                <span>{cR.toFixed(1)}g</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Protein */}
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between">
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col gap-3">
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</p>
                             <p className="text-sm font-bold text-slate-900 dark:text-white">{pV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({pP}%)</span></p>
                         </div>
+                        <div className="space-y-1">
+                            <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(pP, 100)}%`, backgroundColor: '#f43f5e' }} />
+                            </div>
+                            <div className="flex items-center justify-between text-[9px] font-semibold text-slate-600 dark:text-slate-400">
+                                <span>{pV.toFixed(1)}g</span>
+                                <span>{pR.toFixed(1)}g</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Fat */}
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between">
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col gap-3">
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</p>
                             <p className="text-sm font-bold text-slate-900 dark:text-white">{fV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({fP}%)</span></p>
+                        </div>
+                        <div className="space-y-1">
+                            <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(fP, 100)}%`, backgroundColor: '#f59e0b' }} />
+                            </div>
+                            <div className="flex items-center justify-between text-[9px] font-semibold text-slate-600 dark:text-slate-400">
+                                <span>{fV.toFixed(1)}g</span>
+                                <span>{fR.toFixed(1)}g</span>
+                            </div>
                         </div>
                     </div>
                 </div>
