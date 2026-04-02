@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import {
     ArrowLeft, Loader2, Activity, UtensilsCrossed, Layers, Sparkles,
     Check, RefreshCw, X, Search, AlertTriangle, Flame, RotateCcw, Trash2, Zap, ChevronRight,
-    Eye, EyeOff
+    Eye, EyeOff, Pencil
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -13,6 +13,13 @@ import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib
 import { cleanIngredientDisplay, extractCoreName, parseRecipeAmount } from '@/lib/utils/parsing-utils';
 import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
 import { IngredientReviewPanel } from './ingredient-review-panel';
+import FoodItemPicker from '@/components/recipe/food-item-picker';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import type { Ingredient } from './types';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -259,6 +266,7 @@ function IngredientMatchCard({
     const ingUsdaResults = usdaResults[ing.id] || [];
     const [usdaQuery, setUsdaQuery] = React.useState('');
     const [isPeeking, setIsPeeking] = React.useState(false);
+    const [showEditDialog, setShowEditDialog] = React.useState(false);
 
     const handleUsdaButtonClick = async () => {
         const term = extractCoreName(ing.base_ingredient || ing.item);
@@ -391,6 +399,12 @@ function IngredientMatchCard({
                                             : "text-slate-400 hover:text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/40"
                                     )} title={isPeeking ? "Hide match" : "View match"}>
                                     {isPeeking ? <Eye size={16} /> : <EyeOff size={16} />}
+                                </button>
+                            )}
+                            {isMatched && isPeeking && !isAccepted && (
+                                <button onClick={(e) => { e.stopPropagation(); setShowEditDialog(true); }}
+                                    className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-full transition-colors" title="Edit match">
+                                    <Pencil size={16} />
                                 </button>
                             )}
                             {isMatched && !isAccepted && (
@@ -536,6 +550,28 @@ function IngredientMatchCard({
                     )}
                 </div>
             )}
+
+            {/* Edit Match Dialog */}
+            <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Edit Match for "{ing.base_ingredient || ing.item}"</DialogTitle>
+                    </DialogHeader>
+                    <div className="max-h-[500px] overflow-y-auto">
+                        <FoodItemPicker
+                            initialSearchQuery={ing.base_ingredient || ing.item}
+                            onSelect={(selectedItem) => {
+                                processAcceptIngredient(ing, selectedItem);
+                                setShowEditDialog(false);
+                                setIsPeeking(false);
+                                toast.success(`Updated match to "${selectedItem.name}"`);
+                            }}
+                            onClose={() => setShowEditDialog(false)}
+                            mode="all"
+                        />
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
