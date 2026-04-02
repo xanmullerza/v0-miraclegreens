@@ -169,28 +169,9 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-2"><Activity size={16} /> Nutritional Breakdown</h3>
-                    <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
-                        {nutritionViewMode === 'per-serving' ? `Per Serving (1 of ${recipe.servings})` : `Total (${recipe.servings} Servings)`}
-                    </p>
                 </div>
                 <div className="flex gap-3">
-                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
-                        {(['per-serving', 'total'] as const).map(m => (
-                            <button key={m} onClick={() => setNutritionViewMode(m)} className={cn("px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
-                                nutritionViewMode === m ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" : "text-slate-400 hover:text-slate-600")}>
-                                {m === 'per-serving' ? 'Per Serving' : 'Total'}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
-                        {([50, 75, 100] as const).map(t => (
-                            <button key={t} onClick={() => setUniversalThreshold(t as 50 | 75 | 100)}
-                                className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
-                                    universalThreshold === t ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300')}>
-                                {t}%
-                            </button>
-                        ))}
-                    </div>
+
                 </div>
             </div>
 

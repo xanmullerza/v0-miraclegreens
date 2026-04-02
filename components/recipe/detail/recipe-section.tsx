@@ -30,10 +30,14 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             : '-'}
                     </p>
                 </div>
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Servings</p>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">{recipe.servings} servings</p>
-                </div>
+                <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700 h-fit">
+                        {(['per-serving', 'total'] as const).map(m => (
+                            <button key={m} onClick={() => setNutritionViewMode(m)} className={cn("px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
+                                nutritionViewMode === m ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400 hover:text-slate-600")}>
+                                {m === 'per-serving' ? 'Per Serving' : 'Total'}
+                            </button>
+                        ))}
+                    </div>
                 <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Meal Type</p>
                     <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">
