@@ -303,7 +303,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                 </div>
             );
         default:
-            if (activeView.startsWith('help-')) return <HelpSection type={activeView as any} />;
+            if (activeView && typeof activeView === 'string' && activeView.startsWith('help-')) return <HelpSection type={activeView as any} />;
             return null;
     }
 }
