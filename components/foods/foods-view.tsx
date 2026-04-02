@@ -139,7 +139,7 @@ export function FoodsView() {
 
                 <div className="flex items-center gap-3">
                     <Button
-                        onClick={() => router.push('/tracker?tab=planner')}
+                        onClick={() => router.push('/recipes/planner')}
                         className="bg-slate-900 border border-slate-800 text-slate-100 px-6 h-12 rounded-xl font-black uppercase tracking-widest shadow-xl flex items-center gap-2 group transition-all hover:bg-black"
                     >
                         <Sparkles size={16} className="text-amber-400 group-hover:scale-125 transition-transform" />

@@ -13,7 +13,6 @@ import {
     RecipeHeader,
     RecipeSection,
     RecipeNutrition,
-    RecipeSmartMatch, // RE-ENABLED: Only shows workflow UI
     RecipeRelated,
     RecipeManagement,
 } from '@/components/recipe/detail';
@@ -108,7 +107,6 @@ export default function RecipeDetailsPage() {
                             {activeSection === 'nutrition' && (
                                 <div className="space-y-6">
                                     <RecipeNutrition ctx={ctx} />
-                                    <RecipeSmartMatch ctx={ctx} /> {/* RE-ENABLED: Shows only workflow UI */}
                                 </div>
                             )}
 

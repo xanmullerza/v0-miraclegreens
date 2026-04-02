@@ -13,22 +13,22 @@ const nextConfig = {
     return [
       {
         source: '/dashboard/nutrients',
-        destination: '/tracker?tab=nutrients',
+        destination: '/recipes',
         permanent: true,
       },
       {
         source: '/dashboard/meal-o-matic/shopping',
-        destination: '/tracker?tab=shopping',
+        destination: '/recipes',
         permanent: true,
       },
       {
         source: '/dashboard/meal-o-matic/pantry',
-        destination: '/tracker?tab=pantry',
+        destination: '/recipes',
         permanent: true,
       },
       {
         source: '/dashboard/meal-o-matic/planner',
-        destination: '/tracker?tab=planner',
+        destination: '/recipes/planner',
         permanent: true,
       },
       {
@@ -38,7 +38,7 @@ const nextConfig = {
       },
       {
         source: '/dashboard',
-        destination: '/tracker',
+        destination: '/recipes',
         permanent: true,
       },
       {

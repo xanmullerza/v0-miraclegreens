@@ -2,14 +2,14 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { BookOpen, TrendingUp } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
 
 export function DraggableFab() {
     const pathname = usePathname();
     const router = useRouter();
     
-    // Only show on recipes and tracker pages (or add more if desired)
-    const isVisible = pathname === '/recipes' || pathname === '/tracker' || pathname === '/meals' || pathname.startsWith('/foods/');
+    // Only show on recipes and foods pages (or add more if desired)
+    const isVisible = pathname === '/recipes' || pathname === '/foods' || pathname === '/meals' || pathname.startsWith('/foods/');
     
     const [position, setPosition] = useState({ y: 0 }); // Offset from initial position
     const [isDragging, setIsDragging] = useState(false);
@@ -67,16 +67,16 @@ export function DraggableFab() {
             return;
         }
         
-        if (pathname === '/tracker') {
-            router.push('/recipes');
+        if (pathname === '/recipes') {
+            router.push('/foods');
         } else {
-            router.push('/tracker');
+            router.push('/recipes');
         }
     };
 
     if (!isVisible) return null;
 
-    const isTracker = pathname === '/tracker';
+    const isRecipes = pathname === '/recipes';
 
     return (
         <button
@@ -88,12 +88,12 @@ export function DraggableFab() {
                 touchAction: 'none' // Prevent browser touch actions like scrolling
             }}
             className="absolute bottom-16 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg shadow-black/20 bg-slate-900 dark:bg-slate-800 border-2 border-emerald-500/30 text-emerald-500 hover:scale-105 hover:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 transition-all duration-200 ease-out cursor-grab active:cursor-grabbing group select-none"
-            title={isTracker ? "Go to Cookbook" : "Go to Tracker"}
+            title={isRecipes ? "Go to Foods" : "Go to Recipes"}
         >
-            {isTracker ? (
-                <BookOpen size={24} className="group-hover:text-emerald-400 transition-colors" />
+            {isRecipes ? (
+                <Search size={24} className="group-hover:text-emerald-400 transition-colors" />
             ) : (
-                <TrendingUp size={24} className="group-hover:text-emerald-400 transition-colors" />
+                <BookOpen size={24} className="group-hover:text-emerald-400 transition-colors" />
             )}
         </button>
     );
