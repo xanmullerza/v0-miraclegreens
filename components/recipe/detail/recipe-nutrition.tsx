@@ -82,15 +82,14 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         recipe, calculatedNutrition, nutritionViewMode, setNutritionViewMode,
         mineralThreshold, setMineralThreshold, waterSolubleThreshold, setWaterSolubleThreshold,
         storedVitaminThreshold, setStoredVitaminThreshold,
-        findNutrientMatch, energyUnit, nutrientDisplayMode, userRDAs, profile,
-        runAutoMatch, smartMatchRunning
+        findNutrientMatch, energyUnit, nutrientDisplayMode, userRDAs, profile
     } = ctx;
 
     if (!recipe) return null;
 
     const hasData = calculatedNutrition.calories > 0;
 
-    // No data → Smart Match CTA
+    // No data → Empty state (workflow in side panel)
     if (!hasData) {
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -101,12 +100,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                             <Sparkles size={18} className="text-indigo-500 animate-pulse" /> Smart Match
                         </h3>
                         <p className="text-sm text-indigo-700/80 dark:text-indigo-400/80 mb-4 leading-relaxed">
-                            This recipe hasn&apos;t been analyzed yet. Run Smart Match to map ingredients to our nutrition database.
+                            Use the workflow on the right side to match and measure ingredients from our nutrition database.
                         </p>
-                        <button onClick={runAutoMatch} disabled={smartMatchRunning}
-                            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-indigo-200 dark:shadow-none flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 disabled:opacity-70">
-                            {smartMatchRunning ? <><Loader2 size={16} className="animate-spin" /> Analyzing...</> : <><Zap size={16} className="fill-current" /> Run Smart Match</>}
-                        </button>
                     </div>
                 </div>
             </div>

@@ -59,6 +59,8 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                     setUsdaExpanded={setUsdaExpanded}
                     processAcceptIngredient={processAcceptIngredient}
                     deleteIngredient={deleteIngredient}
+                    smartMatchRunning={smartMatchRunning}
+                    runAutoMatch={ctx.runAutoMatch}
                 />
             )}
 
@@ -107,6 +109,8 @@ function StepOneFoodMatch({
     usdaExpanded, setUsdaExpanded,
     processAcceptIngredient,
     deleteIngredient,
+    smartMatchRunning,
+    runAutoMatch,
 }: {
     ingredients: Ingredient[];
     matchedIngredients: Record<string, any>;
@@ -125,6 +129,8 @@ function StepOneFoodMatch({
     setUsdaExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
     processAcceptIngredient: (ing: Ingredient, matchedItem: any) => void;
     deleteIngredient: (id: string) => Promise<void>;
+    smartMatchRunning: boolean;
+    runAutoMatch: () => Promise<void>;
 }) {
     return (
         <div className="space-y-4">
@@ -150,6 +156,16 @@ function StepOneFoodMatch({
                     </button>
                 )}
             </div>
+
+            {Object.keys(matchedIngredients).length === 0 && (
+                <div className="p-4 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/50 text-center space-y-3">
+                    <p className="text-sm text-indigo-700 dark:text-indigo-300">Start by searching for ingredients to match with the database.</p>
+                    <button onClick={runAutoMatch} disabled={smartMatchRunning}
+                        className="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+                        {smartMatchRunning ? <><Loader2 size={14} className="animate-spin" /> Searching...</> : <><Zap size={14} className="fill-current" /> Run Smart Match</>}
+                    </button>
+                </div>
+            )}
 
             <div className="grid gap-3">
                 {ingredients.map((ing) => (
