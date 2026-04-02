@@ -4,7 +4,7 @@ export { useRecipeDetail } from './use-recipe-detail';
 export { RecipeHeader } from './recipe-header';
 export { RecipeSection } from './recipe-section';
 export { RecipeNutrition } from './recipe-nutrition';
-// export { RecipeSmartMatch } from './recipe-smart-match'; // DISABLED - testing content panel only
+export { RecipeSmartMatch } from './recipe-smart-match'; // RE-ENABLED: Only shows workflow UI, not button
 export { RecipeRelated } from './recipe-related';
 export { RecipeManagement } from './recipe-management';
 

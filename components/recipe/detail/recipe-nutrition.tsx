@@ -4,8 +4,6 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Activity, Dna, Sparkles, Zap, Loader2 } from 'lucide-react';
 import { formatEnergyValue } from '@/lib/utils/nutrition-utils';
-import { PortionMatchPanel } from './portion-match-panel';
-import { IngredientReviewPanel } from './ingredient-review-panel';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
@@ -81,27 +79,19 @@ function VitaminPill({ fullName, subtitle, val, pct, hit, hitColor, mode }: {
 // ── Main Component ──────────────────────────────────────────
 export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
     const {
-        recipe, ingredients, calculatedNutrition, nutritionViewMode, setNutritionViewMode,
+        recipe, calculatedNutrition, nutritionViewMode, setNutritionViewMode,
         mineralThreshold, setMineralThreshold, waterSolubleThreshold, setWaterSolubleThreshold,
         storedVitaminThreshold, setStoredVitaminThreshold,
         findNutrientMatch, energyUnit, nutrientDisplayMode, userRDAs, profile,
-        runAutoMatch, smartMatchRunning,
-        matchedIngredients, mappingStep, setMappingStep, 
-        acceptedMatches, setAcceptedMatches, processAcceptIngredient, 
-        stepTwoInputs, setStepTwoInputs, stepTwoSaved, setStepTwoSaved,
-        finalizeRecipeNutrition, setIngredients
+        runAutoMatch, smartMatchRunning
     } = ctx;
 
     if (!recipe) return null;
 
     const hasData = calculatedNutrition.calories > 0;
-    
-    // Show workflow UI if there are matched ingredients but no nutrition data yet
-    const hasMatches = Object.keys(matchedIngredients).length > 0;
-    const isInWorkflow = hasMatches && !hasData;
 
-    // No data and no matches → Smart Match CTA  
-    if (!hasData && !hasMatches) {
+    // No data → Smart Match CTA
+    if (!hasData) {
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100 dark:border-indigo-800/50 relative overflow-hidden">
@@ -122,48 +112,6 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
             </div>
         );
     }
-
-    // Workflow in progress → Show matching workflow
-    if (isInWorkflow) {
-        return (
-            <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                {/* INGREDIENT REVIEW STEP */}
-                {mappingStep === 'INGREDIENT_REVIEW' && (
-                    <IngredientReviewPanel
-                        ingredients={ingredients}
-                        matchedIngredients={matchedIngredients}
-                        setMatchedIngredients={() => {}}
-                        skippedIngredients={{}}
-                        setSkippedIngredients={() => {}}
-                        setMappingStep={setMappingStep}
-                    />
-                )}
-
-                {/* PORTION MATCH STEP */}
-                {mappingStep === 'PORTION_MATCH' && (
-                    <PortionMatchPanel
-                        state={{
-                            recipe,
-                            ingredients,
-                            matchedIngredients,
-                            skippedIngredients: {},
-                            stepTwoInputs,
-                            setStepTwoInputs,
-                            stepTwoSaved,
-                            setStepTwoSaved,
-                            setMappingStep,
-                            smartMatchRunning,
-                            finalizeRecipeNutrition,
-                            setIngredients,
-                        }}
-                        onBack={() => setMappingStep('INGREDIENT_REVIEW')}
-                        onFinalize={finalizeRecipeNutrition}
-                    />
-                )}
-            </div>
-        );
-    }
-
 
     // Shared helpers
     const micro = calculatedNutrition.micronutrients || {};
