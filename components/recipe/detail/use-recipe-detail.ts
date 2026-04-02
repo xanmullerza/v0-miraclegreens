@@ -74,6 +74,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         const currentItem = smartMatch.queue[smartMatch.currentIdx];
         const newMatches = { ...matchedIngredients, [currentItem.ingredient.id]: foodItem };
         const newFlipped = { ...flippedCards, [currentItem.ingredient.id]: true };
+        const newAccepted = { ...acceptedMatches, [currentItem.ingredient.id]: true };
 
         const nextIdx = smartMatch.currentIdx + 1;
         if (nextIdx < smartMatch.queue.length) {
@@ -81,10 +82,12 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             smartMatch.setResults(smartMatch.queue[nextIdx].results);
             setMatchedIngredients(newMatches);
             setFlippedCards(newFlipped);
+            setAcceptedMatches(newAccepted);
             toast.success(`✓ Matched "${foodItem.name}" - showing next ingredient`, { duration: 2000 });
         } else {
             setMatchedIngredients(newMatches);
             setFlippedCards(newFlipped);
+            setAcceptedMatches(newAccepted);
             smartMatch.setShowPicker(false);
             smartMatch.reset();
             setSmartMatchPicker(null);
