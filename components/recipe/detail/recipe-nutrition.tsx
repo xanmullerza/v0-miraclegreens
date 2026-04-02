@@ -409,21 +409,6 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                     <div className="grid grid-cols-2 gap-1.5">{stData.map(d => <VitaminPill key={d.label} fullName={d.fullName} subtitle={d.subtitle} val={d.val} pct={d.pct} hit={d.pct >= storedVitaminThreshold} hitColor="bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400" mode={ndm} />)}</div>
                 </div>
             </div>
-
-            {/* Phytonutrients */}
-            {recipe?.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 && (
-                <div className="rounded-2xl border border-border bg-muted/30 p-4">
-                    <h4 className="font-bold flex items-center gap-2 mb-3 uppercase tracking-wider text-sm text-green-600 dark:text-green-400"><Dna className="h-4 w-4" /> Phytonutrients</h4>
-                    <div className="space-y-2">
-                        {Object.entries(recipe.phytonutrients).slice(0, 3).map(([name, desc]) => (
-                            <div key={name} className="p-2 rounded-lg bg-card border border-green-200 dark:border-green-800/30">
-                                <p className="text-[10px] font-semibold text-green-700 dark:text-green-400">{name}</p>
-                                <p className="text-[9px] text-muted-foreground line-clamp-2">{desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
