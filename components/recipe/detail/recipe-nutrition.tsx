@@ -272,7 +272,12 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 {/* Vitamins (Left) */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
                     <div>
-                        <div className="text-[11px] font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
+                        <div className="flex items-center justify-between">
+                            <div className="text-[11px] font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
+                            <div className="text-[10px] font-bold text-violet-600 dark:text-violet-400 bg-violet-500/10 px-2.5 py-1 rounded-full">
+                                {([...wsData, ...stData].filter(v => v.pct >= universalThreshold).length)} / {wsData.length + stData.length}
+                            </div>
+                        </div>
                         <div className="text-[9px] text-slate-400 mt-0.5">Water & Fat Soluble • Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2.5">
@@ -305,7 +310,12 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 {/* Minerals (Right) */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
                     <div>
-                        <div className="text-[11px] font-black uppercase tracking-widest text-teal-500">Minerals</div>
+                        <div className="flex items-center justify-between">
+                            <div className="text-[11px] font-black uppercase tracking-widest text-teal-500">Minerals</div>
+                            <div className="text-[10px] font-bold text-teal-600 dark:text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full">
+                                {([...elData, ...trData].filter(m => m.pct >= universalThreshold).length)} / {elData.length + trData.length}
+                            </div>
+                        </div>
                         <div className="text-[9px] text-slate-400 mt-0.5">Electrolytes & Trace • Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2.5">
