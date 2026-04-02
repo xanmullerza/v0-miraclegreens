@@ -18,13 +18,13 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
 
     return (
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 auto-rows-max">
                 {loadingRelated ? (
                     // Loading state: 4 skeleton cards
                     Array.from({ length: 4 }).map((_, i) => (
                         <div 
                             key={`skeleton-${i}`} 
-                            className="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" 
+                            className="w-full aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" 
                         />
                     ))
                 ) : (
@@ -35,7 +35,7 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
                             <a
                                 key={meal.id}
                                 href={`/recipes/${meal.id}`}
-                                className="group relative aspect-square rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-400/50 dark:hover:border-emerald-500/50 transition-all overflow-hidden flex flex-col"
+                                className="w-full aspect-square rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-400/50 dark:hover:border-emerald-500/50 transition-all overflow-hidden flex flex-col group relative"
                             >
                                 {/* Recipe Image Background */}
                                 {meal.image ? (
@@ -71,7 +71,7 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
                             // Empty slot - "Recipe not found"
                             <div
                                 key={`empty-${idx}`}
-                                className="aspect-square rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center"
+                                className="w-full aspect-square rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center"
                             >
                                 <div className="text-center">
                                     <Layers size={24} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
