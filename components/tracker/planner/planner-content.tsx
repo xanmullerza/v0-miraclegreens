@@ -270,7 +270,41 @@ export function PlannerContent({
                             ))}
                         </div>
 
-                        {/* Analysis Section */}
+                        {/* Daily Nutrition Summary */}
+                        {plan && (
+                            <div className="grid grid-cols-4 gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                                <div className="text-center">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 mb-1">Energy</div>
+                                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                                        {unit === 'kJ' 
+                                            ? Math.round(plan.totalEnergyKj || 0).toLocaleString()
+                                            : Math.round(plan.totalCalories || 0).toLocaleString()}
+                                    </div>
+                                    <div className="text-[8px] text-slate-400 font-bold">{unit}</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
+                                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                                        {Math.round(plan.macros?.carbs || 0)*10/10}
+                                    </div>
+                                    <div className="text-[8px] text-slate-400 font-bold">g</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
+                                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                                        {Math.round(plan.macros?.protein || 0)*10/10}
+                                    </div>
+                                    <div className="text-[8px] text-slate-400 font-bold">g</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
+                                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                                        {Math.round(plan.macros?.fat || 0)*10/10}
+                                    </div>
+                                    <div className="text-[8px] text-slate-400 font-bold">g</div>
+                                </div>
+                            </div>
+                        )}
                         <div className="pt-8">
                             <button
                                 onClick={() => setShowDailyNutrients(!showDailyNutrients)}
