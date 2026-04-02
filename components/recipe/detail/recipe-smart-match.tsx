@@ -206,7 +206,10 @@ function StepOneFoodMatch({
             {/* Proceed to Step 2 Button */}
             {isStep1Complete && (
                 <button
-                    onClick={proceedToStep2}
+                    onClick={() => {
+                        console.log('[Button Click] Proceeding to Step 2');
+                        proceedToStep2();
+                    }}
                     className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2"
                 >
                     Proceed to Step 2: Portion Verification <ChevronRight size={16} />

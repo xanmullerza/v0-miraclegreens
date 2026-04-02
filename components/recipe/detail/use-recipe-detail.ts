@@ -197,7 +197,10 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // Manual transition to step 2 (when user clicks button)
     const proceedToStep2 = () => {
         if (isStep1Complete) {
+            console.log('[proceedToStep2] Transitioning to PORTION_MATCH', { isStep1Complete, acceptedMatches, skippedIngredients });
             setMappingStep('PORTION_MATCH');
+        } else {
+            console.warn('[proceedToStep2] Cannot proceed - Step 1 not complete', { isStep1Complete });
         }
     };
 
@@ -692,6 +695,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // Sync portion matching state → sidebar
     useEffect(() => {
         if (mappingStep === 'PORTION_MATCH' && ingredients.length > 0 && recipe) {
+            console.log('[useEffect PORTION_MATCH] Navigating to sidebar...', { mappingStep, ingredientsCount: ingredients.length, recipeId: recipe.id });
             setSmartMatchPortion({
                 ingredients,
                 matchedIngredients,
@@ -701,7 +705,10 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 recipe,
                 onInputChange: handlePortionInputChange,
                 onSave: handlePortionSave,
-                onBack: () => setMappingStep('FOOD_MATCH'),
+                onBack: () => {
+                    console.log('[onBack] Returning to FOOD_MATCH');
+                    setMappingStep('FOOD_MATCH');
+                },
                 onFinalize: finalizeRecipeNutrition,
                 onSkipIngredients: (ingIds: string[]) => {
                     const newSkipped = { ...skippedIngredients };
@@ -711,7 +718,14 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     setSkippedIngredients(newSkipped);
                 },
             });
+            console.log('[useEffect PORTION_MATCH] Calling navigateTo(portion-match-picker)');
             navigateTo('portion-match-picker');
+        } else {
+            console.log('[useEffect PORTION_MATCH] conditions not met', { 
+                isMappingStepCorrect: mappingStep === 'PORTION_MATCH', 
+                hasIngredients: ingredients.length > 0, 
+                hasRecipe: !!recipe 
+            });
         }
     }, [mappingStep, ingredients, matchedIngredients, skippedIngredients, stepTwoInputs, stepTwoSaved, recipe]);
 
