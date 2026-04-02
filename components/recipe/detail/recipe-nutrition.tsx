@@ -86,6 +86,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
     } = ctx;
 
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
+    const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
 
     if (!recipe) return null;
 
@@ -172,13 +173,24 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                         {nutritionViewMode === 'per-serving' ? `Per Serving (1 of ${recipe.servings})` : `Total (${recipe.servings} Servings)`}
                     </p>
                 </div>
-                <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
-                    {(['per-serving', 'total'] as const).map(m => (
-                        <button key={m} onClick={() => setNutritionViewMode(m)} className={cn("px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
-                            nutritionViewMode === m ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" : "text-slate-400 hover:text-slate-600")}>
-                            {m === 'per-serving' ? 'Per Serving' : 'Total'}
-                        </button>
-                    ))}
+                <div className="flex gap-3">
+                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
+                        {(['per-serving', 'total'] as const).map(m => (
+                            <button key={m} onClick={() => setNutritionViewMode(m)} className={cn("px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
+                                nutritionViewMode === m ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" : "text-slate-400 hover:text-slate-600")}>
+                                {m === 'per-serving' ? 'Per Serving' : 'Total'}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
+                        {([50, 75, 100] as const).map(t => (
+                            <button key={t} onClick={() => setUniversalThreshold(t as 50 | 75 | 100)}
+                                className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
+                                    universalThreshold === t ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300')}>
+                                {t}%
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -223,23 +235,26 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
                     <div>
                         <div className="text-[11px] font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
-                        <div className="text-[9px] text-slate-400 mt-0.5">Water & Fat Soluble</div>
+                        <div className="text-[9px] text-slate-400 mt-0.5">Water & Fat Soluble • Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2.5">
-                        {[...wsData, ...stData].map(d => (
-                            <div key={d.label} className="flex items-center justify-between">
-                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
-                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>
-                                    {ndm === 'value' && `${d.val.toFixed(1)}`}
-                                    {ndm === 'percentage' && `${d.pct}%`}
-                                    {ndm === 'both' && `${d.val.toFixed(1)} (${d.pct}%)`}
-                                </span>
-                            </div>
-                        ))}
+                        {[...wsData, ...stData].map(d => {
+                            const meetsThreshold = d.pct >= universalThreshold;
+                            return (
+                                <div key={d.label} className="flex items-center justify-between">
+                                    <span className={cn("text-[10px] font-semibold", meetsThreshold ? 'text-violet-700 dark:text-violet-400' : 'text-slate-600 dark:text-slate-400')}>{d.label}</span>
+                                    <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= universalThreshold ? 'text-amber-500' : 'text-slate-400')}>
+                                        {ndm === 'value' && `${d.val.toFixed(1)}`}
+                                        {ndm === 'percentage' && `${d.pct}%`}
+                                        {ndm === 'both' && `${d.val.toFixed(1)} (${d.pct}%)`}
+                                    </span>
+                                </div>
+                            );
+                        })}
                         <div className="border-t border-slate-200 dark:border-slate-800 pt-2 mt-2">
                             <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Choline</span>
-                                <span className={cn("text-[10px] font-bold", cholineData.pct >= 100 ? 'text-emerald-500' : cholineData.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>
+                                <span className={cn("text-[10px] font-semibold", cholineData.pct >= universalThreshold ? 'text-violet-700 dark:text-violet-400' : 'text-slate-600 dark:text-slate-400')}>Choline</span>
+                                <span className={cn("text-[10px] font-bold", cholineData.pct >= 100 ? 'text-emerald-500' : cholineData.pct >= universalThreshold ? 'text-amber-500' : 'text-slate-400')}>
                                     {ndm === 'value' && `${cholineData.val.toFixed(1)} mg`}
                                     {ndm === 'percentage' && `${cholineData.pct}%`}
                                     {ndm === 'both' && `${cholineData.val.toFixed(1)} mg (${cholineData.pct}%)`}
@@ -253,19 +268,22 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
                     <div>
                         <div className="text-[11px] font-black uppercase tracking-widest text-teal-500">Minerals</div>
-                        <div className="text-[9px] text-slate-400 mt-0.5">Electrolytes & Trace</div>
+                        <div className="text-[9px] text-slate-400 mt-0.5">Electrolytes & Trace • Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2.5">
-                        {[...elData, ...trData].map(d => (
-                            <div key={d.label} className="flex items-center justify-between">
-                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
-                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>
-                                    {ndm === 'value' && `${d.val.toFixed(1)} mg`}
-                                    {ndm === 'percentage' && `${d.pct}%`}
-                                    {ndm === 'both' && `${d.val.toFixed(1)} mg (${d.pct}%)`}
-                                </span>
-                            </div>
-                        ))}
+                        {[...elData, ...trData].map(d => {
+                            const meetsThreshold = d.pct >= universalThreshold;
+                            return (
+                                <div key={d.label} className="flex items-center justify-between">
+                                    <span className={cn("text-[10px] font-semibold", meetsThreshold ? 'text-teal-700 dark:text-teal-400' : 'text-slate-600 dark:text-slate-400')}>{d.label}</span>
+                                    <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= universalThreshold ? 'text-amber-500' : 'text-slate-400')}>
+                                        {ndm === 'value' && `${d.val.toFixed(1)} mg`}
+                                        {ndm === 'percentage' && `${d.pct}%`}
+                                        {ndm === 'both' && `${d.val.toFixed(1)} mg (${d.pct}%)`}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
