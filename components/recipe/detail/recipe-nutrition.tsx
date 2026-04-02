@@ -120,7 +120,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         fat: recipe.fat > 0 ? recipe.fat : calculatedNutrition.fat,
         energyKj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
         micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
-        phytonutrients: recipe.phytonutrients && Object.keys(recipe.phytonutrients).length > 0 ? recipe.phytonutrients : calculatedNutrition.phytonutrients || {}
+        // Use calculated phytonutrients first (has sources), fall back to recipe (no sources)
+        phytonutrients: calculatedNutrition.phytonutrients && Object.keys(calculatedNutrition.phytonutrients).length > 0 ? calculatedNutrition.phytonutrients : (recipe.phytonutrients || {})
     };
 
     const micro = nutrition.micronutrients || {};
