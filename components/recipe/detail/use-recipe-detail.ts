@@ -259,7 +259,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
                 const { data: ingredientsData, error: ingredientsError } = await supabase
                     .from('ingredients')
-                    .select('*, food_items(*, food_measures(id, label, weight_g))')
+                    .select('*, food_items(id, name, source, portions)')
                     .eq('recipe_id', recipeId)
                     .order('id', { ascending: true });
 
@@ -273,10 +273,10 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     
                     ingredientsData.forEach((ing) => {
                         if (ing.food_items) {
-                            // Map food_measures to portions for compatibility with component
+                            // Use portions column directly from food_items
                             const foodItem = {
                                 ...ing.food_items,
-                                portions: ing.food_items?.food_measures || []
+                                portions: ing.food_items?.portions || []
                             };
                             initialMatches[ing.id] = foodItem;
                             initialAccepted[ing.id] = true;

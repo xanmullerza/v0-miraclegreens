@@ -51,20 +51,33 @@ export function CustomMeasurementDialog({
         setSavingIndex(currentIndex);
         try {
             // Generate label from measure unit (e.g., "tbsp" instead of "4 tbsp")
-            // This way "4 tbsp" and "5 tbsp" both use the same "tbsp" measure
             const label = `${measureUnit}`;
 
-            const { error } = await supabase
-                .from('food_measures')
-                .upsert({
-                    food_item_id: current.food_item_id,
-                    label: label.trim(),
-                    weight_g: parseFloat(weight)
-                }, {
-                    onConflict: 'food_item_id,label'
-                });
+            // Fetch current food item to get existing portions
+            const { data: foodItem, error: fetchErr } = await supabase
+                .from('food_items')
+                .select('portions')
+                .eq('id', current.food_item_id)
+                .single();
 
-            if (error) throw error;
+            if (fetchErr) throw fetchErr;
+
+            // Get existing portions array or create new one
+            const existingPortions = Array.isArray(foodItem?.portions) ? foodItem.portions : [];
+            
+            // Check if measure already exists and update it, otherwise add it
+            const newMeasure = { label: label.trim(), weight_g: parseFloat(weight) };
+            const updatedPortions = existingPortions.some(p => p.label === newMeasure.label)
+                ? existingPortions.map(p => p.label === newMeasure.label ? newMeasure : p)
+                : [...existingPortions, newMeasure];
+
+            // Update food_items with new portions array
+            const { error: updateErr } = await supabase
+                .from('food_items')
+                .update({ portions: updatedPortions })
+                .eq('id', current.food_item_id);
+
+            if (updateErr) throw updateErr;
 
             toast.success(`✓ Saved: 1 ${measureUnit} = ${weight}g`);
             moveToNext();
