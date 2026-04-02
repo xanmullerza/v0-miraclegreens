@@ -521,32 +521,12 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
             toast.dismiss(loadingToastId);
 
-            // Show dialog for unmatchable items if any
+            // Stay in FOOD_MATCH step - all matching happens in side panel
             if (unmatchable.length > 0) {
-                const unmatchableForDialog = unmatchable.map(ing => ({
-                    id: ing.id,
-                    item: ing.item,
-                    base_ingredient: ing.base_ingredient,
-                    amount: ing.amount
-                }));
-
-                setIngredientMatch({
-                    unmatchedIngredients: unmatchableForDialog,
-                    onComplete: () => {
-                        setIngredientMatch(null);
-                        // Transition to REVIEW step (not directly to portions)
-                        setMappingStep('INGREDIENT_REVIEW');
-                    },
-                    onMatched: (ingId: string, foodItem: any) => {
-                        setMatchedIngredients(prev => ({ ...prev, [ingId]: foodItem }));
-                        setAcceptedMatches(prev => ({ ...prev, [ingId]: true }));
-                    }
-                });
-                navigateTo('ingredient-match');
-                toast.success(`Auto-matched ${Object.keys(autoMatched).length} ingredients. ${unmatchable.length} need manual selection.`, { duration: 2000 });
+                toast.success(`Auto-matched ${Object.keys(autoMatched).length} ingredients. ${unmatchable.length} need manual selection in the side panel.`, { duration: 3000 });
             } else {
                 toast.success(`✓ Successfully auto-matched all ${Object.keys(autoMatched).length} ingredients!`, { id: loadingToastId });
-                // No unmatchable items - proceed to review
+                // Auto-transition to review if all matched
                 setMappingStep('INGREDIENT_REVIEW');
             }
         } catch (err: any) {
