@@ -4,7 +4,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import {
     ArrowLeft, Loader2, Activity, UtensilsCrossed, Layers, Sparkles,
-    Check, RefreshCw, X, Search, AlertTriangle, Flame, RotateCcw, Trash2, Zap
+    Check, RefreshCw, X, Search, AlertTriangle, Flame, RotateCcw, Trash2, Zap, ChevronRight
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -61,6 +61,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                     deleteIngredient={deleteIngredient}
                     smartMatchRunning={smartMatchRunning}
                     runAutoMatch={ctx.runAutoMatch}
+                    setMappingStep={setMappingStep}
                 />
             )}
 
@@ -111,6 +112,7 @@ function StepOneFoodMatch({
     deleteIngredient,
     smartMatchRunning,
     runAutoMatch,
+    setMappingStep,
 }: {
     ingredients: Ingredient[];
     matchedIngredients: Record<string, any>;
@@ -131,6 +133,7 @@ function StepOneFoodMatch({
     deleteIngredient: (id: string) => Promise<void>;
     smartMatchRunning: boolean;
     runAutoMatch: () => Promise<void>;
+    setMappingStep: React.Dispatch<React.SetStateAction<'FOOD_MATCH' | 'INGREDIENT_REVIEW' | 'PORTION_MATCH'>>;
 }) {
     return (
         <div className="space-y-4">
@@ -191,6 +194,16 @@ function StepOneFoodMatch({
                     />
                 ))}
             </div>
+
+            {/* Proceed Button - Show after matches are ready */}
+            {Object.keys(matchedIngredients).length > 0 && (
+                <button
+                    onClick={() => setMappingStep('INGREDIENT_REVIEW')}
+                    className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                >
+                    Proceed to Ingredient Review <ChevronRight size={16} />
+                </button>
+            )}
         </div>
     );
 }

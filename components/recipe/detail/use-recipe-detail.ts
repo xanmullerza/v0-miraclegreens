@@ -521,14 +521,14 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
             toast.dismiss(loadingToastId);
 
-            // Stay in FOOD_MATCH step - all matching happens in side panel
+            // Stay in FOOD_MATCH step to show matched ingredient cards in side panel
+            // User must accept matches before proceeding to INGREDIENT_REVIEW
             if (unmatchable.length > 0) {
                 toast.success(`Auto-matched ${Object.keys(autoMatched).length} ingredients. ${unmatchable.length} need manual selection in the side panel.`, { duration: 3000 });
             } else {
-                toast.success(`✓ Successfully auto-matched all ${Object.keys(autoMatched).length} ingredients!`, { id: loadingToastId });
-                // Auto-transition to review if all matched
-                setMappingStep('INGREDIENT_REVIEW');
+                toast.success(`✓ Successfully auto-matched all ${Object.keys(autoMatched).length} ingredients! Review below and click "Proceed to Portion Matching".`, { id: loadingToastId });
             }
+            // Keep at FOOD_MATCH - don't auto-transition yet
         } catch (err: any) {
             console.error('Auto-match error:', err);
             toast.error('Auto-match failed');
