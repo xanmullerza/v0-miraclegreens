@@ -87,7 +87,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
 
     if (!recipe) return null;
 
-    const hasData = calculatedNutrition.calories > 0;
+    // Check if recipe has nutrition data saved in DB OR calculated from ingredients
+    const hasData = recipe.calories > 0 || calculatedNutrition.calories > 0;
 
     // No data → Empty state (workflow in side panel)
     if (!hasData) {
@@ -109,13 +110,23 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
     }
 
     // Shared helpers
-    const micro = calculatedNutrition.micronutrients || {};
+    // Use recipe's saved nutrition if available, otherwise use calculated nutrition
+    const nutrition = {
+        calories: recipe.calories > 0 ? recipe.calories : calculatedNutrition.calories,
+        protein: recipe.protein > 0 ? recipe.protein : calculatedNutrition.protein,
+        carbs: recipe.carbs > 0 ? recipe.carbs : calculatedNutrition.carbs,
+        fat: recipe.fat > 0 ? recipe.fat : calculatedNutrition.fat,
+        energyKj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
+        micronutrients: calculatedNutrition.micronutrients || {}
+    };
+
+    const micro = nutrition.micronutrients || {};
     const s = Math.max(recipe.servings || 1, 1);
     const sf = nutritionViewMode === 'per-serving' ? 1 / s : 1;
     const nv = (keys: string[]) => { let v = 0; for (const k of keys) { const m = findNutrientMatch(micro, k); if (m != null && micro[m] != null) { v = micro[m]; break; } } return v * sf; };
 
     // Macros
-    const eV = calculatedNutrition.calories * sf, pV = calculatedNutrition.protein * sf, cV = calculatedNutrition.carbs * sf, fV = calculatedNutrition.fat * sf;
+    const eV = nutrition.calories * sf, pV = nutrition.protein * sf, cV = nutrition.carbs * sf, fV = nutrition.fat * sf;
     const pR = userRDAs?.['Protein'] || (profile?.weight ? Number(profile.weight) * 1.6 : 100), cR = userRDAs?.['Carbs'] || 250, fR = userRDAs?.['Fat'] || 70;
     const pP = Math.min(Math.round((pV / pR) * 100), 100), cP = Math.min(Math.round((cV / cR) * 100), 100), fP = Math.min(Math.round((fV / fR) * 100), 100);
     const pCal = pV * 4, cCal = cV * 4, fCal = fV * 9, tCal = pCal + cCal + fCal || 1;
