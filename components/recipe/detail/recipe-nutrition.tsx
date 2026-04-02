@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Activity, Dna, Sparkles, Zap, Loader2 } from 'lucide-react';
 import { formatEnergyValue } from '@/lib/utils/nutrition-utils';
@@ -84,6 +84,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         storedVitaminThreshold, setStoredVitaminThreshold,
         findNutrientMatch, energyUnit, nutrientDisplayMode, userRDAs, profile
     } = ctx;
+
+    const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
 
     if (!recipe) return null;
 
@@ -271,21 +273,50 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                 <div className="mb-4">
                     <div className="text-[11px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Phytonutrients</div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">Plant compounds with powerful health benefits</div>
+                    <div className="text-[9px] text-slate-400 mt-0.5">Plant compounds with powerful health benefits • Click a tag to learn more</div>
                 </div>
                 {nutrition.phytonutrients && Object.keys(nutrition.phytonutrients).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                         {Object.entries(nutrition.phytonutrients).map(([name, value]) => {
                             const v = Number(value) * sf;
+                            const isExpanded = expandedPhyto === name;
+                            const description = typeof value === 'string' ? value : '';
+
                             return (
-                                <div
+                                <button
                                     key={name}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-300/30 dark:border-green-600/40 text-green-700 dark:text-green-400 hover:shadow-md hover:border-green-400/50 dark:hover:border-green-500/50 transition-all cursor-default"
+                                    onClick={() => setExpandedPhyto(isExpanded ? null : name)}
+                                    className={cn(
+                                        "relative h-16 rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden",
+                                        isExpanded
+                                            ? "col-span-full md:col-span-2 bg-gradient-to-r from-green-500/15 to-emerald-500/15 border-green-400/50 dark:border-green-500/50 w-full px-4 py-3"
+                                            : "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-300/30 dark:border-green-600/40 hover:shadow-md hover:border-green-400/50 dark:hover:border-green-500/50"
+                                    )}
                                 >
-                                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500/20 text-[7px] font-black">•</span>
-                                    <span>{name}</span>
-                                    {v > 0 && <span className="text-[9px] opacity-70">({v.toFixed(2)}mg)</span>}
-                                </div>
+                                    {isExpanded ? (
+                                        // Expanded view - Show description
+                                        <div className="flex flex-col justify-between h-full w-full">
+                                            <div>
+                                                <div className="text-[11px] font-black text-green-700 dark:text-green-400 mb-1.5">{name}</div>
+                                                <p className="text-[9px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-3">
+                                                    {description || "No description available"}
+                                                </p>
+                                            </div>
+                                            {v > 0 && (
+                                                <div className="text-[8px] text-slate-400 mt-2">
+                                                    Amount: {v.toFixed(2)}mg
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        // Collapsed view - Show tag
+                                        <>
+                                            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500/20 text-[7px] font-black">•</span>
+                                            <span className="text-[10px] font-semibold text-green-700 dark:text-green-400">{name}</span>
+                                            {v > 0 && <span className="text-[9px] opacity-70 text-green-600 dark:text-green-500">({v.toFixed(2)}mg)</span>}
+                                        </>
+                                    )}
+                                </button>
                             );
                         })}
                     </div>
