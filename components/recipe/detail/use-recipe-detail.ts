@@ -191,26 +191,15 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         }
     }, [ingredients]);
 
-    // Auto-transition to review once all ingredients are decided (matched or skipped)
-    useEffect(() => {
-        if (mappingStep === 'FOOD_MATCH' && ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id])) {
-            setMappingStep('INGREDIENT_REVIEW');
-        }
-    }, [ingredients, acceptedMatches, skippedIngredients, mappingStep]);
+    // Check if step 1 is complete
+    const isStep1Complete = ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id]);
 
-    // Auto-transition from review to portions once all ingredients are accepted or skipped
-    useEffect(() => {
-        if (mappingStep !== 'INGREDIENT_REVIEW' || ingredients.length === 0) {
-            return;  // Only check if we're in INGREDIENT_REVIEW step
-        }
-        
-        // All ingredients must be either matched or skipped
-        const allDecided = ingredients.every(ing => matchedIngredients[ing.id] || skippedIngredients[ing.id]);
-        
-        if (allDecided) {
+    // Manual transition to step 2 (when user clicks button)
+    const proceedToStep2 = () => {
+        if (isStep1Complete) {
             setMappingStep('PORTION_MATCH');
         }
-    }, [mappingStep, ingredients.length, matchedIngredients, skippedIngredients]);
+    };
 
     const fetchRecipeDetails = async () => {
         try {
@@ -777,6 +766,8 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         setAcceptedMatches,
         mappingStep,
         setMappingStep,
+        isStep1Complete,
+        proceedToStep2,
         stepTwoInputs,
         setStepTwoInputs,
         stepTwoSaved,

@@ -33,6 +33,8 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
         smartMatchRunning, processAcceptIngredient,
         finalizeRecipeNutrition, setIngredients,
         deleteIngredient,
+        isStep1Complete,
+        proceedToStep2,
     } = ctx;
 
     if (!recipe) return null;
@@ -62,6 +64,8 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                     smartMatchRunning={smartMatchRunning}
                     runAutoMatch={ctx.runAutoMatch}
                     setMappingStep={setMappingStep}
+                    isStep1Complete={isStep1Complete}
+                    proceedToStep2={proceedToStep2}
                 />
             )}
 
@@ -113,6 +117,8 @@ function StepOneFoodMatch({
     smartMatchRunning,
     runAutoMatch,
     setMappingStep,
+    isStep1Complete,
+    proceedToStep2,
 }: {
     ingredients: Ingredient[];
     matchedIngredients: Record<string, any>;
@@ -134,6 +140,8 @@ function StepOneFoodMatch({
     smartMatchRunning: boolean;
     runAutoMatch: () => Promise<void>;
     setMappingStep: React.Dispatch<React.SetStateAction<'FOOD_MATCH' | 'INGREDIENT_REVIEW' | 'PORTION_MATCH'>>;
+    isStep1Complete: boolean;
+    proceedToStep2: () => void;
 }) {
     return (
         <div className="space-y-4">
@@ -492,6 +500,19 @@ function IngredientMatchCard({
                             </div>
                         ))
                     )}
+                </div>
+            )}
+
+            {/* Proceed to Step 2 Button */}
+            {isStep1Complete && (
+                <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <button
+                        onClick={proceedToStep2}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors"
+                    >
+                        Proceed to Step 2: Portion Verification
+                        <ChevronRight size={16} />
+                    </button>
                 </div>
             )}
         </div>
