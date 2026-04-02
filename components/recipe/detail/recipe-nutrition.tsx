@@ -277,43 +277,49 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 </div>
                 {nutrition.phytonutrients && Object.keys(nutrition.phytonutrients).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                        {Object.entries(nutrition.phytonutrients).map(([name, value]) => {
-                            const v = Number(value) * sf;
+                        {Object.entries(nutrition.phytonutrients).map(([name, data]) => {
                             const isExpanded = expandedPhyto === name;
-                            const description = typeof value === 'string' ? value : '';
+                            const description = typeof data === 'object' ? data.description : String(data);
+                            const sources = typeof data === 'object' ? data.sources || [] : [];
 
                             return (
                                 <button
                                     key={name}
                                     onClick={() => setExpandedPhyto(isExpanded ? null : name)}
                                     className={cn(
-                                        "relative h-16 rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden",
+                                        "relative rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden font-semibold",
                                         isExpanded
-                                            ? "col-span-full md:col-span-2 bg-gradient-to-r from-green-500/15 to-emerald-500/15 border-green-400/50 dark:border-green-500/50 w-full px-4 py-3"
-                                            : "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-300/30 dark:border-green-600/40 hover:shadow-md hover:border-green-400/50 dark:hover:border-green-500/50"
+                                            ? "col-span-full w-full px-4 py-3 h-auto bg-gradient-to-r from-green-500/15 to-emerald-500/15 border-green-400/50 dark:border-green-500/50"
+                                            : "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-300/30 dark:border-blue-600/40 text-blue-700 dark:text-blue-400 hover:shadow-md hover:border-blue-400/50 dark:hover:border-blue-500/50"
                                     )}
                                 >
                                     {isExpanded ? (
-                                        // Expanded view - Show description
-                                        <div className="flex flex-col justify-between h-full w-full">
+                                        // Expanded view - Show description and sources
+                                        <div className="flex flex-col gap-3 w-full">
                                             <div>
-                                                <div className="text-[11px] font-black text-green-700 dark:text-green-400 mb-1.5">{name}</div>
-                                                <p className="text-[9px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-3">
+                                                <div className="text-[11px] font-black text-green-700 dark:text-green-400">{name}</div>
+                                                <p className="text-[9px] text-slate-600 dark:text-slate-300 leading-relaxed mt-1.5">
                                                     {description || "No description available"}
                                                 </p>
                                             </div>
-                                            {v > 0 && (
-                                                <div className="text-[8px] text-slate-400 mt-2">
-                                                    Amount: {v.toFixed(2)}mg
+                                            {sources.length > 0 && (
+                                                <div>
+                                                    <div className="text-[8px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">Sources</div>
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {sources.map((source) => (
+                                                            <span key={source} className="inline-block text-[8px] bg-green-500/20 text-green-700 dark:text-green-400 px-2 py-1 rounded-full border border-green-300/30 dark:border-green-600/40">
+                                                                {source}
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
                                     ) : (
                                         // Collapsed view - Show tag
                                         <>
-                                            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500/20 text-[7px] font-black">•</span>
-                                            <span className="text-[10px] font-semibold text-green-700 dark:text-green-400">{name}</span>
-                                            {v > 0 && <span className="text-[9px] opacity-70 text-green-600 dark:text-green-500">({v.toFixed(2)}mg)</span>}
+                                            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-500/20 text-[7px] font-black">•</span>
+                                            <span className="text-[10px]">{name}</span>
                                         </>
                                     )}
                                 </button>

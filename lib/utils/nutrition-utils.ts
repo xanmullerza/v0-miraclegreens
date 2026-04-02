@@ -31,12 +31,13 @@ export const calculateAggregatedNutrition = (ingredients: any[]) => {
     let totalCarbs = 0;
     let totalFat = 0;
     const aggregatedMicros: Record<string, number> = {};
-    const aggregatedPhytos: Record<string, string> = {};
+    const aggregatedPhytos: Record<string, { description: string; sources: string[] }> = {};
 
     ingredients.forEach(ing => {
         // Skip if no food item or no weight
         const food = ing.food_items || ing.food_item;
         const weight = ing.weight_g || 0;
+        const foodName = food?.name || 'Unknown';
         
         if (food && weight > 0) {
             const ratio = weight / 100; // Database values are typically per 100g
@@ -57,11 +58,20 @@ export const calculateAggregatedNutrition = (ingredients: any[]) => {
                 });
             }
 
-            // Aggregate phytonutrients (merge existing ones)
+            // Aggregate phytonutrients with sources tracking
             if (food.phytonutrients && typeof food.phytonutrients === 'object') {
                 Object.entries(food.phytonutrients).forEach(([key, val]) => {
                     if (val) {
-                        aggregatedPhytos[key] = String(val);
+                        if (!aggregatedPhytos[key]) {
+                            aggregatedPhytos[key] = {
+                                description: String(val),
+                                sources: []
+                            };
+                        }
+                        // Add source if not already present
+                        if (!aggregatedPhytos[key].sources.includes(foodName)) {
+                            aggregatedPhytos[key].sources.push(foodName);
+                        }
                     }
                 });
             }
