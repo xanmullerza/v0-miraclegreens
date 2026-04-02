@@ -52,6 +52,7 @@ export function CustomMeasurementDialog({
         try {
             // Generate label from measure unit (e.g., "tbsp" instead of "4 tbsp")
             const label = `${measureUnit}`;
+            const weightValue = parseFloat(weight);
 
             // Fetch current food item to get existing portions
             const { data: foodItem, error: fetchErr } = await supabase
@@ -60,16 +61,30 @@ export function CustomMeasurementDialog({
                 .eq('id', current.food_item_id)
                 .single();
 
-            if (fetchErr) throw fetchErr;
+            if (fetchErr) {
+                console.error('Fetch error:', fetchErr);
+                throw fetchErr;
+            }
 
             // Get existing portions array or create new one
             const existingPortions = Array.isArray(foodItem?.portions) ? foodItem.portions : [];
             
             // Check if measure already exists and update it, otherwise add it
-            const newMeasure = { label: label.trim(), weight_g: parseFloat(weight) };
-            const updatedPortions = existingPortions.some(p => p.label === newMeasure.label)
-                ? existingPortions.map(p => p.label === newMeasure.label ? newMeasure : p)
-                : [...existingPortions, newMeasure];
+            const newMeasure = { label: label.trim(), weight_g: weightValue };
+            const measureExists = existingPortions.some(p => p.label === newMeasure.label);
+            
+            let updatedPortions;
+            if (measureExists) {
+                // Update existing measure
+                updatedPortions = existingPortions.map(p => 
+                    p.label === newMeasure.label ? newMeasure : p
+                );
+                console.log('Updating existing measure:', newMeasure.label);
+            } else {
+                // Add new measure
+                updatedPortions = [...existingPortions, newMeasure];
+                console.log('Adding new measure:', newMeasure.label);
+            }
 
             // Update food_items with new portions array
             const { error: updateErr } = await supabase
@@ -77,7 +92,10 @@ export function CustomMeasurementDialog({
                 .update({ portions: updatedPortions })
                 .eq('id', current.food_item_id);
 
-            if (updateErr) throw updateErr;
+            if (updateErr) {
+                console.error('Update error:', updateErr);
+                throw updateErr;
+            }
 
             toast.success(`✓ Saved: 1 ${measureUnit} = ${weight}g`);
             moveToNext();
