@@ -195,21 +195,19 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         }
     }, [ingredients, acceptedMatches, skippedIngredients, mappingStep]);
 
-    // Auto-transition from review to portions once all ingredients are accepted
+    // Auto-transition from review to portions once all ingredients are accepted or skipped
     useEffect(() => {
-        if (mappingStep === 'INGREDIENT_REVIEW' && ingredients.length > 0) {
-            // Only proceed if all matched ingredients have verified food items
-            const allVerified = ingredients.every(ing => {
-                // Skipped ingredients are OK
-                if (skippedIngredients[ing.id]) return true;
-                // Matched ingredients must have a food item
-                return matchedIngredients[ing.id]?.id;
-            });
-            if (allVerified) {
-                setMappingStep('PORTION_MATCH');
-            }
+        if (mappingStep !== 'INGREDIENT_REVIEW' || ingredients.length === 0) {
+            return;  // Only check if we're in INGREDIENT_REVIEW step
         }
-    }, [mappingStep, ingredients, matchedIngredients, skippedIngredients]);
+        
+        // All ingredients must be either matched or skipped
+        const allDecided = ingredients.every(ing => matchedIngredients[ing.id] || skippedIngredients[ing.id]);
+        
+        if (allDecided) {
+            setMappingStep('PORTION_MATCH');
+        }
+    }, [mappingStep, ingredients.length, matchedIngredients, skippedIngredients]);
 
     const fetchRecipeDetails = async () => {
         try {

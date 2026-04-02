@@ -196,7 +196,7 @@ function StepOneFoodMatch({
             </div>
 
             {/* Proceed Button - Show after matches are ready */}
-            {Object.keys(matchedIngredients).length > 0 && (
+            {ingredients.length > 0 && ingredients.every(ing => Object.keys(matchedIngredients).includes(ing.id) || skippedIngredients[ing.id]) && (
                 <button
                     onClick={() => setMappingStep('INGREDIENT_REVIEW')}
                     className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2"
