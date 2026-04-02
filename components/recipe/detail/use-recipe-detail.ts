@@ -584,9 +584,20 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
             toast.success("Recipe nutrition analyzed and saved!", { id: loadingToastId });
             
-            await fetchRecipeDetails();
+            // Update recipe with new nutrition WITHOUT re-fetching ingredients
+            // (which would reset smart match state)
+            if (recipe) {
+                setRecipe({
+                    ...recipe,
+                    calories: finalCals,
+                    energy_kj: finalKj,
+                    carbs: finalCarbs,
+                    fat: finalFat,
+                    protein: finalProtein,
+                    micronutrients: finalMicros
+                });
+            }
             setActiveSection('nutrition');
-            // Don't reset mappingStep - Step 2 workflow is complete, stay on nutrition view
             
         } catch (err: any) {
             console.error("Finalize error:", err);
