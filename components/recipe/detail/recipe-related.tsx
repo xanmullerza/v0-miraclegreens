@@ -24,7 +24,7 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
                     Array.from({ length: 4 }).map((_, i) => (
                         <div 
                             key={`skeleton-${i}`} 
-                            className="h-32 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" 
+                            className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700 h-24" 
                         />
                     ))
                 ) : (
@@ -35,50 +35,46 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
                             <a
                                 key={meal.id}
                                 href={`/recipes/${meal.id}`}
-                                className="h-32 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-400/50 dark:hover:border-emerald-500/50 transition-all overflow-hidden flex flex-col group relative"
+                                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden hover:border-emerald-400/50 dark:hover:border-emerald-500/50"
                             >
-                                {/* Recipe Image Background */}
-                                {meal.image ? (
+                                {/* Background image */}
+                                {meal.image && (
                                     <img 
                                         src={meal.image} 
-                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                        className="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" 
                                         alt={meal.title} 
                                     />
-                                ) : (
-                                    <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center">
-                                        <Layers size={24} className="text-slate-400 opacity-50" />
-                                    </div>
                                 )}
 
-                                {/* Overlay gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                                {/* Content - always at bottom on hover reveal */}
-                                <div className="absolute inset-0 flex flex-col justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <div className="space-y-0.5">
-                                        {(meal as any).overlapMatch && (
-                                            <p className="text-[8px] font-black uppercase tracking-[0.1em] text-emerald-300">
-                                                {(meal as any).overlapMatch} Shared
-                                            </p>
-                                        )}
-                                        <h4 className="text-xs font-bold text-white line-clamp-2 leading-tight">
-                                            {meal.title}
-                                        </h4>
-                                    </div>
+                                {/* Content */}
+                                <div className="relative z-10">
+                                    {(meal as any).overlapMatch && (
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 mb-1">
+                                            {(meal as any).overlapMatch} Shared
+                                        </p>
+                                    )}
+                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
+                                        {meal.title}
+                                    </h4>
                                 </div>
+
+                                {/* Icon indicator */}
+                                <Layers size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors relative z-10" />
                             </a>
                         ) : (
                             // Empty slot - "Recipe not found"
                             <div
                                 key={`empty-${idx}`}
-                                className="h-32 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center"
+                                className="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between h-24 text-center"
                             >
-                                <div className="text-center">
-                                    <Layers size={18} className="text-slate-300 dark:text-slate-600 mx-auto mb-1" />
-                                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500">
+                                <div />
+                                <div className="space-y-1">
+                                    <Layers size={16} className="text-slate-300 dark:text-slate-600 mx-auto" />
+                                    <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                                         Recipe not found
                                     </p>
                                 </div>
+                                <div />
                             </div>
                         )
                     ))
