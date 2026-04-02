@@ -196,11 +196,28 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
 
             {/* Macros 2x2 Grid */}
             <div className="grid grid-cols-2 gap-3">
-                {/* Energy */}
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between h-24">
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Energy</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(energyUnit === 'kJ' ? eV * 4.184 : eV)} {energyUnit}</p>
+                {/* Energy - Detailed with Macro Breakdown */}
+                <div className="col-span-1 md:col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-slate-50 to-slate-50/50 dark:from-slate-900/30 dark:to-slate-900/10 flex items-center gap-4">
+                    <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
+                        <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
+                            <circle cx="48" cy="48" r={R} fill="none" stroke="currentColor" strokeWidth={STR} className="text-slate-200 dark:text-slate-800" />
+                            <circle cx="48" cy="48" r={R} fill="none" stroke="#3b82f6" strokeWidth={STR} strokeLinecap="butt" style={{ ...cS, transition: 'all 0.7s ease' }} />
+                            <circle cx="48" cy="48" r={R} fill="none" stroke="#f59e0b" strokeWidth={STR} strokeLinecap="butt" style={{ ...fS, transition: 'all 0.7s ease' }} />
+                            <circle cx="48" cy="48" r={R} fill="none" stroke="#f43f5e" strokeWidth={STR} strokeLinecap="butt" style={{ ...pS, transition: 'all 0.7s ease' }} />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-base font-black text-slate-900 dark:text-white leading-none">{Math.round(energyUnit === 'kJ' ? eV * 4.184 : eV)}</span>
+                            <span className="text-[8px] text-slate-400 font-bold mt-0.5">{energyUnit}</span>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2">Energy</p>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">{formatEnergyValue(eV, energyUnit, eV * 4.184)}</div>
+                        <div className="space-y-2">
+                            {[{ l: 'Carbs', p: cP, c: '#3b82f6', t: 'text-blue-500' }, { l: 'Fat', p: fP, c: '#f59e0b', t: 'text-amber-500' }, { l: 'Protein', p: pP, c: '#f43f5e', t: 'text-rose-500' }].map(({ l, p, c, t }) => (
+                                <div key={l} className="flex items-center gap-1.5"><span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 w-12 flex-shrink-0">{l}</span><Bar pct={p} color={c} /><span className={cn("text-[10px] font-black w-8 text-right flex-shrink-0", t)}>{p}%</span></div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
