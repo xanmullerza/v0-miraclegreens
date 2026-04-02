@@ -203,13 +203,13 @@ function StepOneFoodMatch({
                 ))}
             </div>
 
-            {/* Proceed Button - Show after matches are ready */}
-            {ingredients.length > 0 && ingredients.every(ing => Object.keys(matchedIngredients).includes(ing.id) || skippedIngredients[ing.id]) && (
+            {/* Proceed to Step 2 Button */}
+            {isStep1Complete && (
                 <button
-                    onClick={() => setMappingStep('INGREDIENT_REVIEW')}
+                    onClick={proceedToStep2}
                     className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2"
                 >
-                    Proceed to Ingredient Review <ChevronRight size={16} />
+                    Proceed to Step 2: Portion Verification <ChevronRight size={16} />
                 </button>
             )}
         </div>
@@ -500,19 +500,6 @@ function IngredientMatchCard({
                             </div>
                         ))
                     )}
-                </div>
-            )}
-
-            {/* Proceed to Step 2 Button */}
-            {isStep1Complete && (
-                <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
-                    <button
-                        onClick={proceedToStep2}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors"
-                    >
-                        Proceed to Step 2: Portion Verification
-                        <ChevronRight size={16} />
-                    </button>
                 </div>
             )}
         </div>
