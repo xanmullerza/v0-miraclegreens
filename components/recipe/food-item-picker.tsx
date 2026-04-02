@@ -93,7 +93,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
             setLoading(true);
             try {
                 // Use unified search that returns both USDA and local results
-                // USDA results come first due to sorting in searchFoodItem
+                // Local DB results are prioritized first, USDA is fallback for no matches
                 const matches = await searchFoodItem(searchQuery);
                 setResults(matches);
             } catch (err) {
