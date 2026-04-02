@@ -401,7 +401,7 @@ function IngredientMatchCard({
                                     {isPeeking ? <Eye size={16} /> : <EyeOff size={16} />}
                                 </button>
                             )}
-                            {isMatched && isPeeking && !isAccepted && (
+                            {isMatched && isPeeking && (
                                 <button onClick={(e) => { e.stopPropagation(); setShowEditDialog(true); }}
                                     className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-full transition-colors" title="Edit match">
                                     <Pencil size={16} />
