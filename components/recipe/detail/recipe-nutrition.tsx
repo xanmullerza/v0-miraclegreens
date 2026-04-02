@@ -267,6 +267,35 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 </div>
             </div>
 
+            {/* Phytonutrients Tag Cloud */}
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                <div className="mb-4">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Phytonutrients</div>
+                    <div className="text-[9px] text-slate-400 mt-0.5">Plant compounds with powerful health benefits</div>
+                </div>
+                {nutrition.phytonutrients && Object.keys(nutrition.phytonutrients).length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                        {Object.entries(nutrition.phytonutrients).map(([name, value]) => {
+                            const v = Number(value) * sf;
+                            return (
+                                <div
+                                    key={name}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-300/30 dark:border-green-600/40 text-green-700 dark:text-green-400 hover:shadow-md hover:border-green-400/50 dark:hover:border-green-500/50 transition-all cursor-default"
+                                >
+                                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500/20 text-[7px] font-black">•</span>
+                                    <span>{name}</span>
+                                    {v > 0 && <span className="text-[9px] opacity-70">({v.toFixed(2)}mg)</span>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="text-center py-4">
+                        <p className="text-[10px] text-slate-400">No phytonutrient data available</p>
+                    </div>
+                )}
+            </div>
+
             {/* Macros + Electrolytes */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
