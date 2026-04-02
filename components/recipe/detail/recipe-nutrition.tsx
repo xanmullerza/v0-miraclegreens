@@ -402,4 +402,3 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         </div>
     );
 }
-}
