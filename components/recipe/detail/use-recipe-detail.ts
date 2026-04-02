@@ -695,7 +695,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // Sync portion matching state → sidebar
     useEffect(() => {
         if (mappingStep === 'PORTION_MATCH' && ingredients.length > 0 && recipe) {
-            console.log('[useEffect PORTION_MATCH] Navigating to sidebar...', { mappingStep, ingredientsCount: ingredients.length, recipeId: recipe.id });
+            console.log('[useEffect PORTION_MATCH] Setting portion state for sidebar/inline display');
             setSmartMatchPortion({
                 ingredients,
                 matchedIngredients,
@@ -718,8 +718,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     setSkippedIngredients(newSkipped);
                 },
             });
-            console.log('[useEffect PORTION_MATCH] Calling navigateTo(portion-match-picker)');
-            navigateTo('portion-match-picker');
+            // No navigateTo - Step 2 will display inline in RecipeSmartMatch
         } else {
             console.log('[useEffect PORTION_MATCH] conditions not met', { 
                 isMappingStepCorrect: mappingStep === 'PORTION_MATCH', 
