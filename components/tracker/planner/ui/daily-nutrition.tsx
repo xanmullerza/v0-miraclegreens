@@ -35,25 +35,35 @@ export function DailyNutrition({
         });
     }
 
-    // Calculate totals
-    const totals = mealsArray.reduce(
-        (acc: any, recipe: any) => {
-            acc.calories += recipe.calories || 0;
-            acc.energy_kj += recipe.energy_kj || 0;
-            acc.protein += recipe.protein || 0;
-            acc.fat += recipe.fat || 0;
-            acc.carbs += recipe.carbs || 0;
+    // Calculate totals - use pre-aggregated micronutrients from plan if available
+    const totals = plan.micronutrients && plan.phytonutrients 
+        ? {
+              calories: mealsArray.reduce((sum, m) => sum + (m.calories || 0), 0),
+              energy_kj: mealsArray.reduce((sum, m) => sum + (m.energy_kj || 0), 0),
+              protein: mealsArray.reduce((sum, m) => sum + (m.protein || 0), 0),
+              fat: mealsArray.reduce((sum, m) => sum + (m.fat || 0), 0),
+              carbs: mealsArray.reduce((sum, m) => sum + (m.carbs || 0), 0),
+              micronutrients: plan.micronutrients,
+              phytonutrients: plan.phytonutrients,
+          }
+        : mealsArray.reduce(
+              (acc: any, recipe: any) => {
+                  acc.calories += recipe.calories || 0;
+                  acc.energy_kj += recipe.energy_kj || 0;
+                  acc.protein += recipe.protein || 0;
+                  acc.fat += recipe.fat || 0;
+                  acc.carbs += recipe.carbs || 0;
 
-            Object.entries(recipe.micronutrients || {}).forEach(([key, val]) => {
-                acc.micronutrients[key] = (acc.micronutrients[key] || 0) + (val as number);
-            });
+                  Object.entries(recipe.micronutrients || {}).forEach(([key, val]) => {
+                      acc.micronutrients[key] = (acc.micronutrients[key] || 0) + (val as number);
+                  });
 
-            // Aggregate phytonutrients
-            Object.entries(recipe.phytonutrients || {}).forEach(([key, val]) => {
-                acc.phytonutrients[key] = val; // Keep track of phytonutrient data
-            });
+                  // Aggregate phytonutrients
+                  Object.entries(recipe.phytonutrients || {}).forEach(([key, val]) => {
+                      acc.phytonutrients[key] = val;
+                  });
 
-            return acc;
+                  return acc;
         },
         { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {}, phytonutrients: {} }
     );
