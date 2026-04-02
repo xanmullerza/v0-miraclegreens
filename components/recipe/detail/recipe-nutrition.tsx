@@ -209,6 +209,47 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 </div>
             </div>
 
+            {/* Vitamins + Minerals Two Column */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Vitamins (Left) */}
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                    <div>
+                        <div className="text-[11px] font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
+                        <div className="text-[9px] text-slate-400 mt-0.5">Water & Fat Soluble</div>
+                    </div>
+                    <div className="space-y-2.5">
+                        {[...wsData, ...stData].map(d => (
+                            <div key={d.label} className="flex items-center justify-between">
+                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
+                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>{d.pct}%</span>
+                            </div>
+                        ))}
+                        <div className="border-t border-slate-200 dark:border-slate-800 pt-2 mt-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Choline</span>
+                                <span className="text-[10px] text-slate-400">{nv(['Choline', 'choline_mg']).toFixed(1)} mg</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Minerals (Right) */}
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                    <div>
+                        <div className="text-[11px] font-black uppercase tracking-widest text-teal-500">Minerals</div>
+                        <div className="text-[9px] text-slate-400 mt-0.5">Electrolytes & Trace</div>
+                    </div>
+                    <div className="space-y-2.5">
+                        {[...elData, ...trData].map(d => (
+                            <div key={d.label} className="flex items-center justify-between">
+                                <span className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
+                                <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= 50 ? 'text-amber-500' : 'text-slate-400')}>{d.pct}%</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
             {/* Macros + Electrolytes */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
