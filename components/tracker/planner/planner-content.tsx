@@ -83,11 +83,29 @@ export function PlannerContent({
     const isProfileIncomplete = !profile.age || !profile.weight || !profile.height;
 
     // Calculate RDAs for daily nutrition
-    const userRDAs = useRDA(
+    const rdas = useRDA(
         typeof profile.age === 'number' ? profile.age : 30,
         profile.gender || 'female',
         state.calories || 2000
     );
+
+    // Fallback RDAs while loading or if fetch fails
+    const defaultRDAs: Record<string, number> = {
+        'Energy': state.calories || 2000,
+        'Protein': ((profile?.weight || 70) * 1.6),
+        'Carbs': 250,
+        'Fat': 70,
+        'Potassium': 2600,
+        'Magnesium': 310,
+        'Calcium': 1000,
+        'Vitamin A': 700,
+        'Vitamin C': 75,
+        'Vitamin D': 600,
+        'Vitamin E': 15,
+        'Vitamin K': 90,
+    };
+
+    const userRDAs = rdas || defaultRDAs;
 
     const getFilteredMeals = () => {
         if (!plan) return [];
