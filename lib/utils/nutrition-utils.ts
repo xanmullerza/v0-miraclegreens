@@ -24,7 +24,15 @@ export const formatEnergyValue = (calories: number, unit: EnergyUnit, energyKj?:
  * Aggregates nutrition data from a list of ingredients.
  * Each ingredient should have its matched food_item data and a calculated weight_g.
  */
-export const calculateAggregatedNutrition = (ingredients: any[]) => {
+export const calculateAggregatedNutrition = (ingredients: any[]): {
+    calories: number;
+    energyKj: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    micronutrients: Record<string, number>;
+    phytonutrients: Record<string, string | { description: string; sources: string[] }>;
+} => {
     let totalCalories = 0;
     let totalEnergyKj = 0;
     let totalProtein = 0;
