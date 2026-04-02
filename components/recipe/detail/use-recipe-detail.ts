@@ -259,7 +259,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
                 const { data: ingredientsData, error: ingredientsError } = await supabase
                     .from('ingredients')
-                    .select('*, food_items(id, name, source, portions)')
+                    .select('*, food_items(id, name, source, portions, phytonutrients, micronutrients, energy_kcal, energy_kj, protein_g, carbs_g, fat_g)')
                     .eq('recipe_id', recipeId)
                     .order('id', { ascending: true });
 
