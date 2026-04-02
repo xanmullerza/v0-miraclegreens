@@ -4,7 +4,8 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import {
     ArrowLeft, Loader2, Activity, UtensilsCrossed, Layers, Sparkles,
-    Check, RefreshCw, X, Search, AlertTriangle, Flame, RotateCcw, Trash2, Zap, ChevronRight
+    Check, RefreshCw, X, Search, AlertTriangle, Flame, RotateCcw, Trash2, Zap, ChevronRight,
+    Eye, EyeOff
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -257,6 +258,7 @@ function IngredientMatchCard({
     const isUsdaLoading = !!usdaLoading[ing.id];
     const ingUsdaResults = usdaResults[ing.id] || [];
     const [usdaQuery, setUsdaQuery] = React.useState('');
+    const [isPeeking, setIsPeeking] = React.useState(false);
 
     const handleUsdaButtonClick = async () => {
         const term = extractCoreName(ing.base_ingredient || ing.item);
@@ -345,23 +347,52 @@ function IngredientMatchCard({
                                 {isSkipped && isFlavoring ? <Flame size={18} /> : isSkipped && !isFlavoring ? <X size={18} /> : isAccepted ? <Check size={18} /> : <UtensilsCrossed size={18} />}
                             </div>
                             <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <p className="text-sm font-bold text-foreground capitalize truncate max-w-[120px]">
-                                        {cleanIngredientDisplay(ing.base_ingredient || ing.item)}
-                                    </p>
-                                    {isFlavoring && (
-                                        <span className="text-[8px] h-4 px-1.5 py-0 rounded-full border bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 font-bold uppercase tracking-wider">
-                                            Flavor
+                                {isPeeking && isMatched ? (
+                                    // Show matched item
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <p className="text-sm font-bold text-indigo-900 dark:text-indigo-300 truncate max-w-[150px]">
+                                            {matchedIngredients[ing.id]?.name || 'Match'}
+                                        </p>
+                                        <span className={cn(
+                                            "text-[8px] h-4 px-1 py-0 rounded border",
+                                            matchedIngredients[ing.id]?.source === 'usda'
+                                                ? "bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400"
+                                                : "bg-indigo-100 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400"
+                                        )}>
+                                            {matchedIngredients[ing.id]?.source === 'usda' ? 'USDA' : 'DB'}
                                         </span>
-                                    )}
-                                </div>
+                                    </div>
+                                ) : (
+                                    // Show original ingredient
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-sm font-bold text-foreground capitalize truncate max-w-[120px]">
+                                            {cleanIngredientDisplay(ing.base_ingredient || ing.item)}
+                                        </p>
+                                        {isFlavoring && (
+                                            <span className="text-[8px] h-4 px-1.5 py-0 rounded-full border bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 font-bold uppercase tracking-wider">
+                                                Flavor
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                                 <p className="text-xs text-muted-foreground font-medium">
-                                    {(ing.amount?.includes('0.25') && (ing.base_ingredient || ing.item)?.match(/^\d/)) ? '' : ing.amount} {ing.weight_g ? `(${ing.weight_g}g)` : ''}
+                                    {isPeeking && isMatched ? `Matched for: "${ing.base_ingredient || ing.item}"` : (ing.amount?.includes('0.25') && (ing.base_ingredient || ing.item)?.match(/^\d/)) ? '' : ing.amount} {!isPeeking ? ing.weight_g ? `(${ing.weight_g}g)` : '' : ''}
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-2">
+                            {isMatched && (
+                                <button onClick={(e) => { e.stopPropagation(); setIsPeeking(!isPeeking); }}
+                                    className={cn(
+                                        "p-2 rounded-full transition-colors",
+                                        isPeeking
+                                            ? "text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40"
+                                            : "text-slate-400 hover:text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/40"
+                                    )} title={isPeeking ? "Hide match" : "View match"}>
+                                    {isPeeking ? <Eye size={16} /> : <EyeOff size={16} />}
+                                </button>
+                            )}
                             {isMatched && !isAccepted && (
                                 <button onClick={(e) => { e.stopPropagation(); setFlippedCards(prev => ({ ...prev, [ing.id]: true })); }}
                                     className="p-2 text-indigo-500 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-full transition-colors" title="Review Match">
