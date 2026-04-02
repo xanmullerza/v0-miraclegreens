@@ -174,6 +174,41 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                 </div>
             </div>
 
+            {/* Macros 2x2 Grid */}
+            <div className="grid grid-cols-2 gap-3">
+                {/* Energy */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between h-24">
+                    <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Energy</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">{Math.round(energyUnit === 'kJ' ? eV * 4.184 : eV)} {energyUnit}</p>
+                    </div>
+                </div>
+
+                {/* Carbohydrates */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between h-24">
+                    <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbohydrates</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">{cV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({cP}%)</span></p>
+                    </div>
+                </div>
+
+                {/* Protein */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between h-24">
+                    <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">{pV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({pP}%)</span></p>
+                    </div>
+                </div>
+
+                {/* Fat */}
+                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col justify-between h-24">
+                    <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">{fV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({fP}%)</span></p>
+                    </div>
+                </div>
+            </div>
+
             {/* Macros + Electrolytes */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
