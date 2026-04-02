@@ -17,7 +17,7 @@ export interface Recipe {
     tags: string[];
     source?: string;
     micronutrients?: Record<string, number>;
-    phytonutrients?: Record<string, string>;
+    phytonutrients?: Record<string, string | { description: string; sources: string[] }>;
     user_id?: string;
 }
 
@@ -37,7 +37,7 @@ export interface Ingredient {
         carbs_g?: number;
         fat_g?: number;
         micronutrients?: Record<string, number>;
-        phytonutrients?: Record<string, string>;
+        phytonutrients?: Record<string, string | { description: string; sources: string[] }>;
         portions?: { label: string; weight_g: number }[];
         [key: string]: any;
     };
@@ -55,7 +55,7 @@ export interface CalculatedNutrition {
     carbs: number;
     fat: number;
     micronutrients: Record<string, number>;
-    phytonutrients: Record<string, string>;
+    phytonutrients: Record<string, string | { description: string; sources: string[] }>;
 }
 
 export interface RecipeDetailData {
