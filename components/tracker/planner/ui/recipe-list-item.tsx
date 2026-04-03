@@ -22,8 +22,24 @@ export const RecipeListItem = ({
     const [addedToList, setAddedToList] = useState(false);
 
     // Calculate nutrition values based on selectedServings (always normalized from 1 serving)
+    // Estimate servings: if DB servings=1 but energy suggests multiple servings, estimate from energy density
+    // Typical serving size is 800-1700 kJ (200-400 kcal) for most meals
+    // If > 2500 kJ, likely 2+ servings. If > 4200 kJ, likely 3+ servings
+    const estimateServingsFromEnergy = (energyKj: number): number => {
+        if (energyKj <= 2500) return 1;        // ≤ 600 kcal
+        if (energyKj <= 3750) return 2;        // 600-900 kcal
+        if (energyKj <= 5000) return 2.5;      // 900-1200 kcal
+        return Math.ceil(energyKj / 1885);     // 1885 kJ (450 kcal) per serving heuristic
+    };
+
+    let originalServings = (recipe as any).originalServings || recipe.servings || 1;
+    
+    // If DB shows servings=1 but energy is high, estimate actual servings from energy_kj
+    if (originalServings === 1 && (recipe.energyKj || 0) > 2500) {
+        originalServings = estimateServingsFromEnergy(recipe.energyKj || 0);
+    }
+
     // Use originalServings if available (from meal generator), otherwise fall back to recipe.servings
-    const originalServings = (recipe as any).originalServings || recipe.servings || 1;
     // Scale factor: normalize to 1 serving, then multiply by selectedServings
     const sf = (1 / originalServings) * selectedServings;
     const displayCalories = (recipe.calories || 0) * sf;
