@@ -71,8 +71,8 @@ export interface RecipeDetailData {
 
     // Nutrition
     calculatedNutrition: CalculatedNutrition;
-    nutritionViewMode: 'per-serving' | 'total';
-    setNutritionViewMode: React.Dispatch<React.SetStateAction<'per-serving' | 'total'>>;
+    selectedServings: number;
+    setSelectedServings: React.Dispatch<React.SetStateAction<number>>;
     totalWeight: number;
 
     // Thresholds

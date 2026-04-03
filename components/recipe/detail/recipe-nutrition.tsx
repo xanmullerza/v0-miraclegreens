@@ -13,7 +13,7 @@ type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
 // ── Main Component ──────────────────────────────────────────
 export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
     const {
-        recipe, calculatedNutrition, nutritionViewMode, setNutritionViewMode,
+        recipe, calculatedNutrition, selectedServings,
         energyUnit, nutrientDisplayMode, userRDAs, profile
     } = ctx;
 
@@ -44,7 +44,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         );
     }
 
-    // Calculate nutrition using the hook
+    // Calculate nutrition using the hook - always per-serving, scale by selectedServings
     const nutrition = useRecipeNutrition({
         recipe: {
             ...recipe,
@@ -55,46 +55,51 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
             energy_kj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
             micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
         },
-        viewMode: (nutritionViewMode === 'total' ? 'per-recipe' : 'per-serving') as 'per-recipe' | 'per-serving',
+        viewMode: 'per-serving' as const,
         energyUnit,
         userRDAs,
         nutrientDisplayMode,
     });
+
+    // Scale nutrition by selectedServings
+    const scaledNutrition = nutrition ? {
+        ...nutrition,
+        calories: nutrition.calories * selectedServings,
+        protein: nutrition.protein * selectedServings,
+        carbs: nutrition.carbs * selectedServings,
+        fat: nutrition.fat * selectedServings,
+        protein_pct: nutrition.protein_pct,
+        carbs_pct: nutrition.carbs_pct,
+        fat_pct: nutrition.fat_pct,
+        aminoAcids: nutrition.aminoAcids?.map(aa => ({ ...aa, value: aa.value * selectedServings })),
+        carbBreakdown: nutrition.carbBreakdown ? {
+            starch: nutrition.carbBreakdown.starch * selectedServings,
+            fiber: nutrition.carbBreakdown.fiber * selectedServings,
+            sugar: nutrition.carbBreakdown.sugar * selectedServings,
+        } : undefined,
+        fatBreakdown: nutrition.fatBreakdown ? {
+            saturated: nutrition.fatBreakdown.saturated * selectedServings,
+            monounsaturated: nutrition.fatBreakdown.monounsaturated * selectedServings,
+            polyunsaturated: nutrition.fatBreakdown.polyunsaturated * selectedServings,
+            omega3: nutrition.fatBreakdown.omega3 * selectedServings,
+            omega6: nutrition.fatBreakdown.omega6 * selectedServings,
+            cholesterol: nutrition.fatBreakdown.cholesterol * selectedServings,
+        } : undefined,
+        elements: nutrition.elements?.map(el => ({ ...el, val: el.val * selectedServings })),
+        traces: nutrition.traces?.map(tr => ({ ...tr, val: tr.val * selectedServings })),
+        waterSoluble: nutrition.waterSoluble?.map(ws => ({ ...ws, val: ws.val * selectedServings })),
+        storedVitamins: nutrition.storedVitamins?.map(sv => ({ ...sv, val: sv.val * selectedServings })),
+    } : null;
 
     // Get phytonutrients (not part of NutritionDisplay yet)
     const phytonutrients = calculatedNutrition.phytonutrients && Object.keys(calculatedNutrition.phytonutrients).length > 0 ? calculatedNutrition.phytonutrients : (recipe.phytonutrients || {});
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-            {/* Rendering mode toggle */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-2">
-                        <Activity size={16} /> Serving Mode
-                    </h3>
-                </div>
-                <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
-                    {(['total', 'per-serving'] as const).map(mode => (
-                        <button
-                            key={mode}
-                            onClick={() => setNutritionViewMode(mode as 'per-serving' | 'total')}
-                            className={cn(
-                                'flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
-                                nutritionViewMode === mode
-                                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                            )}
-                        >
-                            {mode === 'total' ? 'Recipe' : 'Per Serving'}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
             {/* Nutrition Display Component */}
-            {nutrition && (
+            {scaledNutrition && (
                 <NutritionDisplay
-                    nutrition={nutrition}
+                    nutrition={scaledNutrition}
                     energyUnit={energyUnit}
                     nutrientDisplayMode={nutrientDisplayMode}
                     universalThreshold={universalThreshold}
