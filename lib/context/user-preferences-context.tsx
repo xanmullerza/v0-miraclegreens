@@ -131,14 +131,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             setHeaderStyleState(savedHeaderStyle);
         }
 
-        const savedPlan = localStorage.getItem("dailyPlan");
-        if (savedPlan) {
-            try {
-                setDailyPlanState(JSON.parse(savedPlan));
-            } catch (e) {
-                console.error("Failed to parse daily plan", e);
-            }
-        }
+        // (Removed dailyPlan loading from localStorage, force clear old ones)
+        localStorage.removeItem("dailyPlan");
 
         // 1. First load from LocalStorage (fast)
         const savedProfile = localStorage.getItem("userProfile");
@@ -234,7 +228,6 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                 };
                 setProfileState(defaultProfile);
                 localStorage.removeItem("userProfile");
-                localStorage.removeItem("dailyPlan");
                 setProfileLoaded(true);
             }
         });
@@ -328,11 +321,6 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
 
     const updateDailyPlan = (plan: DailyPlan | null) => {
         setDailyPlanState(plan);
-        if (plan) {
-            localStorage.setItem("dailyPlan", JSON.stringify(plan));
-        } else {
-            localStorage.removeItem("dailyPlan");
-        }
     };
 
     const dailyTargets = calculateIndividualTargets({
