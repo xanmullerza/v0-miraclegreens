@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { formatEnergy } from '../utils';
 import { RecipeListItemProps } from '../types';
 import { useShoppingList } from '@/hooks/use-shopping-list';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { toast } from 'sonner';
 
 export const RecipeListItem = ({
@@ -19,6 +20,17 @@ export const RecipeListItem = ({
     const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
     const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
     const [addedToList, setAddedToList] = useState(false);
+
+    // Get nutrition view mode from recipe filter context
+    const { filters } = useRecipeFilter();
+    const nutritionViewMode = filters.nutritionViewMode;
+
+    // Calculate nutrition values based on view mode
+    const servings = recipe.servings || 1;
+    const displayCalories = nutritionViewMode === 'per-serving' ? (recipe.calories || 0) / servings : (recipe.calories || 0);
+    const displayCarbs = nutritionViewMode === 'per-serving' ? (recipe.carbs || 0) / servings : (recipe.carbs || 0);
+    const displayFat = nutritionViewMode === 'per-serving' ? (recipe.fat || 0) / servings : (recipe.fat || 0);
+    const displayProtein = nutritionViewMode === 'per-serving' ? (recipe.protein || 0) / servings : (recipe.protein || 0);
 
     // 1. Fetch fresh ingredients (to avoid stale plan data)
     useEffect(() => {
@@ -107,10 +119,10 @@ export const RecipeListItem = ({
                 </div>
 
                 {/* Stats (Desktop View) */}
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Energy</span><span className="font-black text-[10px]">{formatEnergy(recipe.calories || 0, unit)}</span></div>
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Carbs</span><span className="font-black text-[10px]">{recipe.carbs?.toFixed(1) || 0}g</span></div>
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Fat</span><span className="font-black text-[10px]">{recipe.fat?.toFixed(1) || 0}g</span></div>
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Protein</span><span className="font-black text-[10px]">{recipe.protein?.toFixed(1) || 0}g</span></div>
+                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Energy</span><span className="font-black text-[10px]">{formatEnergy(displayCalories, unit)}</span></div>
+                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Carbs</span><span className="font-black text-[10px]">{displayCarbs.toFixed(1)}g</span></div>
+                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Fat</span><span className="font-black text-[10px]">{displayFat.toFixed(1)}g</span></div>
+                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Protein</span><span className="font-black text-[10px]">{displayProtein.toFixed(1)}g</span></div>
 
                 {/* Action Grid */}
                 <div className="hidden lg:grid grid-cols-2 gap-1 px-4">

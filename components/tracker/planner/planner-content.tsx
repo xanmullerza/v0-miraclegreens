@@ -18,6 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 import { TrackerTabShell, SortOption } from '../tracker-tab-shell';
 
@@ -58,6 +59,9 @@ export function PlannerContent({
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [planLength, setPlanLength] = useState<PlanLength>('daily');
     const [showLengthMenu, setShowLengthMenu] = useState(false);
+
+    // Get nutrition view mode from recipe filter context
+    const { filters, updateFilter } = useRecipeFilter();
 
     // Override local state with external props if provided
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : state.showFavoritesOnly;
@@ -148,38 +152,69 @@ export function PlannerContent({
     };
 
     const lengthSwitcher = (
-        <div className="relative">
-            <button
-                onClick={() => setShowLengthMenu(!showLengthMenu)}
-                className="h-10 px-4 rounded-xl bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]"
-            >
-                <Sparkles size={14} className="animate-pulse" />
-                <span className="hidden sm:inline">{planLength}</span>
-                <ChevronDown size={10} className={cn("transition-transform duration-300", showLengthMenu && "rotate-180")} />
-            </button>
+        <div className="flex items-center gap-2">
+            {/* Nutrition View Mode Toggle */}
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <button 
+                    onClick={() => updateFilter('nutritionViewMode', 'per-serving')}
+                    className={cn(
+                        "px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
+                        filters.nutritionViewMode === 'per-serving'
+                            ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
+                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    )}
+                    title="Show nutrition per serving"
+                >
+                    Per Serving
+                </button>
+                <button 
+                    onClick={() => updateFilter('nutritionViewMode', 'total')}
+                    className={cn(
+                        "px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
+                        filters.nutritionViewMode === 'total'
+                            ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
+                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    )}
+                    title="Show total nutrition for recipe"
+                >
+                    Total
+                </button>
+            </div>
 
-            {showLengthMenu && (
-                <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl z-[100] p-1.5 min-w-[160px] animate-in fade-in zoom-in-95 duration-200">
-                    {(['daily', 'weekly', 'monthly'] as PlanLength[]).map((length) => (
-                        <button
-                            key={length}
-                            onClick={() => {
-                                setPlanLength(length);
-                                setShowLengthMenu(false);
-                            }}
-                            className={cn(
-                                "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mb-1 last:mb-0",
-                                planLength === length
-                                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/10"
-                                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                            )}
-                        >
-                            <Calendar size={12} className={planLength === length ? "text-white" : "text-blue-500"} />
-                            {length}
-                        </button>
-                    ))}
-                </div>
-            )}
+            {/* Plan Length Switcher */}
+            <div className="relative">
+                <button
+                    onClick={() => setShowLengthMenu(!showLengthMenu)}
+                    className="h-10 px-4 rounded-xl bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                    <Sparkles size={14} className="animate-pulse" />
+                    <span className="hidden sm:inline">{planLength}</span>
+                    <ChevronDown size={10} className={cn("transition-transform duration-300", showLengthMenu && "rotate-180")} />
+                </button>
+
+                {showLengthMenu && (
+                    <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl z-[100] p-1.5 min-w-[160px] animate-in fade-in zoom-in-95 duration-200">
+                        {(['daily', 'weekly', 'monthly'] as PlanLength[]).map((length) => (
+                            <button
+                                key={length}
+                                onClick={() => {
+                                    setPlanLength(length);
+                                    setShowLengthMenu(false);
+                                }}
+                                className={cn(
+                                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mb-1 last:mb-0",
+                                    planLength === length
+                                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/10"
+                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                )}
+                            >
+                                <Calendar size={12} className={planLength === length ? "text-white" : "text-blue-500"} />
+                                {length}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 
