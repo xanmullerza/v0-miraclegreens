@@ -219,7 +219,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                         <input
                             type="number"
                             min="1"
-                            max="1000"
+                            max="9999"
                             value={macroGrams}
                             onChange={(e) => setMacroGrams(Math.max(1, parseInt(e.target.value) || 100))}
                             className="w-20 bg-slate-800 text-white text-center text-sm font-bold rounded px-2 py-1 border border-slate-600 focus:outline-none focus:border-orange-400"
