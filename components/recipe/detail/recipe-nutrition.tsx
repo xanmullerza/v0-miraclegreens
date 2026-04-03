@@ -64,31 +64,31 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
     // Scale nutrition by selectedServings
     const scaledNutrition = nutrition ? {
         ...nutrition,
-        calories: nutrition.calories * selectedServings,
-        protein: nutrition.protein * selectedServings,
-        carbs: nutrition.carbs * selectedServings,
-        fat: nutrition.fat * selectedServings,
-        protein_pct: nutrition.protein_pct,
-        carbs_pct: nutrition.carbs_pct,
-        fat_pct: nutrition.fat_pct,
+        energy: { ...nutrition.energy, value: nutrition.energy.value * selectedServings },
+        protein: { ...nutrition.protein, value: nutrition.protein.value * selectedServings },
+        carbs: { ...nutrition.carbs, value: nutrition.carbs.value * selectedServings },
+        fat: { ...nutrition.fat, value: nutrition.fat.value * selectedServings },
         aminoAcids: nutrition.aminoAcids?.map(aa => ({ ...aa, value: aa.value * selectedServings })),
-        carbBreakdown: nutrition.carbBreakdown ? {
+        carbBreakdown: {
             starch: nutrition.carbBreakdown.starch * selectedServings,
             fiber: nutrition.carbBreakdown.fiber * selectedServings,
             sugar: nutrition.carbBreakdown.sugar * selectedServings,
-        } : undefined,
-        fatBreakdown: nutrition.fatBreakdown ? {
+        },
+        fatBreakdown: {
             saturated: nutrition.fatBreakdown.saturated * selectedServings,
             monounsaturated: nutrition.fatBreakdown.monounsaturated * selectedServings,
             polyunsaturated: nutrition.fatBreakdown.polyunsaturated * selectedServings,
             omega3: nutrition.fatBreakdown.omega3 * selectedServings,
             omega6: nutrition.fatBreakdown.omega6 * selectedServings,
             cholesterol: nutrition.fatBreakdown.cholesterol * selectedServings,
-        } : undefined,
-        elements: nutrition.elements?.map(el => ({ ...el, val: el.val * selectedServings })),
-        traces: nutrition.traces?.map(tr => ({ ...tr, val: tr.val * selectedServings })),
-        waterSoluble: nutrition.waterSoluble?.map(ws => ({ ...ws, val: ws.val * selectedServings })),
-        storedVitamins: nutrition.storedVitamins?.map(sv => ({ ...sv, val: sv.val * selectedServings })),
+        },
+        micronutrients: {
+            electrolytes: nutrition.micronutrients.electrolytes?.map(el => ({ ...el, val: el.val * selectedServings })) || [],
+            trace: nutrition.micronutrients.trace?.map(tr => ({ ...tr, val: tr.val * selectedServings })) || [],
+            waterSoluble: nutrition.micronutrients.waterSoluble?.map(ws => ({ ...ws, val: ws.val * selectedServings })) || [],
+            fatSoluble: nutrition.micronutrients.fatSoluble?.map(sv => ({ ...sv, val: sv.val * selectedServings })) || [],
+            choline: { ...nutrition.micronutrients.choline, val: nutrition.micronutrients.choline.val * selectedServings },
+        },
     } : null;
 
     // Get phytonutrients (not part of NutritionDisplay yet)
