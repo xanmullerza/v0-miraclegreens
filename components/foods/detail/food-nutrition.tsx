@@ -418,6 +418,14 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                         <span className="text-[10px] font-semibold text-slate-300">Omega-3</span>
                                         <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Omega-3'], macroGrams).toFixed(2)}g</span>
                                     </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Omega-6</span>
+                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Omega-6'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Cholesterol</span>
+                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Cholesterol'], macroGrams).toFixed(0)}mg</span>
+                                    </div>
                                 </div>
                             )}
                         </div>
