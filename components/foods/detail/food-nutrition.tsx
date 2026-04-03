@@ -554,6 +554,8 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
         <div className="space-y-6">
                 <MacroNutrients energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
 
+            <MicroNutrients userRDAs={userRDAs} />
+
             <Phytonutrients />
 
             {/* NUTRIENT BREAKDOWN MODAL */}
