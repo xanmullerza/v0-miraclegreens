@@ -44,19 +44,26 @@ const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)
 
 /**
  * Helper function to calculate nutrition including micronutrients
+ * Returns per-serving values if servings > 1
  */
-const calculateNutrition = (ingredients: any[]) => {
+const calculateNutrition = (ingredients: any[], servings: number = 1) => {
     let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalEnergyKj = 0;
     const micronutrients: Record<string, number> = {};
     const phytonutrients: Record<string, string> = {};
 
     const result = {
-        get calories() { return totalCalories; },
-        get energyKj() { return totalEnergyKj; },
-        get protein() { return totalProtein; },
-        get carbs() { return totalCarbs; },
-        get fat() { return totalFat; },
-        micronutrients,
+        get calories() { return totalCalories / servings; },
+        get energyKj() { return totalEnergyKj / servings; },
+        get protein() { return totalProtein / servings; },
+        get carbs() { return totalCarbs / servings; },
+        get fat() { return totalFat / servings; },
+        get micronutrients() {
+            const scaledMicro: Record<string, number> = {};
+            Object.entries(micronutrients).forEach(([key, val]) => {
+                scaledMicro[key] = val / servings;
+            });
+            return scaledMicro;
+        },
         phytonutrients
     };
 
@@ -201,7 +208,7 @@ export const getRandomRecipeByType = async (
         })
         .filter((r: any) => r.id !== excludeId) // Exclude current recipe
         .map((r: any) => {
-            const calculatedNutrition = calculateNutrition(r.ingredients);
+            const calculatedNutrition = calculateNutrition(r.ingredients, r.servings || 1);
 
             return {
                 recipe: {
@@ -227,7 +234,7 @@ export const getRandomRecipeByType = async (
                         category: i.food_items?.category?.toLowerCase() || ''
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                    servings: r.servings || 1,
+                    servings: 1,
                     originalServings: r.servings || 1,
                     micronutrients: calculatedNutrition.micronutrients,
                     phytonutrients: calculatedNutrition.phytonutrients
@@ -352,7 +359,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             return true;
         })
         .map((r: any) => {
-            const calculatedNutrition = calculateNutrition(r.ingredients);
+            const calculatedNutrition = calculateNutrition(r.ingredients, r.servings || 1);
 
             // Store micronutrients keyed by recipe ID
             recipeMicronutrients[r.id] = calculatedNutrition.micronutrients;
@@ -381,7 +388,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                     category: i.food_items?.category?.toLowerCase() || ''
                 })),
                 instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                servings: r.servings || 1,
+                servings: 1,
                 originalServings: r.servings || 1
             };
         });

@@ -313,7 +313,7 @@ export function PlannerContent({
                                     recipe={meal}
                                     mealLabel={meal.mealLabel}
                                     unit={unit as any}
-                                    onMarkEaten={() => handleMarkEaten(meal, meal.mealLabel)}
+                                    onMarkEaten={() => handleMarkEaten(meal, meal.mealLabel, selectedServings)}
                                     isEaten={eatenMeals.has(meal.mealLabel)}
                                     pantryItems={pantryItems}
                                     onRecipeClick={onRecipeClick}
@@ -330,6 +330,7 @@ export function PlannerContent({
                                 profile={profile}
                                 energyUnit={unit}
                                 nutrientDisplayMode="both"
+                                selectedServings={selectedServings}
                             />
                         </div>
                     </div>

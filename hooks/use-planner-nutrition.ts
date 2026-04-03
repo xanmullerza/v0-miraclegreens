@@ -6,6 +6,7 @@ interface UsePlannerNutritionProps {
     energyUnit: string;
     userRDAs?: Record<string, number> | null;
     nutrientDisplayMode?: string;
+    selectedServings?: number;
 }
 
 export function usePlannerNutrition({
@@ -13,6 +14,7 @@ export function usePlannerNutrition({
     energyUnit,
     userRDAs = {},
     nutrientDisplayMode = 'both',
+    selectedServings = 1,
 }: UsePlannerNutritionProps) {
     const nutrition = useMemo(() => {
         if (!plan) return null;
@@ -28,37 +30,32 @@ export function usePlannerNutrition({
             });
         }
 
-        // Calculate totals
-        const totals = plan.micronutrients && plan.phytonutrients
-            ? {
-                calories: mealsArray.reduce((sum, m) => sum + (m.calories || 0), 0),
-                energy_kj: mealsArray.reduce((sum, m) => sum + (m.energy_kj || 0), 0),
-                protein: mealsArray.reduce((sum, m) => sum + (m.protein || 0), 0),
-                fat: mealsArray.reduce((sum, m) => sum + (m.fat || 0), 0),
-                carbs: mealsArray.reduce((sum, m) => sum + (m.carbs || 0), 0),
-                micronutrients: plan.micronutrients,
-                phytonutrients: plan.phytonutrients,
-            }
-            : mealsArray.reduce(
-                (acc: any, recipe: any) => {
-                    acc.calories += recipe.calories || 0;
-                    acc.energy_kj += recipe.energy_kj || 0;
-                    acc.protein += recipe.protein || 0;
-                    acc.fat += recipe.fat || 0;
-                    acc.carbs += recipe.carbs || 0;
+        // Calculate totals from individual items (more reliable than summary object)
+        const totals = mealsArray.reduce(
+            (acc: any, recipe: any) => {
+                acc.calories += (recipe.calories || 0) * selectedServings;
+                acc.energy_kj += (recipe.energy_kj || 0) * selectedServings;
+                acc.protein += (recipe.protein || 0) * selectedServings;
+                acc.fat += (recipe.fat || 0) * selectedServings;
+                acc.carbs += (recipe.carbs || 0) * selectedServings;
 
-                    Object.entries(recipe.micronutrients || {}).forEach(([key, val]) => {
-                        acc.micronutrients[key] = (acc.micronutrients[key] || 0) + (val as number);
-                    });
+                Object.entries(recipe.micronutrients || {}).forEach(([key, val]) => {
+                    acc.micronutrients[key] = (acc.micronutrients[key] || 0) + (val as number) * selectedServings;
+                });
 
-                    Object.entries(recipe.phytonutrients || {}).forEach(([key, val]) => {
+                Object.entries(recipe.phytonutrients || {}).forEach(([key, val]) => {
+                    // Accumulate rather than overwrite
+                    if (typeof val === 'string') {
                         acc.phytonutrients[key] = val;
-                    });
+                    } else if (val && typeof val === 'object') {
+                         acc.phytonutrients[key] = val;
+                    }
+                });
 
-                    return acc;
-                },
-                { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {}, phytonutrients: {} }
-            );
+                return acc;
+            },
+            { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {}, phytonutrients: {} }
+        );
 
         const micro = totals.micronutrients || {};
 
@@ -83,10 +80,10 @@ export function usePlannerNutrition({
         const fR = userRDAs?.['Fat'] || 70;
         const eR = userRDAs?.['Energy'] || 2000;
 
-        const pP = Math.min(Math.round((pV / pR) * 100), 100);
-        const cP = Math.min(Math.round((cV / cR) * 100), 100);
-        const fP = Math.min(Math.round((fV / fR) * 100), 100);
-        const eP = Math.min(Math.round(((energyUnit === 'kJ' ? totals.energy_kj : totals.calories) / eR) * 100), 100);
+        const pP = Math.min(Math.round((pV / pR) * 100), 150); // Allow over 100%
+        const cP = Math.min(Math.round((cV / cR) * 100), 150);
+        const fP = Math.min(Math.round((fV / fR) * 100), 150);
+        const eP = Math.min(Math.round(((energyUnit === 'kJ' ? totals.energy_kj : totals.calories) / eR) * 100), 150);
 
         // Amino acids
         const aminoAcids = [
@@ -165,8 +162,10 @@ export function usePlannerNutrition({
         const cholineRDA = userRDAs?.['Choline'] || 0;
         const cholineData = { label: 'Choline', val: cholineVal, pct: cholineRDA > 0 ? Math.round((cholineVal / cholineRDA) * 100) : 0 };
 
+        const finalEnergyValue = energyUnit === 'kJ' ? totals.energy_kj : totals.calories;
+
         return {
-            energy: { value: eV, percent: eP },
+            energy: { value: finalEnergyValue, percent: eP },
             protein: { value: pV, percent: pP, rda: pR },
             carbs: { value: cV, percent: cP, rda: cR },
             fat: { value: fV, percent: fP, rda: fR },
@@ -181,10 +180,11 @@ export function usePlannerNutrition({
                 trace: trData,
                 waterSoluble: wsData,
                 fatSoluble: stData,
-                choline: cholineData,
+                 choline: cholineData,
             },
+            phytonutrients: totals.phytonutrients,
         };
-    }, [plan, energyUnit, userRDAs]);
+    }, [plan, energyUnit, userRDAs, selectedServings]);
 
     return nutrition;
 }

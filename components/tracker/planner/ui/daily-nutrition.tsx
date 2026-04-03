@@ -12,6 +12,7 @@ interface DailyNutritionProps {
     profile?: any;
     energyUnit?: string;
     nutrientDisplayMode?: 'value' | 'percentage' | 'both';
+    selectedServings?: number;
 }
 
 export function DailyNutrition({
@@ -20,6 +21,7 @@ export function DailyNutrition({
     profile,
     energyUnit = 'kJ',
     nutrientDisplayMode = 'both',
+    selectedServings = 1,
 }: DailyNutritionProps) {
     const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
@@ -32,6 +34,7 @@ export function DailyNutrition({
         energyUnit,
         userRDAs,
         nutrientDisplayMode,
+        selectedServings,
     });
 
     return (
@@ -51,9 +54,9 @@ export function DailyNutrition({
                     <div className="text-[11px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Phytonutrients</div>
                     <div className="text-[9px] text-slate-400 mt-0.5">Plant compounds from combined meals • Click a tag to learn more</div>
                 </div>
-                {plan.phytonutrients && Object.keys(plan.phytonutrients).length > 0 ? (
+                {nutrition?.phytonutrients && Object.keys(nutrition.phytonutrients).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                        {Object.entries(plan.phytonutrients).map(([name, data]) => {
+                        {Object.entries(nutrition.phytonutrients).map(([name, data]) => {
                             const isExpanded = expandedPhyto === name;
                             const description = typeof data === 'object' ? (data as any).description : String(data);
                             const sources = typeof data === 'object' ? (data as any).sources || [] : [];

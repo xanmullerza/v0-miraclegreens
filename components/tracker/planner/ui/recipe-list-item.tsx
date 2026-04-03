@@ -21,16 +21,15 @@ export const RecipeListItem = ({
     const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
     const [addedToList, setAddedToList] = useState(false);
 
-    // Calculate nutrition values based on selectedServings
-    const currentServings = Math.max(recipe.servings || 1, 1);
-    const sf = (1 / currentServings) * selectedServings;
+    // Scale nutrition based on selectedServings
+    const sf = selectedServings;
     const displayCalories = (recipe.calories || 0) * sf;
     const displayEnergy = (recipe.energyKj || 0) * sf;
     const displayCarbs = (recipe.carbs || 0) * sf;
     const displayFat = (recipe.fat || 0) * sf;
     const displayProtein = (recipe.protein || 0) * sf;
 
-    // Fetch fresh ingredients (for pantry/shopping list matching)
+    // Fetch fresh ingredients
     useEffect(() => {
         let cancelled = false;
         supabase.from('ingredients')
@@ -49,7 +48,6 @@ export const RecipeListItem = ({
         return () => { cancelled = true; };
     }, [recipe.id]);
 
-    // 2. Pantry Match Analysis
     const pantryIds = new Set(pantryItems.map(f => f.id));
     const pantryNames = new Set(pantryItems.flatMap(f => [
         (f.common_name || f.name || '').toLowerCase().trim(),
@@ -93,77 +91,149 @@ export const RecipeListItem = ({
         <div 
             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
             className={cn(
-                'group relative rounded-2xl border transition-all cursor-pointer overflow-hidden p-1 lg:p-0',
-                isEaten ? 'bg-emerald-500/10 border-emerald-500/20 opacity-75' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-500/30',
+                'group relative rounded-3xl border transition-all cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
+                isEaten 
+                    ? 'bg-emerald-500/5 border-emerald-500/10 opacity-60 grayscale-[0.3]' 
+                    : 'bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/5',
             )}
         >
-            <div className="lg:grid lg:grid-cols-[100px_1fr_60px_60px_60px_60px_240px] gap-1.5 lg:items-center lg:px-6">
-                <div className="aspect-[4/3] lg:aspect-square w-full lg:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-xl lg:rounded-none">
-                    {recipe.image ? (
-                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-300"><ChefHat size={18} /></div>
-                    )}
-                    <div className="absolute top-1 left-1 bg-black/60 text-white text-[7px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-sm uppercase">{mealLabel}</div>
-                </div>
-
-                <div className="p-1 lg:p-0">
-                    <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white capitalize">{recipe.title}</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
-                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Clock size={8}/>{recipe.prepTime || 0}m</div>
-                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Users size={8}/>{recipe.servings}P</div>
-                        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[7px] border-none px-1 py-0">{recipe.type}</Badge>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 p-4 sm:p-5">
+                {/* Image Section */}
+                <div className="relative shrink-0 sm:self-start">
+                    <div className="aspect-[16/9] sm:aspect-square w-full sm:w-28 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl border border-slate-200 dark:border-slate-700">
+                        {recipe.image ? (
+                            <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600"><ChefHat size={32} /></div>
+                        )}
+                        <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[8px] font-black tracking-widest px-2.5 py-1 rounded-lg uppercase border border-white/10">{mealLabel}</div>
                     </div>
                 </div>
 
-                {/* Stats (Desktop View) */}
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Energy</span><span className="font-black text-[10px]">{formatEnergy(displayCalories, unit)}</span></div>
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Carbs</span><span className="font-black text-[10px]">{displayCarbs.toFixed(1)}g</span></div>
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Fat</span><span className="font-black text-[10px]">{displayFat.toFixed(1)}g</span></div>
-                <div className="hidden lg:flex flex-col items-end"><span className="text-[7px] font-black text-slate-400 uppercase">Protein</span><span className="font-black text-[10px]">{displayProtein.toFixed(1)}g</span></div>
+                {/* Content Section */}
+                <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
+                    <div className="space-y-1">
+                        <h3 className="font-bold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors">{recipe.title}</h3>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800/50 px-2 py-1 rounded-lg">
+                                <Clock size={12} className="text-blue-500"/>{recipe.prepTime || 30}M
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800/50 px-2 py-1 rounded-lg">
+                                <Users size={12} className="text-emerald-500"/>{recipe.originalServings || 1}P
+                            </div>
+                            <div className="px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] border border-slate-200 dark:border-slate-700 text-slate-400 rounded-lg">{recipe.type}</div>
+                        </div>
+                    </div>
 
-                {/* Action Grid */}
-                <div className="hidden lg:grid grid-cols-2 gap-1 px-4">
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
-                        className={cn('text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-0.5', tierClasses[tier])}
-                    >
-                        <ShoppingBasket size={8}/> {stockedIngs.length}/{filteredIngs.length} Stocked
-                    </button>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
-                        className={cn('text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-0.5', toBuyState === 'toBuy' ? 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500' : 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500')}
-                    >
-                        <ShoppingCart size={8}/> {missingIngs.length}/{filteredIngs.length} {toBuyState === 'toBuy' ? 'To Buy' : 'To Add'}
-                    </button>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="bg-slate-50/50 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col gap-0.5">
+                            <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Energy</span>
+                            <span className="font-black text-sm lg:text-base text-slate-900 dark:text-white">{formatEnergy(displayCalories, unit, displayEnergy)}</span>
+                        </div>
+                        <div className="bg-slate-50/50 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col gap-0.5">
+                            <span className="text-[7px] font-black text-blue-500/60 uppercase tracking-widest">Carbs</span>
+                            <span className="font-black text-sm lg:text-base text-slate-900 dark:text-white">{displayCarbs.toFixed(1)}g</span>
+                        </div>
+                        <div className="bg-slate-50/50 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col gap-0.5">
+                            <span className="text-[7px] font-black text-amber-500/60 uppercase tracking-widest">Fat</span>
+                            <span className="font-black text-sm lg:text-base text-slate-900 dark:text-white">{displayFat.toFixed(1)}g</span>
+                        </div>
+                        <div className="bg-slate-50/50 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col gap-0.5">
+                            <span className="text-[7px] font-black text-rose-500/60 uppercase tracking-widest">Protein</span>
+                            <span className="font-black text-sm lg:text-base text-slate-900 dark:text-white">{displayProtein.toFixed(1)}g</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Actions Section */}
+                <div className="flex flex-row sm:flex-col gap-2 pt-2 sm:pt-0 sm:border-l sm:border-slate-100 sm:dark:border-slate-800 sm:pl-6 sm:w-52">
+                    <div className="flex flex-1 sm:flex-none gap-2">
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
+                            className={cn(
+                                'flex-1 text-[8px] font-black uppercase tracking-widest h-10 px-3 rounded-xl border transition-all flex items-center justify-center gap-2',
+                                tierClasses[tier]
+                            )}
+                        >
+                            <ShoppingBasket size={14}/> {stockedIngs.length}/{filteredIngs.length}
+                        </button>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
+                            className={cn(
+                                'flex-1 text-[8px] font-black uppercase tracking-widest h-10 px-3 rounded-xl border transition-all flex items-center justify-center gap-2',
+                                toBuyState === 'toBuy' ? 'border-blue-500/30 bg-blue-500/10 text-blue-500' : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-400'
+                            )}
+                        >
+                            <ShoppingCart size={14}/> {missingIngs.length}/{filteredIngs.length}
+                        </button>
+                    </div>
+
                     <button 
                         onClick={(e) => { e.stopPropagation(); if(!isEaten && onMarkEaten) onMarkEaten(); }}
-                        className={cn('text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border flex items-center justify-center gap-0.5', isEaten ? 'bg-emerald-500 text-white' : 'bg-slate-50 dark:bg-slate-800 text-slate-500')}
+                        className={cn(
+                            'sm:w-full text-[10px] font-black uppercase tracking-[0.2em] h-12 rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg px-4',
+                            isEaten 
+                                ? 'bg-emerald-500 text-white shadow-emerald-500/20 order-first sm:order-last' 
+                                : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98]'
+                        )}
                     >
-                        {isEaten ? <Check size={8}/> : null} {isEaten ? 'Eaten' : 'Mark Eaten'}
+                        {isEaten ? <CheckCircle2 size={16}/> : null}
+                        <span>{isEaten ? 'Eaten' : 'Log Meal'}</span>
                     </button>
+
                     {onRegenerate && !isEaten && (
-                        <button onClick={(e) => { e.stopPropagation(); onRegenerate(); }} className="text-[7px] font-black uppercase tracking-wide px-1.5 py-1 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-500">
-                           <RotateCcw size={8}/> Shuffle
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); onRegenerate(); }}
+                            className="hidden sm:flex w-full text-[9px] font-bold uppercase tracking-widest h-10 items-center justify-center gap-2 text-slate-400 hover:text-blue-500 transition-colors"
+                        >
+                            <RotateCcw size={12}/> Swap Meal
                         </button>
                     )}
                 </div>
             </div>
 
-            {/* Inline ingredient list on mobile/panel click */}
+            {/* Expanded Panel Section */}
             {activePanel && (
-                <div className="border-t border-slate-100 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900/50 animate-in slide-in-from-top-2">
-                    <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            {activePanel === 'stocked' ? 'In Your Pantry' : 'Shopping List'}
-                        </h4>
-                        <button onClick={() => setActivePanel(null)}><X size={12}/></button>
+                <div className="border-t border-slate-100 dark:border-slate-800 p-6 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl animate-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="space-y-0.5">
+                            <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                                {activePanel === 'stocked' ? 'Pantry Analysis' : 'Shopping Requirements'}
+                            </h4>
+                            <p className="text-[9px] text-slate-500 font-medium">Molecular ingredients needed for this protocol</p>
+                        </div>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setActivePanel(null); }}
+                            className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                        >
+                            <X size={14}/>
+                        </button>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2">
                         {(activePanel === 'stocked' ? stockedIngs : missingIngs).map((ing, i) => (
-                            <span key={i} className="text-[9px] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border dark:border-slate-700 capitalize">
-                                {ing.foodName || ing.baseIngredient || ing.item}
-                            </span>
+                            <div key={i} className="group/ing relative flex items-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-blue-500/50">
+                                <div className={cn("w-1.5 h-1.5 rounded-full", activePanel === 'stocked' ? "bg-emerald-500" : "bg-blue-500")} />
+                                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200 capitalize">
+                                    {ing.foodName || ing.baseIngredient || ing.item}
+                                </span>
+                                {activePanel !== 'stocked' && (
+                                    <button 
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            await addShoppingItem({
+                                                name: ing.foodName || ing.baseIngredient || ing.item,
+                                                quantity: ing.amount,
+                                                food_item_id: ing.food_item_id
+                                            });
+                                            toast.success('Added to shopping list');
+                                        }}
+                                        className="ml-2 p-1 hover:text-blue-500 transition-colors"
+                                    >
+                                        <Plus size={10}/>
+                                    </button>
+                                )}
+                            </div>
                         ))}
                     </div>
                 </div>

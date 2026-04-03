@@ -44,8 +44,8 @@ export function usePlannerActions(state: any, actions: any) {
         }
     };
 
-    const handleMarkEaten = async (recipe: Recipe, mealType: string) => {
-        const servings = recipe.servings || 1;
+    const handleMarkEaten = async (recipe: Recipe, mealType: string, selectedServings: number = 1) => {
+        const recipeServings = recipe.servings || 1;
         let ingredients = recipe.ingredients || [];
         
         try {
@@ -72,8 +72,12 @@ export function usePlannerActions(state: any, actions: any) {
         const newQuantities = { ...quantities };
 
         for (const ing of ingredients) {
-            const weightToSubtract = (ing.weightG ?? 0) * servings;
-            if (!weightToSubtract) continue;
+            // weightG is usually for the whole recipe. 
+            // So we divide by recipeServings to get per-serving, then multiply by selectedServings eaten.
+            const weightPerServing = (ing.weightG ?? 0) / recipeServings;
+            const weightToSubtract = weightPerServing * selectedServings;
+            
+            if (!weightToSubtract || weightToSubtract <= 0) continue;
 
             let itemId: string | null = null;
             // 1. Direct match
@@ -85,7 +89,7 @@ export function usePlannerActions(state: any, actions: any) {
                 const pMatch = pantryItems.find(p => p.id === ing.food_item_id);
                 if (pMatch) itemId = pMatch.id;
             }
-            // 3. Fuzzy match (simplified version for modular hook)
+            // 3. Fuzzy match
             if (!itemId) {
                 const name = (ing.item || '').toLowerCase().trim();
                 const match = pantryItems.find(p => (p.common_name || p.name || '').toLowerCase().trim() === name);
@@ -129,6 +133,6 @@ export function usePlannerActions(state: any, actions: any) {
     return {
         handleGenerate,
         handleMarkEaten,
-        handleShuffleAll: handleGenerate // Logic is essentially identical for shuffle
+        handleShuffleAll: handleGenerate
     };
 }
