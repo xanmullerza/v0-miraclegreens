@@ -10,6 +10,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const router = useRouter();
     const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
+    const [expandedMacro, setExpandedMacro] = useState<string | null>(null);
     const [macroGrams, setMacroGrams] = useState(100);
     const { 
         food, amount, selectedPortion, energyUnit, dailyTargets, userRDAs, nutrientDisplayMode,
@@ -254,21 +255,49 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                     <div className="flex-1 grid grid-cols-3 gap-3">
                         {/* Carbs */}
                         <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Carbs</p>
-                                <p className="text-sm font-bold text-white">
-                                    {cV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({cP}%)</span>
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(cP, 100)}%`, backgroundColor: '#3b82f6' }} />
+                            <button 
+                                onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
+                                className="flex items-center justify-between hover:opacity-80 transition-opacity"
+                            >
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Carbs</p>
+                                    <p className="text-sm font-bold text-white">
+                                        {cV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({cP}%)</span>
+                                    </p>
                                 </div>
-                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
-                                    <span>{cV.toFixed(1)}g</span>
-                                    <span>{cR.toFixed(1)}g</span>
+                                <span className="text-slate-400 text-lg">
+                                    {expandedMacro === 'carbs' ? '▼' : '▶'}
+                                </span>
+                            </button>
+                            
+                            {expandedMacro !== 'carbs' && (
+                                <div className="space-y-1">
+                                    <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(cP, 100)}%`, backgroundColor: '#3b82f6' }} />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
+                                        <span>{cV.toFixed(1)}g</span>
+                                        <span>{cR.toFixed(1)}g</span>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
+
+                            {expandedMacro === 'carbs' && (
+                                <div className="space-y-2 border-t border-slate-700 pt-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Starch</span>
+                                        <span className="text-[10px] font-bold text-blue-400">{getValForCustomGrams(['Starch', 'starch_g'], macroGrams).toFixed(1)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Fiber</span>
+                                        <span className="text-[10px] font-bold text-blue-400">{getValForCustomGrams(['Fiber', 'fiber_g'], macroGrams).toFixed(1)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Sugar</span>
+                                        <span className="text-[10px] font-bold text-blue-400">{getValForCustomGrams(['Sugars', 'sugars_g'], macroGrams).toFixed(1)}g</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Protein */}
