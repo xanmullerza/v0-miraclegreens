@@ -49,7 +49,7 @@ export function FoodsView({
     dropdownContent
 }: FoodsViewProps) {
     const { energyUnit } = useUserPreferences();
-    const { searchQuery } = useSearch();
+    const { searchQuery, setSearchQuery } = useSearch();
     const { quantities, pantryItems, loading: pantryLoading } = usePantry();
 
     const [foods, setFoods] = useState<FoodItem[]>([]);
@@ -293,7 +293,7 @@ export function FoodsView({
                 <TrackerTabShell
                     title="Foods"
                     searchQuery={effectiveSearchQuery}
-                    onSearchChange={(q) => onSearchChange?.(q)}
+                    onSearchChange={(q) => onSearchChange ? onSearchChange(q) : setSearchQuery(q)}
                     sortField={sortField}
                     setSortField={(f: any) => setSortField(f)}
                     sortDirection={sortDirection}
