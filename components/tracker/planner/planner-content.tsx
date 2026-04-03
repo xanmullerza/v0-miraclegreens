@@ -58,6 +58,7 @@ export function PlannerContent({
     const [planLength, setPlanLength] = useState<PlanLength>('daily');
     const [showLengthMenu, setShowLengthMenu] = useState(false);
     const [selectedServings, setSelectedServings] = useState<number>(1);
+    const [hasAttemptedInitial, setHasAttemptedInitial] = useState(false);
 
     // Override local state with external props if provided
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : state.showFavoritesOnly;
@@ -68,13 +69,20 @@ export function PlannerContent({
     const { plan, eatenMeals, unit, generating } = state;
 
     const { navigateTo, setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
-    const [user, setUser] = useState<any>(undefined);
     const { profile, profileLoaded, dailyTargets } = useUserPreferences();
-
+    const [user, setUser] = useState<any>(undefined);
+    const [authReady, setAuthReady] = useState(false);
     useEffect(() => {
-        supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+        let resolvedViaGetSession = false;
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            resolvedViaGetSession = true;
             setUser(session?.user ?? null);
+            setAuthReady(true);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'INITIAL_SESSION' && resolvedViaGetSession) return;
+            setUser(session?.user ?? null);
+            setAuthReady(true);
         });
         return () => subscription.unsubscribe();
     }, []);
@@ -209,12 +217,12 @@ export function PlannerContent({
 
     // Auto-generate plan when navigating to empty planner if authenticated & setup
     useEffect(() => {
-        if (!profileLoaded || !user || isProfileIncomplete) return;
+        if (!profileLoaded || !authReady || !user || isProfileIncomplete) return;
         
-        if (!plan && !generating) {
-            handleGenerate();
+        if (!plan && !generating && !hasAttemptedInitial) {
+            handleGenerate().then(() => setHasAttemptedInitial(true));
         }
-    }, [user, isProfileIncomplete, plan, generating, profileLoaded]);
+    }, [user, isProfileIncomplete, plan, generating, profileLoaded, authReady, hasAttemptedInitial]);
 
     return (
         <TrackerTabShell
@@ -234,9 +242,10 @@ export function PlannerContent({
             dropdownContent={lengthSwitcher}
         >
             <div className="space-y-8 py-4">
-                {!profileLoaded || user === undefined ? (
-                    <div className="py-20 flex flex-col items-center justify-center space-y-6 animate-pulse">
-                        <div className="w-20 h-20 rounded-full border-4 border-slate-500/20 border-t-slate-500 animate-spin" />
+                {!profileLoaded || !authReady || user === undefined ? (
+                    <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+                        <Loader2 size={24} className="animate-spin text-emerald-500" />
+                        <p className="text-[10px] font-black uppercase tracking-widest">Verifying Authentication...</p>
                     </div>
                 ) : user === null ? (
                     <div className="flex flex-col items-center justify-center space-y-6 pt-4">
@@ -278,13 +287,13 @@ export function PlannerContent({
                             </div>
                         </div>
                     </div>
-                ) : generating ? (
+                ) : generating || (user && !plan && !hasAttemptedInitial) ? (
                     <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
                         <Loader2 size={24} className="animate-spin text-emerald-500" />
                         <p className="text-[10px] font-black uppercase tracking-widest">Loading meal plan...</p>
                     </div>
-                ) : !plan ? (
-                    <div className="flex flex-col items-center justify-center space-y-6 pt-4">
+                ) : (user && !plan && hasAttemptedInitial) ? (
+                     <div className="flex flex-col items-center justify-center space-y-6 pt-4">
                         <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
                             <p className="text-sm font-medium text-rose-400 font-bold uppercase tracking-widest">
                                 Failed to generate plan. Your recipe parameters might be too strict.
