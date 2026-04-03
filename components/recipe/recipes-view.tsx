@@ -351,7 +351,7 @@ export function RecipesView({
 
         } catch (error) {
             console.error('Error fetching recipes:', error);
-            toast.error('Failed to load meal library');
+            toast.error('Failed to load recipe library');
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -414,7 +414,7 @@ export function RecipesView({
             return (
                 <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
                     <Loader2 className={cn("animate-spin", isMix ? "text-indigo-500" : "text-blue-500")} size={32} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading {isMix ? 'mixes' : 'meals'}...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading {isMix ? 'mixes' : 'recipes'}...</p>
                 </div>
             );
         }
@@ -426,7 +426,7 @@ export function RecipesView({
                         <ChefHat size={32} />
                     </div>
                     <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        {showFavoritesOnly ? "Collection Empty" : `No ${isMix ? 'mixes' : 'meals'} found.`}
+                        {showFavoritesOnly ? "Collection Empty" : `No ${isMix ? 'mixes' : 'recipes'} found.`}
                     </p>
                 </div>
             );
@@ -528,7 +528,7 @@ export function RecipesView({
                 ) : recipes.length > 0 && (
                     <div className="flex justify-center pt-8">
                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-                            {totalCount} {totalCount === 1 ? (isMix ? 'mix' : 'meal') : (isMix ? 'mixes' : 'meals')} found
+                            {totalCount} {totalCount === 1 ? (isMix ? 'mix' : 'recipe') : (isMix ? 'mixes' : 'recipes')} found
                          </p>
                     </div>
                 )}
