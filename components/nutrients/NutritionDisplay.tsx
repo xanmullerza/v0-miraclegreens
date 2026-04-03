@@ -96,9 +96,9 @@ export function NutritionDisplay({
             </div>
 
             {/* Macros Section */}
-            <div className="flex gap-3">
+            <div className="flex flex-col lg:flex-row gap-3">
                 {/* Energy Donut */}
-                <div className="flex-shrink-0 p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col justify-center items-center">
+                <div className="flex-shrink-0 p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col justify-center items-center lg:h-auto">
                     <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
                         <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
                             <circle

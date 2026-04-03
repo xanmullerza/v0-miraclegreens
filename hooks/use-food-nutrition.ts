@@ -180,6 +180,56 @@ export function useFoodNutrition({
             cholesterol: getValForCustomGrams(['Cholesterol'], macroGrams),
         };
 
+        // Micronutrients
+        const electrolytes = [
+            { label: 'Sodium', keys: ['Sodium'], rda: 2300 },
+            { label: 'Potassium', keys: ['Potassium'], rda: 3500 },
+            { label: 'Calcium', keys: ['Calcium'], rda: 1000 },
+            { label: 'Magnesium', keys: ['Magnesium'], rda: 400 },
+        ].map(({ label, keys, rda }) => {
+            const val = getValForCustomGrams(keys, macroGrams);
+            return { label, val, pct: Math.round((val / rda) * 100) };
+        });
+
+        const trace = [
+            { label: 'Iron', keys: ['Iron'], rda: 18 },
+            { label: 'Zinc', keys: ['Zinc'], rda: 11 },
+            { label: 'Copper', keys: ['Copper'], rda: 0.9 },
+            { label: 'Manganese', keys: ['Manganese'], rda: 2.3 },
+            { label: 'Iodine', keys: ['Iodine'], rda: 0.15 },
+            { label: 'Selenium', keys: ['Selenium'], rda: 0.055 },
+        ].map(({ label, keys, rda }) => {
+            const val = getValForCustomGrams(keys, macroGrams);
+            return { label, val, pct: Math.round((val / rda) * 100) };
+        });
+
+        const waterSoluble = [
+            { label: 'B1', fullName: 'Thiamine', subtitle: 'Carb metabolism', keys: ['Thiamine', 'Vitamin B1'], rda: 1.2 },
+            { label: 'B2', fullName: 'Riboflavin', subtitle: 'Energy production', keys: ['Riboflavin', 'Vitamin B2'], rda: 1.3 },
+            { label: 'B3', fullName: 'Niacin', subtitle: 'DNA repair', keys: ['Niacin', 'Vitamin B3'], rda: 16 },
+            { label: 'B5', fullName: 'Pantothenic Acid', subtitle: 'Hormone synthesis', keys: ['Pantothenic Acid', 'Vitamin B5'], rda: 5 },
+            { label: 'B6', fullName: 'Pyridoxine', subtitle: 'Brain development', keys: ['Pyridoxine', 'Vitamin B6'], rda: 1.7 },
+            { label: 'B7', fullName: 'Biotin', subtitle: 'Hair & nail health', keys: ['Biotin', 'Vitamin B7'], rda: 0.03 },
+            { label: 'B9', fullName: 'Folate', subtitle: 'Cell division', keys: ['Folate', 'Vitamin B9'], rda: 0.4 },
+            { label: 'B12', fullName: 'Cobalamin', subtitle: 'Nerve function', keys: ['Cobalamin', 'Vitamin B12'], rda: 0.0024 },
+            { label: 'C', fullName: 'Ascorbic Acid', subtitle: 'Immune & collagen', keys: ['Ascorbic Acid', 'Vitamin C'], rda: 90 },
+        ].map(({ label, fullName, subtitle, keys, rda }) => {
+            const val = getValForCustomGrams(keys, macroGrams);
+            return { label, fullName, subtitle, val, pct: Math.round((val / rda) * 100) };
+        });
+
+        const fatSoluble = [
+            { label: 'A', fullName: 'Retinol', subtitle: 'Vision & immunity', keys: ['Retinol', 'Vitamin A'], rda: 0.9 },
+            { label: 'D', fullName: 'Calciferol', subtitle: 'Bone & immune', keys: ['Calciferol', 'Vitamin D'], rda: 0.02 },
+            { label: 'E', fullName: 'Tocopherol', subtitle: 'Antioxidant', keys: ['Tocopherol', 'Vitamin E'], rda: 15 },
+            { label: 'K', fullName: 'Phylloquinone', subtitle: 'Blood clotting', keys: ['Phylloquinone', 'Vitamin K'], rda: 0.12 },
+        ].map(({ label, fullName, subtitle, keys, rda }) => {
+            const val = getValForCustomGrams(keys, macroGrams);
+            return { label, fullName, subtitle, val, pct: Math.round((val / rda) * 100) };
+        });
+
+        const cholineVal = getValForCustomGrams(['Choline'], macroGrams);
+
         return {
             energy: { value: eV, percent: 0 },
             protein: { value: pV, percent: pP, rda: pR },
@@ -191,6 +241,13 @@ export function useFoodNutrition({
             })),
             carbBreakdown,
             fatBreakdown,
+            micronutrients: {
+                electrolytes,
+                trace,
+                waterSoluble,
+                fatSoluble,
+                choline: { label: 'Choline', val: cholineVal, pct: Math.round((cholineVal / 550) * 100) },
+            },
         };
     }, [food, macroGrams, energyUnit, userRDAs]);
 
