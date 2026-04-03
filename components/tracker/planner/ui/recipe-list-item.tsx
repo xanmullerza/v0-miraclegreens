@@ -33,7 +33,7 @@ export const RecipeListItem = ({
     const displayProtein = (liveRecipe.protein || 0) * sf;
 
     // DEBUG
-    console.log(`[${liveRecipe.title}] currentServings=${currentServings}, selectedServings=${selectedServings}, recipe.calories=${liveRecipe.calories}, recipe.energy_kj=${liveRecipe.energy_kj}, sf=${sf.toFixed(3)}, displayCalories=${displayCalories.toFixed(1)}, displayEnergy=${displayEnergy.toFixed(1)}`);
+    console.log(`[${liveRecipe.title}] currentServings=${currentServings}, selectedServings=${selectedServings}, recipe.calories=${liveRecipe.calories}, recipe.energyKj=${liveRecipe.energyKj}, sf=${sf.toFixed(3)}, displayCalories=${displayCalories.toFixed(1)}, displayEnergy=${displayEnergy.toFixed(1)}`);
 
     // 1. Fetch fresh recipe metadata AND ingredients (to handle recipe edits)
     useEffect(() => {
