@@ -12,7 +12,7 @@ import {
     Calendar, RotateCcw, LayoutGrid, Info, 
     ChevronDown, Sparkles, ChefHat, 
     Search, Filter as FilterIcon, ArrowDownUp, 
-    Clock, Flame, Dumbbell, List 
+    Clock, Flame, Dumbbell, List, Loader2 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -279,12 +279,9 @@ export function PlannerContent({
                         </div>
                     </div>
                 ) : generating ? (
-                    <div className="py-20 flex flex-col items-center justify-center space-y-6 animate-pulse">
-                        <div className="w-20 h-20 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin" />
-                        <div className="text-center space-y-2">
-                            <h3 className="text-xl font-black uppercase tracking-tighter">Analyzing Nutrient Density</h3>
-                            <p className="text-sm font-medium text-slate-500">Cross-referencing pantry items and RDA targets...</p>
-                        </div>
+                    <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+                        <Loader2 size={24} className="animate-spin text-emerald-500" />
+                        <p className="text-[10px] font-black uppercase tracking-widest">Loading meal plan...</p>
                     </div>
                 ) : !plan ? (
                     <div className="flex flex-col items-center justify-center space-y-6 pt-4">
