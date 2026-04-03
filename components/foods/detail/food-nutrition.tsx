@@ -75,7 +75,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
         return (baseVal * currentWeight) / 100;
     };
 
-    const getValForMacros = (keys: string[], grams: number = 100) => {
+    const getValForCustomGrams = (keys: string[], grams: number = 100) => {
         if (!food) return 0;
         const m = food.micronutrients || {};
         let baseVal = 0;
@@ -182,10 +182,10 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
     // Modern Macronutrients component with donut chart
     const MacroNutrients = ({ energyUnit, dailyTargets, userRDAs }: any) => {
-        const eV = getValForMacros(['Energy', 'energy_kcal', 'Calories'], macroGrams);
-        const pV = getValForMacros(['Protein', 'protein_g'], macroGrams);
-        const cV = getValForMacros(['Carbohydrates', 'carbs_g'], macroGrams);
-        const fV = getValForMacros(['Fat', 'fat_g'], macroGrams);
+        const eV = getValForCustomGrams(['Energy', 'energy_kcal', 'Calories'], macroGrams);
+        const pV = getValForCustomGrams(['Protein', 'protein_g'], macroGrams);
+        const cV = getValForCustomGrams(['Carbohydrates', 'carbs_g'], macroGrams);
+        const fV = getValForCustomGrams(['Fat', 'fat_g'], macroGrams);
 
         const pR = userRDAs?.['Protein'] || dailyTargets.protein;
         const cR = userRDAs?.['Carbs'] || dailyTargets.carbs;
@@ -313,9 +313,9 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     };
 
     // Modern micronutrients component
-    const MicroNutrients = ({ getVal, userRDAs }: any) => {
+    const MicroNutrients = ({ userRDAs }: any) => {
         const nv = (keys: string[]) => {
-            const v = getVal(keys);
+            const v = getValForCustomGrams(keys, macroGrams);
             return v !== null ? v : 0;
         };
 
@@ -564,7 +564,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
             <MacroNutrients energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
 
-            <MicroNutrients getVal={getVal} userRDAs={userRDAs} />
+            <MicroNutrients userRDAs={userRDAs} />
 
             <Phytonutrients />
 
@@ -593,7 +593,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                             {(() => {
                                 const items = NUTRIENT_BREAKDOWNS[breakdownNutrient] || [];
                                 return items.map((item, idx) => {
-                                    const val = getVal(item.keys);
+                                    const val = getValForCustomGrams(item.keys, macroGrams);
                                     return (
                                         <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group hover:border-emerald-500/30 transition-all">
                                             <div className="flex justify-between items-center mb-3">
