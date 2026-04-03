@@ -22,7 +22,8 @@ export const RecipeListItem = ({
     const [addedToList, setAddedToList] = useState(false);
 
     // Calculate nutrition values based on selectedServings (always normalized from 1 serving)
-    const originalServings = recipe.servings || 1;
+    // Use originalServings if available (from meal generator), otherwise fall back to recipe.servings
+    const originalServings = (recipe as any).originalServings || recipe.servings || 1;
     // Scale factor: normalize to 1 serving, then multiply by selectedServings
     const sf = (1 / originalServings) * selectedServings;
     const displayCalories = (recipe.calories || 0) * sf;
