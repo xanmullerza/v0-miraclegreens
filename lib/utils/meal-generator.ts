@@ -227,8 +227,7 @@ export const getRandomRecipeByType = async (
                         category: i.food_items?.category?.toLowerCase() || ''
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                    servings: 1,
-                    originalServings: r.servings || 1,
+                    servings: r.servings || 1,
                     micronutrients: calculatedNutrition.micronutrients,
                     phytonutrients: calculatedNutrition.phytonutrients
                 },
@@ -381,8 +380,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                     category: i.food_items?.category?.toLowerCase() || ''
                 })),
                 instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                servings: 1,
-                originalServings: r.servings || 1
+                servings: r.servings || 1
             };
         });
 
