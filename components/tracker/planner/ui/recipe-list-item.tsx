@@ -46,13 +46,14 @@ export const RecipeListItem = ({
             .single()
             .then(({ data: recipeData, error: recipeError }) => {
                 if (!cancelled && recipeData && !recipeError) {
-                    // Map snake_case database fields to camelCase Recipe type
+                    // Merge fresh recipe data with existing recipe, mapping snake_case to camelCase
                     const mappedRecipe = {
-                        ...recipeData,
-                        energyKj: (recipeData as any).energy_kj,
-                        prepTime: (recipeData as any).prep_time,
+                        ...recipe, // Keep all original fields (diet, ingredients, instructions, etc.)
+                        ...recipeData, // Override with fresh database data
+                        energyKj: (recipeData as any).energy_kj, // Map energy_kj to energyKj
+                        prepTime: (recipeData as any).prep_time, // Map prep_time to prepTime
                     };
-                    setLiveRecipe(mappedRecipe);
+                    setLiveRecipe(mappedRecipe as any);
                 }
             });
         
