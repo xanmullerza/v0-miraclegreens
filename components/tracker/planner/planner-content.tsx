@@ -68,7 +68,7 @@ export function PlannerContent({
     const { plan, eatenMeals, unit, generating } = state;
 
     const { navigateTo, setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<any>(undefined);
     const { profile, profileLoaded, dailyTargets } = useUserPreferences();
 
     useEffect(() => {
@@ -234,11 +234,11 @@ export function PlannerContent({
             dropdownContent={lengthSwitcher}
         >
             <div className="space-y-8 py-4">
-                {!profileLoaded ? (
+                {!profileLoaded || user === undefined ? (
                     <div className="py-20 flex flex-col items-center justify-center space-y-6 animate-pulse">
                         <div className="w-20 h-20 rounded-full border-4 border-slate-500/20 border-t-slate-500 animate-spin" />
                     </div>
-                ) : !user ? (
+                ) : user === null ? (
                     <div className="flex flex-col items-center justify-center space-y-6 pt-4">
                         <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
                             <p className="text-sm font-medium text-white/90 leading-relaxed">
