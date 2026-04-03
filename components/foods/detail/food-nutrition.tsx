@@ -316,7 +316,25 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
         const cholineData = { label: 'Choline', val: cholineVal, pct: cholineRDA > 0 ? Math.round((cholineVal / cholineRDA) * 100) : 0 };
 
         return (
-            <div className="space-y-6">
+            <div className="space-y-6 p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 mb-6">
+                <div className="flex items-center justify-between">
+                    <h4 className="font-black flex items-center gap-2 uppercase tracking-widest text-[10px] text-teal-400">
+                        <Dna className="h-4 w-4" /> Micronutrients
+                    </h4>
+                    <div className="flex bg-slate-700 rounded-lg p-0.5 border border-slate-600">
+                        {([50, 75, 100] as const).map((t) => (
+                            <button
+                                key={t}
+                                onClick={() => setUniversalThreshold(t)}
+                                className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
+                                    universalThreshold === t ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-300')}
+                            >
+                                {t}%
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Vitamins + Minerals Two Column */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Vitamins (Left) */}
