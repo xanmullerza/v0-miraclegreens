@@ -26,8 +26,8 @@ interface NutritionData {
     micronutrients: {
         electrolytes: Array<{ label: string; val: number; pct: number }>;
         trace: Array<{ label: string; val: number; pct: number }>;
-        waterSoluble: Array<{ label: string; label: string; val: number; pct: number }>;
-        fatSoluble: Array<{ label: string; label: string; val: number; pct: number }>;
+        waterSoluble: Array<{ label: string; fullName: string; subtitle: string; val: number; pct: number }>;
+        fatSoluble: Array<{ label: string; fullName: string; subtitle: string; val: number; pct: number }>;
         choline: { label: string; val: number; pct: number };
     };
 }

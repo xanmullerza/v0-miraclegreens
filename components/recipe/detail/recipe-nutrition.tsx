@@ -4,85 +4,17 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Activity, Dna, Sparkles, Zap, Loader2 } from 'lucide-react';
 import { formatEnergyValue } from '@/lib/utils/nutrition-utils';
+import { useRecipeNutrition } from '@/hooks/use-recipe-nutrition';
+import { NutritionDisplay } from '@/components/nutrients/NutritionDisplay';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
-
-// ── Reusable sub-components ─────────────────────────────────
-function ThresholdToggle({ value, onChange }: { value: 50 | 75 | 100; onChange: (v: 50 | 75 | 100) => void }) {
-    return (
-        <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
-            {([50, 75, 100] as const).map(t => (
-                <button key={t} onClick={() => onChange(t)}
-                    className={cn('flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
-                        value === t ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300')}>
-                    {t}%
-                </button>
-            ))}
-        </div>
-    );
-}
-
-function MiniDonut({ count, total, color }: { count: number; total: number; color: string }) {
-    const arcPct = total > 0 ? count / total : 0;
-    const R = 38, S = 8, C = 2 * Math.PI * R;
-    return (
-        <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
-            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
-                <circle cx="40" cy="40" r={R} fill="none" stroke="currentColor" strokeWidth={S} className="text-slate-200 dark:text-slate-800" />
-                <circle cx="40" cy="40" r={R} fill="none" stroke={color} strokeWidth={S} strokeLinecap="butt"
-                    style={{ strokeDasharray: `${arcPct * C} ${C}`, transition: 'stroke-dasharray 0.7s ease' }} />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-base font-black text-slate-900 dark:text-white leading-none">{count}</span>
-                <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
-            </div>
-        </div>
-    );
-}
-
-function NutrientPill({ label, val, pct, hit, hitColor, mode, unit = 'mg' }: {
-    label: string; val: number; pct: number; hit: boolean; hitColor: string; mode: string; unit?: string;
-}) {
-    return (
-        <div className={cn('flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border',
-            hit ? hitColor : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400')}>
-            <span>{label}</span>
-            <span className={hit ? 'font-black' : ''}>
-                {mode === 'value' && `${val.toFixed(label === 'Selenium' ? 1 : 0)}${unit}`}
-                {mode === 'percentage' && `${pct}%`}
-                {mode === 'both' && `${val.toFixed(label === 'Selenium' ? 1 : 0)}${unit} (${pct}%)`}
-            </span>
-        </div>
-    );
-}
-
-function VitaminPill({ fullName, subtitle, val, pct, hit, hitColor, mode }: {
-    fullName: string; subtitle: string; val: number; pct: number; hit: boolean; hitColor: string; mode: string;
-}) {
-    return (
-        <div className={cn('flex flex-col items-start justify-between rounded-lg px-2 py-1.5 font-bold border',
-            hit ? hitColor : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400')}>
-            <div className="text-left w-full">
-                <div className="text-[10px] font-black">{fullName}</div>
-                <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
-            </div>
-            <span className={cn('text-[10px] self-end mt-1', hit ? 'font-black' : '')}>
-                {mode === 'value' && `${val.toFixed(1)}`}
-                {mode === 'percentage' && `${pct}%`}
-                {mode === 'both' && `${val.toFixed(1)} (${pct}%)`}
-            </span>
-        </div>
-    );
-}
 
 // ── Main Component ──────────────────────────────────────────
 export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
     const {
         recipe, calculatedNutrition, nutritionViewMode, setNutritionViewMode,
-        mineralThreshold, setMineralThreshold, waterSolubleThreshold, setWaterSolubleThreshold,
-        storedVitaminThreshold, setStoredVitaminThreshold,
-        findNutrientMatch, energyUnit, nutrientDisplayMode, userRDAs, profile
+        energyUnit, nutrientDisplayMode, userRDAs, profile
     } = ctx;
 
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
@@ -112,226 +44,74 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         );
     }
 
-    // Shared helpers
-    // Use recipe's saved nutrition if available, otherwise use calculated nutrition
-    const nutrition = {
-        calories: recipe.calories > 0 ? recipe.calories : calculatedNutrition.calories,
-        protein: recipe.protein > 0 ? recipe.protein : calculatedNutrition.protein,
-        carbs: recipe.carbs > 0 ? recipe.carbs : calculatedNutrition.carbs,
-        fat: recipe.fat > 0 ? recipe.fat : calculatedNutrition.fat,
-        energyKj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
-        micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
-        // Use calculated phytonutrients first (has sources), fall back to recipe (no sources)
-        phytonutrients: calculatedNutrition.phytonutrients && Object.keys(calculatedNutrition.phytonutrients).length > 0 ? calculatedNutrition.phytonutrients : (recipe.phytonutrients || {})
-    };
+    // Calculate nutrition using the hook
+    const nutrition = useRecipeNutrition({
+        recipe: {
+            ...recipe,
+            calories: recipe.calories > 0 ? recipe.calories : calculatedNutrition.calories,
+            protein: recipe.protein > 0 ? recipe.protein : calculatedNutrition.protein,
+            carbs: recipe.carbs > 0 ? recipe.carbs : calculatedNutrition.carbs,
+            fat: recipe.fat > 0 ? recipe.fat : calculatedNutrition.fat,
+            energy_kj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
+            micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
+        },
+        viewMode: nutritionViewMode as 'per-recipe' | 'per-serving',
+        energyUnit,
+        userRDAs,
+        nutrientDisplayMode,
+    });
 
-    const micro = nutrition.micronutrients || {};
-    const s = Math.max(recipe.servings || 1, 1);
-    const sf = nutritionViewMode === 'per-serving' ? 1 / s : 1;
-    const nv = (keys: string[]) => { let v = 0; for (const k of keys) { const m = findNutrientMatch(micro, k); if (m != null && micro[m] != null) { v = micro[m]; break; } } return v * sf; };
-
-    // Macros
-    const eV = nutrition.calories * sf, pV = nutrition.protein * sf, cV = nutrition.carbs * sf, fV = nutrition.fat * sf;
-    const pR = userRDAs?.['Protein'] || (profile?.weight ? Number(profile.weight) * 1.6 : 100), cR = userRDAs?.['Carbs'] || 250, fR = userRDAs?.['Fat'] || 70;
-    const pP = Math.min(Math.round((pV / pR) * 100), 100), cP = Math.min(Math.round((cV / cR) * 100), 100), fP = Math.min(Math.round((fV / fR) * 100), 100);
-    const pCal = pV * 4, cCal = cV * 4, fCal = fV * 9, tCal = pCal + cCal + fCal || 1;
-    const R = 44, STR = 9, CC = 2 * Math.PI * R;
-    const cFr = cCal / tCal, fFr = fCal / tCal, pFr = pCal / tCal;
-    let o = 0; const cS = { strokeDasharray: `${cFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` }; o += cFr;
-    const fS = { strokeDasharray: `${fFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` }; o += fFr;
-    const pS = { strokeDasharray: `${pFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` };
-    const Bar = ({ pct, color }: { pct: number; color: string }) => (
-        <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: color }} />
-        </div>
-    );
-
-    // Electrolytes + Trace
-    const elData = [{ l: 'Sodium', k: ['Sodium', 'sodium_mg'] }, { l: 'Potassium', k: ['Potassium', 'potassium_mg'] }, { l: 'Magnesium', k: ['Magnesium', 'magnesium_mg'] }, { l: 'Calcium', k: ['Calcium', 'calcium_mg'] }, { l: 'Phosphorus', k: ['Phosphorus', 'phosphorus_mg'] }]
-        .map(({ l, k }) => { const v = nv(k), r = userRDAs?.[l] || 0; return { label: l, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 }; });
-    const trData = [{ l: 'Iron', k: ['Iron', 'iron_mg'] }, { l: 'Zinc', k: ['Zinc', 'zinc_mg'] }, { l: 'Copper', k: ['Copper', 'copper_mg'] }, { l: 'Manganese', k: ['Manganese', 'manganese_mg'] }, { l: 'Selenium', k: ['Selenium', 'selenium_ug'] }]
-        .map(({ l, k }) => { const v = nv(k), r = userRDAs?.[l] || 0; return { label: l, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 }; });
-    const wsData = [{ l: 'B1 (Thiamine)', fn: 'Vitamin B1', sub: 'Thiamine' }, { l: 'B2 (Riboflavin)', fn: 'Vitamin B2', sub: 'Riboflavin' }, { l: 'B3 (Niacin)', fn: 'Vitamin B3', sub: 'Niacin' }, { l: 'B5 (Pantothenic Acid)', fn: 'Vitamin B5', sub: 'Pantothenic Acid' }, { l: 'B6 (Pyridoxine)', fn: 'Vitamin B6', sub: 'Pyridoxine' }, { l: 'B9 (Folate)', fn: 'Vitamin B9', sub: 'Folate' }]
-        .map(({ l, fn, sub }) => { let v = 0; const m = findNutrientMatch(micro, l); if (m != null && micro[m] != null) v = micro[m] * sf; const r = userRDAs?.[l] || 0; return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 }; });
-    const stData = [{ l: 'Vitamin A', fn: 'Vitamin A', sub: 'Retinol' }, { l: 'Vitamin D', fn: 'Vitamin D', sub: 'Calciferol' }, { l: 'Vitamin E', fn: 'Vitamin E', sub: 'Tocopherol' }, { l: 'Vitamin K', fn: 'Vitamin K', sub: 'Phylloquinone' }, { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' }]
-        .map(({ l, fn, sub }) => { let v = 0; const m = findNutrientMatch(micro, l); if (m != null && micro[m] != null) v = micro[m] * sf; const r = userRDAs?.[l] || 0; return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 }; });
-    
-    // Choline data for minerals section
-    const cholineVal = nv(['Choline', 'choline_mg']);
-    const cholineRDA = userRDAs?.['Choline'] || 0;
-    const cholineData = { label: 'Choline', val: cholineVal, pct: cholineRDA > 0 ? Math.round((cholineVal / cholineRDA) * 100) : 0 };
-
-    const ndm = nutrientDisplayMode;
+    // Get phytonutrients (not part of NutritionDisplay yet)
+    const phytonutrients = calculatedNutrition.phytonutrients && Object.keys(calculatedNutrition.phytonutrients).length > 0 ? calculatedNutrition.phytonutrients : (recipe.phytonutrients || {});
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-            {/* Header */}
+            {/* Rendering mode toggle */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-2"><Activity size={16} /> Nutritional Breakdown</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-2">
+                        <Activity size={16} /> Serving Mode
+                    </h3>
                 </div>
                 <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
-                    {([50, 75, 100] as const).map(t => (
-                        <button key={t} onClick={() => setUniversalThreshold(t as 50 | 75 | 100)}
-                            className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
-                                universalThreshold === t ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300')}>
-                            {t}%
+                    {(['per-recipe', 'per-serving'] as const).map(mode => (
+                        <button
+                            key={mode}
+                            onClick={() => setNutritionViewMode(mode)}
+                            className={cn(
+                                'flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
+                                nutritionViewMode === mode
+                                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                            )}
+                        >
+                            {mode === 'per-recipe' ? 'Recipe' : 'Per Serving'}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Macros Grid - Donut + 3 Cards Horizontal */}
-            <div className="flex gap-3">
-                {/* Energy Donut */}
-                <div className="flex-shrink-0 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-slate-50 to-slate-50/50 dark:from-slate-900/30 dark:to-slate-900/10">
-                    <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
-                        <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
-                            <circle cx="48" cy="48" r={R} fill="none" stroke="currentColor" strokeWidth={STR} className="text-slate-200 dark:text-slate-800" />
-                            <circle cx="48" cy="48" r={R} fill="none" stroke="#3b82f6" strokeWidth={STR} strokeLinecap="butt" style={{ ...cS, transition: 'all 0.7s ease' }} />
-                            <circle cx="48" cy="48" r={R} fill="none" stroke="#f59e0b" strokeWidth={STR} strokeLinecap="butt" style={{ ...fS, transition: 'all 0.7s ease' }} />
-                            <circle cx="48" cy="48" r={R} fill="none" stroke="#f43f5e" strokeWidth={STR} strokeLinecap="butt" style={{ ...pS, transition: 'all 0.7s ease' }} />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-base font-black text-slate-900 dark:text-white leading-none">{Math.round(energyUnit === 'kJ' ? eV * 4.184 : eV)}</span>
-                            <span className="text-[8px] text-slate-400 font-bold mt-0.5">{energyUnit}</span>
-                        </div>
-                    </div>
-                </div>
+            {/* Nutrition Display Component */}
+            {nutrition && (
+                <NutritionDisplay
+                    nutrition={nutrition}
+                    energyUnit={energyUnit}
+                    nutrientDisplayMode={nutrientDisplayMode}
+                    universalThreshold={universalThreshold}
+                    onThresholdChange={setUniversalThreshold}
+                />
+            )}
 
-                {/* Macro Cards Grid */}
-                <div className="flex-1 grid grid-cols-3 gap-3">
-                    {/* Carbohydrates */}
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col gap-3">
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbohydrates</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{cV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({cP}%)</span></p>
-                        </div>
-                        <div className="space-y-1">
-                            <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(cP, 100)}%`, backgroundColor: '#3b82f6' }} />
-                            </div>
-                            <div className="flex items-center justify-between text-[9px] font-semibold text-slate-600 dark:text-slate-400">
-                                <span>{cV.toFixed(1)}g</span>
-                                <span>{cR.toFixed(1)}g</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Protein */}
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col gap-3">
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{pV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({pP}%)</span></p>
-                        </div>
-                        <div className="space-y-1">
-                            <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(pP, 100)}%`, backgroundColor: '#f43f5e' }} />
-                            </div>
-                            <div className="flex items-center justify-between text-[9px] font-semibold text-slate-600 dark:text-slate-400">
-                                <span>{pV.toFixed(1)}g</span>
-                                <span>{pR.toFixed(1)}g</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Fat */}
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex flex-col gap-3">
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</p>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{fV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({fP}%)</span></p>
-                        </div>
-                        <div className="space-y-1">
-                            <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(fP, 100)}%`, backgroundColor: '#f59e0b' }} />
-                            </div>
-                            <div className="flex items-center justify-between text-[9px] font-semibold text-slate-600 dark:text-slate-400">
-                                <span>{fV.toFixed(1)}g</span>
-                                <span>{fR.toFixed(1)}g</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Vitamins + Minerals Two Column */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Vitamins (Left) */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
-                    <div>
-                        <div className="flex items-center justify-between">
-                            <div className="text-[11px] font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
-                            <div className="text-[10px] font-bold text-violet-600 dark:text-violet-400 bg-violet-500/10 px-2.5 py-1 rounded-full">
-                                {([...wsData, ...stData].filter(v => v.pct >= universalThreshold).length)} / {wsData.length + stData.length}
-                            </div>
-                        </div>
-                        <div className="text-[9px] text-slate-400 mt-0.5">Water & Fat Soluble • Threshold: ≥ {universalThreshold}% RDA</div>
-                    </div>
-                    <div className="space-y-2.5">
-                        {[...wsData, ...stData].map(d => {
-                            const meetsThreshold = d.pct >= universalThreshold;
-                            return (
-                                <div key={d.label} className="flex items-center justify-between">
-                                    <span className={cn("text-[10px] font-semibold", meetsThreshold ? 'text-violet-700 dark:text-violet-400' : 'text-slate-600 dark:text-slate-400')}>{d.label}</span>
-                                    <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= universalThreshold ? 'text-amber-500' : 'text-slate-400')}>
-                                        {ndm === 'value' && `${d.val.toFixed(1)}`}
-                                        {ndm === 'percentage' && `${d.pct}%`}
-                                        {ndm === 'both' && `${d.val.toFixed(1)} (${d.pct}%)`}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                        <div className="border-t border-slate-200 dark:border-slate-800 pt-2 mt-2">
-                            <div className="flex items-center justify-between">
-                                <span className={cn("text-[10px] font-semibold", cholineData.pct >= universalThreshold ? 'text-violet-700 dark:text-violet-400' : 'text-slate-600 dark:text-slate-400')}>Choline</span>
-                                <span className={cn("text-[10px] font-bold", cholineData.pct >= 100 ? 'text-emerald-500' : cholineData.pct >= universalThreshold ? 'text-amber-500' : 'text-slate-400')}>
-                                    {ndm === 'value' && `${cholineData.val.toFixed(1)} mg`}
-                                    {ndm === 'percentage' && `${cholineData.pct}%`}
-                                    {ndm === 'both' && `${cholineData.val.toFixed(1)} mg (${cholineData.pct}%)`}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Minerals (Right) */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
-                    <div>
-                        <div className="flex items-center justify-between">
-                            <div className="text-[11px] font-black uppercase tracking-widest text-teal-500">Minerals</div>
-                            <div className="text-[10px] font-bold text-teal-600 dark:text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full">
-                                {([...elData, ...trData].filter(m => m.pct >= universalThreshold).length)} / {elData.length + trData.length}
-                            </div>
-                        </div>
-                        <div className="text-[9px] text-slate-400 mt-0.5">Electrolytes & Trace • Threshold: ≥ {universalThreshold}% RDA</div>
-                    </div>
-                    <div className="space-y-2.5">
-                        {[...elData, ...trData].map(d => {
-                            const meetsThreshold = d.pct >= universalThreshold;
-                            return (
-                                <div key={d.label} className="flex items-center justify-between">
-                                    <span className={cn("text-[10px] font-semibold", meetsThreshold ? 'text-teal-700 dark:text-teal-400' : 'text-slate-600 dark:text-slate-400')}>{d.label}</span>
-                                    <span className={cn("text-[10px] font-bold", d.pct >= 100 ? 'text-emerald-500' : d.pct >= universalThreshold ? 'text-amber-500' : 'text-slate-400')}>
-                                        {ndm === 'value' && `${d.val.toFixed(1)} mg`}
-                                        {ndm === 'percentage' && `${d.pct}%`}
-                                        {ndm === 'both' && `${d.val.toFixed(1)} mg (${d.pct}%)`}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-
-            {/* Phytonutrients Tag Cloud */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+            {/* Phytonutrients Section */}
+            {/* Phytonutrients Section */}
+            <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-4">
                 <div className="mb-4">
-                    <div className="text-[11px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Phytonutrients</div>
+                    <div className="text-[11px] font-black uppercase tracking-widest text-green-400">Phytonutrients</div>
                     <div className="text-[9px] text-slate-400 mt-0.5">Plant compounds with powerful health benefits • Click a tag to learn more</div>
                 </div>
-                {nutrition.phytonutrients && Object.keys(nutrition.phytonutrients).length > 0 ? (
+                {phytonutrients && Object.keys(phytonutrients).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                        {Object.entries(nutrition.phytonutrients).map(([name, data]) => {
+                        {Object.entries(phytonutrients).map(([name, data]) => {
                             const isExpanded = expandedPhyto === name;
                             const description = typeof data === 'object' ? data.description : String(data);
                             const sources = typeof data === 'object' ? data.sources || [] : [];
