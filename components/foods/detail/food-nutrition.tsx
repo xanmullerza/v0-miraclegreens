@@ -381,7 +381,161 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
         );
     };
 
-    return (
+    // Modern micronutrients component
+    const MicroNutrients = ({ getVal, userRDAs }: any) => {
+        const nv = (keys: string[]) => {
+            const v = getVal(keys);
+            return v !== null ? v : 0;
+        };
+
+        // Electrolytes & Trace data
+        const elData = [
+            { l: 'Sodium', k: ['Sodium', 'sodium_mg'] },
+            { l: 'Potassium', k: ['Potassium', 'potassium_mg'] },
+            { l: 'Magnesium', k: ['Magnesium', 'magnesium_mg'] },
+            { l: 'Calcium', k: ['Calcium', 'calcium_mg'] },
+            { l: 'Phosphorus', k: ['Phosphorus', 'phosphorus_mg'] },
+        ].map(({ l, k }) => {
+            const v = nv(k);
+            const r = userRDAs?.[l] || 0;
+            return { label: l, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 };
+        });
+
+        const trData = [
+            { l: 'Iron', k: ['Iron', 'iron_mg'] },
+            { l: 'Zinc', k: ['Zinc', 'zinc_mg'] },
+            { l: 'Copper', k: ['Copper', 'copper_mg'] },
+            { l: 'Manganese', k: ['Manganese', 'manganese_mg'] },
+            { l: 'Selenium', k: ['Selenium', 'selenium_ug'] },
+        ].map(({ l, k }) => {
+            const v = nv(k);
+            const r = userRDAs?.[l] || 0;
+            return { label: l, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 };
+        });
+
+        const wsData = [
+            { l: 'B1 (Thiamine)', fn: 'Vitamin B1', sub: 'Thiamine' },
+            { l: 'B2 (Riboflavin)', fn: 'Vitamin B2', sub: 'Riboflavin' },
+            { l: 'B3 (Niacin)', fn: 'Vitamin B3', sub: 'Niacin' },
+            { l: 'B5 (Pantothenic Acid)', fn: 'Vitamin B5', sub: 'Pantothenic Acid' },
+            { l: 'B6 (Pyridoxine)', fn: 'Vitamin B6', sub: 'Pyridoxine' },
+            { l: 'B9 (Folate)', fn: 'Vitamin B9', sub: 'Folate' },
+        ].map(({ l, fn, sub }) => {
+            const v = nv([l]);
+            const r = userRDAs?.[l] || 0;
+            return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 };
+        });
+
+        const stData = [
+            { l: 'Vitamin A', fn: 'Vitamin A', sub: 'Retinol' },
+            { l: 'Vitamin D', fn: 'Vitamin D', sub: 'Calciferol' },
+            { l: 'Vitamin E', fn: 'Vitamin E', sub: 'Tocopherol' },
+            { l: 'Vitamin K', fn: 'Vitamin K', sub: 'Phylloquinone' },
+            { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' },
+        ].map(({ l, fn, sub }) => {
+            const v = nv([l]);
+            const r = userRDAs?.[l] || 0;
+            return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 };
+        });
+
+        const cholineVal = nv(['Choline', 'choline_mg']);
+        const cholineRDA = userRDAs?.['Choline'] || 0;
+        const cholineData = { label: 'Choline', val: cholineVal, pct: cholineRDA > 0 ? Math.round((cholineVal / cholineRDA) * 100) : 0 };
+
+        return (
+            <div className="space-y-6">
+                {/* Vitamins + Minerals Two Column */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Vitamins (Left) */}
+                    <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-4 flex flex-col gap-4">
+                        <div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[11px] font-black uppercase tracking-widest text-violet-400">Vitamins + Choline</div>
+                                <div className="text-[10px] font-bold text-violet-400 bg-violet-500/20 px-2.5 py-1 rounded-full">
+                                    {[...wsData, ...stData].filter((v) => v.pct >= universalThreshold).length} / {wsData.length + stData.length}
+                                </div>
+                            </div>
+                            <div className="text-[9px] text-slate-400 mt-0.5">Water & Fat Soluble • Threshold: ≥ {universalThreshold}% RDA</div>
+                        </div>
+                        <div className="space-y-2.5">
+                            {[...wsData, ...stData].map((d) => {
+                                const meetsThreshold = d.pct >= universalThreshold;
+                                return (
+                                    <div key={d.label} className="flex items-center justify-between">
+                                        <span className={cn('text-[10px] font-semibold', meetsThreshold ? 'text-violet-400' : 'text-slate-400')}>
+                                            {d.label}
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'text-[10px] font-bold',
+                                                d.pct >= 100 ? 'text-emerald-400' : d.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-500'
+                                            )}
+                                        >
+                                            {nutrientDisplayMode === 'value' && `${d.val.toFixed(1)}`}
+                                            {nutrientDisplayMode === 'percentage' && `${d.pct}%`}
+                                            {nutrientDisplayMode === 'both' && `${d.val.toFixed(1)} (${d.pct}%)`}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                            <div className="border-t border-slate-700 pt-2 mt-2">
+                                <div className="flex items-center justify-between">
+                                    <span className={cn('text-[10px] font-semibold', cholineData.pct >= universalThreshold ? 'text-violet-400' : 'text-slate-400')}>
+                                        Choline
+                                    </span>
+                                    <span
+                                        className={cn(
+                                            'text-[10px] font-bold',
+                                            cholineData.pct >= 100 ? 'text-emerald-400' : cholineData.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-500'
+                                        )}
+                                    >
+                                        {nutrientDisplayMode === 'value' && `${cholineData.val.toFixed(1)} mg`}
+                                        {nutrientDisplayMode === 'percentage' && `${cholineData.pct}%`}
+                                        {nutrientDisplayMode === 'both' && `${cholineData.val.toFixed(1)} mg (${cholineData.pct}%)`}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Minerals (Right) */}
+                    <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-4 flex flex-col gap-4">
+                        <div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[11px] font-black uppercase tracking-widest text-teal-400">Minerals</div>
+                                <div className="text-[10px] font-bold text-teal-400 bg-teal-500/20 px-2.5 py-1 rounded-full">
+                                    {[...elData, ...trData].filter((m) => m.pct >= universalThreshold).length} / {elData.length + trData.length}
+                                </div>
+                            </div>
+                            <div className="text-[9px] text-slate-400 mt-0.5">Electrolytes & Trace • Threshold: ≥ {universalThreshold}% RDA</div>
+                        </div>
+                        <div className="space-y-2.5">
+                            {[...elData, ...trData].map((d) => {
+                                const meetsThreshold = d.pct >= universalThreshold;
+                                return (
+                                    <div key={d.label} className="flex items-center justify-between">
+                                        <span className={cn('text-[10px] font-semibold', meetsThreshold ? 'text-teal-400' : 'text-slate-400')}>
+                                            {d.label}
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'text-[10px] font-bold',
+                                                d.pct >= 100 ? 'text-emerald-400' : d.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-500'
+                                            )}
+                                        >
+                                            {nutrientDisplayMode === 'value' && `${d.val.toFixed(1)} mg`}
+                                            {nutrientDisplayMode === 'percentage' && `${d.pct}%`}
+                                            {nutrientDisplayMode === 'both' && `${d.val.toFixed(1)} mg (${d.pct}%)`}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
         <div className="space-y-6">
             <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex items-center justify-between gap-4">
                 <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2 shrink-0">
@@ -395,40 +549,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
             <MacroNutrients getVal={getVal} energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
 
-            <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
-                'Sodium': ['Sodium', 'sodium_mg'],
-                'Potassium': ['Potassium', 'potassium_mg'],
-                'Magnesium': ['Magnesium', 'magnesium_mg'],
-                'Calcium': ['Calcium', 'calcium_mg'],
-                'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-            }} />
-
-            <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential minerals for energy and immune support" items={{
-                'Iron': ['Iron', 'iron_mg'],
-                'Zinc': ['Zinc', 'zinc_mg'],
-                'Copper': ['Copper', 'copper_mg'],
-                'Manganese': ['Manganese', 'manganese_mg'],
-                'Selenium': ['Selenium', 'selenium_ug']
-            }} />
-
-            <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Daily vitamins for a healthy mind and body" items={{
-                'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                'Choline': ['Choline', 'choline_mg'],
-            }} />
-
-            <NutrientGrid title="Fat-Soluble Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
-                'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
-            }} />
+            <MicroNutrients getVal={getVal} userRDAs={userRDAs} />
 
             <button
                 onClick={() => setShowAdvancedNutrition(!showAdvancedNutrition)}
