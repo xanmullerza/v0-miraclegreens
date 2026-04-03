@@ -31,6 +31,11 @@ export const RecipeListItem = ({
     const displayFat = (recipe.fat || 0) * sf;
     const displayProtein = (recipe.protein || 0) * sf;
 
+    // DEBUG: Log scaling calculations
+    useEffect(() => {
+        console.log(`[${recipe.title}] originalServings=${originalServings}, selectedServings=${selectedServings}, recipe.calories=${recipe.calories}, sf=${sf.toFixed(3)}, displayCalories=${displayCalories.toFixed(1)}`);
+    }, [recipe.title, originalServings, selectedServings, recipe.calories, sf, displayCalories]);
+
     // 1. Fetch fresh ingredients (to avoid stale plan data)
     useEffect(() => {
         let cancelled = false;
