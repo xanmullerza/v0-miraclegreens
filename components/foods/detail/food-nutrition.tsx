@@ -419,7 +419,9 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                 const meetsThreshold = d.pct >= universalThreshold;
                                 return (
                                     <div key={d.label} className="flex items-center justify-between">
-                                        <span className={cn('text-[10px] font-semibold', meetsThreshold ? 'text-violet-400' : 'text-slate-400')}>
+                                        <span className={cn('text-[10px] font-semibold',
+                                            d.pct >= 100 ? 'text-emerald-400' : d.pct >= 50 ? 'text-blue-400' : d.pct >= 25 ? 'text-yellow-400' : 'text-red-400'
+                                        )}>
                                             {d.label}
                                         </span>
                                         <span
@@ -437,7 +439,9 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                             })}
                             <div className="border-t border-slate-700 pt-2 mt-2">
                                 <div className="flex items-center justify-between">
-                                    <span className={cn('text-[10px] font-semibold', cholineData.pct >= universalThreshold ? 'text-violet-400' : 'text-slate-400')}>
+                                    <span className={cn('text-[10px] font-semibold',
+                                        cholineData.pct >= 100 ? 'text-emerald-400' : cholineData.pct >= 50 ? 'text-blue-400' : cholineData.pct >= 25 ? 'text-yellow-400' : 'text-red-400'
+                                    )}>
                                         Choline
                                     </span>
                                     <span
@@ -471,7 +475,9 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                 const meetsThreshold = d.pct >= universalThreshold;
                                 return (
                                     <div key={d.label} className="flex items-center justify-between">
-                                        <span className={cn('text-[10px] font-semibold', meetsThreshold ? 'text-teal-400' : 'text-slate-400')}>
+                                        <span className={cn('text-[10px] font-semibold',
+                                            d.pct >= 100 ? 'text-emerald-400' : d.pct >= 50 ? 'text-blue-400' : d.pct >= 25 ? 'text-yellow-400' : 'text-red-400'
+                                        )}>
                                             {d.label}
                                         </span>
                                         <span
