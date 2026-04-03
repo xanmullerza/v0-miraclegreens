@@ -54,20 +54,6 @@ export function NutritionDisplay({
     const { energy, protein, carbs, fat, aminoAcids, carbBreakdown, fatBreakdown, micronutrients } = nutrition;
     const ndm = nutrientDisplayMode;
 
-    // Donut chart for energy
-    const R = 44, STR = 9, CC = 2 * Math.PI * R;
-    const pCal = protein.value * 4;
-    const cCal = carbs.value * 4;
-    const fCal = fat.value * 9;
-    const tCal = pCal + cCal + fCal || 1;
-    const cFr = cCal / tCal, fFr = fCal / tCal, pFr = pCal / tCal;
-    let o = 0;
-    const cS = { strokeDasharray: `${cFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` };
-    o += cFr;
-    const fS = { strokeDasharray: `${fFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` };
-    o += fFr;
-    const pS = { strokeDasharray: `${pFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` };
-
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -95,211 +81,133 @@ export function NutritionDisplay({
                 )}
             </div>
 
-            {/* Macros Section */}
-            <div className="flex flex-col lg:flex-row gap-3">
-                {/* Energy Donut */}
-                <div className="flex-shrink-0 p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col justify-center items-center lg:h-auto">
-                    <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
-                        <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
-                            <circle
-                                cx="48"
-                                cy="48"
-                                r={R}
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth={STR}
-                                className="text-slate-700"
-                            />
-                            <circle
-                                cx="48"
-                                cy="48"
-                                r={R}
-                                fill="none"
-                                stroke="#3b82f6"
-                                strokeWidth={STR}
-                                strokeLinecap="butt"
-                                style={{ ...cS, transition: 'all 0.7s ease' }}
-                            />
-                            <circle
-                                cx="48"
-                                cy="48"
-                                r={R}
-                                fill="none"
-                                stroke="#f59e0b"
-                                strokeWidth={STR}
-                                strokeLinecap="butt"
-                                style={{ ...fS, transition: 'all 0.7s ease' }}
-                            />
-                            <circle
-                                cx="48"
-                                cy="48"
-                                r={R}
-                                fill="none"
-                                stroke="#f43f5e"
-                                strokeWidth={STR}
-                                strokeLinecap="butt"
-                                style={{ ...pS, transition: 'all 0.7s ease' }}
-                            />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-base font-black text-white leading-none">{Math.round(energy.value)}</span>
-                            <span className="text-[8px] text-slate-400 font-bold mt-0.5">{energyUnit}</span>
+            {/* Macros Summary Bar */}
+            <div className="grid grid-cols-4 gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+                {/* Energy */}
+                <div className="text-center">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 mb-1">Energy</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                        {Math.round(energy.value).toLocaleString()}
+                    </div>
+                    <div className="text-[8px] text-slate-400 font-bold">{energyUnit}</div>
+                </div>
+                
+                {/* Carbs */}
+                <button 
+                    onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
+                    className="text-center hover:opacity-80 transition-opacity group relative"
+                >
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                        {Math.round(carbs.value)}
+                    </div>
+                    <div className="text-[8px] text-slate-400 font-bold">g</div>
+                    <div className="absolute top-0 right-0 text-slate-400 group-hover:text-blue-500 transition-colors">
+                        {expandedMacro === 'carbs' ? '▼' : '▶'}
+                    </div>
+                </button>
+                
+                {/* Protein */}
+                <button 
+                    onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
+                    className="text-center hover:opacity-80 transition-opacity group relative"
+                >
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                        {Math.round(protein.value)}
+                    </div>
+                    <div className="text-[8px] text-slate-400 font-bold">g</div>
+                    <div className="absolute top-0 right-0 text-slate-400 group-hover:text-rose-500 transition-colors">
+                        {expandedMacro === 'protein' ? '▼' : '▶'}
+                    </div>
+                </button>
+                
+                {/* Fat */}
+                <button 
+                    onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
+                    className="text-center hover:opacity-80 transition-opacity group relative"
+                >
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                        {Math.round(fat.value)}
+                    </div>
+                    <div className="text-[8px] text-slate-400 font-bold">g</div>
+                    <div className="absolute top-0 right-0 text-slate-400 group-hover:text-amber-500 transition-colors">
+                        {expandedMacro === 'fat' ? '▼' : '▶'}
+                    </div>
+                </button>
+            </div>
+
+            {/* Expanded Macro Details */}
+            <div className="space-y-3">
+                {/* Carbs Details */}
+                {expandedMacro === 'carbs' && (
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 space-y-3">
+                        <h4 className="text-[11px] font-black uppercase tracking-widest text-blue-500 mb-3">Carbs Breakdown</h4>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Starch</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{carbBreakdown.starch.toFixed(1)}g</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Fiber</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{carbBreakdown.fiber.toFixed(1)}g</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Sugar</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{carbBreakdown.sugar.toFixed(1)}g</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                {/* Macro Cards */}
-                <div className="flex-1 space-y-3">
-                    {/* Carbs */}
-                    <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
-                        <button
-                            onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
-                            className="flex items-center justify-between hover:opacity-80 transition-opacity"
-                        >
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Carbs</p>
-                                <p className="text-sm font-bold text-white">
-                                    {carbs.value.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({carbs.percent}%)</span>
-                                </p>
-                            </div>
-                            <span className="text-slate-400 text-lg">{expandedMacro === 'carbs' ? '▼' : '▶'}</span>
-                        </button>
-
-                        {expandedMacro !== 'carbs' && (
-                            <div className="space-y-1">
-                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                                    <div
-                                        className="h-full rounded-full transition-all duration-700"
-                                        style={{ width: `${Math.min(carbs.percent, 100)}%`, backgroundColor: '#3b82f6' }}
-                                    />
+                {/* Protein Details */}
+                {expandedMacro === 'protein' && (
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 space-y-3">
+                        <h4 className="text-[11px] font-black uppercase tracking-widest text-rose-500 mb-3">Amino Acids Breakdown</h4>
+                        <div className="space-y-2">
+                            {aminoAcids.map(aa => (
+                                <div key={aa.name} className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{aa.name}</span>
+                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{aa.value.toFixed(2)}g</span>
                                 </div>
-                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
-                                    <span>{carbs.value.toFixed(1)}g</span>
-                                    <span>{carbs.rda.toFixed(1)}g</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {expandedMacro === 'carbs' && (
-                            <div className="space-y-2 border-t border-slate-700 pt-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Starch</span>
-                                    <span className="text-[10px] font-bold">{carbBreakdown.starch.toFixed(1)}g</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Fiber</span>
-                                    <span className="text-[10px] font-bold">{carbBreakdown.fiber.toFixed(1)}g</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Sugar</span>
-                                    <span className="text-[10px] font-bold">{carbBreakdown.sugar.toFixed(1)}g</span>
-                                </div>
-                            </div>
-                        )}
+                            ))}
+                        </div>
                     </div>
+                )}
 
-                    {/* Protein */}
-                    <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
-                        <button
-                            onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
-                            className="flex items-center justify-between hover:opacity-80 transition-opacity"
-                        >
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 mb-1">Protein</p>
-                                <p className="text-sm font-bold text-white">
-                                    {protein.value.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({protein.percent}%)</span>
-                                </p>
+                {/* Fat Details */}
+                {expandedMacro === 'fat' && (
+                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 space-y-3">
+                        <h4 className="text-[11px] font-black uppercase tracking-widest text-amber-500 mb-3">Fat Breakdown</h4>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Saturated</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.saturated.toFixed(1)}g</span>
                             </div>
-                            <span className="text-slate-400 text-lg">{expandedMacro === 'protein' ? '▼' : '▶'}</span>
-                        </button>
-
-                        {expandedMacro !== 'protein' && (
-                            <div className="space-y-1">
-                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                                    <div
-                                        className="h-full rounded-full transition-all duration-700"
-                                        style={{ width: `${Math.min(protein.percent, 100)}%`, backgroundColor: '#f43f5e' }}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
-                                    <span>{protein.value.toFixed(1)}g</span>
-                                    <span>{protein.rda.toFixed(1)}g</span>
-                                </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Monounsaturated</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.monounsaturated.toFixed(1)}g</span>
                             </div>
-                        )}
-
-                        {expandedMacro === 'protein' && (
-                            <div className="space-y-2 border-t border-slate-700 pt-3">
-                                {aminoAcids.map(aa => (
-                                    <div key={aa.name} className="flex items-center justify-between">
-                                        <span className="text-[10px] font-semibold text-slate-300">{aa.name}</span>
-                                        <span className="text-[10px] font-bold">{aa.value.toFixed(2)}g</span>
-                                    </div>
-                                ))}
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Polyunsaturated</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.polyunsaturated.toFixed(1)}g</span>
                             </div>
-                        )}
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Omega-3</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.omega3.toFixed(2)}g</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Omega-6</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.omega6.toFixed(2)}g</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Cholesterol</span>
+                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.cholesterol.toFixed(0)}mg</span>
+                            </div>
+                        </div>
                     </div>
-
-                    {/* Fat */}
-                    <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
-                        <button
-                            onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
-                            className="flex items-center justify-between hover:opacity-80 transition-opacity"
-                        >
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-1">Fat</p>
-                                <p className="text-sm font-bold text-white">
-                                    {fat.value.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({fat.percent}%)</span>
-                                </p>
-                            </div>
-                            <span className="text-slate-400 text-lg">{expandedMacro === 'fat' ? '▼' : '▶'}</span>
-                        </button>
-
-                        {expandedMacro !== 'fat' && (
-                            <div className="space-y-1">
-                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                                    <div
-                                        className="h-full rounded-full transition-all duration-700"
-                                        style={{ width: `${Math.min(fat.percent, 100)}%`, backgroundColor: '#f59e0b' }}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
-                                    <span>{fat.value.toFixed(1)}g</span>
-                                    <span>{fat.rda.toFixed(1)}g</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {expandedMacro === 'fat' && (
-                            <div className="space-y-2 border-t border-slate-700 pt-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Saturated</span>
-                                    <span className="text-[10px] font-bold">{fatBreakdown.saturated.toFixed(1)}g</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Monounsaturated</span>
-                                    <span className="text-[10px] font-bold">{fatBreakdown.monounsaturated.toFixed(1)}g</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Polyunsaturated</span>
-                                    <span className="text-[10px] font-bold">{fatBreakdown.polyunsaturated.toFixed(1)}g</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Omega-3</span>
-                                    <span className="text-[10px] font-bold">{fatBreakdown.omega3.toFixed(2)}g</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Omega-6</span>
-                                    <span className="text-[10px] font-bold">{fatBreakdown.omega6.toFixed(2)}g</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[10px] font-semibold text-slate-300">Cholesterol</span>
-                                    <span className="text-[10px] font-bold">{fatBreakdown.cholesterol.toFixed(0)}mg</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* Micronutrients */}
