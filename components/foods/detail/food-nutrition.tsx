@@ -152,23 +152,9 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
         return (
             <div className="space-y-6 p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 mb-6">
-                <div className="flex items-center justify-between">
-                    <h4 className="font-black flex items-center gap-2 uppercase tracking-widest text-[10px] text-orange-400">
-                        <Zap className="h-4 w-4" /> Macronutrients
-                    </h4>
-                    <div className="flex bg-slate-700 rounded-lg p-0.5 border border-slate-600">
-                        {([50, 75, 100] as const).map((t) => (
-                            <button
-                                key={t}
-                                onClick={() => setUniversalThreshold(t)}
-                                className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
-                                    universalThreshold === t ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-300')}
-                            >
-                                {t}%
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                <h4 className="font-black flex items-center gap-2 uppercase tracking-widest text-[10px] text-orange-400">
+                    <Zap className="h-4 w-4" /> Macronutrients
+                </h4>
 
                 {/* Macros Grid - Donut + 3 Cards */}
                 <div className="flex gap-3">
