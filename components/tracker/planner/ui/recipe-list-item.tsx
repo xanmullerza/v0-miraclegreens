@@ -17,27 +17,40 @@ export const RecipeListItem = ({
 }: RecipeListItemProps & { selectedServings?: number }) => {
     const router = useRouter();
     const [liveIngs, setLiveIngs] = useState(recipe.ingredients || []);
+    const [liveRecipe, setLiveRecipe] = useState(recipe);
     const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
     const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
     const [addedToList, setAddedToList] = useState(false);
 
     // Calculate nutrition values based on selectedServings (always normalized from 1 serving)
-    // Use originalServings if available (from meal generator), otherwise fall back to recipe.servings
-    // Same logic as recipes tab: normalize to per-serving, then scale by selectedServings
-    const originalServings = Math.max((recipe as any).originalServings || recipe.servings || 1, 1);
-    const sf = (1 / originalServings) * selectedServings;
-    const displayCalories = (recipe.calories || 0) * sf;
-    const displayEnergy = (recipe.energyKj || 0) * sf;
-    const displayCarbs = (recipe.carbs || 0) * sf;
-    const displayFat = (recipe.fat || 0) * sf;
-    const displayProtein = (recipe.protein || 0) * sf;
+    // Use fresh recipe data (servings, calories) to handle recipe edits
+    const currentServings = Math.max(liveRecipe.servings || 1, 1);
+    const sf = (1 / currentServings) * selectedServings;
+    const displayCalories = (liveRecipe.calories || 0) * sf;
+    const displayEnergy = (liveRecipe.energy_kj || liveRecipe.energyKj || 0) * sf;
+    const displayCarbs = (liveRecipe.carbs || 0) * sf;
+    const displayFat = (liveRecipe.fat || 0) * sf;
+    const displayProtein = (liveRecipe.protein || 0) * sf;
 
     // DEBUG
-    console.log(`[${recipe.title}] originalServings=${originalServings}, selectedServings=${selectedServings}, recipe.calories=${recipe.calories}, recipe.energyKj=${recipe.energyKj}, sf=${sf.toFixed(3)}, displayCalories=${displayCalories.toFixed(1)}, displayEnergy=${displayEnergy.toFixed(1)}`);
+    console.log(`[${liveRecipe.title}] currentServings=${currentServings}, selectedServings=${selectedServings}, recipe.calories=${liveRecipe.calories}, recipe.energy_kj=${liveRecipe.energy_kj}, sf=${sf.toFixed(3)}, displayCalories=${displayCalories.toFixed(1)}, displayEnergy=${displayEnergy.toFixed(1)}`);
 
-    // 1. Fetch fresh ingredients (to avoid stale plan data)
+    // 1. Fetch fresh recipe metadata AND ingredients (to handle recipe edits)
     useEffect(() => {
         let cancelled = false;
+        
+        // Fetch fresh recipe data - include all fields needed for display
+        supabase.from('recipes')
+            .select('id, title, servings, calories, energy_kj, protein, carbs, fat, micronutrients, image, type, prep_time')
+            .eq('id', recipe.id)
+            .single()
+            .then(({ data: recipeData, error: recipeError }) => {
+                if (!cancelled && recipeData && !recipeError) {
+                    setLiveRecipe(recipeData);
+                }
+            });
+        
+        // Fetch fresh ingredients
         supabase.from('ingredients')
             .select('item, base_ingredient, food_item_id, weight_g, amount, measure_label, is_miracle_product, food_items(name, common_name, category)')
             .eq('recipe_id', recipe.id)
@@ -104,8 +117,8 @@ export const RecipeListItem = ({
         >
             <div className="lg:grid lg:grid-cols-[100px_1fr_60px_60px_60px_60px_240px] gap-1.5 lg:items-center lg:px-6">
                 <div className="aspect-[4/3] lg:aspect-square w-full lg:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-xl lg:rounded-none">
-                    {recipe.image ? (
-                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    {liveRecipe.image ? (
+                        <img src={liveRecipe.image} alt={liveRecipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-slate-300"><ChefHat size={18} /></div>
                     )}
@@ -113,11 +126,11 @@ export const RecipeListItem = ({
                 </div>
 
                 <div className="p-1 lg:p-0">
-                    <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white capitalize">{recipe.title}</h3>
+                    <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white capitalize">{liveRecipe.title}</h3>
                     <div className="flex items-center gap-2 mt-0.5">
-                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Clock size={8}/>{recipe.prepTime}m</div>
-                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Users size={8}/>{recipe.servings}P</div>
-                        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[7px] border-none px-1 py-0">{recipe.type}</Badge>
+                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Clock size={8}/>{liveRecipe.prep_time || 0}m</div>
+                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Users size={8}/>{liveRecipe.servings}P</div>
+                        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[7px] border-none px-1 py-0">{liveRecipe.type}</Badge>
                     </div>
                 </div>
 
