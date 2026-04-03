@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
-import { DidYouKnow } from '@/components/ux/DidYouKnow';
 import { ExtraMarkersSection } from './ExtraMarkersSection';
 import { BiologicalRatiosSection } from './BiologicalRatiosSection';
 
@@ -526,12 +525,6 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                         userRDAs={userRDAs}
                         energyUnit={energyUnit}
                         dailyTargets={dailyTargets}
-                    />
-
-                    <DidYouKnow
-                        phytonutrients={food.phytonutrients}
-                        foodName={food.common_name || food.name}
-                        className="py-4"
                     />
                 </div>
             )}
