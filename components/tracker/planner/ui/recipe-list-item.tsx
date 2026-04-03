@@ -22,35 +22,18 @@ export const RecipeListItem = ({
     const [addedToList, setAddedToList] = useState(false);
 
     // Calculate nutrition values based on selectedServings (always normalized from 1 serving)
-    // Estimate servings: if DB servings=1 but energy suggests multiple servings, estimate from energy density
-    // Typical serving size is 800-1700 kJ (200-400 kcal) for most meals
-    // If > 2500 kJ, likely 2+ servings. If > 4200 kJ, likely 3+ servings
-    const estimateServingsFromEnergy = (energyKj: number): number => {
-        if (energyKj <= 2500) return 1;        // ≤ 600 kcal
-        if (energyKj <= 3750) return 2;        // 600-900 kcal
-        if (energyKj <= 5000) return 2.5;      // 900-1200 kcal
-        return Math.ceil(energyKj / 1885);     // 1885 kJ (450 kcal) per serving heuristic
-    };
-
-    let originalServings = (recipe as any).originalServings || recipe.servings || 1;
-    
-    // If DB shows servings=1 but energy is high, estimate actual servings from energy_kj
-    if (originalServings === 1 && (recipe.energyKj || 0) > 2500) {
-        originalServings = estimateServingsFromEnergy(recipe.energyKj || 0);
-    }
-
     // Use originalServings if available (from meal generator), otherwise fall back to recipe.servings
-    // Scale factor: normalize to 1 serving, then multiply by selectedServings
+    // Same logic as recipes tab: normalize to per-serving, then scale by selectedServings
+    const originalServings = Math.max((recipe as any).originalServings || recipe.servings || 1, 1);
     const sf = (1 / originalServings) * selectedServings;
     const displayCalories = (recipe.calories || 0) * sf;
+    const displayEnergy = (recipe.energyKj || 0) * sf;
     const displayCarbs = (recipe.carbs || 0) * sf;
     const displayFat = (recipe.fat || 0) * sf;
     const displayProtein = (recipe.protein || 0) * sf;
 
-    // DEBUG: Log scaling calculations
-    useEffect(() => {
-        console.log(`[${recipe.title}] originalServings=${originalServings}, selectedServings=${selectedServings}, recipe.calories=${recipe.calories}, sf=${sf.toFixed(3)}, displayCalories=${displayCalories.toFixed(1)}`);
-    }, [recipe.title, originalServings, selectedServings, recipe.calories, sf, displayCalories]);
+    // DEBUG
+    console.log(`[${recipe.title}] originalServings=${originalServings}, selectedServings=${selectedServings}, recipe.calories=${recipe.calories}, recipe.energyKj=${recipe.energyKj}, sf=${sf.toFixed(3)}, displayCalories=${displayCalories.toFixed(1)}, displayEnergy=${displayEnergy.toFixed(1)}`);
 
     // 1. Fetch fresh ingredients (to avoid stale plan data)
     useEffect(() => {
