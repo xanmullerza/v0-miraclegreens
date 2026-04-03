@@ -10,6 +10,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const router = useRouter();
     const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
+    const [macroGrams, setMacroGrams] = useState(100);
     const { 
         food, amount, selectedPortion, energyUnit, dailyTargets, userRDAs, nutrientDisplayMode,
         breakdownNutrient, setBreakdownNutrient
@@ -74,6 +75,64 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
         return (baseVal * currentWeight) / 100;
     };
 
+    const getValForMacros = (keys: string[], grams: number = 100) => {
+        if (!food) return 0;
+        const m = food.micronutrients || {};
+        let baseVal = 0;
+
+        for (const k of keys) {
+            let val = 0;
+            if (k === 'energy_kcal') {
+                if (energyUnit === 'kJ' && food.energy_kj) val = food.energy_kj;
+                else val = food.energy_kcal || 0;
+            }
+            else if (k === 'energy_kj') {
+                if (energyUnit === 'kcal' && food.energy_kcal) val = food.energy_kcal;
+                else val = food.energy_kj || 0;
+            }
+            else if (k === 'Energy' || k === 'Calories' || k === 'calories') {
+                if (energyUnit === 'kJ') val = food.energy_kj || (food.energy_kcal ? food.energy_kcal * 4.184 : 0);
+                else val = food.energy_kcal || (food.energy_kj ? food.energy_kj / 4.184 : 0);
+            }
+            else if (k === 'protein_g') val = food.protein_g || 0;
+            else if (k === 'carbs_g') val = food.carbs_g || 0;
+            else if (k === 'fat_g') val = food.fat_g || 0;
+            else {
+                if (m[k] !== undefined) val = m[k];
+                else {
+                    const match = findNutrientMatch(m, k);
+                    if (match) val = m[match];
+                }
+            }
+
+            if (val > 0) {
+                baseVal = val;
+                break;
+            }
+        }
+
+        if (baseVal === 0 && (keys.includes('fat_g') || keys.includes('Fat'))) {
+            const sat = m['Saturated Fat'] || 0;
+            const mono = m['Monounsaturated Fat'] || 0;
+            const poly = m['Polyunsaturated Fat'] || 0;
+            const trans = m['Trans Fat'] || 0;
+            const sum = sat + mono + poly + trans;
+            if (sum > 0) baseVal = sum;
+        }
+
+        if (baseVal === 0 && keys.some(k => k.toLowerCase().includes('energy') || k.toLowerCase().includes('calorie'))) {
+            const p = food.protein_g || 0;
+            const c = food.carbs_g || 0;
+            const f = food.fat_g || 0;
+            if (p > 0 || c > 0 || f > 0) {
+                const kcal = (p * 4) + (c * 4) + (f * 9);
+                baseVal = energyUnit === 'kJ' ? kcal * 4.184 : kcal;
+            }
+        }
+
+        return (baseVal * grams) / 100;
+    };
+
     const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
         'Vitamin A': [
             { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
@@ -122,11 +181,11 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     if (!food) return null;
 
     // Modern Macronutrients component with donut chart
-    const MacroNutrients = ({ getVal, energyUnit, dailyTargets, userRDAs }: any) => {
-        const eV = getVal(['Energy', 'energy_kcal', 'Calories']);
-        const pV = getVal(['Protein', 'protein_g']);
-        const cV = getVal(['Carbohydrates', 'carbs_g']);
-        const fV = getVal(['Fat', 'fat_g']);
+    const MacroNutrients = ({ energyUnit, dailyTargets, userRDAs }: any) => {
+        const eV = getValForMacros(['Energy', 'energy_kcal', 'Calories'], macroGrams);
+        const pV = getValForMacros(['Protein', 'protein_g'], macroGrams);
+        const cV = getValForMacros(['Carbohydrates', 'carbs_g'], macroGrams);
+        const fV = getValForMacros(['Fat', 'fat_g'], macroGrams);
 
         const pR = userRDAs?.['Protein'] || dailyTargets.protein;
         const cR = userRDAs?.['Carbs'] || dailyTargets.carbs;
@@ -152,9 +211,22 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
         return (
             <div className="space-y-6 p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 mb-6">
-                <h4 className="font-black flex items-center gap-2 uppercase tracking-widest text-[10px] text-orange-400">
-                    <Zap className="h-4 w-4" /> Macronutrients
-                </h4>
+                <div className="flex items-center justify-between">
+                    <h4 className="font-black flex items-center gap-2 uppercase tracking-widest text-[10px] text-orange-400">
+                        <Zap className="h-4 w-4" /> Macronutrients
+                    </h4>
+                    <div className="flex items-center gap-2 bg-slate-700 rounded-lg p-2 border border-slate-600">
+                        <input
+                            type="number"
+                            min="1"
+                            max="1000"
+                            value={macroGrams}
+                            onChange={(e) => setMacroGrams(Math.max(1, parseInt(e.target.value) || 100))}
+                            className="w-16 bg-slate-800 text-white text-center text-sm font-bold rounded px-2 py-1 border border-slate-600 focus:outline-none focus:border-orange-400"
+                        />
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">g</span>
+                    </div>
+                </div>
 
                 {/* Macros Grid - Donut + 3 Cards */}
                 <div className="flex gap-3">
@@ -490,7 +562,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                 </span>
             </div>
 
-            <MacroNutrients getVal={getVal} energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
+            <MacroNutrients energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
 
             <MicroNutrients getVal={getVal} userRDAs={userRDAs} />
 
