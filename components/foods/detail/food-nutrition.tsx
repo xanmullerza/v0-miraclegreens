@@ -302,40 +302,108 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
                         {/* Protein */}
                         <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 mb-1">Protein</p>
-                                <p className="text-sm font-bold text-white">
-                                    {pV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({pP}%)</span>
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(pP, 100)}%`, backgroundColor: '#f43f5e' }} />
+                            <button 
+                                onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
+                                className="flex items-center justify-between hover:opacity-80 transition-opacity"
+                            >
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 mb-1">Protein</p>
+                                    <p className="text-sm font-bold text-white">
+                                        {pV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({pP}%)</span>
+                                    </p>
                                 </div>
-                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
-                                    <span>{pV.toFixed(1)}g</span>
-                                    <span>{pR.toFixed(1)}g</span>
+                                <span className="text-slate-400 text-lg">
+                                    {expandedMacro === 'protein' ? '▼' : '▶'}
+                                </span>
+                            </button>
+                            
+                            {expandedMacro !== 'protein' && (
+                                <div className="space-y-1">
+                                    <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(pP, 100)}%`, backgroundColor: '#f43f5e' }} />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
+                                        <span>{pV.toFixed(1)}g</span>
+                                        <span>{pR.toFixed(1)}g</span>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
+
+                            {expandedMacro === 'protein' && (
+                                <div className="space-y-2 border-t border-slate-700 pt-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Histidine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Histidine', 'histidine_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Leucine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Leucine', 'leucine_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Lysine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Lysine', 'lysine_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Methionine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Methionine', 'methionine_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Tryptophan</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Tryptophan', 'tryptophan_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Fat */}
                         <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-1">Fat</p>
-                                <p className="text-sm font-bold text-white">
-                                    {fV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({fP}%)</span>
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(fP, 100)}%`, backgroundColor: '#f59e0b' }} />
+                            <button 
+                                onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
+                                className="flex items-center justify-between hover:opacity-80 transition-opacity"
+                            >
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-1">Fat</p>
+                                    <p className="text-sm font-bold text-white">
+                                        {fV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({fP}%)</span>
+                                    </p>
                                 </div>
-                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
-                                    <span>{fV.toFixed(1)}g</span>
-                                    <span>{fR.toFixed(1)}g</span>
+                                <span className="text-slate-400 text-lg">
+                                    {expandedMacro === 'fat' ? '▼' : '▶'}
+                                </span>
+                            </button>
+                            
+                            {expandedMacro !== 'fat' && (
+                                <div className="space-y-1">
+                                    <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(fP, 100)}%`, backgroundColor: '#f59e0b' }} />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
+                                        <span>{fV.toFixed(1)}g</span>
+                                        <span>{fR.toFixed(1)}g</span>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
+
+                            {expandedMacro === 'fat' && (
+                                <div className="space-y-2 border-t border-slate-700 pt-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Saturated</span>
+                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Saturated Fat'], macroGrams).toFixed(1)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Monounsaturated</span>
+                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Monounsaturated Fat'], macroGrams).toFixed(1)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Polyunsaturated</span>
+                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Polyunsaturated Fat'], macroGrams).toFixed(1)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Omega-3</span>
+                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Omega-3'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
