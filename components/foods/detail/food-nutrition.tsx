@@ -183,7 +183,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
                                 <span className="text-base font-black text-white leading-none">
-                                    {Math.round(energyUnit === 'kJ' ? eV * 4.184 : eV)}
+                                    {Math.round(eV)}
                                 </span>
                                 <span className="text-[8px] text-slate-400 font-bold mt-0.5">{energyUnit}</span>
                             </div>
