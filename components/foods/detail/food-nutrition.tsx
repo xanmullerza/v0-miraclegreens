@@ -215,16 +215,18 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                     <h4 className="font-black flex items-center gap-2 uppercase tracking-widest text-[10px] text-orange-400">
                         <Zap className="h-4 w-4" /> Macronutrients
                     </h4>
-                    <div className="flex items-center gap-2 bg-slate-700 rounded-lg p-2 border border-slate-600">
+                    <div className="flex items-center gap-2 bg-slate-700 rounded-lg p-2 border border-slate-600 hover:border-orange-400/50 transition-colors cursor-pointer group" title="Click to adjust portion size">
                         <input
                             type="number"
                             min="1"
                             max="9999"
                             value={macroGrams}
                             onChange={(e) => setMacroGrams(Math.max(1, parseInt(e.target.value) || 100))}
-                            className="w-20 bg-slate-800 text-white text-center text-sm font-bold rounded px-2 py-1 border border-slate-600 focus:outline-none focus:border-orange-400"
+                            className="w-20 bg-slate-800 text-white text-center text-sm font-bold rounded px-2 py-1 border border-slate-600 focus:outline-none focus:border-orange-400 group-hover:border-orange-400/50 transition-colors cursor-pointer"
+                            title="Edit portion size (1-9999g)"
+                            aria-label="Portion size in grams"
                         />
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">g</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-orange-400/60 transition-colors">g</span>
                     </div>
                 </div>
 
