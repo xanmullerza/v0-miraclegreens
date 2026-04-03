@@ -135,7 +135,7 @@ export const RecipeListItem = ({
                 <div className="p-1 lg:p-0">
                     <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white capitalize">{liveRecipe.title}</h3>
                     <div className="flex items-center gap-2 mt-0.5">
-                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Clock size={8}/>{liveRecipe.prep_time || 0}m</div>
+                        <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Clock size={8}/>{liveRecipe.prepTime || 0}m</div>
                         <div className="flex items-center gap-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-tighter"><Users size={8}/>{liveRecipe.servings}P</div>
                         <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[7px] border-none px-1 py-0">{liveRecipe.type}</Badge>
                     </div>
