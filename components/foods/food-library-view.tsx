@@ -39,10 +39,10 @@ interface FoodsViewProps {
     dropdownContent?: React.ReactNode;
 }
 
-export function FoodsView({ 
-    showAddFood = false, 
-    setShowAddFood, 
-    searchQuery: externalSearchQuery, 
+export function FoodsView({
+    showAddFood = false,
+    setShowAddFood,
+    searchQuery: externalSearchQuery,
     onSearchChange,
     hideControls = false,
     noContainer = false,
@@ -72,7 +72,7 @@ export function FoodsView({
         e.preventDefault();
         e.stopPropagation();
         setCartLoading(food.id);
-        
+
         // Simulate adding to cart
         setTimeout(() => {
             toast.success(`${food.common_name || food.name} added to cart (R${food.price?.toFixed(2) || '0.00'})`);
@@ -217,7 +217,7 @@ export function FoodsView({
             {loading && foods.length === 0 && (
                 <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
                     <Loader2 size={24} className="animate-spin text-emerald-500" />
-                    <p className="text-[10px] font-black uppercase tracking-widest">Loading Library...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest">Loading Foods...</p>
                 </div>
             )}
 
