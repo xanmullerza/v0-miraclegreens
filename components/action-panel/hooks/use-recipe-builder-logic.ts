@@ -88,21 +88,29 @@ export function useRecipeBuilderLogic({
         try {
             const totals = recipeIngredients.reduce((acc, ing) => {
                 const multiplier = (ing.weight_g || 0) / 100;
+                const newMicros = { ...acc.micronutrients };
+                Object.entries(ing.micronutrients || {}).forEach(([key, val]) => {
+                    newMicros[key] = (newMicros[key] || 0) + (val as number) * multiplier;
+                });
                 return {
                     calories: acc.calories + ((ing.calories || 0) * multiplier),
+                    energy_kj: acc.energy_kj + ((ing.energy_kj || 0) * multiplier),
                     protein: acc.protein + ((ing.protein || 0) * multiplier),
                     fat: acc.fat + ((ing.fat || 0) * multiplier),
                     carbs: acc.carbs + ((ing.carbs || 0) * multiplier),
+                    micronutrients: newMicros,
                 };
-            }, { calories: 0, protein: 0, fat: 0, carbs: 0 });
+            }, { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> });
 
             const recipeData = {
                 title: recipeTitle,
                 type: recipeType,
                 calories: Math.round(totals.calories),
+                energy_kj: Math.round(totals.energy_kj),
                 protein: Math.round(totals.protein * 10) / 10,
                 carbs: Math.round(totals.carbs * 10) / 10,
                 fat: Math.round(totals.fat * 10) / 10,
+                micronutrients: totals.micronutrients,
                 prep_time: recipePrepTime,
                 cook_time: recipeCookTime,
                 servings: recipeServings,
