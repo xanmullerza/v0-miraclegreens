@@ -4,7 +4,7 @@ import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 interface UsePlannerNutritionProps {
     plan: any;
     energyUnit: string;
-    userRDAs?: Record<string, number>;
+    userRDAs?: Record<string, number> | null;
     nutrientDisplayMode?: string;
 }
 

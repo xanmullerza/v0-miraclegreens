@@ -5,7 +5,7 @@ interface UseRecipeNutritionProps {
     recipe: any;
     viewMode: 'per-recipe' | 'per-serving';
     energyUnit: string;
-    userRDAs?: Record<string, number>;
+    userRDAs?: Record<string, number> | null;
     nutrientDisplayMode?: string;
 }
 

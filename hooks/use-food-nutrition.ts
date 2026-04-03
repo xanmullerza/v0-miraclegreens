@@ -6,7 +6,7 @@ interface UseFoodNutritionProps {
     selectedPortion: any;
     amount: number;
     energyUnit: string;
-    userRDAs?: Record<string, number>;
+    userRDAs?: Record<string, number> | null;
     nutrientDisplayMode?: string;
 }
 
