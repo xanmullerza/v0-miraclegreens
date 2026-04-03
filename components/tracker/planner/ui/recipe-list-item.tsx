@@ -8,26 +8,23 @@ import { supabase } from '@/lib/supabase';
 import { formatEnergy } from '../utils';
 import { RecipeListItemProps } from '../types';
 import { useShoppingList } from '@/hooks/use-shopping-list';
-import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { toast } from 'sonner';
 
 export const RecipeListItem = ({
     recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEaten, isEaten = false,
     pantryItems = [], onRecipeClick, showFlavours = false, showSupplements = false,
-}: RecipeListItemProps) => {
+    selectedServings = 1,
+}: RecipeListItemProps & { selectedServings?: number }) => {
     const router = useRouter();
     const [liveIngs, setLiveIngs] = useState(recipe.ingredients || []);
     const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
     const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
     const [addedToList, setAddedToList] = useState(false);
 
-    // Get nutrition view mode from recipe filter context
-    const { filters } = useRecipeFilter();
-    const nutritionViewMode = filters.nutritionViewMode;
-
-    // Calculate nutrition values based on view mode (same logic as recipes tab)
-    const servings = Math.max(recipe.servings || 1, 1);
-    const sf = nutritionViewMode === 'per-serving' ? 1 / servings : 1;
+    // Calculate nutrition values based on selectedServings (always normalized from 1 serving)
+    const originalServings = recipe.servings || 1;
+    // Scale factor: normalize to 1 serving, then multiply by selectedServings
+    const sf = (1 / originalServings) * selectedServings;
     const displayCalories = (recipe.calories || 0) * sf;
     const displayCarbs = (recipe.carbs || 0) * sf;
     const displayFat = (recipe.fat || 0) * sf;

@@ -18,7 +18,6 @@ import {
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 import { TrackerTabShell, SortOption } from '../tracker-tab-shell';
 
@@ -59,9 +58,7 @@ export function PlannerContent({
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [planLength, setPlanLength] = useState<PlanLength>('daily');
     const [showLengthMenu, setShowLengthMenu] = useState(false);
-
-    // Get nutrition view mode from recipe filter context
-    const { filters, updateFilter } = useRecipeFilter();
+    const [selectedServings, setSelectedServings] = useState<number>(1);
 
     // Override local state with external props if provided
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : state.showFavoritesOnly;
@@ -153,31 +150,24 @@ export function PlannerContent({
 
     const lengthSwitcher = (
         <div className="flex items-center gap-2">
-            {/* Nutrition View Mode Toggle */}
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <button 
-                    onClick={() => updateFilter('nutritionViewMode', 'per-serving')}
-                    className={cn(
-                        "px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
-                        filters.nutritionViewMode === 'per-serving'
-                            ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
-                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                    )}
-                    title="Show nutrition per serving"
+            {/* Servings Adjuster */}
+            <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <button
+                    onClick={() => setSelectedServings(Math.max(0.5, selectedServings - 0.5))}
+                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
+                    title="Decrease servings"
                 >
-                    Per Serving
+                    <ChevronDown size={12} />
                 </button>
-                <button 
-                    onClick={() => updateFilter('nutritionViewMode', 'total')}
-                    className={cn(
-                        "px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-lg transition-all",
-                        filters.nutritionViewMode === 'total'
-                            ? "bg-white dark:bg-slate-700 text-emerald-600 shadow-sm"
-                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                    )}
-                    title="Show total nutrition for recipe"
+                <div className="px-2 py-1 text-[7px] font-bold uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap min-w-[50px] text-center">
+                    {selectedServings.toFixed(1)}x
+                </div>
+                <button
+                    onClick={() => setSelectedServings(selectedServings + 0.5)}
+                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
+                    title="Increase servings"
                 >
-                    Total
+                    <ChevronDown size={12} className="rotate-180" />
                 </button>
             </div>
 
@@ -327,6 +317,7 @@ export function PlannerContent({
                                     isEaten={eatenMeals.has(meal.mealLabel)}
                                     pantryItems={pantryItems}
                                     onRecipeClick={onRecipeClick}
+                                    selectedServings={selectedServings}
                                 />
                             ))}
                         </div>

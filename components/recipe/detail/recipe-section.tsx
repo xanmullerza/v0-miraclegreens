@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Plus, Minus } from 'lucide-react';
 import { formatEnergyValue } from '@/lib/utils/nutrition-utils';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import type { useRecipeDetail } from './use-recipe-detail';
@@ -14,7 +14,7 @@ interface RecipeSectionProps {
 }
 
 export function RecipeSection({ ctx }: RecipeSectionProps) {
-    const { recipe, ingredients, instructions, calculatedNutrition, nutritionViewMode, setNutritionViewMode, setShowTagsDialog, flippedCards, setFlippedCards, energyUnit } = ctx;
+    const { recipe, ingredients, instructions, calculatedNutrition, selectedServings, setSelectedServings, setShowTagsDialog, flippedCards, setFlippedCards, energyUnit } = ctx;
 
     if (!recipe) return null;
 
@@ -30,14 +30,25 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             : '-'}
                     </p>
                 </div>
-                <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700 h-fit">
-                        {(['per-serving', 'total'] as const).map(m => (
-                            <button key={m} onClick={() => setNutritionViewMode(m)} className={cn("px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest rounded-md transition-all",
-                                nutritionViewMode === m ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400 hover:text-slate-600")}>
-                                {m === 'per-serving' ? 'Per Serving' : 'Total'}
-                            </button>
-                        ))}
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700 h-fit">
+                    <button
+                        onClick={() => setSelectedServings(Math.max(1, selectedServings - 1))}
+                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
+                        title="Decrease servings"
+                    >
+                        <Minus size={14} />
+                    </button>
+                    <div className="px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap min-w-[60px] text-center">
+                        {selectedServings.toFixed(1)} Serving{selectedServings !== 1 ? 's' : ''}
                     </div>
+                    <button
+                        onClick={() => setSelectedServings(selectedServings + 1)}
+                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
+                        title="Increase servings"
+                    >
+                        <Plus size={14} />
+                    </button>
+                </div>
                 <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Meal Type</p>
                     <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">
@@ -102,8 +113,9 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     </h3>
                     <div className="grid gap-2">
                         {ingredients.map((ing, idx) => {
-                            const servings = recipe.servings || 1;
-                            const weightScale = nutritionViewMode === 'total' ? 1 : (1 / servings);
+                            const originalServings = recipe.servings || 1;
+                            // Normalize to 1 serving, then scale by selectedServings
+                            const weightScale = (1 / originalServings) * selectedServings;
                             const displayWeight = Math.round((ing.weight_g || 0) * weightScale * 10) / 10;
                             
                             const food = ing.food_items;
@@ -122,7 +134,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             const isGenericItem = ing.amount?.toLowerCase().includes('item') || ing.amount?.toLowerCase().includes('unit');
                             const cleanAmount = isGenericItem && displayWeight > 0 
                                 ? `${displayWeight}g` 
-                                : (nutritionViewMode === 'total' ? ing.amount : scaleIngredient(ing.amount || '', 1 / servings));
+                                : scaleIngredient(ing.amount || '', weightScale);
 
                             return (
                                 <div

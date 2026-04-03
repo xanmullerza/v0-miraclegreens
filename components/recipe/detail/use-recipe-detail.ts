@@ -53,8 +53,8 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
     
-    // Nutrition Display Mode
-    const [nutritionViewMode, setNutritionViewMode] = useState<'per-serving' | 'total'>('per-serving');
+    // Nutrition Display Mode - servings multiplier for scaling
+    const [selectedServings, setSelectedServings] = useState<number>(1);
     
     // Threshold state for minerals/vitamins
     const [mineralThreshold, setMineralThreshold] = useState<50 | 75 | 100>(75);
@@ -758,8 +758,8 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         setActiveSection,
         
         calculatedNutrition,
-        nutritionViewMode,
-        setNutritionViewMode,
+        selectedServings,
+        setSelectedServings,
         totalWeight,
         
         mineralThreshold,
