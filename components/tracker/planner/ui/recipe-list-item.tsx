@@ -27,7 +27,7 @@ export const RecipeListItem = ({
     const currentServings = Math.max(liveRecipe.servings || 1, 1);
     const sf = (1 / currentServings) * selectedServings;
     const displayCalories = (liveRecipe.calories || 0) * sf;
-    const displayEnergy = (liveRecipe.energy_kj || liveRecipe.energyKj || 0) * sf;
+    const displayEnergy = (liveRecipe.energyKj || 0) * sf;
     const displayCarbs = (liveRecipe.carbs || 0) * sf;
     const displayFat = (liveRecipe.fat || 0) * sf;
     const displayProtein = (liveRecipe.protein || 0) * sf;
@@ -46,7 +46,13 @@ export const RecipeListItem = ({
             .single()
             .then(({ data: recipeData, error: recipeError }) => {
                 if (!cancelled && recipeData && !recipeError) {
-                    setLiveRecipe(recipeData);
+                    // Map snake_case database fields to camelCase Recipe type
+                    const mappedRecipe = {
+                        ...recipeData,
+                        energyKj: (recipeData as any).energy_kj,
+                        prepTime: (recipeData as any).prep_time,
+                    };
+                    setLiveRecipe(mappedRecipe);
                 }
             });
         
