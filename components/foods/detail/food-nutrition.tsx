@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Activity, Zap, Dna, Layers, X } from 'lucide-react';
+import { Zap, Dna, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
@@ -552,19 +552,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
     return (
         <div className="space-y-6">
-            <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex items-center justify-between gap-4">
-                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2 shrink-0">
-                    <Activity size={18} />
-                    Essential Nutrients
-                </h3>
-                <span className="text-xs font-black italic text-slate-400 tracking-tight">
-                    {selectedPortion ? `${amount} × ${selectedPortion.label}` : `${amount}g`}
-                </span>
-            </div>
-
-            <MacroNutrients energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
-
-            <MicroNutrients userRDAs={userRDAs} />
+                <MacroNutrients energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
 
             <Phytonutrients />
 
