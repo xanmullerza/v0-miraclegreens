@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Activity, Zap, Gem, Droplet, Battery, Dna, ChevronDown, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -9,6 +9,7 @@ import { DidYouKnow } from '@/components/ux/DidYouKnow';
 
 export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const router = useRouter();
+    const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
     const { 
         food, amount, selectedPortion, energyUnit, dailyTargets, userRDAs, nutrientDisplayMode,
         showAdvancedNutrition, setShowAdvancedNutrition, breakdownNutrient, setBreakdownNutrient
@@ -247,6 +248,139 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
     if (!food) return null;
 
+    // Modern Macronutrients component with donut chart
+    const MacroNutrients = ({ getVal, energyUnit, dailyTargets, userRDAs }: any) => {
+        const eV = getVal(['Energy', 'energy_kcal', 'Calories']);
+        const pV = getVal(['Protein', 'protein_g']);
+        const cV = getVal(['Carbohydrates', 'carbs_g']);
+        const fV = getVal(['Fat', 'fat_g']);
+
+        const pR = userRDAs?.['Protein'] || dailyTargets.protein;
+        const cR = userRDAs?.['Carbs'] || dailyTargets.carbs;
+        const fR = userRDAs?.['Fat'] || dailyTargets.fat;
+        const eR = userRDAs?.['Energy'] || dailyTargets.energy;
+
+        const pP = Math.min(Math.round((pV / pR) * 100), 100);
+        const cP = Math.min(Math.round((cV / cR) * 100), 100);
+        const fP = Math.min(Math.round((fV / fR) * 100), 100);
+
+        const pCal = pV * 4;
+        const cCal = cV * 4;
+        const fCal = fV * 9;
+        const tCal = pCal + cCal + fCal || 1;
+        const R = 44, STR = 9, CC = 2 * Math.PI * R;
+        const cFr = cCal / tCal, fFr = fCal / tCal, pFr = pCal / tCal;
+        let o = 0;
+        const cS = { strokeDasharray: `${cFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` };
+        o += cFr;
+        const fS = { strokeDasharray: `${fFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` };
+        o += fFr;
+        const pS = { strokeDasharray: `${pFr * CC} ${CC}`, strokeDashoffset: `${-o * CC}` };
+
+        return (
+            <div className="space-y-6 p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 mb-6">
+                <div className="flex items-center justify-between">
+                    <h4 className="font-black flex items-center gap-2 uppercase tracking-widest text-[10px] text-orange-400">
+                        <Zap className="h-4 w-4" /> Macronutrients
+                    </h4>
+                    <div className="flex bg-slate-700 rounded-lg p-0.5 border border-slate-600">
+                        {([50, 75, 100] as const).map((t) => (
+                            <button
+                                key={t}
+                                onClick={() => setUniversalThreshold(t)}
+                                className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
+                                    universalThreshold === t ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-300')}
+                            >
+                                {t}%
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Macros Grid - Donut + 3 Cards */}
+                <div className="flex gap-3">
+                    {/* Energy Donut */}
+                    <div className="flex-shrink-0 p-4 rounded-2xl border border-slate-700 bg-slate-800/50">
+                        <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
+                            <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
+                                <circle cx="48" cy="48" r={R} fill="none" stroke="currentColor" strokeWidth={STR} className="text-slate-700" />
+                                <circle cx="48" cy="48" r={R} fill="none" stroke="#3b82f6" strokeWidth={STR} strokeLinecap="butt" style={{ ...cS, transition: 'all 0.7s ease' }} />
+                                <circle cx="48" cy="48" r={R} fill="none" stroke="#f59e0b" strokeWidth={STR} strokeLinecap="butt" style={{ ...fS, transition: 'all 0.7s ease' }} />
+                                <circle cx="48" cy="48" r={R} fill="none" stroke="#f43f5e" strokeWidth={STR} strokeLinecap="butt" style={{ ...pS, transition: 'all 0.7s ease' }} />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-base font-black text-white leading-none">
+                                    {Math.round(energyUnit === 'kJ' ? eV * 4.184 : eV)}
+                                </span>
+                                <span className="text-[8px] text-slate-400 font-bold mt-0.5">{energyUnit}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Macro Cards */}
+                    <div className="flex-1 grid grid-cols-3 gap-3">
+                        {/* Carbs */}
+                        <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-1">Carbs</p>
+                                <p className="text-sm font-bold text-white">
+                                    {cV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({cP}%)</span>
+                                </p>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(cP, 100)}%`, backgroundColor: '#3b82f6' }} />
+                                </div>
+                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
+                                    <span>{cV.toFixed(1)}g</span>
+                                    <span>{cR.toFixed(1)}g</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Protein */}
+                        <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 mb-1">Protein</p>
+                                <p className="text-sm font-bold text-white">
+                                    {pV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({pP}%)</span>
+                                </p>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(pP, 100)}%`, backgroundColor: '#f43f5e' }} />
+                                </div>
+                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
+                                    <span>{pV.toFixed(1)}g</span>
+                                    <span>{pR.toFixed(1)}g</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Fat */}
+                        <div className="p-4 rounded-2xl border border-slate-700 bg-slate-800/50 flex flex-col gap-3">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-1">Fat</p>
+                                <p className="text-sm font-bold text-white">
+                                    {fV.toFixed(1)}g <span className="text-[10px] text-slate-400 font-normal">({fP}%)</span>
+                                </p>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(fP, 100)}%`, backgroundColor: '#f59e0b' }} />
+                                </div>
+                                <div className="flex items-center justify-between text-[9px] font-semibold text-slate-400">
+                                    <span>{fV.toFixed(1)}g</span>
+                                    <span>{fR.toFixed(1)}g</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="space-y-6">
             <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex items-center justify-between gap-4">
@@ -259,12 +393,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                 </span>
             </div>
 
-            <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Detailed breakdown of energy and macro density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
-                'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
-                'Protein': ['Protein', 'protein_g', 'protein'],
-                'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
-                'Fat': ['Fat', 'fat_g', 'fat']
-            }} />
+            <MacroNutrients getVal={getVal} energyUnit={energyUnit} dailyTargets={dailyTargets} userRDAs={userRDAs} />
 
             <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
                 'Sodium': ['Sodium', 'sodium_mg'],
