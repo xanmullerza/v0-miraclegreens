@@ -1,4 +1,4 @@
-﻿export type DietType = 'anything' | 'vegan' | 'vegetarian' | 'pescatarian';
+export type DietType = 'anything' | 'vegan' | 'vegetarian' | 'pescatarian';
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
 export interface Ingredient {
@@ -31,6 +31,7 @@ export interface Recipe {
     ingredients: Ingredient[];
     instructions: string[];
     servings?: number;
+    originalServings?: number;
     micronutrients?: Record<string, number>;
     phytonutrients?: Record<string, string>;
     calculated_nutrition?: import('@/lib/utils/nutrition-calculator').CalculatedNutrition;
