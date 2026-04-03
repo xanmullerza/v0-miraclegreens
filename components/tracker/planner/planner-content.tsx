@@ -10,8 +10,8 @@ import { useRDA } from '@/hooks/use-rda';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
-    Calendar, RotateCcw, Scale, LayoutGrid, Info, 
-    ChevronDown, ChevronUp, Sparkles, ChefHat, 
+    Calendar, RotateCcw, LayoutGrid, Info, 
+    ChevronDown, Sparkles, ChefHat, 
     Search, Filter as FilterIcon, ArrowDownUp, 
     Clock, Flame, Dumbbell, List 
 } from 'lucide-react';
@@ -64,7 +64,6 @@ export function PlannerContent({
     
     const { handleGenerate, handleMarkEaten, handleShuffleAll } = usePlannerActions(state, actions);
     const { pantryItems } = usePantry();
-    const [showDailyNutrients, setShowDailyNutrients] = useState(false);
 
     const { step, plan, eatenMeals, unit, generating } = state;
 
@@ -332,34 +331,16 @@ export function PlannerContent({
                                 </div>
                             </div>
                         )}
-                        <div className="pt-8">
-                            <button
-                                onClick={() => setShowDailyNutrients(!showDailyNutrients)}
-                                className="w-full py-6 flex items-center justify-between px-8 rounded-3xl bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 group"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
-                                        <Scale size={24} />
-                                    </div>
-                                    <div className="text-left">
-                                        <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-500">Cumulative Analysis</p>
-                                        <h4 className="text-lg font-black uppercase tracking-tighter">Molecular Daily Breakdown</h4>
-                                    </div>
-                                </div>
-                                {showDailyNutrients ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                            </button>
 
-                            {showDailyNutrients && (
-                                <div className="mt-8 p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
-                                    <DailyNutrition 
-                                        plan={plan} 
-                                        userRDAs={userRDAs}
-                                        profile={profile}
-                                        energyUnit={unit}
-                                        nutrientDisplayMode="both"
-                                    />
-                                </div>
-                            )}
+                        {/* Daily Nutrition Display */}
+                        <div className="mt-8 p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
+                            <DailyNutrition 
+                                plan={plan} 
+                                userRDAs={userRDAs}
+                                profile={profile}
+                                energyUnit={unit}
+                                nutrientDisplayMode="both"
+                            />
                         </div>
                     </div>
                 )}
