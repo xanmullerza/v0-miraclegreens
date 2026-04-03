@@ -55,7 +55,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
             energy_kj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
             micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
         },
-        viewMode: nutritionViewMode as 'per-recipe' | 'per-serving',
+        viewMode: (nutritionViewMode === 'total' ? 'per-recipe' : 'per-serving') as 'per-recipe' | 'per-serving',
         energyUnit,
         userRDAs,
         nutrientDisplayMode,
@@ -74,10 +74,10 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                     </h3>
                 </div>
                 <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
-                    {(['per-recipe', 'per-serving'] as const).map(mode => (
+                    {(['total', 'per-serving'] as const).map(mode => (
                         <button
                             key={mode}
-                            onClick={() => setNutritionViewMode(mode)}
+                            onClick={() => setNutritionViewMode(mode as 'per-serving' | 'total')}
                             className={cn(
                                 'flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
                                 nutritionViewMode === mode
@@ -85,7 +85,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                                     : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                             )}
                         >
-                            {mode === 'per-recipe' ? 'Recipe' : 'Per Serving'}
+                            {mode === 'total' ? 'Recipe' : 'Per Serving'}
                         </button>
                     ))}
                 </div>
