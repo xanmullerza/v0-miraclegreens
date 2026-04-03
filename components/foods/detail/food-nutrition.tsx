@@ -536,6 +536,8 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
             </div>
         );
     };
+
+    return (
         <div className="space-y-6">
             <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex items-center justify-between gap-4">
                 <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2 shrink-0">
