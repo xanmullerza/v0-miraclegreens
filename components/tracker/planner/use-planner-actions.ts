@@ -15,14 +15,15 @@ export function usePlannerActions(state: any, actions: any) {
     const { items: shoppingItems, addItem: addShoppingItem } = useShoppingList();
     const { filters } = useRecipeFilter();
     const { searchQuery } = useSearch();
-    const { setGenerating, setStep, setPlan, setEatenMeals } = actions;
+    const { profile, dailyTargets } = useUserPreferences();
+    const { setGenerating, setPlan, setEatenMeals } = actions;
 
     const handleGenerate = async () => {
         setGenerating(true);
         try {
             const newPlan = await generateDailyPlan({
-                targetCalories: state.calories,
-                diet: state.diet,
+                targetCalories: dailyTargets.energy || 2000,
+                diet: (profile.dietType as DietType) || 'anything',
                 numMeals: 3,
                 favoritesOnly: state.showFavoritesOnly,
                 pantryItems,
@@ -35,7 +36,6 @@ export function usePlannerActions(state: any, actions: any) {
                 strictPantry: filters.pantryMode === 'pantry-only'
             });
             setPlan(newPlan);
-            setStep(3);
         } catch (error) {
             console.error('Generation error:', error);
             toast.error('Failed to generate plan');
