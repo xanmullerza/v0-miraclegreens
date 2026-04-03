@@ -286,15 +286,15 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                 <div className="space-y-2 border-t border-slate-700 pt-3">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Starch</span>
-                                        <span className="text-[10px] font-bold text-blue-400">{getValForCustomGrams(['Starch', 'starch_g'], macroGrams).toFixed(1)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Starch', 'starch_g'], macroGrams).toFixed(1)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Fiber</span>
-                                        <span className="text-[10px] font-bold text-blue-400">{getValForCustomGrams(['Fiber', 'fiber_g'], macroGrams).toFixed(1)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Fiber', 'fiber_g'], macroGrams).toFixed(1)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Sugar</span>
-                                        <span className="text-[10px] font-bold text-blue-400">{getValForCustomGrams(['Sugars', 'sugars_g'], macroGrams).toFixed(1)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Sugars', 'sugars_g'], macroGrams).toFixed(1)}g</span>
                                     </div>
                                 </div>
                             )}
@@ -333,39 +333,39 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                 <div className="space-y-2 border-t border-slate-700 pt-3">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Histidine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Histidine', 'histidine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Histidine', 'histidine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Isoleucine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Isoleucine', 'isoleucine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Isoleucine', 'isoleucine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Leucine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Leucine', 'leucine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Leucine', 'leucine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Lysine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Lysine', 'lysine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Lysine', 'lysine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Methionine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Methionine', 'methionine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Methionine', 'methionine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Phenylalanine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Phenylalanine', 'phenylalanine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Phenylalanine', 'phenylalanine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Threonine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Threonine', 'threonine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Threonine', 'threonine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Tryptophan</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Tryptophan', 'tryptophan_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Tryptophan', 'tryptophan_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Valine</span>
-                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Valine', 'valine_g'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Valine', 'valine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                 </div>
                             )}
@@ -404,27 +404,27 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                 <div className="space-y-2 border-t border-slate-700 pt-3">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Saturated</span>
-                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Saturated Fat'], macroGrams).toFixed(1)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Saturated Fat'], macroGrams).toFixed(1)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Monounsaturated</span>
-                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Monounsaturated Fat'], macroGrams).toFixed(1)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Monounsaturated Fat'], macroGrams).toFixed(1)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Polyunsaturated</span>
-                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Polyunsaturated Fat'], macroGrams).toFixed(1)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Polyunsaturated Fat'], macroGrams).toFixed(1)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Omega-3</span>
-                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Omega-3'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Omega-3'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Omega-6</span>
-                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Omega-6'], macroGrams).toFixed(2)}g</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Omega-6'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Cholesterol</span>
-                                        <span className="text-[10px] font-bold text-amber-400">{getValForCustomGrams(['Cholesterol'], macroGrams).toFixed(0)}mg</span>
+                                        <span className="text-[10px] font-bold">{getValForCustomGrams(['Cholesterol'], macroGrams).toFixed(0)}mg</span>
                                     </div>
                                 </div>
                             )}
