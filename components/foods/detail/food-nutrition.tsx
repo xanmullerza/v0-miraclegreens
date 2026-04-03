@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Activity, Zap, Dna, ChevronDown, Layers, X } from 'lucide-react';
+import { Activity, Zap, Dna, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
-import { ExtraMarkersSection } from './ExtraMarkersSection';
-import { BiologicalRatiosSection } from './BiologicalRatiosSection';
 
 export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const router = useRouter();
@@ -14,7 +12,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
     const { 
         food, amount, selectedPortion, energyUnit, dailyTargets, userRDAs, nutrientDisplayMode,
-        showAdvancedNutrition, setShowAdvancedNutrition, breakdownNutrient, setBreakdownNutrient
+        breakdownNutrient, setBreakdownNutrient
     } = ctx;
 
     const getVal = (keys: string[]) => {
@@ -493,41 +491,6 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
             <MicroNutrients getVal={getVal} userRDAs={userRDAs} />
 
             <Phytonutrients />
-
-            <button
-                onClick={() => setShowAdvancedNutrition(!showAdvancedNutrition)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-900/10 hover:bg-amber-100/60 dark:hover:bg-amber-900/20 transition-all group"
-            >
-                <span className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400">
-                    <Dna size={14} />
-                    Advanced Nutrition
-                </span>
-                <ChevronDown className={`w-4 h-4 text-amber-500 transition-transform duration-200 ${showAdvancedNutrition ? 'rotate-180' : ''}`} />
-            </button>
-
-            {showAdvancedNutrition && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <ExtraMarkersSection 
-                        getVal={getVal}
-                        food={food}
-                        setBreakdownNutrient={setBreakdownNutrient}
-                        nutrientDisplayMode={nutrientDisplayMode}
-                        userRDAs={userRDAs}
-                        energyUnit={energyUnit}
-                        dailyTargets={dailyTargets}
-                    />
-
-                    <BiologicalRatiosSection 
-                        getVal={getVal}
-                        food={food}
-                        setBreakdownNutrient={setBreakdownNutrient}
-                        nutrientDisplayMode={nutrientDisplayMode}
-                        userRDAs={userRDAs}
-                        energyUnit={energyUnit}
-                        dailyTargets={dailyTargets}
-                    />
-                </div>
-            )}
 
             {/* NUTRIENT BREAKDOWN MODAL */}
             {breakdownNutrient && food.micronutrients && (
