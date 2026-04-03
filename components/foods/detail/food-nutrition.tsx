@@ -380,16 +380,24 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                         <Dna className="h-4 w-4" /> Micronutrients
                     </h4>
                     <div className="flex bg-slate-700 rounded-lg p-0.5 border border-slate-600">
-                        {([50, 75, 100] as const).map((t) => (
-                            <button
-                                key={t}
-                                onClick={() => setUniversalThreshold(t)}
-                                className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
-                                    universalThreshold === t ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-300')}
-                            >
-                                {t}%
-                            </button>
-                        ))}
+                        {([50, 75, 100] as const).map((t) => {
+                            const getThresholdColor = (threshold: number) => {
+                                if (threshold === 50) return 'bg-amber-500/20 text-amber-400 border border-amber-500/50';
+                                if (threshold === 75) return 'bg-blue-500/20 text-blue-400 border border-blue-500/50';
+                                if (threshold === 100) return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50';
+                                return '';
+                            };
+                            return (
+                                <button
+                                    key={t}
+                                    onClick={() => setUniversalThreshold(t)}
+                                    className={cn('flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
+                                        universalThreshold === t ? getThresholdColor(t) : 'text-slate-400 hover:text-slate-300')}
+                                >
+                                    {t}%
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -417,7 +425,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                         <span
                                             className={cn(
                                                 'text-[10px] font-bold',
-                                                d.pct >= 100 ? 'text-emerald-400' : d.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-500'
+                                                d.pct >= 100 ? 'text-emerald-400' : d.pct >= 50 ? 'text-blue-400' : d.pct >= 25 ? 'text-yellow-400' : 'text-red-400'
                                             )}
                                         >
                                             {nutrientDisplayMode === 'value' && `${d.val.toFixed(1)}`}
@@ -435,7 +443,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                     <span
                                         className={cn(
                                             'text-[10px] font-bold',
-                                            cholineData.pct >= 100 ? 'text-emerald-400' : cholineData.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-500'
+                                            cholineData.pct >= 100 ? 'text-emerald-400' : cholineData.pct >= 50 ? 'text-blue-400' : cholineData.pct >= 25 ? 'text-yellow-400' : 'text-red-400'
                                         )}
                                     >
                                         {nutrientDisplayMode === 'value' && `${cholineData.val.toFixed(1)} mg`}
@@ -469,7 +477,7 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                         <span
                                             className={cn(
                                                 'text-[10px] font-bold',
-                                                d.pct >= 100 ? 'text-emerald-400' : d.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-500'
+                                                d.pct >= 100 ? 'text-emerald-400' : d.pct >= 50 ? 'text-blue-400' : d.pct >= 25 ? 'text-yellow-400' : 'text-red-400'
                                             )}
                                         >
                                             {nutrientDisplayMode === 'value' && `${d.val.toFixed(1)} mg`}
