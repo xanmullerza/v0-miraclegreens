@@ -114,6 +114,14 @@ export function usePlannerState() {
 
         const validatePlan = async () => {
             try {
+                // Version bump to clear broken nutrition caches
+                if (plan && !(plan as any)._version) {
+                    console.warn('Clearing stale plan to apply new nutritional calculations.');
+                    setPlan(null);
+                    setStep(1);
+                    return;
+                }
+
                 const recipeIds = [
                     plan.breakfast?.id,
                     plan.lunch?.id,

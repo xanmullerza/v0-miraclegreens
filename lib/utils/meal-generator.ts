@@ -521,8 +521,9 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             micronutrients: aggregatedMicro,
             phytonutrients: aggregatePhytonutrients(allRecipeIds),
             recipeMicronutrients: planRecipeMicros,
-            recipePhytonutrients: planRecipePhytos
-        };
+            recipePhytonutrients: planRecipePhytos,
+            _version: 1.1
+        } as DailyPlan;
 
         const diff = Math.abs(targetCalories - totalCalories);
         const calScore = 1 - Math.min(1, diff / targetCalories);
