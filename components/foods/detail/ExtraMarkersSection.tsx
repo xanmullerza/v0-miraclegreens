@@ -1,5 +1,5 @@
-import { Activity } from 'lucide-react';
-import { NutrientGrid } from './NutrientGrid';
+// TODO: Re-import NutrientGrid once polished
+// import { NutrientGrid } from './NutrientGrid';
 
 interface ExtraMarkersSectionProps {
     getVal: (keys: string[]) => number;
@@ -20,26 +20,6 @@ export function ExtraMarkersSection({
     energyUnit,
     dailyTargets 
 }: ExtraMarkersSectionProps) {
-    return (
-        <NutrientGrid
-            title="Extra Markers"
-            icon={Activity}
-            theme="amber"
-            subtitle="Extra health markers worth tracking"
-            forceRaw={true}
-            items={{
-                'Fiber': ['Fiber', 'fiber_g'],
-                'Sugars': ['Sugars', 'sugars_g'],
-                'Oxalate': ['Oxalate', 'oxalate_mg'],
-                'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
-            }}
-            food={food}
-            getVal={getVal}
-            setBreakdownNutrient={setBreakdownNutrient}
-            nutrientDisplayMode={nutrientDisplayMode}
-            userRDAs={userRDAs}
-            energyUnit={energyUnit}
-            dailyTargets={dailyTargets}
-        />
-    );
+    // TODO: Render NutrientGrid component after polish
+    return null;
 }
