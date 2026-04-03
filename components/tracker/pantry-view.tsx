@@ -102,7 +102,7 @@ export function PantryView({
     const [loading, setLoading] = useState(true);
     const { searchQuery, setSearchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-    const { dailyPlan, updateDailyPlan, energyUnit, measurementUnit } = useUserPreferences();
+    const { energyUnit, measurementUnit } = useUserPreferences();
 
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);

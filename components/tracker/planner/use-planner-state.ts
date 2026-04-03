@@ -15,10 +15,9 @@ export interface PlannerState {
 export function usePlannerState() {
     const {
         energyUnit: unit,
-        dailyPlan: plan,
-        updateDailyPlan: setPlan,
     } = useUserPreferences();
 
+    const [plan, setPlan] = useState<any>(null);
     const [generating, setGenerating] = useState(false);
     const [pageMode, setPageMode] = useState<'planner' | 'maker'>('planner');
     const [makerMode, setMakerMode] = useState<'menu' | 'food' | 'meal' | 'mix'>('menu');

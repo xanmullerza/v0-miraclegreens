@@ -59,7 +59,7 @@ export function FoodsView() {
     const [loading, setLoading] = useState(true);
     const { searchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-    const { dailyPlan, updateDailyPlan, measurementUnit } = useUserPreferences();
+    const { measurementUnit } = useUserPreferences();
 
     const toggleGroup = (groupName: string, e: React.MouseEvent) => {
         e.stopPropagation();

@@ -60,8 +60,6 @@ interface UserPreferencesContextType {
         carbs: number;
         fat: number;
     };
-    dailyPlan: DailyPlan | null;
-    updateDailyPlan: (plan: DailyPlan | null) => void;
     showRDADrawer: boolean;
     setShowRDADrawer: (show: boolean) => void;
     profileLoaded: boolean;
@@ -95,7 +93,6 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         isPremium: false
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
-    const [dailyPlan, setDailyPlanState] = useState<DailyPlan | null>(null);
     const [showRDADrawer, setShowRDADrawer] = useState(false);
     const [profileLoaded, setProfileLoaded] = useState(false);
 
@@ -319,10 +316,6 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("skipPlannerQuiz", String(skip));
     };
 
-    const updateDailyPlan = (plan: DailyPlan | null) => {
-        setDailyPlanState(plan);
-    };
-
     const dailyTargets = calculateIndividualTargets({
         weight: Number(profile.weight) || 70,
         height: Number(profile.height) || 170,
@@ -351,8 +344,6 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             headerStyle,
             setHeaderStyle,
             dailyTargets,
-            dailyPlan,
-            updateDailyPlan,
             showRDADrawer,
             setShowRDADrawer,
             profileLoaded
