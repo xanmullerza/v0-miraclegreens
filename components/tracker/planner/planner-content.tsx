@@ -224,6 +224,9 @@ export function PlannerContent({
         }
     }, [user, isProfileIncomplete, plan, generating, profileLoaded, authReady, hasAttemptedInitial]);
 
+    // Unified Loading State Logic
+    const isLoading = !profileLoaded || !authReady || user === undefined || generating || (user && !plan && !hasAttemptedInitial);
+
     return (
         <TrackerTabShell
             title="Planner"
@@ -242,10 +245,10 @@ export function PlannerContent({
             dropdownContent={lengthSwitcher}
         >
             <div className="space-y-8 py-4">
-                {!profileLoaded || !authReady || user === undefined ? (
+                {isLoading ? (
                     <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
                         <Loader2 size={24} className="animate-spin text-emerald-500" />
-                        <p className="text-[10px] font-black uppercase tracking-widest">Verifying Authentication...</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest italic">Loading meal plan...</p>
                     </div>
                 ) : user === null ? (
                     <div className="flex flex-col items-center justify-center space-y-6 pt-4">
@@ -273,7 +276,7 @@ export function PlannerContent({
                     <div className="flex flex-col items-center justify-center space-y-6 pt-4">
                         <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
                             <p className="text-sm font-medium text-white/90 leading-relaxed">
-                                Welcome, {user.user_metadata?.full_name || 'User'}!
+                                Welcome, {user?.user_metadata?.full_name || 'User'}!
                                 <br />
                                 <span className="text-emerald-400 font-bold block mt-1">Complete your profile to generate a personalised meal plan.</span>
                             </p>
@@ -286,11 +289,6 @@ export function PlannerContent({
                                 </Button>
                             </div>
                         </div>
-                    </div>
-                ) : generating || (user && !plan && !hasAttemptedInitial) ? (
-                    <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <Loader2 size={24} className="animate-spin text-emerald-500" />
-                        <p className="text-[10px] font-black uppercase tracking-widest">Loading meal plan...</p>
                     </div>
                 ) : (user && !plan && hasAttemptedInitial) ? (
                      <div className="flex flex-col items-center justify-center space-y-6 pt-4">
