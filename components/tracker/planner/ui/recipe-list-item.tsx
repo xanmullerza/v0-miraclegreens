@@ -26,11 +26,12 @@ export const RecipeListItem = ({
     const nutritionViewMode = filters.nutritionViewMode;
 
     // Calculate nutrition values based on view mode
-    const servings = recipe.servings || 1;
-    const displayCalories = nutritionViewMode === 'per-serving' ? (recipe.calories || 0) / servings : (recipe.calories || 0);
-    const displayCarbs = nutritionViewMode === 'per-serving' ? (recipe.carbs || 0) / servings : (recipe.carbs || 0);
-    const displayFat = nutritionViewMode === 'per-serving' ? (recipe.fat || 0) / servings : (recipe.fat || 0);
-    const displayProtein = nutritionViewMode === 'per-serving' ? (recipe.protein || 0) / servings : (recipe.protein || 0);
+    // Use originalServings to properly scale the toggle (planner recipes have servings:1 but originalServings from DB)
+    const originalServings = (recipe as any).originalServings || recipe.servings || 1;
+    const displayCalories = nutritionViewMode === 'per-serving' ? (recipe.calories || 0) / originalServings : (recipe.calories || 0);
+    const displayCarbs = nutritionViewMode === 'per-serving' ? (recipe.carbs || 0) / originalServings : (recipe.carbs || 0);
+    const displayFat = nutritionViewMode === 'per-serving' ? (recipe.fat || 0) / originalServings : (recipe.fat || 0);
+    const displayProtein = nutritionViewMode === 'per-serving' ? (recipe.protein || 0) / originalServings : (recipe.protein || 0);
 
     // 1. Fetch fresh ingredients (to avoid stale plan data)
     useEffect(() => {
