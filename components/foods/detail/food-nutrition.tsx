@@ -336,6 +336,10 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                         <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Histidine', 'histidine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Isoleucine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Isoleucine', 'isoleucine_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Leucine</span>
                                         <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Leucine', 'leucine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
@@ -348,8 +352,20 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                                         <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Methionine', 'methionine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                     <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Phenylalanine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Phenylalanine', 'phenylalanine_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Threonine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Threonine', 'threonine_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-semibold text-slate-300">Tryptophan</span>
                                         <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Tryptophan', 'tryptophan_g'], macroGrams).toFixed(2)}g</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-slate-300">Valine</span>
+                                        <span className="text-[10px] font-bold text-rose-400">{getValForCustomGrams(['Valine', 'valine_g'], macroGrams).toFixed(2)}g</span>
                                     </div>
                                 </div>
                             )}
