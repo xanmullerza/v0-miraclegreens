@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Activity, Zap, Gem, Droplet, Battery, Dna, ChevronDown, Layers, X } from 'lucide-react';
+import { Activity, Zap, Dna, ChevronDown, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
