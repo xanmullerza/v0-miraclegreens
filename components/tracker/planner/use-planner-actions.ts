@@ -45,7 +45,7 @@ export function usePlannerActions(state: any, actions: any) {
     };
 
     const handleMarkEaten = async (recipe: Recipe, mealType: string, selectedServings: number = 1) => {
-        const recipeServings = recipe.servings || 1;
+        const recipeServings = (recipe as any).originalServings || recipe.servings || 1;
         let ingredients = recipe.ingredients || [];
         
         try {
