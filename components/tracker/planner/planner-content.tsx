@@ -248,7 +248,7 @@ export function PlannerContent({
             {/* Servings Adjuster */}
             <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                 <button
-                    onClick={() => isAnonymous ? handleAuthRedirect() : setSelectedServings(Math.max(0.5, selectedServings - 0.5))}
+                    onClick={() => setSelectedServings(Math.max(0.5, selectedServings - 0.5))}
                     className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
                     title="Decrease servings"
                 >
@@ -258,7 +258,7 @@ export function PlannerContent({
                     {effectiveServings.toFixed(1)}x
                 </div>
                 <button
-                    onClick={() => isAnonymous ? handleAuthRedirect() : setSelectedServings(effectiveServings + 0.5)}
+                    onClick={() => setSelectedServings(effectiveServings + 0.5)}
                     className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
                     title="Increase servings"
                 >
@@ -284,7 +284,7 @@ export function PlannerContent({
                                 key={length}
                                 onClick={() => {
                                     setPlanLength(length);
-                                    handleAuthRedirect();
+                                    setShowLengthMenu(false);
                                 }}
                                 className={cn(
                                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mb-1 last:mb-0",
@@ -369,7 +369,7 @@ export function PlannerContent({
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="space-y-6 relative group/meals">
                             {/* Day View Header */}
                             <div className="flex items-center justify-between px-2">
                                 <div className="flex items-center gap-3">
@@ -415,23 +415,22 @@ export function PlannerContent({
                                     selectedServings={effectiveServings}
                                 />
                             </div>
+
+                            {/* Click Interceptor for Anonymous Users (Content Only) */}
+                            {isAnonymous && (
+                                <div 
+                                    className="absolute inset-x-0 top-0 bottom-0 z-50 cursor-pointer"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleAuthRedirect();
+                                    }}
+                                />
+                            )}
                         </div>
                     )}
                 </div>
             </TrackerTabShell>
-
-            {/* Click Interceptor for Anonymous Users */}
-            {isAnonymous && (
-                <div 
-                    className="absolute inset-x-0 top-0 bottom-0 z-50 cursor-pointer"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleAuthRedirect();
-                    }}
-                />
-            )}
-
         </div>
     );
 }
