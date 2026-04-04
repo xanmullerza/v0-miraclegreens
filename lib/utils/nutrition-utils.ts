@@ -12,9 +12,9 @@ export type EnergyUnit = 'kcal' | 'kJ';
 /**
  * Format energy values based on preference.
  */
-export const formatEnergyValue = (calories: number, unit: EnergyUnit, energyKj?: number) => {
+export const formatEnergyValue = (calories: number, unit: EnergyUnit, energy_kj?: number) => {
     if (unit === 'kJ') {
-        const value = energyKj !== undefined ? energyKj : calories * CAL_TO_KJ;
+        const value = energy_kj !== undefined ? energy_kj : calories * CAL_TO_KJ;
         return `${Math.round(value).toLocaleString()} kJ`;
     }
     return `${Math.round(calories).toLocaleString()} kcal`;
@@ -26,7 +26,7 @@ export const formatEnergyValue = (calories: number, unit: EnergyUnit, energyKj?:
  */
 export const calculateAggregatedNutrition = (ingredients: any[]): {
     calories: number;
-    energyKj: number;
+    energy_kj: number;
     protein: number;
     carbs: number;
     fat: number;

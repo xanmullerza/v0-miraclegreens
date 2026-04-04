@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Activity, Dna, Sparkles, Zap, Loader2 } from 'lucide-react';
-import { formatEnergyValue } from '@/lib/utils/nutrition-utils';
 import { useRecipeNutrition } from '@/hooks/use-recipe-nutrition';
 import { NutritionDisplay } from '@/components/nutrients/NutritionDisplay';
 import type { useRecipeDetail } from './use-recipe-detail';

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight, Plus, Minus } from 'lucide-react';
-import { formatEnergyValue } from '@/lib/utils/nutrition-utils';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import type { useRecipeDetail } from './use-recipe-detail';
 
