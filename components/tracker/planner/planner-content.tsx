@@ -19,6 +19,77 @@ import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { supabase } from '@/lib/supabase';
 import { TrackerTabShell, SortOption } from '../tracker-tab-shell';
+import { 
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
+
+const DEMO_PLAN = {
+    breakfast: {
+        id: 'demo-b1',
+        title: 'Tropical Chia Seed Pudding',
+        calories: 420,
+        energy_kj: 1757,
+        protein: 18,
+        fat: 22,
+        carbs: 45,
+        image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80',
+        micronutrients: { 'Vitamin C': 45, 'Calcium': 300, 'Magnesium': 150, 'Potassium': 450, 'Fiber': 12, 'Omega-3': 4.5 },
+        phytonutrients: { 
+            'Anthocyanins': { description: 'Powerful antioxidants found in berries that support heart health.', sources: ['Blueberries', 'Blackberries'] },
+            'Quercetin': { description: 'A plant pigment that may help reduce inflammation.', sources: ['Onions', 'Apples'] }
+        }
+    },
+    lunch: {
+        id: 'demo-l1',
+        title: 'Mediterranean Quinoa Salad',
+        calories: 580,
+        energy_kj: 2426,
+        protein: 22,
+        fat: 28,
+        carbs: 65,
+        image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
+        micronutrients: { 'Iron': 4.5, 'Vitamin K': 120, 'Folate': 200, 'Magnesium': 180, 'Fiber': 15 },
+        phytonutrients: { 
+            'Lycopene': { description: 'A carotenoid that gives tomatoes their red color and supports prostate health.', sources: ['Tomatoes', 'Watermelon'] },
+            'Lutein': { description: 'A xanthophyll that supports eye health.', sources: ['Kale', 'Spinach'] }
+        }
+    },
+    dinner: {
+        id: 'demo-d1',
+        title: 'Pan-Seared Miso Salmon',
+        calories: 650,
+        energy_kj: 2719,
+        protein: 42,
+        fat: 35,
+        carbs: 15,
+        image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80',
+        micronutrients: { 'Vitamin D': 15, 'B12 (Cobalamin)': 6, 'Selenium': 55, 'Omega-3': 2.2, 'Potassium': 800 },
+        phytonutrients: { 
+            'Sulforaphane': { description: 'Found in cruciferous vegetables like the bok choy garnish, it supports detoxification.', sources: ['Broccoli', 'Bok Choy'] },
+            'Astaxanthin': { description: 'The pigment that makes salmon pink; a potent antioxidant.', sources: ['Salmon', 'Shrimp'] }
+        }
+    },
+    snacks: [
+        {
+            id: 'demo-s1',
+            title: 'Roasted Spiced Chickpeas',
+            calories: 210,
+            energy_kj: 878,
+            protein: 8,
+            fat: 6,
+            carbs: 32,
+            image: 'https://images.unsplash.com/photo-1599307734127-14234563a3df?w=400&q=80',
+            micronutrients: { 'Fiber': 8, 'Iron': 2.2, 'Folate': 80, 'Manganese': 1.2 },
+            phytonutrients: { 
+                'Genistein': { description: 'An isoflavone found in legumes that may have heart-protective effects.', sources: ['Soybeans', 'Chickpeas'] }
+            }
+        }
+    ]
+};
 
 export interface PlannerContentProps {
     showFavoritesOnly?: boolean;
@@ -56,8 +127,8 @@ export function PlannerContent({
     const [sortField, setSortField] = useState('time');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [planLength, setPlanLength] = useState<PlanLength>('daily');
-    const [showLengthMenu, setShowLengthMenu] = useState(false);
     const [hasAttemptedInitial, setHasAttemptedInitial] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
     // Override local state with external props if provided
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : state.showFavoritesOnly;
@@ -71,6 +142,10 @@ export function PlannerContent({
     const { profile, profileLoaded, dailyTargets, selectedServings, setSelectedServings } = useUserPreferences();
     const [user, setUser] = useState<any>(undefined);
     const [authReady, setAuthReady] = useState(false);
+
+    const isAnonymous = authReady && user === null;
+    const effectivePlan = isAnonymous ? DEMO_PLAN : state.plan;
+
     useEffect(() => {
         let resolvedViaGetSession = false;
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -114,13 +189,13 @@ export function PlannerContent({
     const userRDAs = rdas || defaultRDAs;
 
     const getFilteredMeals = () => {
-        if (!plan) return [];
+        if (!effectivePlan) return [];
         let meals: any[] = [];
-        if (plan.breakfast) meals.push({ ...plan.breakfast, mealLabel: 'breakfast' });
-        if (plan.lunch) meals.push({ ...plan.lunch, mealLabel: 'lunch' });
-        if (plan.dinner) meals.push({ ...plan.dinner, mealLabel: 'dinner' });
-        if (plan.snacks && Array.isArray(plan.snacks)) {
-            plan.snacks.forEach((s: any, i: number) => meals.push({ ...s, mealLabel: `snack-${i+1}` }));
+        if (effectivePlan.breakfast) meals.push({ ...effectivePlan.breakfast, mealLabel: 'breakfast' });
+        if (effectivePlan.lunch) meals.push({ ...effectivePlan.lunch, mealLabel: 'lunch' });
+        if (effectivePlan.dinner) meals.push({ ...effectivePlan.dinner, mealLabel: 'dinner' });
+        if (effectivePlan.snacks && Array.isArray(effectivePlan.snacks)) {
+            effectivePlan.snacks.forEach((s: any, i: number) => meals.push({ ...s, mealLabel: `snack-${i+1}` }));
         }
 
         // Filter by search
@@ -224,133 +299,162 @@ export function PlannerContent({
     }, [user, isProfileIncomplete, plan, generating, profileLoaded, authReady, hasAttemptedInitial]);
 
     // Unified Loading State Logic
-    const isLoading = !profileLoaded || !authReady || user === undefined || generating || (user && !plan && !hasAttemptedInitial);
+    const isLoading = !profileLoaded || !authReady || user === undefined || generating || (user && !state.plan && !hasAttemptedInitial);
 
     return (
-        <TrackerTabShell
-            title="Planner"
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            sortField={sortField}
-            setSortField={setSortField}
-            sortDirection={sortDirection}
-            setSortDirection={setSortDirection}
-            sortOptions={PLANNER_SORT_OPTIONS}
-            showFilters={true}
-            onFilterClick={() => {
-                setActiveView('recipe-filters');
-                setIsActionPanelOpen(true);
-            }}
-            dropdownContent={lengthSwitcher}
-        >
-            <div className="space-y-6 py-4">
-                {isLoading ? (
-                    <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <Loader2 size={24} className="animate-spin text-emerald-500" />
-                        <p className="text-[10px] font-black uppercase tracking-widest italic">Loading meal plan...</p>
-                    </div>
-                ) : user === null ? (
-                    <div className="flex flex-col items-center justify-center space-y-6 pt-4">
-                        <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
-                            <p className="text-sm font-medium text-white/90 leading-relaxed">
-                                Because the meal planner is highly personalised, we require you to create an account to access it.
-                            </p>
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                                <Button 
-                                    className="h-12 rounded-lg px-8 bg-white text-slate-900 border-2 border-white hover:bg-slate-50 hover:border-slate-200 font-bold flex items-center justify-center gap-3 group transition-all shadow-lg"
-                                    onClick={() => supabase.auth.signInWithOAuth({ provider: 'google' })}
-                                >
-                                    <svg className="w-6 h-6 transition-transform group-hover:scale-110 flex-shrink-0" viewBox="0 0 24 24">
-                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                        <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"/>
-                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                                    </svg>
-                                    <span className="text-slate-900 whitespace-nowrap font-bold text-base">Continue with Google</span>
-                                </Button>
-                            </div>
+        <div className="relative group/planner">
+            <TrackerTabShell
+                title="Planner"
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                sortField={sortField}
+                setSortField={setSortField}
+                sortDirection={sortDirection}
+                setSortDirection={setSortDirection}
+                sortOptions={PLANNER_SORT_OPTIONS}
+                showFilters={true}
+                onFilterClick={() => {
+                    setActiveView('recipe-filters');
+                    setIsActionPanelOpen(true);
+                }}
+                dropdownContent={lengthSwitcher}
+            >
+                <div className="space-y-6 py-4">
+                    {isLoading ? (
+                        <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+                            <Loader2 size={24} className="animate-spin text-emerald-500" />
+                            <p className="text-[10px] font-black uppercase tracking-widest italic">Loading meal plan...</p>
                         </div>
-                    </div>
-                ) : isProfileIncomplete ? (
-                    <div className="flex flex-col items-center justify-center space-y-6 pt-4">
-                        <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
-                            <p className="text-sm font-medium text-white/90 leading-relaxed">
-                                Welcome, {user?.user_metadata?.full_name || 'User'}!
-                                <br />
-                                <span className="text-emerald-400 font-bold block mt-1">Complete your profile to generate a personalised meal plan.</span>
-                            </p>
-                            <div className="flex justify-center pt-2">
-                                <Button 
-                                    onClick={() => navigateTo('profile')}
-                                    className="h-10 rounded-full px-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20"
-                                >
-                                    Complete Profile
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                ) : (user && !plan && hasAttemptedInitial) ? (
-                     <div className="flex flex-col items-center justify-center space-y-6 pt-4">
-                        <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
-                            <p className="text-sm font-medium text-rose-400 font-bold uppercase tracking-widest">
-                                Failed to generate plan. Your recipe parameters might be too strict.
-                            </p>
-                            <Button onClick={handleGenerate} className="h-10 rounded-full px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20">
-                                Retry Generation
-                            </Button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-6">
-                        {/* Day View Header */}
-                        <div className="flex items-center justify-between px-2">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-                                    <Calendar size={20}/>
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-lg uppercase tracking-tight">
-                                        {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                    </h3>
-                                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">
-                                        {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-                                    </p>
+                    ) : isProfileIncomplete && !isAnonymous ? (
+                        <div className="flex flex-col items-center justify-center space-y-6 pt-4">
+                            <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
+                                <p className="text-sm font-medium text-white/90 leading-relaxed">
+                                    Welcome, {user?.user_metadata?.full_name || 'User'}!
+                                    <br />
+                                    <span className="text-emerald-400 font-bold block mt-1">Complete your profile to generate a personalised meal plan.</span>
+                                </p>
+                                <div className="flex justify-center pt-2">
+                                    <Button 
+                                        onClick={() => navigateTo('profile')}
+                                        className="h-10 rounded-full px-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20"
+                                    >
+                                        Complete Profile
+                                    </Button>
                                 </div>
                             </div>
                         </div>
+                    ) : (user && !state.plan && hasAttemptedInitial) ? (
+                         <div className="flex flex-col items-center justify-center space-y-6 pt-4">
+                            <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
+                                <p className="text-sm font-medium text-rose-400 font-bold uppercase tracking-widest">
+                                    Failed to generate plan. Your recipe parameters might be too strict.
+                                </p>
+                                <Button onClick={handleGenerate} className="h-10 rounded-full px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20">
+                                    Retry Generation
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            {/* Day View Header */}
+                            <div className="flex items-center justify-between px-2">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                                        <Calendar size={20}/>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg uppercase tracking-tight">
+                                            {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                        </h3>
+                                        <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">
+                                            {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
-                        {/* List of Meals */}
-                        <div className="space-y-2">
-                            {getFilteredMeals().map((meal) => (
-                                <RecipeListItem
-                                    key={meal.id}
-                                    recipe={meal}
-                                    mealLabel={meal.mealLabel}
-                                    unit={unit as any}
-                                    onMarkEaten={() => handleMarkEaten(meal, meal.mealLabel, selectedServings)}
-                                    isEaten={eatenMeals.has(meal.mealLabel)}
-                                    pantryItems={pantryItems}
-                                    onRecipeClick={onRecipeClick}
+                            {/* List of Meals */}
+                            <div className="space-y-2">
+                                {getFilteredMeals().map((meal) => (
+                                    <RecipeListItem
+                                        key={meal.id}
+                                        recipe={meal}
+                                        mealLabel={meal.mealLabel}
+                                        unit={unit as any}
+                                        onMarkEaten={() => handleMarkEaten(meal, meal.mealLabel, selectedServings)}
+                                        isEaten={eatenMeals.has(meal.mealLabel)}
+                                        pantryItems={pantryItems}
+                                        onRecipeClick={(id) => isAnonymous ? setShowAuthModal(true) : onRecipeClick?.(id)}
+                                        selectedServings={selectedServings}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Daily Nutrition Display */}
+                            <div className="mt-6 p-4 sm:p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
+                                <DailyNutrition 
+                                    plan={effectivePlan} 
+                                    userRDAs={userRDAs}
+                                    profile={profile}
+                                    energyUnit={unit}
+                                    nutrientDisplayMode="both"
                                     selectedServings={selectedServings}
                                 />
-                            ))}
+                            </div>
                         </div>
+                    )}
+                </div>
+            </TrackerTabShell>
 
-                        {/* Daily Nutrition Display */}
-                        <div className="mt-6 p-4 sm:p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
-                            <DailyNutrition 
-                                plan={plan} 
-                                userRDAs={userRDAs}
-                                profile={profile}
-                                energyUnit={unit}
-                                nutrientDisplayMode="both"
-                                selectedServings={selectedServings}
-                            />
+            {/* Click Interceptor for Anonymous Users */}
+            {isAnonymous && (
+                <div 
+                    className="absolute inset-x-0 top-0 bottom-0 z-50 cursor-pointer"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowAuthModal(true);
+                    }}
+                />
+            )}
+
+            {/* Auth Modal */}
+            <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
+                <DialogContent className="max-w-xl p-0 bg-slate-900 border-slate-800 rounded-[2rem] overflow-hidden">
+                    <div className="p-8 text-center space-y-6">
+                        <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center mx-auto text-emerald-500 mb-2">
+                            <Sparkles size={32} />
                         </div>
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-black uppercase tracking-tight text-white mb-2">
+                                Unlock Your Protocol
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-400 text-base leading-relaxed">
+                                Because the meal planner is highly personalised to your biology and preferences, we require you to create an account to access the full protocol logic.
+                            </DialogDescription>
+                        </DialogHeader>
+                        
+                        <div className="pt-4">
+                            <Button 
+                                className="h-14 w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100 font-black flex items-center justify-center gap-3 group transition-all shadow-xl"
+                                onClick={() => supabase.auth.signInWithOAuth({ provider: 'google' })}
+                            >
+                                <svg className="w-6 h-6" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                </svg>
+                                <span className="uppercase tracking-widest text-[11px]">Continue with Google</span>
+                            </Button>
+                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 pt-2">
+                            Secure • Cloud Synced • Personalised
+                        </p>
                     </div>
-                )}
-            </div>
-        </TrackerTabShell>
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 }
 
