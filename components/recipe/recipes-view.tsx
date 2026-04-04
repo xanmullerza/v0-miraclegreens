@@ -512,10 +512,10 @@ export function RecipesView({
                                 <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
                                     <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
                                         {[
-                                            { label: 'Ready In', value: `${recipe.prep_time || 0}m` },
-                                            { label: 'Servings', value: `${recipe.servings || 1}s` },
-                                            { label: 'Meal Type', value: recipe.meal_type || 'meal', active: true },
-                                            { label: 'Difficulty', value: recipe.difficulty || 'Med' },
+                                            { label: 'Ready In', value: `${(recipe.prep_time || 0) + (recipe.cook_time || 0) || '-'} min` },
+                                            { label: 'Servings', value: `${recipe.servings || 1} Servings` },
+                                            { label: 'Meal Type', value: recipe.type || recipe.meal_type || 'Other', active: true },
+                                            { label: 'Difficulty', value: recipe.difficulty || 'Medium' },
                                         ].map((tab) => (
                                             <div
                                                 key={tab.label}
@@ -526,8 +526,8 @@ export function RecipesView({
                                                         : "text-slate-500 bg-white/5"
                                                 )}
                                             >
-                                                <span className="opacity-40 text-[6px] tracking-widest">{tab.label}</span>
-                                                <span className="truncate max-w-full italic">{tab.value}</span>
+                                                <span className="opacity-40 text-[6px] tracking-widest leading-none">{tab.label}</span>
+                                                <span className="truncate max-w-full italic leading-none">{tab.value}</span>
                                             </div>
                                         ))}
                                     </div>
