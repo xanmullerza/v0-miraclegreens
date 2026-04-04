@@ -8,7 +8,6 @@ import { usePantry } from '@/hooks/use-pantry';
 import { useRDA } from '@/hooks/use-rda';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import { 
     Calendar, RotateCcw, LayoutGrid, Info, 
     ChevronDown, Sparkles, ChefHat, 
@@ -92,6 +91,7 @@ export interface PlannerContentProps {
     isFilterOpen?: boolean;
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     onRecipeClick?: (recipeId: string) => void;
+    onSubViewChange?: (view: 'shopping' | 'pantry') => void;
 }
 
 const PLANNER_SORT_OPTIONS: SortOption[] = [
@@ -111,8 +111,8 @@ export function PlannerContent({
     isFilterOpen: externalIsFilterOpen,
     setIsFilterOpen: externalSetIsFilterOpen,
     onRecipeClick,
+    onSubViewChange,
 }: PlannerContentProps) {
-    const router = useRouter();
     const { state, actions } = usePlannerState();
     
     // UI State for shell
@@ -286,16 +286,16 @@ export function PlannerContent({
                         {/* Divider */}
                         <div className="my-1.5 border-t border-slate-200 dark:border-slate-700" />
 
-                        {/* Quick links */}
+                        {/* Quick links — stay within Tracker */}
                         <button
-                            onClick={() => { setShowLengthMenu(false); router.push('/library?view=list'); }}
+                            onClick={() => { setShowLengthMenu(false); onSubViewChange?.('shopping'); }}
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-600 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 mb-1"
                         >
                             <ShoppingBasket size={12} className="text-amber-500" />
                             Shopping
                         </button>
                         <button
-                            onClick={() => { setShowLengthMenu(false); router.push('/library?view=pantry'); }}
+                            onClick={() => { setShowLengthMenu(false); onSubViewChange?.('pantry'); }}
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-600"
                         >
                             <Shapes size={12} className="text-sky-500" />
