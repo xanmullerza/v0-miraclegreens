@@ -37,7 +37,11 @@ const DEMO_PLAN = {
         fat: 18,
         carbs: 40,
         image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80',
-        micronutrients: { 'Vitamin C': 45, 'Calcium': 300, 'Magnesium': 150, 'Potassium': 450, 'Fiber': 12, 'Omega-3': 4.5 },
+        micronutrients: { 
+            'Vitamin C': 45, 'Calcium': 320, 'Magnesium': 140, 'Potassium': 480, 
+            'Fiber': 12, 'Omega-3': 4.5, 'B1 (Thiamine)': 0.3, 'B2 (Riboflavin)': 0.4,
+            'B3 (Niacin)': 4.2, 'Vitamin E': 3.5, 'Vitamin A': 120, 'Phosphorus': 280
+        },
         phytonutrients: { 
             'Anthocyanins': { description: 'Powerful antioxidants found in berries that support heart health.', sources: ['Blueberries', 'Blackberries'] },
             'Quercetin': { description: 'A plant pigment that may help reduce inflammation.', sources: ['Onions', 'Apples'] }
@@ -52,7 +56,11 @@ const DEMO_PLAN = {
         fat: 25,
         carbs: 55,
         image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
-        micronutrients: { 'Iron': 4.5, 'Vitamin K': 120, 'Folate': 200, 'Magnesium': 180, 'Fiber': 15 },
+        micronutrients: { 
+            'Iron': 4.2, 'Vitamin K': 110, 'Folate': 180, 'Magnesium': 160, 
+            'Fiber': 15, 'Potassium': 1200, 'B1 (Thiamine)': 0.4, 'B6 (Pyridoxine)': 0.5,
+            'Vitamin A': 450, 'Vitamin C': 65, 'Zinc': 2.8, 'Sodium': 420
+        },
         phytonutrients: { 
             'Lycopene': { description: 'A carotenoid that gives tomatoes their red color and supports prostate health.', sources: ['Tomatoes', 'Watermelon'] },
             'Lutein': { description: 'A xanthophyll that supports eye health.', sources: ['Kale', 'Spinach'] }
@@ -67,7 +75,11 @@ const DEMO_PLAN = {
         fat: 32,
         carbs: 12,
         image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80',
-        micronutrients: { 'Vitamin D': 15, 'B12 (Cobalamin)': 6, 'Selenium': 55, 'Omega-3': 2.2, 'Potassium': 800 },
+        micronutrients: { 
+            'Vitamin D': 15, 'B12 (Cobalamin)': 6, 'Selenium': 55, 'Omega-3': 2.2, 
+            'Potassium': 920, 'B3 (Niacin)': 8.5, 'B6 (Pyridoxine)': 0.8, 'B5 (Pantothenic Acid)': 2.5,
+            'Vitamin E': 4.2, 'Phosphorus': 450, 'Zinc': 3.2, 'Sodium': 680
+        },
         phytonutrients: { 
             'Sulforaphane': { description: 'Found in cruciferous vegetables like the bok choy garnish, it supports detoxification.', sources: ['Broccoli', 'Bok Choy'] },
             'Astaxanthin': { description: 'The pigment that makes salmon pink; a potent antioxidant.', sources: ['Salmon', 'Shrimp'] }
@@ -83,7 +95,11 @@ const DEMO_PLAN = {
             fat: 5,
             carbs: 25,
             image: 'https://images.unsplash.com/photo-1599599810769-cfde5a1d659a?w=400&q=80',
-            micronutrients: { 'Fiber': 8, 'Iron': 2.2, 'Folate': 80, 'Manganese': 1.2 },
+            micronutrients: { 
+                'Fiber': 8, 'Iron': 2.4, 'Folate': 85, 'Manganese': 1.2, 
+                'B1 (Thiamine)': 0.2, 'Magnesium': 60, 'Potassium': 320, 'Zinc': 1.5,
+                'Sodium': 280, 'Choline': 45
+            },
             phytonutrients: { 
                 'Genistein': { description: 'An isoflavone found in legumes that may have heart-protective effects.', sources: ['Soybeans', 'Chickpeas'] }
             }
