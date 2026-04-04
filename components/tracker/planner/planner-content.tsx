@@ -127,6 +127,7 @@ export function PlannerContent({
     const [sortField, setSortField] = useState('time');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [planLength, setPlanLength] = useState<PlanLength>('daily');
+    const [showLengthMenu, setShowLengthMenu] = useState(false);
     const [hasAttemptedInitial, setHasAttemptedInitial] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
