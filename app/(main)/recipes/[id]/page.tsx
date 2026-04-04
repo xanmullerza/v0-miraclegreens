@@ -57,9 +57,9 @@ export default function RecipeDetailsPage() {
             <>
                 <TabHeader
                     tabs={[
-                        { id: 'recipes', label: 'Recipes' },
+                        { id: 'recipes', label: 'Cookbook' },
                         { id: 'foods', label: 'Foods' },
-                        { id: 'planner', label: 'Planner' },
+                        { id: 'planner', label: 'Tracker' },
                     ]}
                     activeTab="recipes"
                     onTabChange={handleTabChange}
@@ -83,9 +83,9 @@ export default function RecipeDetailsPage() {
         <>
             <TabHeader
                 tabs={[
-                    { id: 'recipes', label: 'Recipes' },
+                    { id: 'recipes', label: 'Cookbook' },
                     { id: 'foods', label: 'Foods' },
-                    { id: 'planner', label: 'Planner' },
+                    { id: 'planner', label: 'Tracker' },
                 ]}
                 activeTab="recipes"
                 onTabChange={handleTabChange}

@@ -11,9 +11,9 @@ function PlannerPageContent() {
     const router = useRouter();
 
     const tabs = [
-        { id: 'recipes', label: 'Recipes' },
+        { id: 'recipes', label: 'Cookbook' },
         { id: 'foods', label: 'Foods' },
-        { id: 'planner', label: 'Planner' },
+        { id: 'planner', label: 'Tracker' },
     ];
 
     const handleTabChange = (id: string) => {

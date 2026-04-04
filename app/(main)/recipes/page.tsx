@@ -48,9 +48,9 @@ function RecipesPageContent() {
     }, [searchParams]);
 
     const tabs: { id: TabId; label: string; activeColor: string }[] = [
-        { id: 'recipes', label: 'Recipes', activeColor: 'text-emerald-500' },
+        { id: 'recipes', label: 'Cookbook', activeColor: 'text-emerald-500' },
         { id: 'foods', label: 'Foods', activeColor: 'text-cyan-500' },
-        { id: 'planner', label: 'Planner', activeColor: 'text-blue-500' },
+        { id: 'planner', label: 'Tracker', activeColor: 'text-blue-500' },
     ];
 
     const handleTabChange = (id: TabId) => {

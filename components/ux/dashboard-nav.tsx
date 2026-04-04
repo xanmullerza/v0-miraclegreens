@@ -36,7 +36,7 @@ export function DashboardNav() {
     const buttons = [
         { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/recipes?tab=foods&view=list', color: 'amber' },
         { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/recipes?tab=foods&view=pantry', color: 'sky' },
-        { id: 'planner', icon: Calendar, label: 'Planner', path: '/planner', color: 'purple' },
+        { id: 'planner', icon: Calendar, label: 'Tracker', path: '/planner', color: 'purple' },
     ];
 
     return (

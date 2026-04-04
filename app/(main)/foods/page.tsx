@@ -12,9 +12,9 @@ export default function IngredientsPage() {
     const { searchQuery, setSearchQuery } = useSearch();
 
     const tabs = [
-        { id: 'recipes', label: 'Recipes' },
+        { id: 'recipes', label: 'Cookbook' },
         { id: 'foods', label: 'Foods' },
-        { id: 'planner', label: 'Planner' },
+        { id: 'planner', label: 'Tracker' },
     ];
 
     const handleTabChange = (id: string) => {
