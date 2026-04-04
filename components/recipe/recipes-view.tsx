@@ -455,8 +455,8 @@ export function RecipesView({
                             className={cn(
                                 'group relative rounded-[2rem] border transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm',
                                 isMix 
-                                    ? 'bg-indigo-50/80 dark:bg-indigo-900/40 border-indigo-900 hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-500/10' 
-                                    : 'bg-white/80 dark:bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:shadow-[0_0_35px_-8px_rgba(16,185,129,0.35)]'
+                                    ? 'bg-indigo-950/80 border-indigo-900 hover:border-indigo-700' 
+                                    : 'bg-slate-950 border-slate-800 hover:border-slate-600'
                             )}
                             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
                         >
