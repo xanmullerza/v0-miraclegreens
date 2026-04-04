@@ -12,7 +12,7 @@ function PlannerPageContent() {
 
     const tabs = [
         { id: 'recipes', label: 'Cookbook' },
-        { id: 'foods', label: 'Foods' },
+        { id: 'foods', label: 'Library' },
         { id: 'planner', label: 'Tracker' },
     ];
 

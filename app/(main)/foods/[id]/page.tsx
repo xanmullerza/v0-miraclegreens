@@ -55,7 +55,7 @@ export default function FoodDetailsPage() {
             <TabHeader
                 tabs={[
                     { id: 'recipes', label: 'Cookbook' },
-                    { id: 'foods', label: 'Foods' },
+                    { id: 'foods', label: 'Library' },
                     { id: 'planner', label: 'Tracker' },
                 ]}
                 activeTab="foods"
