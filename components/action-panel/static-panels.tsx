@@ -3,7 +3,7 @@ import { PanelWrapper } from './panel-wrapper';
 import { PrivacyContent } from '@/components/static/privacy-content';
 import { SupportContent } from '@/components/static/support-content';
 import { TermsContent } from '@/components/static/terms-content';
-import ProfilePage from '@/app/users/profile/page';
+import { ProfileContent } from '@/components/static/profile-content';
 
 export function PrivacyPanel({ onClose }: { onClose: () => void }) {
     return (
@@ -38,7 +38,7 @@ export function TermsPanel({ onClose }: { onClose: () => void }) {
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
     return (
         <PanelWrapper title="Settings" onClose={onClose}>
-            <ProfilePage />
+            <ProfileContent />
         </PanelWrapper>
     );
 }
