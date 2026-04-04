@@ -16,28 +16,39 @@ function PlannerPageContent() {
     const [subView, setSubView] = useState<TrackerSubView>('planner');
     const [scannerOpen, setScannerOpen] = useState(false);
     const [refreshKey] = useState(0);
+    const getTrackerLabel = () => {
+
+        if (subView === 'shopping') return 'Shopping';
+        if (subView === 'pantry') return 'Pantry';
+        return 'Tracker';
+    };
 
     const tabs = [
         { id: 'recipes', label: 'Cookbook' },
         { id: 'foods', label: 'Library' },
-        { id: 'planner', label: 'Tracker' },
+        { id: 'planner', label: getTrackerLabel() },
     ];
 
     const handleTabChange = (id: string) => {
         if (id === 'recipes') router.push('/cookbook');
-        else if (id === 'planner') router.push('/tracker');
+        else if (id === 'planner') {
+            if (subView !== 'planner') setSubView('planner');
+            else router.push('/tracker');
+        }
         else router.push('/library');
     };
+
 
     // "Back to Tracker" button passed into Shopping/Pantry views as their dropdown slot
     const backButton = (
         <button
             onClick={() => setSubView('planner')}
-            className="h-10 px-4 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98]"
+            className="h-10 px-4 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] ring-1 ring-white/10"
         >
             <ArrowLeft size={12} />
-            Tracker
+            Planner
         </button>
+
     );
 
     return (

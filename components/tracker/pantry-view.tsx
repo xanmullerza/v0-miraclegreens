@@ -679,7 +679,8 @@ export function PantryView({
             <div className="space-y-8 animate-in fade-in duration-500">
             {/* Login Prompt - Only shown if not loading and no user */}
             {!loading && !user && (
-                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/20 p-6 rounded-[2rem] flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group">
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 p-6 rounded-[2.5rem] flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group shadow-lg ring-1 ring-emerald-500/10">
+
                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
                     <div className="flex items-center gap-4 relative z-10">
@@ -710,7 +711,8 @@ export function PantryView({
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Checking your kitchen...</p>
                 </div>
             ) : filteredFoods.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] bg-white/50 dark:bg-slate-900/10 backdrop-blur-sm group">
+                <div className="flex flex-col items-center justify-center py-24 rounded-[3rem] bg-white/50 dark:bg-slate-900/10 backdrop-blur-sm group shadow-inner ring-1 ring-slate-800/20">
+
                     <div className="w-20 h-20 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <ShoppingBasket size={40} />
                     </div>
@@ -747,7 +749,8 @@ export function PantryView({
                             const colors = getCategoryColor(groupName);
 
                             return (
-                                <div key={groupName} className={cn("rounded-xl border p-4", colors.bg, colors.border)}>
+                                <div key={groupName} className={cn("rounded-[2.5rem] p-4 shadow-xl ring-1 ring-white/5 bg-gradient-to-br from-slate-900/80 to-slate-800/40")}>
+
                                     <div className={cn("text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2 text-slate-700 dark:text-slate-400")}>
                                         {<colors.icon size={18} className="text-slate-600 dark:text-slate-500" />}
                                         {groupName}
@@ -764,14 +767,16 @@ export function PantryView({
                                             <div key={food.id}>
                                                 {/* Main food item card - always visible */}
                                                 <div
-                                                    className="flex items-center gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800 cursor-pointer"
+                                                    className="flex items-center gap-3 px-3 py-2 rounded-[1.5rem] transition-all bg-white/5 dark:bg-slate-800/30 ring-1 ring-white/5 hover:bg-white/10 dark:hover:bg-slate-800/60 cursor-pointer shadow-lg group-hover:scale-[1.01]"
+
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id);
                                                     }}
                                                 >
                                                     {/* Food Image */}
-                                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
+                                                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0 flex items-center justify-center shadow-lg ring-1 ring-white/5">
+
                                                         {food.image ? (
                                                             <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" />
                                                         ) : (
