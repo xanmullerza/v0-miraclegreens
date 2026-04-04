@@ -521,27 +521,27 @@ export function RecipesView({
                                 <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
                                     <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
                                         {[
-                                            { label: <Clock size={11} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
-                                            { label: <Users size={11} />, value: recipe.servings || 1 },
+                                            { label: <Clock size={14} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
+                                            { label: <Users size={14} />, value: recipe.servings || 1 },
                                             { 
                                                 label: (() => {
                                                     const t = (recipe.type || recipe.meal_type || 'Other').toLowerCase();
-                                                    if (t === 'breakfast') return <Coffee size={11} />;
-                                                    if (t === 'lunch') return <Sun size={11} />;
-                                                    if (t === 'dinner') return <Moon size={11} />;
-                                                    if (t === 'snack') return <Apple size={11} />;
-                                                    if (t.includes('supplement')) return <Pill size={11} />;
-                                                    return <UtensilsCrossed size={11} />;
+                                                    if (t === 'breakfast') return <Coffee size={14} />;
+                                                    if (t === 'lunch') return <Sun size={14} />;
+                                                    if (t === 'dinner') return <Moon size={14} />;
+                                                    if (t === 'snack') return <Apple size={14} />;
+                                                    if (t.includes('supplement')) return <Pill size={14} />;
+                                                    return <UtensilsCrossed size={14} />;
                                                 })(), 
                                                 value: recipe.type || recipe.meal_type || 'Other', 
                                                 active: true 
                                             },
-                                            { label: <Gauge size={11} />, value: recipe.difficulty || 'Medium' },
+                                            { label: <Gauge size={14} />, value: recipe.difficulty || 'Medium' },
                                         ].map((tab, idx) => (
                                             <div
                                                 key={idx}
                                                 className={cn(
-                                                    'py-1.5 px-2.5 text-[7px] font-black uppercase tracking-[0.1em] rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-col items-center justify-center gap-0.5',
+                                                    'py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-row items-center justify-center gap-2.5',
                                                     tab.active
                                                         ? isMix ? "bg-slate-800/80 text-indigo-400 shadow-[0_0_15px_-5px_rgba(129,140,248,0.3)] ring-1 ring-white/10" : "bg-slate-800/80 text-emerald-400 shadow-[0_0_15px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
                                                         : "text-slate-500 bg-white/5"
@@ -549,13 +549,13 @@ export function RecipesView({
                                             >
                                                 {tab.label && (
                                                     <span className={cn(
-                                                        "opacity-60 leading-none mb-0.5",
+                                                        "opacity-80 leading-none shrink-0",
                                                         tab.active ? "text-current" : "text-slate-400"
                                                     )}>
                                                         {tab.label}
                                                     </span>
                                                 )}
-                                                <span className={cn("truncate max-w-full italic leading-none font-black", !tab.active ? "text-[10px]" : "text-[8px] uppercase tracking-wider")}>{tab.value}</span>
+                                                <span className={cn("truncate max-w-full italic leading-none font-black")}>{tab.value}</span>
                                             </div>
                                         ))}
                                     </div>
