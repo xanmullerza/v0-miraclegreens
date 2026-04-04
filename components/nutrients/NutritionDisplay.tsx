@@ -216,25 +216,25 @@ export function NutritionDisplay({
                 <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-3 flex flex-col gap-3">
                     <div>
                         <div className="flex items-center justify-between">
-                            <div className="text-[11px] font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
-                            <div className="text-[10px] font-bold text-violet-400 bg-violet-500/10 px-2.5 py-1 rounded-full">
+                            <div className="text-sm font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
+                            <div className="text-xs font-bold text-violet-400 bg-violet-500/10 px-2.5 py-1 rounded-full">
                                 {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).filter(v => v.pct >= universalThreshold).length} /{' '}
                                 {micronutrients.waterSoluble.length + micronutrients.fatSoluble.length}
                             </div>
                         </div>
-                        <div className="text-[9px] text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2">
                         {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).map(v => {
                             const meetsThreshold = v.pct >= universalThreshold;
                             return (
                                 <div key={v.label} className="flex items-center justify-between">
-                                    <span className={cn('text-[10px] font-semibold', meetsThreshold ? 'text-violet-300' : 'text-slate-400')}>
+                                    <span className={cn('text-sm font-semibold', meetsThreshold ? 'text-violet-300' : 'text-slate-400')}>
                                         {v.label}
                                     </span>
                                     <span
                                         className={cn(
-                                            'text-[10px] font-bold',
+                                            'text-sm font-bold' ,
                                             v.pct >= 100 ? 'text-emerald-400' : v.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                         )}
                                     >
@@ -249,7 +249,7 @@ export function NutritionDisplay({
                             <div className="flex items-center justify-between">
                                 <span
                                     className={cn(
-                                        'text-[10px] font-semibold',
+                                        'text-sm font-semibold',
                                         micronutrients.choline.pct >= universalThreshold ? 'text-violet-300' : 'text-slate-400'
                                     )}
                                 >
@@ -257,7 +257,7 @@ export function NutritionDisplay({
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-[10px] font-bold',
+                                        'text-sm font-bold',
                                         micronutrients.choline.pct >= 100 ? 'text-emerald-400' : micronutrients.choline.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                     )}
                                 >
@@ -274,25 +274,25 @@ export function NutritionDisplay({
                 <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-3 flex flex-col gap-3">
                     <div>
                         <div className="flex items-center justify-between">
-                            <div className="text-[11px] font-black uppercase tracking-widest text-cyan-500">Minerals</div>
-                            <div className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-full">
+                            <div className="text-sm font-black uppercase tracking-widest text-cyan-500">Minerals</div>
+                            <div className="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-full">
                                 {micronutrients.electrolytes.concat(micronutrients.trace).filter(v => v.pct >= universalThreshold).length} /{' '}
                                 {micronutrients.electrolytes.length + micronutrients.trace.length}
                             </div>
                         </div>
-                        <div className="text-[9px] text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2">
                         {micronutrients.electrolytes.concat(micronutrients.trace).map(m => {
                             const meetsThreshold = m.pct >= universalThreshold;
                             return (
                                 <div key={m.label} className="flex items-center justify-between">
-                                    <span className={cn('text-[10px] font-semibold', meetsThreshold ? 'text-cyan-300' : 'text-slate-400')}>
+                                    <span className={cn('text-sm font-semibold', meetsThreshold ? 'text-cyan-300' : 'text-slate-400')}>
                                         {m.label}
                                     </span>
                                     <span
                                         className={cn(
-                                            'text-[10px] font-bold',
+                                            'text-sm font-bold' ,
                                             m.pct >= 100 ? 'text-emerald-400' : m.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                         )}
                                     >

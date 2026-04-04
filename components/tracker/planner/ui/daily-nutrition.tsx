@@ -51,8 +51,8 @@ export function DailyNutrition({
             {/* Phytonutrients Tag Cloud */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                 <div className="mb-4">
-                    <div className="text-[11px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Phytonutrients</div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">Plant compounds from combined meals • Click a tag to learn more</div>
+                    <div className="text-sm font-black uppercase tracking-widest text-green-600 dark:text-green-400">Phytonutrients</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">Plant compounds from combined meals • Click a tag to learn more</div>
                 </div>
                 {nutrition?.phytonutrients && Object.keys(nutrition.phytonutrients).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
@@ -96,7 +96,7 @@ export function DailyNutrition({
                                     ) : (
                                         <>
                                             <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-500/20 text-[7px] font-black">•</span>
-                                            <span className="text-[10px]">{name}</span>
+                                            <span className="text-xs">{name}</span>
                                         </>
                                     )}
                                 </button>
