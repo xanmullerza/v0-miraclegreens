@@ -31,11 +31,11 @@ const DEMO_PLAN = {
     breakfast: {
         id: 'demo-b1',
         title: 'Tropical Chia Seed Pudding',
-        calories: 420,
-        energy_kj: 1757,
-        protein: 18,
-        fat: 22,
-        carbs: 45,
+        calories: 395,
+        energy_kj: 1653,
+        protein: 15,
+        fat: 18,
+        carbs: 40,
         image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80',
         micronutrients: { 'Vitamin C': 45, 'Calcium': 300, 'Magnesium': 150, 'Potassium': 450, 'Fiber': 12, 'Omega-3': 4.5 },
         phytonutrients: { 
@@ -46,11 +46,11 @@ const DEMO_PLAN = {
     lunch: {
         id: 'demo-l1',
         title: 'Mediterranean Quinoa Salad',
-        calories: 580,
-        energy_kj: 2426,
-        protein: 22,
-        fat: 28,
-        carbs: 65,
+        calories: 550,
+        energy_kj: 2301,
+        protein: 20,
+        fat: 25,
+        carbs: 55,
         image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
         micronutrients: { 'Iron': 4.5, 'Vitamin K': 120, 'Folate': 200, 'Magnesium': 180, 'Fiber': 15 },
         phytonutrients: { 
@@ -61,11 +61,11 @@ const DEMO_PLAN = {
     dinner: {
         id: 'demo-d1',
         title: 'Pan-Seared Miso Salmon',
-        calories: 650,
-        energy_kj: 2719,
-        protein: 42,
-        fat: 35,
-        carbs: 15,
+        calories: 620,
+        energy_kj: 2594,
+        protein: 38,
+        fat: 32,
+        carbs: 12,
         image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80',
         micronutrients: { 'Vitamin D': 15, 'B12 (Cobalamin)': 6, 'Selenium': 55, 'Omega-3': 2.2, 'Potassium': 800 },
         phytonutrients: { 
@@ -77,12 +77,12 @@ const DEMO_PLAN = {
         {
             id: 'demo-s1',
             title: 'Roasted Spiced Chickpeas',
-            calories: 210,
-            energy_kj: 878,
-            protein: 8,
-            fat: 6,
-            carbs: 32,
-            image: 'https://images.unsplash.com/photo-1599307734127-14234563a3df?w=400&q=80',
+            calories: 180,
+            energy_kj: 753,
+            protein: 7,
+            fat: 5,
+            carbs: 25,
+            image: 'https://images.unsplash.com/photo-1599599810769-cfde5a1d659a?w=400&q=80',
             micronutrients: { 'Fiber': 8, 'Iron': 2.2, 'Folate': 80, 'Manganese': 1.2 },
             phytonutrients: { 
                 'Genistein': { description: 'An isoflavone found in legumes that may have heart-protective effects.', sources: ['Soybeans', 'Chickpeas'] }
@@ -242,10 +242,10 @@ export function PlannerContent({
                     <ChevronDown size={12} />
                 </button>
                 <div className="px-2 py-1 text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap min-w-[50px] text-center">
-                    {selectedServings.toFixed(1)}x
+                    {effectiveServings.toFixed(1)}x
                 </div>
                 <button
-                    onClick={() => setSelectedServings(selectedServings + 0.5)}
+                    onClick={() => setSelectedServings(effectiveServings + 0.5)}
                     className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
                     title="Increase servings"
                 >
@@ -382,11 +382,11 @@ export function PlannerContent({
                                         recipe={meal}
                                         mealLabel={meal.mealLabel}
                                         unit={unit as any}
-                                        onMarkEaten={() => handleMarkEaten(meal, meal.mealLabel, selectedServings)}
+                                        onMarkEaten={() => handleMarkEaten(meal, meal.mealLabel, effectiveServings)}
                                         isEaten={eatenMeals.has(meal.mealLabel)}
                                         pantryItems={pantryItems}
                                         onRecipeClick={(id) => isAnonymous ? setShowAuthModal(true) : onRecipeClick?.(id)}
-                                        selectedServings={selectedServings}
+                                        selectedServings={effectiveServings}
                                     />
                                 ))}
                             </div>
@@ -399,7 +399,7 @@ export function PlannerContent({
                                     profile={profile}
                                     energyUnit={unit}
                                     nutrientDisplayMode="both"
-                                    selectedServings={selectedServings}
+                                    selectedServings={effectiveServings}
                                 />
                             </div>
                         </div>
