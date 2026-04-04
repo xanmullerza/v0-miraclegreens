@@ -26,7 +26,7 @@ export function HeaderLogo({
     const router = useRouter();
     const { theme, setTheme } = useTheme();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
-    const { isActionPanelOpen, setIsActionPanelOpen, setActiveView } = useActionPanel();
+    const { isActionPanelOpen, setIsActionPanelOpen, setActiveView, activeView } = useActionPanel();
     const { profile } = useUserPreferences();
     const [isMobile, setIsMobile] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -115,18 +115,21 @@ export function HeaderLogo({
             <div className="flex items-center h-full px-2 sm:px-4">
                 {/* Navigation Items (Privacy, Support, Terms) */}
                 <div className="flex items-center h-full sm:divide-x divide-border border-l border-border">
-                    {[
-                        { label: 'Privacy', path: '/static/privacy', icon: Shield, color: 'text-slate-500' },
-                        { label: 'Support', path: '/static/support', icon: HelpCircle, color: 'text-slate-500' },
-                        { label: 'Terms', path: '/static/terms', icon: BookOpen, color: 'text-slate-500' },
-                    ].map((item) => {
+                    { [
+                        { label: 'Privacy', id: 'privacy', icon: Shield, color: 'text-slate-500' },
+                        { label: 'Support', id: 'support', icon: HelpCircle, color: 'text-slate-500' },
+                        { label: 'Terms', id: 'terms', icon: BookOpen, color: 'text-slate-500' },
+                    ].map((item: any) => {
                         const Icon = item.icon;
-                        const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
+                        const isActive = isActionPanelOpen && activeView === item.id;
                         
                         return (
-                            <Link
-                                key={item.path}
-                                href={item.path}
+                            <button
+                                key={item.id}
+                                onClick={() => {
+                                    setActiveView(item.id);
+                                    setIsActionPanelOpen(true);
+                                }}
                                 className={cn(
                                     "flex items-center gap-2 px-2.5 sm:px-6 h-full transition-all text-[9.5px] font-black uppercase tracking-widest",
                                     isActive
@@ -137,7 +140,7 @@ export function HeaderLogo({
                             >
                                 <Icon size={14} className={isActive ? item.color : ''} />
                                 <span className="hidden sm:inline">{item.label}</span>
-                            </Link>
+                            </button>
                         );
                     })}
                 </div>
