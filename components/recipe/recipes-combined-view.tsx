@@ -56,21 +56,21 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                     <button
                         onClick={() => setShowFilterMenu(!showFilterMenu)}
                         className={cn(
-                            "h-8 px-4 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border",
+                            "h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2",
                             recipeFilter === 'all'
-                                ? `bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20`
+                                ? `bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20`
                                 : recipeFilter === 'remixes'
-                                ? `bg-violet-600 text-white border-violet-600 shadow-lg shadow-violet-500/20`
+                                ? `bg-violet-600 text-white border-violet-500 shadow-lg shadow-violet-500/20`
                                 : recipeFilter === 'my-recipes'
-                                ? `bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-500/20`
-                                : `bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20`
+                                ? `bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20`
+                                : `bg-amber-600 text-white border-amber-500 shadow-lg shadow-amber-500/20`
                         )}
                     >
-                        {currentFilter?.icon}
+                        {currentFilter?.icon && React.cloneElement(currentFilter.icon as any, { className: "animate-pulse" })}
                         <span>{currentFilter?.label}</span>
-                        <ChevronDown size={10} className={cn("transition-transform", showFilterMenu && "rotate-180")} />
+                        <ChevronDown size={10} className={cn("transition-transform duration-300", showFilterMenu && "rotate-180")} />
                     </button>
-
+企
                     {showFilterMenu && (
                         <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xl z-20 p-1 min-w-[180px]">
                             {filterOptions.map((option) => (

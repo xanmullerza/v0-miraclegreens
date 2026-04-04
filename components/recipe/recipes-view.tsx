@@ -25,6 +25,8 @@ import {
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -434,77 +436,109 @@ export function RecipesView({
 
         return (
             <div className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-4">
                     {recipes.map((recipe) => (
                         <div
                             key={recipe.id}
-                            onClick={() => {
-                                if (onRecipeClick) {
-                                    onRecipeClick(recipe.id);
-                                } else {
-                                    router.push(`/recipes/${recipe.id}`);
-                                }
-                            }}
                             className={cn(
-                                "group relative rounded-xl border transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm",
+                                'group relative rounded-[2rem] border transition-all cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
                                 isMix 
-                                    ? "bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800/50 hover:border-indigo-400 hover:shadow-indigo-500/10 hover:shadow-xl" 
-                                    : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/50 hover:border-emerald-400 hover:shadow-emerald-500/10 hover:shadow-xl"
+                                    ? 'bg-indigo-50/80 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 hover:border-indigo-500/30' 
+                                    : 'bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-blue-500/30',
+                                'hover:shadow-xl hover:shadow-blue-500/5'
                             )}
+                            onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
                         >
-                            <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
-                                <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
-                                    {recipe.image ? (
-                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                            <ChefHat size={24} className="opacity-10" />
-                                        </div>
-                                    )}
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 sm:p-4">
+                                <div className="relative shrink-0 flex items-center">
+                                    <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl border border-slate-200 dark:border-slate-700">
+                                        {recipe.image ? (
+                                            <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                                <ChefHat size={28} />
+                                            </div>
+                                        )}
+                                        {recipe.meal_type && (
+                                            <div className="absolute top-1.5 left-1.5 bg-slate-900/80 backdrop-blur-md text-white text-[7px] font-black tracking-widest px-2 py-0.5 rounded-md uppercase border border-white/10">
+                                                {recipe.meal_type}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex-1 min-w-0 lg:p-0">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight line-clamp-2">
+
+                                <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
+                                    <div className="space-y-0.5">
+                                        <h3 className="font-bold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">
                                             {recipe.title.toLowerCase().split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                                         </h3>
                                     </div>
-                                    {(recipe.calories > 0 || recipe.protein > 0) && (
-                                        <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
-                                            {(() => {
-                                                const multiplier = filters.nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
-                                                return (
-                                                    <>
-                                                        <span className="text-blue-500">{formatEnergy(recipe.calories * multiplier, energyUnit)}</span>
-                                                        <span className="text-slate-300 text-[8px]">•</span>
-                                                        <span className="text-amber-500">{Math.round(recipe.carbs * multiplier)}g C</span>
-                                                        <span className="text-slate-300 text-[8px]">•</span>
-                                                        <span className="text-rose-500">{Math.round(recipe.fat * multiplier)}g F</span>
-                                                        <span className="text-slate-300 text-[8px]">•</span>
-                                                        <span className="text-emerald-500">{Math.round(recipe.protein * multiplier)}g P</span>
-                                                    </>
-                                                );
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-                                {(recipe.calories > 0 || recipe.protein > 0) && (
-                                    <div className="hidden lg:flex items-center justify-end gap-3">
+
+                                    <div className="flex flex-wrap gap-2.5">
                                         {(() => {
                                             const multiplier = filters.nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
                                             return (
                                                 <>
-                                                    <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(recipe.calories * multiplier, energyUnit)}</span>
-                                                    <span className="text-slate-300 text-[8px]">•</span>
-                                                    <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{(recipe.carbs * multiplier).toFixed(1)}g</span>
-                                                    <span className="text-slate-300 text-[8px]">•</span>
-                                                    <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{(recipe.fat * multiplier).toFixed(1)}g</span>
-                                                    <span className="text-slate-300 text-[8px]">•</span>
-                                                    <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{(recipe.protein * multiplier).toFixed(1)}g</span>
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                            {formatEnergy(recipe.calories * multiplier, energyUnit)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                        <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                            {(recipe.carbs * multiplier).toFixed(1)}g
+                                                        </span>
+                                                    </div>
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                        <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                            {(recipe.fat * multiplier).toFixed(1)}g
+                                                        </span>
+                                                    </div>
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                        <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                            {(recipe.protein * multiplier).toFixed(1)}g
+                                                        </span>
+                                                    </div>
                                                 </>
                                             );
                                         })()}
                                     </div>
-                                )}
+                                </div>
+
+                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
+                                    <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
+                                        {[
+                                            { label: 'Recipe', active: true },
+                                            { label: 'Nutrition' },
+                                            { label: 'Related' },
+                                            { label: 'Management' },
+                                        ].map((tab) => (
+                                            <button
+                                                key={tab.label}
+                                                className={cn(
+                                                    'py-1.5 px-2.5 text-[7px] font-black uppercase tracking-[0.15em] rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%]',
+                                                    tab.active
+                                                        ? isMix ? "bg-slate-800/80 text-indigo-400 shadow-[0_0_15px_-5px_rgba(129,140,248,0.3)] ring-1 ring-white/10" : "bg-slate-800/80 text-emerald-400 shadow-[0_0_15px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
+                                                        : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                                                )}
+                                            >
+                                                {tab.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    
+                                    <Link 
+                                        href={`/recipes/${recipe.id}`}
+                                        className="lg:w-full text-[9px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-slate-900/20 px-4 group/btn"
+                                    >
+                                        <span>View Detail</span>
+                                        <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform"/>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     ))}
