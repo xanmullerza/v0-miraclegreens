@@ -522,19 +522,19 @@ export function RecipesView({
                                 </div>
 
                                 <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
-                                    <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
+                                    <div className="flex flex-wrap items-center justify-center gap-2 p-1 rounded-3xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner grow">
                                         {[
-                                            { label: <Clock size={14} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
-                                            { label: <Users size={14} />, value: recipe.servings || 1 },
+                                            { label: <Clock size={24} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
+                                            { label: <Users size={24} />, value: recipe.servings || 1 },
                                             { 
                                                 label: (() => {
                                                     const t = (recipe.type || recipe.meal_type || 'Other').toLowerCase();
-                                                    if (t === 'breakfast') return <Coffee size={14} />;
-                                                    if (t === 'lunch') return <Sun size={14} />;
-                                                    if (t === 'dinner') return <Moon size={14} />;
-                                                    if (t === 'snack') return <Apple size={14} />;
-                                                    if (t.includes('supplement')) return <Pill size={14} />;
-                                                    return <UtensilsCrossed size={14} />;
+                                                    if (t === 'breakfast') return <Coffee size={24} />;
+                                                    if (t === 'lunch') return <Sun size={24} />;
+                                                    if (t === 'dinner') return <Moon size={24} />;
+                                                    if (t === 'snack') return <Apple size={24} />;
+                                                    if (t.includes('supplement')) return <Pill size={24} />;
+                                                    return <UtensilsCrossed size={24} />;
                                                 })(), 
                                                 value: '', 
                                                 active: true 
@@ -542,9 +542,9 @@ export function RecipesView({
                                             { 
                                                 label: (() => {
                                                     const d = recipe.difficulty || 'Medium';
-                                                    if (d === 'Easy') return <SignalLow size={18} />;
-                                                    if (d === 'Hard') return <Signal size={18} />;
-                                                    return <SignalMedium size={18} />;
+                                                    if (d === 'Easy') return <SignalLow size={28} />;
+                                                    if (d === 'Hard') return <Signal size={28} />;
+                                                    return <SignalMedium size={28} />;
                                                 })(), 
                                                 value: '' 
                                             },
@@ -552,7 +552,7 @@ export function RecipesView({
                                             <div
                                                 key={idx}
                                                 className={cn(
-                                                    'py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-row items-center justify-center gap-2.5',
+                                                    'py-5 px-4 text-sm font-black uppercase tracking-wider rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-row items-center justify-center gap-3',
                                                     tab.active
                                                         ? isMix ? "bg-slate-800/80 text-indigo-400 shadow-[0_0_15px_-5px_rgba(129,140,248,0.3)] ring-1 ring-white/10" : "bg-slate-800/80 text-emerald-400 shadow-[0_0_15px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
                                                         : "text-slate-500 bg-white/5"
@@ -570,14 +570,6 @@ export function RecipesView({
                                             </div>
                                         ))}
                                     </div>
-                                    
-                                    <Link 
-                                        href={`/recipes/${recipe.id}`}
-                                        className="lg:w-full text-[9px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-slate-900/20 px-4 group/btn"
-                                    >
-                                        <span>View Detail</span>
-                                        <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform"/>
-                                    </Link>
                                 </div>
                             </div>
                         </div>
