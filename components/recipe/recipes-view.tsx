@@ -426,16 +426,18 @@ export function RecipesView({
     const renderRecipesList = () => {
         if (loading) {
             return (
-                <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
+                <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem]">
                     <Loader2 className={cn("animate-spin", isMix ? "text-indigo-500" : "text-blue-500")} size={32} />
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading {isMix ? 'mixes' : 'recipes'}...</p>
                 </div>
+
             );
         }
         
         if (recipes.length === 0) {
             return (
-                <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
+                <div className="h-96 flex flex-col items-center justify-center rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
+
                     <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <ChefHat size={32} />
                     </div>
@@ -453,16 +455,18 @@ export function RecipesView({
                         <div
                             key={recipe.id}
                             className={cn(
-                                'group relative rounded-[2rem] border transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm',
+                                'group relative rounded-[2rem] transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
                                 isMix 
-                                    ? 'bg-indigo-950/80 border-indigo-900 hover:border-indigo-700' 
-                                    : 'bg-slate-900 border-slate-800 hover:border-slate-600'
+                                    ? 'bg-indigo-950/80 hover:bg-indigo-950' 
+                                    : 'bg-slate-900 hover:bg-slate-900/90'
                             )}
+
                             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 sm:p-4">
                                 <div className="relative shrink-0 flex items-center">
-                                    <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl border border-slate-200 dark:border-slate-700">
+                                    <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl">
+
                                         {recipe.image ? (
                                             <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                         ) : (
@@ -471,7 +475,8 @@ export function RecipesView({
                                             </div>
                                         )}
                                         {recipe.meal_type && (
-                                            <div className="absolute top-1.5 left-1.5 bg-slate-900/80 backdrop-blur-md text-white text-[7px] font-black tracking-widest px-2 py-0.5 rounded-md uppercase border border-white/10">
+                                            <div className="absolute top-1.5 left-1.5 bg-slate-900/80 backdrop-blur-md text-white text-[7px] font-black tracking-widest px-2 py-0.5 rounded-md uppercase">
+
                                                 {recipe.meal_type}
                                             </div>
                                         )}
@@ -490,25 +495,29 @@ export function RecipesView({
                                             const multiplier = filters.nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
                                             return (
                                                 <>
-                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[65px]">
+
                                                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
                                                         <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
                                                             {formatEnergy(recipe.calories * multiplier, energyUnit)}
                                                         </span>
                                                     </div>
-                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[65px]">
+
                                                         <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
                                                         <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
                                                             {(recipe.carbs * multiplier).toFixed(1)}g
                                                         </span>
                                                     </div>
-                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[65px]">
+
                                                         <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
                                                         <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
                                                             {(recipe.fat * multiplier).toFixed(1)}g
                                                         </span>
                                                     </div>
-                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[65px]">
+
                                                         <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
                                                         <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
                                                             {(recipe.protein * multiplier).toFixed(1)}g
@@ -520,7 +529,8 @@ export function RecipesView({
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-800 lg:pl-4 lg:w-52 justify-center">
+                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:pl-4 lg:w-52 justify-center">
+
                                     <div className="flex flex-wrap items-center justify-center gap-1 p-2 rounded-3xl bg-transparent grow">
                                         {([
                                             {
@@ -589,11 +599,12 @@ export function RecipesView({
                             onClick={handleLoadMore}
                             disabled={loadingMore}
                             className={cn(
-                                "h-12 px-8 rounded-full border flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-40",
+                                "h-12 px-8 rounded-full flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-40",
                                 isMix 
-                                    ? "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-500 hover:border-indigo-400 hover:text-indigo-600"
-                                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-500 hover:border-blue-400 hover:text-blue-600"
+                                    ? "bg-white dark:bg-slate-800/50 text-slate-500 hover:text-indigo-600 shadow-sm"
+                                    : "bg-white dark:bg-slate-800/50 text-slate-500 hover:text-blue-600 shadow-sm"
                             )}
+
                         >
                             {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <ChevronDown size={14} />}
                             Load More

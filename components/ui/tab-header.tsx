@@ -41,8 +41,10 @@ export function TabHeader({
     ];
 
     return (
-        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl py-6 px-4 border-b border-border/50">
-            <div className="flex items-center justify-center max-w-5xl mx-auto bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] border border-white/5 shadow-2xl overflow-x-auto no-scrollbar">
+        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl py-6 px-4">
+
+            <div className="flex items-center justify-center max-w-5xl mx-auto bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] shadow-2xl overflow-x-auto no-scrollbar">
+
                 {displayItems.map((item) => (
                     <button
                         key={item.id}
@@ -50,7 +52,8 @@ export function TabHeader({
                         className={cn(
                             "flex-1 min-w-[100px] py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1.5rem] transition-all duration-300 whitespace-nowrap px-4",
                             item.isActive
-                                ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
+                                ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]"
+
                                 : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
                         )}
                     >
