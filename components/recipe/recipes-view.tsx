@@ -21,7 +21,10 @@ import {
     Apple,
     Pill,
     Gauge,
-    UtensilsCrossed
+    UtensilsCrossed,
+    SignalLow,
+    SignalMedium,
+    Signal
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -536,7 +539,15 @@ export function RecipesView({
                                                 value: '', 
                                                 active: true 
                                             },
-                                            { label: <Gauge size={14} />, value: recipe.difficulty || 'Medium' },
+                                            { 
+                                                label: (() => {
+                                                    const d = recipe.difficulty || 'Medium';
+                                                    if (d === 'Easy') return <SignalLow size={14} />;
+                                                    if (d === 'Hard') return <Signal size={14} />;
+                                                    return <SignalMedium size={14} />;
+                                                })(), 
+                                                value: '' 
+                                            },
                                         ].map((tab, idx) => (
                                             <div
                                                 key={idx}
