@@ -8,11 +8,13 @@ import { usePantry } from '@/hooks/use-pantry';
 import { useRDA } from '@/hooks/use-rda';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 import { 
     Calendar, RotateCcw, LayoutGrid, Info, 
     ChevronDown, Sparkles, ChefHat, 
     Search, Filter as FilterIcon, ArrowDownUp, 
-    Clock, Flame, Dumbbell, List, Loader2 
+    Clock, Flame, Dumbbell, List, Loader2,
+    ShoppingBasket, Shapes
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -110,6 +112,7 @@ export function PlannerContent({
     setIsFilterOpen: externalSetIsFilterOpen,
     onRecipeClick,
 }: PlannerContentProps) {
+    const router = useRouter();
     const { state, actions } = usePlannerState();
     
     // UI State for shell
@@ -260,6 +263,7 @@ export function PlannerContent({
 
                 {showLengthMenu && (
                     <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl z-[100] p-1.5 min-w-[160px] animate-in fade-in zoom-in-95 duration-200">
+                        {/* Plan length options */}
                         {(['daily', 'weekly', 'monthly'] as PlanLength[]).map((length) => (
                             <button
                                 key={length}
@@ -278,6 +282,25 @@ export function PlannerContent({
                                 {length}
                             </button>
                         ))}
+
+                        {/* Divider */}
+                        <div className="my-1.5 border-t border-slate-200 dark:border-slate-700" />
+
+                        {/* Quick links */}
+                        <button
+                            onClick={() => { setShowLengthMenu(false); router.push('/library?view=list'); }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-600 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 mb-1"
+                        >
+                            <ShoppingBasket size={12} className="text-amber-500" />
+                            Shopping
+                        </button>
+                        <button
+                            onClick={() => { setShowLengthMenu(false); router.push('/library?view=pantry'); }}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-600"
+                        >
+                            <Shapes size={12} className="text-sky-500" />
+                            Pantry
+                        </button>
                     </div>
                 )}
             </div>

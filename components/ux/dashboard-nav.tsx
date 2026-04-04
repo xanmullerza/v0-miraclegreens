@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Calendar, ShoppingBasket, Shapes, X as CloseIcon } from 'lucide-react';
+import { Calendar, X as CloseIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 
@@ -11,17 +11,9 @@ export function DashboardNav() {
     const pathname = usePathname();
     const { setIsActionPanelOpen } = useActionPanel();
 
-    // Determine active button based on clean pathname + optional view param
+    // Determine active button based on clean pathname
     const getActiveButton = () => {
         if (pathname === '/tracker') return 'planner';
-        if (pathname === '/library') {
-            const searchParams = new URLSearchParams(
-                typeof window !== 'undefined' ? window.location.search : ''
-            );
-            const view = searchParams.get('view');
-            if (view === 'list') return 'shopping';
-            if (view === 'pantry') return 'pantry';
-        }
         return null;
     };
 
@@ -30,8 +22,6 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/library?view=list', color: 'amber' },
-        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/library?view=pantry', color: 'sky' },
         { id: 'planner', icon: Calendar, label: 'Tracker', path: '/tracker', color: 'purple' },
     ];
 
