@@ -61,19 +61,21 @@ export function TrackerTabShell({
     const currentSortLabel = sortOptions.find(opt => opt.id === sortField)?.label.split(' ')[0] || 'Sort';
 
     return (
-        <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
+        <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] shadow-xl">
+
             {/* Sticky Header */}
-            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-[2rem]">
+            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-[2rem]">
+
                 <div className="flex items-center gap-4 px-6 py-4 w-full">
                     {/* Filter Button (Optional) */}
                     {showFilters && (
                         <button 
                             onClick={onFilterClick}
                             className={cn(
-                                "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border relative shadow-sm",
                                 (hasActiveFilters || activeFilterCount > 0)
-                                    ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20"
-                                    : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
+                                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                                    : "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400"
+
                             )}
                             title="Filters"
                         >
@@ -92,10 +94,11 @@ export function TrackerTabShell({
                         <button
                             onClick={() => setShowSortOptions(!showSortOptions)}
                             className={cn(
-                                "h-9 px-4 rounded-xl flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
+                                "h-9 px-4 rounded-xl flex items-center gap-2 transition-all text-[10px] font-black uppercase tracking-widest",
                                 showSortOptions
-                                    ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200"
-                                    : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500"
+                                    ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600"
+                                    : "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400"
+
                             )}
                             title="Sort Options"
                         >
@@ -104,7 +107,8 @@ export function TrackerTabShell({
                         </button>
 
                         {showSortOptions && (
-                            <div className="absolute left-0 top-full mt-2 w-44 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
+                            <div className="absolute left-0 top-full mt-2 w-44 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl z-20 p-1.5">
+
                                 {sortOptions.map((opt) => (
                                     <button
                                         key={opt.id}
@@ -136,10 +140,10 @@ export function TrackerTabShell({
                             onChange={(e) => onSearchChange(e.target.value)}
                             placeholder={placeholder || `Search ${title.toLowerCase()}...`}
                             className={cn(
-                                "w-full h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
-                                "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                "bg-white/50 dark:bg-slate-900/50",
                                 "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
-                                "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                "focus:bg-white dark:focus:bg-slate-800 focus:ring-0"
+
                             )}
                         />
                         {searchQuery && (

@@ -91,22 +91,25 @@ export const RecipeListItem = ({
         <div 
             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
             className={cn(
-                'group relative rounded-[2rem] border transition-all cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
+                'group relative rounded-[2.5rem] transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1',
                 isEaten 
-                    ? 'bg-emerald-500/5 border-emerald-500/10 opacity-60 grayscale-[0.3]' 
-                    : 'bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5',
+                    ? 'bg-emerald-500/5 opacity-60 grayscale-[0.3]' 
+                    : 'bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800/90',
             )}
+
         >
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 sm:p-4">
                 {/* Image Section */}
                 <div className="relative shrink-0 flex items-center">
-                    <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl shadow-xl ring-1 ring-white/5">
+
                         {recipe.image ? (
                             <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600"><ChefHat size={28} /></div>
                         )}
-                        <div className="absolute top-1.5 left-1.5 bg-slate-900/80 backdrop-blur-md text-white text-[7px] font-black tracking-widest px-2 py-0.5 rounded-md uppercase border border-white/10">{mealLabel}</div>
+                        <div className="absolute top-1.5 left-1.5 bg-slate-900/80 backdrop-blur-md text-white text-[7px] font-black tracking-widest px-2 py-0.5 rounded-md uppercase">{mealLabel}</div>
+
                     </div>
                 </div>
 
@@ -118,19 +121,23 @@ export const RecipeListItem = ({
 
                     {/* Stats Grid - Enhanced size */}
                     <div className="flex flex-wrap gap-2.5">
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                        <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{formatEnergy(displayCalories, unit, displayEnergy)}</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                        <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                             <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayCarbs.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                        <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                             <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayFat.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                        <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                             <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayProtein.toFixed(1)}g</span>
                         </div>
@@ -138,23 +145,26 @@ export const RecipeListItem = ({
                 </div>
 
                 {/* Actions Section */}
-                <div className="flex flex-row sm:flex-col gap-2 pt-2 sm:pt-0 sm:border-l sm:border-slate-100 sm:dark:border-slate-800 sm:pl-4 sm:w-44">
+                <div className="flex flex-row sm:flex-col gap-2 pt-2 sm:pt-0 sm:pl-4 sm:w-44">
+
                     <div className="flex flex-1 sm:flex-none gap-2">
                         <button 
                             onClick={(e) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
                             className={cn(
-                                'flex-1 text-[7px] font-black uppercase tracking-widest h-8 px-2 rounded-lg border transition-all flex items-center justify-center gap-1.5',
-                                tierClasses[tier]
+                                'flex-1 text-[7px] font-black uppercase tracking-widest h-8 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5',
+                                tierClasses[tier].replace('border-emerald-500/30 ', '').replace('border-blue-500/30 ', '').replace('border-amber-500/30 ', '')
                             )}
+
                         >
                             <ShoppingBasket size={12}/> {stockedIngs.length}/{filteredIngs.length}
                         </button>
                         <button 
                             onClick={(e) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
                             className={cn(
-                                'flex-1 text-[7px] font-black uppercase tracking-widest h-8 px-2 rounded-lg border transition-all flex items-center justify-center gap-1.5',
-                                toBuyState === 'toBuy' ? 'border-blue-500/30 bg-blue-500/10 text-blue-500' : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                'flex-1 text-[7px] font-black uppercase tracking-widest h-8 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5',
+                                toBuyState === 'toBuy' ? 'bg-blue-500/10 text-blue-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                             )}
+
                         >
                             <ShoppingCart size={12}/> {missingIngs.length}/{filteredIngs.length}
                         </button>
@@ -186,7 +196,8 @@ export const RecipeListItem = ({
 
             {/* Expanded Panel Section */}
             {activePanel && (
-                <div className="border-t border-slate-100 dark:border-slate-800 p-6 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl animate-in slide-in-from-top-4 duration-300">
+                <div className="p-6 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl animate-in slide-in-from-top-4 duration-300">
+
                     <div className="flex items-center justify-between mb-4">
                         <div className="space-y-0.5">
                             <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">
@@ -203,7 +214,8 @@ export const RecipeListItem = ({
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {(activePanel === 'stocked' ? stockedIngs : missingIngs).map((ing, i) => (
-                            <div key={i} className="group/ing relative flex items-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-blue-500/50">
+                            <div key={i} className="group/ing relative flex items-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700">
+
                                 <div className={cn("w-1.5 h-1.5 rounded-full", activePanel === 'stocked' ? "bg-emerald-500" : "bg-blue-500")} />
                                 <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200 capitalize">
                                     {ing.foodName || ing.baseIngredient || ing.item}

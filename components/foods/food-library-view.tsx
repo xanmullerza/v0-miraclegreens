@@ -225,14 +225,16 @@ export function FoodsView({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
-                    className="h-10 px-4 rounded-xl bg-cyan-600 text-white border-cyan-500 shadow-lg shadow-cyan-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]"
+                    className="h-10 px-4 rounded-xl bg-cyan-600 text-white shadow-lg shadow-cyan-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98]"
                 >
+
                     <Leaf size={14} className="animate-pulse" />
                     <span className="hidden sm:inline">Foods</span>
                     <ChevronDown size={10} />
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-slate-900 border-slate-800 p-2 rounded-2xl shadow-2xl">
+            <DropdownMenuContent align="end" className="w-48 bg-slate-900 p-2 rounded-2xl shadow-2xl">
+
                 <DropdownMenuItem 
                     className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-white font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1"
                 >
@@ -329,14 +331,16 @@ export function FoodsView({
                 <div
                     key={food.id}
                     className={cn(
-                        'group relative rounded-[2rem] border transition-all cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
-                        'bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5'
+                        'group relative rounded-[2.5rem] transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1',
+                        'bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800/90'
                     )}
+
                 >
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 sm:p-4">
                         {/* Image Section */}
                         <div className="relative shrink-0 flex items-center">
-                            <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl border border-slate-200 dark:border-slate-700">
+                            <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl shadow-xl ring-1 ring-white/5">
+
                                 {food.image ? (
                                     <Image src={food.image} alt={food.name} fill className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 ) : (
@@ -345,7 +349,8 @@ export function FoodsView({
                                     </div>
                                 )}
                                 {food.is_in_pantry && (
-                                    <div className="absolute top-1.5 right-1.5 bg-emerald-500 text-white rounded-full p-1 shadow-lg z-10 border border-emerald-400">
+                                    <div className="absolute top-1.5 right-1.5 bg-emerald-500 text-white rounded-full p-1 shadow-lg z-10">
+
                                         <Check size={8} strokeWidth={4} />
                                     </div>
                                 )}
@@ -362,19 +367,23 @@ export function FoodsView({
 
                             {/* Stats Grid - MATCHING PLANNER STYLE EXACTLY */}
                             <div className="flex flex-wrap gap-2.5">
-                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
                                     <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{formatEnergy(food.energy_kcal, energyUnit)}</span>
                                 </div>
-                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                                     <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
                                     <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{food.carbs_g.toFixed(1)}g</span>
                                 </div>
-                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                                     <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
                                     <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{food.fat_g.toFixed(1)}g</span>
                                 </div>
-                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+
                                     <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
                                     <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{food.protein_g.toFixed(1)}g</span>
                                 </div>
@@ -382,7 +391,8 @@ export function FoodsView({
                         </div>
 
                         {/* Actions Section - MATCHING PLANNER STRUCTURE + FOOD DETAIL TABS */}
-                        <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-48 justify-center">
+                        <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:pl-4 lg:w-48 justify-center">
+
                             <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
                                 {[
                                     { label: 'About', active: true },

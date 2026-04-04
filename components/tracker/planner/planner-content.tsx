@@ -345,7 +345,8 @@ export function PlannerContent({
                         </div>
                     ) : isProfileIncomplete && !isAnonymous ? (
                         <div className="flex flex-col items-center justify-center space-y-6 pt-4">
-                            <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
+                            <div className="max-w-2xl w-full p-8 rounded-[2.5rem] bg-slate-900 shadow-2xl text-center space-y-5 ring-1 ring-white/5">
+
                                 <p className="text-sm font-medium text-white/90 leading-relaxed">
                                     Welcome, {user?.user_metadata?.full_name || 'User'}!
                                     <br />
@@ -363,7 +364,8 @@ export function PlannerContent({
                         </div>
                     ) : (user && !state.plan && hasAttemptedInitial) ? (
                          <div className="flex flex-col items-center justify-center space-y-6 pt-4">
-                            <div className="max-w-2xl w-full p-8 rounded-[2rem] bg-slate-900 border border-slate-700/50 shadow-2xl text-center space-y-5">
+                            <div className="max-w-2xl w-full p-8 rounded-[2.5rem] bg-slate-900 shadow-2xl text-center space-y-5 ring-1 ring-white/5">
+
                                 <p className="text-sm font-medium text-rose-400 font-bold uppercase tracking-widest">
                                     Failed to generate plan. Your recipe parameters might be too strict.
                                 </p>
@@ -409,7 +411,8 @@ export function PlannerContent({
                             </div>
 
                             {/* Daily Nutrition Display */}
-                            <div className="mt-6 p-4 sm:p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
+                            <div className="mt-6 p-4 sm:p-6 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/50 shadow-xl ring-1 ring-white/5 animate-in slide-in-from-top-6 duration-500">
+
                                 <DailyNutrition 
                                     plan={effectivePlan} 
                                     userRDAs={userRDAs}
