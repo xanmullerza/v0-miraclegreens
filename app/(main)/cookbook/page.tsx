@@ -57,10 +57,7 @@ function RecipesPageContent() {
         setActiveTab(id);
         if (id === 'recipes') router.push('/cookbook');
         else if (id === 'planner') router.push('/tracker');
-        else {
-            const viewQuery = id === 'foods' && inventoryView !== 'foods' ? `&view=${inventoryView}` : '';
-            router.push(`/cookbook?tab=${id}${viewQuery}`);
-        }
+        else router.push('/library');
     };
 
     const handleViewChange = (view: InventoryView) => {
