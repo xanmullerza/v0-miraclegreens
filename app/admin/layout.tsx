@@ -17,6 +17,10 @@ import {
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { SearchProvider, useSearch } from '@/lib/context/search-context';
+import { ActionPanelProvider } from '@/lib/context/action-panel-context';
+import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
+import { SplitViewProvider } from '@/lib/context/split-view-context';
+import { RecipeFilterProvider } from '@/lib/context/recipe-filter-context';
 import { supabase } from '@/lib/supabase';
 import {
     DropdownMenu,
@@ -284,8 +288,16 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <SearchProvider>
-            <AdminLayoutContent>{children}</AdminLayoutContent>
-        </SearchProvider>
+        <SplitViewProvider>
+            <ActionPanelProvider>
+                <SearchProvider>
+                    <HeaderActionsProvider>
+                        <RecipeFilterProvider>
+                            <AdminLayoutContent>{children}</AdminLayoutContent>
+                        </RecipeFilterProvider>
+                    </HeaderActionsProvider>
+                </SearchProvider>
+            </ActionPanelProvider>
+        </SplitViewProvider>
     );
 }
