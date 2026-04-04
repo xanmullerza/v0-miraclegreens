@@ -1,7 +1,8 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, ShoppingBasket, Shapes } from 'lucide-react';
+
 import { PageContainer } from '@/components/ui/page-container';
 import { TabHeader } from '@/components/ui/tab-header';
 import { useRouter } from 'next/navigation';
@@ -26,8 +27,17 @@ function PlannerPageContent() {
     const tabs = [
         { id: 'recipes', label: 'Cookbook' },
         { id: 'foods', label: 'Library' },
-        { id: 'planner', label: getTrackerLabel() },
+        { 
+            id: 'planner', 
+            label: getTrackerLabel(),
+            dropdownOptions: [
+                { id: 'p1', label: 'Planner', onClick: () => setSubView('planner'), icon: <Sparkles size={12} className="text-blue-500" /> },
+                { id: 'p2', label: 'Shopping List', onClick: () => setSubView('shopping'), icon: <ShoppingBasket size={12} className="text-amber-500" /> },
+                { id: 'p3', label: 'Pantry Inventory', onClick: () => setSubView('pantry'), icon: <Shapes size={12} className="text-sky-500" /> },
+            ]
+        },
     ];
+
 
     const handleTabChange = (id: string) => {
         if (id === 'recipes') router.push('/cookbook');
