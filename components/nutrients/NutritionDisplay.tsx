@@ -55,7 +55,7 @@ export function NutritionDisplay({
     const ndm = nutrientDisplayMode;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-2">
@@ -82,7 +82,7 @@ export function NutritionDisplay({
             </div>
 
             {/* Macros Summary Bar */}
-            <div className="grid grid-cols-4 gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
+            <div className="grid grid-cols-4 gap-2 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
                 {/* Energy */}
                 <div className="text-center">
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 mb-1">Energy</div>
@@ -213,7 +213,7 @@ export function NutritionDisplay({
             {/* Micronutrients */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Vitamins */}
-                <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-4 flex flex-col gap-4">
+                <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-3 flex flex-col gap-3">
                     <div>
                         <div className="flex items-center justify-between">
                             <div className="text-[11px] font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
@@ -271,7 +271,7 @@ export function NutritionDisplay({
                 </div>
 
                 {/* Minerals */}
-                <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-4 flex flex-col gap-4">
+                <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-3 flex flex-col gap-3">
                     <div>
                         <div className="flex items-center justify-between">
                             <div className="text-[11px] font-black uppercase tracking-widest text-cyan-500">Minerals</div>

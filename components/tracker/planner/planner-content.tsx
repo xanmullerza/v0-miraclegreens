@@ -244,7 +244,7 @@ export function PlannerContent({
             }}
             dropdownContent={lengthSwitcher}
         >
-            <div className="space-y-8 py-4">
+            <div className="space-y-6 py-4">
                 {isLoading ? (
                     <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
                         <Loader2 size={24} className="animate-spin text-emerald-500" />
@@ -321,7 +321,7 @@ export function PlannerContent({
                         </div>
 
                         {/* List of Meals */}
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             {getFilteredMeals().map((meal) => (
                                 <RecipeListItem
                                     key={meal.id}
@@ -338,7 +338,7 @@ export function PlannerContent({
                         </div>
 
                         {/* Daily Nutrition Display */}
-                        <div className="mt-8 p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
+                        <div className="mt-6 p-4 sm:p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-6 duration-500">
                             <DailyNutrition 
                                 plan={plan} 
                                 userRDAs={userRDAs}
