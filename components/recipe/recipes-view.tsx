@@ -551,22 +551,16 @@ export function RecipesView({
                                         ].map((tab, idx) => (
                                             <div
                                                 key={idx}
-                                                className={cn(
-                                                    'py-5 px-2 text-sm font-black uppercase tracking-wider rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-row items-center justify-center gap-1.5',
-                                                    tab.active
-                                                        ? isMix ? "bg-slate-800/80 text-indigo-400 shadow-[0_0_15px_-5px_rgba(129,140,248,0.3)] ring-1 ring-white/10" : "bg-slate-800/80 text-emerald-400 shadow-[0_0_15px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
-                                                        : "text-slate-500 bg-white/5"
-                                                )}
+                                                className="py-5 px-2 text-sm font-black uppercase tracking-wider rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-row items-center justify-center gap-1.5 bg-transparent text-slate-400"
                                             >
                                                 {tab.label && (
-                                                    <span className={cn(
-                                                        "opacity-80 leading-none shrink-0",
-                                                        tab.active ? "text-current" : "text-slate-400"
-                                                    )}>
+                                                    <span className="opacity-70 leading-none shrink-0">
                                                         {tab.label}
                                                     </span>
                                                 )}
-                                                <span className={cn("truncate max-w-full italic leading-none font-black")}>{tab.value}</span>
+                                                {tab.value !== '' && (
+                                                    <span className="truncate max-w-full leading-none font-black text-white/80 text-xs">{tab.value}</span>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
