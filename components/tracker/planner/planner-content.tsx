@@ -87,7 +87,7 @@ const DEMO_PLAN = {
             protein: 7,
             fat: 5,
             carbs: 25,
-            image: 'https://plus.unsplash.com/premium_photo-1695297514394-06ac9000a4d5?w=400&q=80',
+            image: 'https://images.unsplash.com/photo-1515544867661-30444936f2e8?w=400&q=80',
             micronutrients: { 
                 'Fiber': 8, 'Iron': 2.4, 'Folate': 85, 'Manganese': 1.2, 
                 'B1 (Thiamine)': 0.2, 'Magnesium': 60, 'Potassium': 320, 'Zinc': 1.5,
