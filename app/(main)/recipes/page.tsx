@@ -12,16 +12,18 @@ import { PantryView } from '@/components/tracker/pantry-view';
 import { useSearch } from '@/lib/context/search-context';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useActionPanel } from '@/lib/context/action-panel-context';
+import { ChevronDown, ShoppingCart, Package, Leaf, List, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ShoppingCart, Package, Leaf, List } from 'lucide-react';
 
 type TabId = 'recipes' | 'foods' | 'planner';
-type InventoryView = 'foods' | 'list' | 'pantry' | 'cart';
+type InventoryView = 'foods' | 'nutridex' | 'list' | 'pantry' | 'cart';
 
 function RecipesPageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { profile } = useUserPreferences();
+    const { setIsActionPanelOpen, setActiveView } = useActionPanel();
     
     const initialTab = (searchParams.get('tab') as TabId) || 'recipes';
     const initialView = (searchParams.get('view') as InventoryView) || 'foods';
@@ -62,6 +64,13 @@ function RecipesPageContent() {
     };
 
     const handleViewChange = (view: InventoryView) => {
+        if (view === 'nutridex') {
+            setShowInventoryMenu(false);
+            setActiveView('nutridex');
+            setIsActionPanelOpen(true);
+            return;
+        }
+        
         setInventoryView(view);
         setShowInventoryMenu(false);
         router.push(`/recipes?tab=foods&view=${view}`);
@@ -75,6 +84,8 @@ function RecipesPageContent() {
                     "h-10 px-4 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
                     inventoryView === 'foods'
                         ? "bg-cyan-600 text-white border-cyan-600 shadow-lg shadow-cyan-500/20"
+                        : inventoryView === 'nutridex'
+                        ? "bg-fuchsia-600 text-white border-fuchsia-600 shadow-lg shadow-fuchsia-500/20"
                         : inventoryView === 'list'
                         ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
                         : inventoryView === 'pantry'
@@ -83,11 +94,12 @@ function RecipesPageContent() {
                 )}
             >
                 {inventoryView === 'foods' && <Leaf size={12} />}
+                {inventoryView === 'nutridex' && <Activity size={12} />}
                 {inventoryView === 'list' && <List size={12} />}
                 {inventoryView === 'pantry' && <Package size={12} />}
                 {inventoryView === 'cart' && <ShoppingCart size={12} />}
                 <span>
-                    {inventoryView === 'foods' ? 'Foods' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
+                    {inventoryView === 'foods' ? 'Foods' : inventoryView === 'nutridex' ? 'Nutridex' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
                 </span>
                 <ChevronDown size={10} className={cn("transition-transform", showInventoryMenu && "rotate-180")} />
             </button>
@@ -105,6 +117,18 @@ function RecipesPageContent() {
                     >
                         <Leaf size={12} />
                         Foods
+                    </button>
+                    <button
+                        onClick={() => handleViewChange('nutridex')}
+                        className={cn(
+                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                            inventoryView === 'nutridex'
+                                ? "bg-fuchsia-600 text-white"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-900/20 hover:text-fuchsia-600"
+                        )}
+                    >
+                        <Activity size={12} className={inventoryView !== 'nutridex' ? 'text-fuchsia-500' : ''} />
+                        Nutridex
                     </button>
                     <button
                         onClick={() => handleViewChange('list')}
