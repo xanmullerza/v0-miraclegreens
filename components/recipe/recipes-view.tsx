@@ -542,9 +542,9 @@ export function RecipesView({
                                             { 
                                                 label: (() => {
                                                     const d = recipe.difficulty || 'Medium';
-                                                    if (d === 'Easy') return <SignalLow size={14} />;
-                                                    if (d === 'Hard') return <Signal size={14} />;
-                                                    return <SignalMedium size={14} />;
+                                                    if (d === 'Easy') return <SignalLow size={18} />;
+                                                    if (d === 'Hard') return <Signal size={18} />;
+                                                    return <SignalMedium size={18} />;
                                                 })(), 
                                                 value: '' 
                                             },
