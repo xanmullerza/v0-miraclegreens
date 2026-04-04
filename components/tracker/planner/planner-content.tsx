@@ -166,7 +166,7 @@ export function PlannerContent({
                 >
                     <ChevronDown size={12} />
                 </button>
-                <div className="px-2 py-1 text-[7px] font-bold uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap min-w-[50px] text-center">
+                <div className="px-2 py-1 text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap min-w-[50px] text-center">
                     {selectedServings.toFixed(1)}x
                 </div>
                 <button
