@@ -70,7 +70,6 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                         <span>{currentFilter?.label}</span>
                         <ChevronDown size={10} className={cn("transition-transform duration-300", showFilterMenu && "rotate-180")} />
                     </button>
-企
                     {showFilterMenu && (
                         <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xl z-20 p-1 min-w-[180px]">
                             {filterOptions.map((option) => (

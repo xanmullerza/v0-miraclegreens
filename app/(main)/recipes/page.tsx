@@ -155,7 +155,6 @@ function RecipesPageContent() {
                 activeTab={activeTab}
                 onTabChange={(id) => handleTabChange(id as TabId)}
             />
-企
             {/* Content */}
             <PageContainer maxWidth="max-w-7xl">
                 <div className="space-y-6 animate-in fade-in duration-500 py-6">
