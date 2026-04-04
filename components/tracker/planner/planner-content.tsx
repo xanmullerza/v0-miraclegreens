@@ -92,7 +92,9 @@ export interface PlannerContentProps {
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     onRecipeClick?: (recipeId: string) => void;
     onSubViewChange?: (view: 'shopping' | 'pantry') => void;
+    dropdownContent?: React.ReactNode;
 }
+
 
 const PLANNER_SORT_OPTIONS: SortOption[] = [
     { id: 'time', label: 'Time (Schedule)', icon: <Clock size={12} /> },
@@ -112,7 +114,9 @@ export function PlannerContent({
     setIsFilterOpen: externalSetIsFilterOpen,
     onRecipeClick,
     onSubViewChange,
+    dropdownContent,
 }: PlannerContentProps) {
+
     const { state, actions } = usePlannerState();
     
     // UI State for shell
@@ -335,8 +339,9 @@ export function PlannerContent({
                     setActiveView('recipe-filters');
                     setIsActionPanelOpen(true);
                 }}
-                dropdownContent={lengthSwitcher}
+                dropdownContent={dropdownContent || lengthSwitcher}
             >
+
                 <div className="space-y-6 py-4">
                     {isLoading ? (
                         <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">

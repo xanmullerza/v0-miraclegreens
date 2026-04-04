@@ -1,7 +1,15 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { Loader2, ArrowLeft, Sparkles, ShoppingBasket, Shapes } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, ShoppingBasket, Shapes, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
 
 import { PageContainer } from '@/components/ui/page-container';
 import { TabHeader } from '@/components/ui/tab-header';
@@ -39,27 +47,69 @@ function PlannerPageContent() {
     ];
 
 
+    // Themed Tracker dropdown matching Cookbook/Library style
+    const trackerDropdown = (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button
+                    className={cn(
+                        "h-10 px-4 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10",
+                        subView === 'planner' ? "bg-blue-600 text-white shadow-blue-500/20" :
+                        subView === 'shopping' ? "bg-amber-600 text-white shadow-amber-500/20" :
+                        "bg-emerald-600 text-white shadow-emerald-500/20"
+                    )}
+                >
+                    {subView === 'planner' ? <Sparkles size={14} className="animate-pulse" /> :
+                     subView === 'shopping' ? <ShoppingBasket size={14} className="animate-pulse" /> :
+                     <Shapes size={14} className="animate-pulse" />}
+                    <span className="hidden sm:inline">{getTrackerLabel()}</span>
+                    <ChevronDown size={10} />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-800 p-2 rounded-2xl shadow-2xl">
+                <DropdownMenuItem 
+                    className={cn(
+                        "gap-3 py-2.5 cursor-pointer font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1",
+                        subView === 'planner' ? "bg-blue-600/20 text-blue-400" : "text-slate-300 focus:bg-slate-800"
+                    )}
+                    onClick={() => setSubView('planner')}
+                >
+                    <Sparkles size={14} className="text-blue-500" />
+                    Meal Planner
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className={cn(
+                        "gap-3 py-2.5 cursor-pointer font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1",
+                        subView === 'shopping' ? "bg-amber-600/20 text-amber-400" : "text-slate-300 focus:bg-slate-800"
+                    )}
+                    onClick={() => setSubView('shopping')}
+                >
+                    <ShoppingBasket size={14} className="text-amber-500" />
+                    Shopping List
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className={cn(
+                        "gap-3 py-2.5 cursor-pointer font-bold tracking-widest uppercase text-[10px] rounded-xl",
+                        subView === 'pantry' ? "bg-emerald-600/20 text-emerald-400" : "text-slate-300 focus:bg-slate-800"
+                    )}
+                    onClick={() => setSubView('pantry')}
+                >
+                    <Shapes size={14} className="text-emerald-500" />
+                    Pantry Inventory
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+
     const handleTabChange = (id: string) => {
         if (id === 'recipes') router.push('/cookbook');
+        else if (id === 'foods') router.push('/library');
         else if (id === 'planner') {
-            if (subView !== 'planner') setSubView('planner');
-            else router.push('/tracker');
+            // Already handled by Dropdown in TabHeader if they are already on planner
+            router.push('/tracker');
         }
-        else router.push('/library');
     };
 
-
-    // "Back to Tracker" button passed into Shopping/Pantry views as their dropdown slot
-    const backButton = (
-        <button
-            onClick={() => setSubView('planner')}
-            className="h-10 px-4 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] ring-1 ring-white/10"
-        >
-            <ArrowLeft size={12} />
-            Planner
-        </button>
-
-    );
 
     return (
         <>
@@ -74,21 +124,23 @@ function PlannerPageContent() {
                     {subView === 'planner' && (
                         <MealPlannerContent
                             onSubViewChange={(view) => setSubView(view)}
+                            dropdownContent={trackerDropdown}
                         />
                     )}
                     {subView === 'shopping' && (
                         <ShoppingListView
                             scannerOpen={scannerOpen}
                             onScannerOpenChange={setScannerOpen}
-                            dropdownContent={backButton}
+                            dropdownContent={trackerDropdown}
                         />
                     )}
                     {subView === 'pantry' && (
                         <PantryView
                             refreshKey={refreshKey}
-                            dropdownContent={backButton}
+                            dropdownContent={trackerDropdown}
                         />
                     )}
+
                 </div>
             </PageContainer>
         </>
