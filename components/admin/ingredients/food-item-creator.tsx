@@ -221,7 +221,7 @@ export function FoodItemCreatorContent() {
             if (uploadError) throw uploadError;
 
             const { data: { publicUrl } } = supabase.storage
-                .from('food-images')
+                .from('food-items')
                 .getPublicUrl(fileName);
 
             setImage(publicUrl);
