@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
     ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search, ShoppingCart, List, Package,
-    Info, Activity, Scale, Settings, FlaskConical, ChevronRight
+    Info, Activity, Scale, LifeBuoy, Settings, FlaskConical, ChevronRight
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
@@ -258,6 +258,16 @@ export function FoodsView({
                 >
                     <Scale size={14} className="text-amber-500" />
                     Comparator
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-slate-300 font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1"
+                    onClick={() => {
+                        setActiveView('lifeguard');
+                        setIsActionPanelOpen(true);
+                    }}
+                >
+                    <LifeBuoy size={14} className="text-red-500" />
+                    Lifeguard
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                     className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-slate-300 font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1"

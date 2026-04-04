@@ -13,11 +13,11 @@ import { useSearch } from '@/lib/context/search-context';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
-import { ChevronDown, ShoppingCart, Package, Leaf, List, Activity, Scale } from 'lucide-react';
+import { ChevronDown, ShoppingCart, Package, Leaf, List, Activity, Scale, LifeBuoy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type TabId = 'recipes' | 'foods' | 'planner';
-type InventoryView = 'foods' | 'nutridex' | 'comparator' | 'list' | 'pantry' | 'cart';
+type InventoryView = 'foods' | 'nutridex' | 'comparator' | 'lifeguard' | 'list' | 'pantry' | 'cart';
 
 function RecipesPageContent() {
     const searchParams = useSearchParams();
@@ -76,6 +76,12 @@ function RecipesPageContent() {
             setIsActionPanelOpen(true);
             return;
         }
+        if (view === 'lifeguard') {
+            setShowInventoryMenu(false);
+            setActiveView('lifeguard');
+            setIsActionPanelOpen(true);
+            return;
+        }
         
         setInventoryView(view);
         setShowInventoryMenu(false);
@@ -94,6 +100,8 @@ function RecipesPageContent() {
                         ? "bg-fuchsia-600 text-white border-fuchsia-600 shadow-lg shadow-fuchsia-500/20"
                         : inventoryView === 'comparator'
                         ? "bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/20"
+                        : inventoryView === 'lifeguard'
+                        ? "bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20"
                         : inventoryView === 'list'
                         ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
                         : inventoryView === 'pantry'
@@ -104,11 +112,12 @@ function RecipesPageContent() {
                 {inventoryView === 'foods' && <Leaf size={12} />}
                 {inventoryView === 'nutridex' && <Activity size={12} />}
                 {inventoryView === 'comparator' && <Scale size={12} />}
+                {inventoryView === 'lifeguard' && <LifeBuoy size={12} />}
                 {inventoryView === 'list' && <List size={12} />}
                 {inventoryView === 'pantry' && <Package size={12} />}
                 {inventoryView === 'cart' && <ShoppingCart size={12} />}
                 <span>
-                    {inventoryView === 'foods' ? 'Foods' : inventoryView === 'nutridex' ? 'Nutridex' : inventoryView === 'comparator' ? 'Comparator' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
+                    {inventoryView === 'foods' ? 'Foods' : inventoryView === 'nutridex' ? 'Nutridex' : inventoryView === 'comparator' ? 'Comparator' : inventoryView === 'lifeguard' ? 'Lifeguard' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
                 </span>
                 <ChevronDown size={10} className={cn("transition-transform", showInventoryMenu && "rotate-180")} />
             </button>
@@ -150,6 +159,18 @@ function RecipesPageContent() {
                     >
                         <Scale size={12} className={inventoryView !== 'comparator' ? 'text-amber-500' : ''} />
                         Comparator
+                    </button>
+                    <button
+                        onClick={() => handleViewChange('lifeguard')}
+                        className={cn(
+                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                            inventoryView === 'lifeguard'
+                                ? "bg-red-500 text-white"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500"
+                        )}
+                    >
+                        <LifeBuoy size={12} className={inventoryView !== 'lifeguard' ? 'text-red-500' : ''} />
+                        Lifeguard
                     </button>
                     <button
                         onClick={() => handleViewChange('list')}
