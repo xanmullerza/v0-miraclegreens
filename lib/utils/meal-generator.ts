@@ -53,7 +53,7 @@ const calculateNutrition = (ingredients: any[], servings: number = 1) => {
 
     const result = {
         get calories() { return totalCalories / servings; },
-        get energyKj() { return totalEnergyKj / servings; },
+        get energy_kj() { return totalEnergyKj / servings; },
         get protein() { return totalProtein / servings; },
         get carbs() { return totalCarbs / servings; },
         get fat() { return totalFat / servings; },
@@ -216,7 +216,7 @@ export const getRandomRecipeByType = async (
                     title: r.title,
                     type: r.type,
                     calories: calculatedNutrition.calories || (r.calories / (r.servings || 1)) || 0,
-                    energyKj: calculatedNutrition.energyKj || (r.energy_kj / (r.servings || 1)) || 0,
+                    energy_kj: calculatedNutrition.energy_kj || (r.energy_kj / (r.servings || 1)) || 0,
                     protein: calculatedNutrition.protein || (r.protein / (r.servings || 1)) || 0,
                     carbs: calculatedNutrition.carbs || (r.carbs / (r.servings || 1)) || 0,
                     fat: calculatedNutrition.fat || (r.fat / (r.servings || 1)) || 0,
@@ -370,7 +370,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 title: r.title,
                 type: r.type,
                 calories: calculatedNutrition.calories || (r.calories / (r.servings || 1)) || 0,
-                energyKj: calculatedNutrition.energyKj || (r.energy_kj / (r.servings || 1)) || 0,
+                energy_kj: calculatedNutrition.energy_kj || (r.energy_kj / (r.servings || 1)) || 0,
                 protein: calculatedNutrition.protein || (r.protein / (r.servings || 1)) || 0,
                 carbs: calculatedNutrition.carbs || (r.carbs / (r.servings || 1)) || 0,
                 fat: calculatedNutrition.fat || (r.fat / (r.servings || 1)) || 0,
@@ -389,7 +389,9 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 })),
                 instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
                 servings: 1,
-                originalServings: r.servings || 1
+                originalServings: r.servings || 1,
+                micronutrients: calculatedNutrition.micronutrients,
+                phytonutrients: calculatedNutrition.phytonutrients
             };
         });
 
@@ -495,7 +497,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         }
 
         const totalCalories = b.calories + l.calories + d.calories + snacks.reduce((acc, s) => acc + s.calories, 0);
-        const totalEnergyKj = (b.energyKj || 0) + (l.energyKj || 0) + (d.energyKj || 0) + snacks.reduce((acc, s) => acc + (s.energyKj || 0), 0);
+        const totalEnergyKj = (b.energy_kj || 0) + (l.energy_kj || 0) + (d.energy_kj || 0) + snacks.reduce((acc, s) => acc + (s.energy_kj || 0), 0);
         const allRecipeIds = [b.id, l.id, d.id, ...snacks.map(s => s.id)];
         const aggregatedMicro = aggregateMicronutrients(allRecipeIds);
 

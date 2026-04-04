@@ -24,7 +24,7 @@ export const RecipeListItem = ({
     // Scale nutrition based on selectedServings
     const sf = selectedServings;
     const displayCalories = (recipe.calories || 0) * sf;
-    const displayEnergy = (recipe.energyKj || 0) * sf;
+    const displayEnergy = (recipe.energy_kj || 0) * sf;
     const displayCarbs = (recipe.carbs || 0) * sf;
     const displayFat = (recipe.fat || 0) * sf;
     const displayProtein = (recipe.protein || 0) * sf;

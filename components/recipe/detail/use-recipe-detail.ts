@@ -557,7 +557,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             const finalCarbs = Math.round((nutrition.carbs) * 10) / 10;
             const finalFat = Math.round((nutrition.fat) * 10) / 10;
             const finalProtein = Math.round((nutrition.protein) * 10) / 10;
-            const finalKj = Math.round(nutrition.energyKj);
+            const finalKj = Math.round(nutrition.energy_kj);
             
             const finalMicros = Object.fromEntries(
                 Object.entries(nutrition.micronutrients || {}).map(([key, val]) => [key, val])
@@ -636,7 +636,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // Calculate nutrition from current ingredients
     const calculatedNutrition: CalculatedNutrition = ingredients.length > 0 
         ? calculateAggregatedNutrition(ingredients) 
-        : { calories: 0, energyKj: 0, protein: 0, carbs: 0, fat: 0, micronutrients: {}, phytonutrients: {} };
+        : { calories: 0, energy_kj: 0, protein: 0, carbs: 0, fat: 0, micronutrients: {}, phytonutrients: {} };
 
     // --- Portion Matching Handlers ---
     const handlePortionInputChange = (ingId: string, field: 'multiplier' | 'measure', value: string) => {

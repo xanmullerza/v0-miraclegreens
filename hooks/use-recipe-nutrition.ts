@@ -34,7 +34,7 @@ export function useRecipeNutrition({
         };
 
         // Macros
-        const eV = (recipe.calories || 0) * sf;
+        const eV = (energyUnit === 'kJ' ? (recipe.energy_kj || (recipe.calories || 0) * 4.184) : (recipe.calories || 0)) * sf;
         const pV = (recipe.protein || 0) * sf;
         const cV = (recipe.carbs || 0) * sf;
         const fV = (recipe.fat || 0) * sf;

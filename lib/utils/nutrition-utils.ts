@@ -88,7 +88,7 @@ export const calculateAggregatedNutrition = (ingredients: any[]): {
 
     return {
         calories: totalCalories,
-        energyKj: totalEnergyKj,
+        energy_kj: totalEnergyKj,
         protein: totalProtein,
         carbs: totalCarbs,
         fat: totalFat,

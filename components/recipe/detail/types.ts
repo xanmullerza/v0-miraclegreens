@@ -50,7 +50,7 @@ export interface Instruction {
 
 export interface CalculatedNutrition {
     calories: number;
-    energyKj: number;
+    energy_kj: number;
     protein: number;
     carbs: number;
     fat: number;

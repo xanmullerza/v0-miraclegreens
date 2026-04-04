@@ -52,7 +52,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
             protein: recipe.protein > 0 ? recipe.protein : calculatedNutrition.protein,
             carbs: recipe.carbs > 0 ? recipe.carbs : calculatedNutrition.carbs,
             fat: recipe.fat > 0 ? recipe.fat : calculatedNutrition.fat,
-            energy_kj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energyKj,
+            energy_kj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energy_kj,
             micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
         },
         viewMode: 'per-serving' as const,
