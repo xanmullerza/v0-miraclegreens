@@ -35,6 +35,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { parseNutritionText, parseMeasures } from '@/lib/utils/nutrition-parser';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -58,6 +59,7 @@ const ALL_CLINICAL_MARKERS = [
 ];
 
 export function FoodItemCreatorContent() {
+    const { profile } = useUserPreferences();
     const router = useRouter();
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -267,11 +269,16 @@ export function FoodItemCreatorContent() {
                 micronutrients: finalMicros,
                 portions: parsedPortions,
                 user_id: currentUser?.id || null,
-                is_curated: true
+                is_curated: profile.isAdmin // Only admins can create curated content
             };
 
             const { error } = await supabase.from('food_items').upsert(foodData, { onConflict: 'name' });
-            if (error) throw error;
+            if (error) {
+                if (error.code === '42501') {
+                    throw new Error('You do not have permission to save to the global registry. Only admins can create curated food items.');
+                }
+                throw error;
+            }
             toast.success('Food item saved successfully!');
             router.push('/users/admin');
         } catch (error: any) {

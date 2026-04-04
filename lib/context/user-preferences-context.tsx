@@ -37,6 +37,7 @@ interface UserProfile {
     country: string;
     familyMembers: FamilyMember[];
     isPremium: boolean;
+    isAdmin: boolean;
 }
 
 interface UserPreferencesContextType {
@@ -92,7 +93,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         healthConditions: [],
         country: "Oceania",
         familyMembers: [],
-        isPremium: false
+        isPremium: false,
+        isAdmin: false
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
     const [showRDADrawer, setShowRDADrawer] = useState(false);
@@ -185,7 +187,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                     healthConditions: data.health_conditions || [],
                     country: data.country || "Australia",
                     familyMembers: data.family_members || [],
-                    isPremium: data.is_premium || false
+                    isPremium: data.is_premium || false,
+                    isAdmin: data.is_admin || false
                 };
                 setProfileState(cloudProfile);
                 localStorage.setItem("userProfile", JSON.stringify(cloudProfile));
@@ -232,7 +235,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                     healthConditions: [],
                     country: "Oceania",
                     familyMembers: [],
-                    isPremium: false
+                    isPremium: false,
+                    isAdmin: false
                 };
                 setProfileState(defaultProfile);
                 localStorage.removeItem("userProfile");
@@ -311,6 +315,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                 health_conditions: newProfile.healthConditions,
                 family_members: newProfile.familyMembers,
                 is_premium: newProfile.isPremium,
+                is_admin: newProfile.isAdmin,
                 updated_at: new Date().toISOString()
             } as any);
 
