@@ -111,37 +111,28 @@ export const RecipeListItem = ({
                 </div>
 
                 {/* Content Section */}
-                <div className="flex-1 min-w-0 space-y-2 sm:space-y-3">
+                <div className="flex-1 min-w-0 space-y-2.5 sm:space-y-4">
                     <div className="space-y-0.5">
-                        <h3 className="font-bold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">{recipe.title}</h3>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                            <div className="flex items-center gap-1 text-[9px] text-slate-500 font-bold uppercase tracking-widest bg-slate-100/80 dark:bg-slate-800/50 px-1.5 py-0.5 rounded-md">
-                                <Clock size={10} className="text-blue-500"/>{recipe.prepTime || 30}M
-                            </div>
-                            <div className="flex items-center gap-1 text-[9px] text-slate-500 font-bold uppercase tracking-widest bg-slate-100/80 dark:bg-slate-800/50 px-1.5 py-0.5 rounded-md">
-                                <Users size={10} className="text-emerald-500"/>{recipe.originalServings || 1}P
-                            </div>
-                            <div className="px-1.5 py-0.5 text-[7px] font-black uppercase tracking-[0.15em] border border-slate-200 dark:border-slate-700 text-slate-400 rounded-md">{recipe.type}</div>
-                        </div>
+                        <h3 className="font-bold text-base sm:text-xl tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">{recipe.title}</h3>
                     </div>
 
-                    {/* Stats Grid - Ultra Compact */}
-                    <div className="flex flex-wrap gap-2">
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-2.5 py-1.5 rounded-xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[50px]">
-                            <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Energy</span>
-                            <span className="font-black text-xs text-slate-900 dark:text-white leading-none">{formatEnergy(displayCalories, unit, displayEnergy)}</span>
+                    {/* Stats Grid - Enhanced size */}
+                    <div className="flex flex-wrap gap-2.5">
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
+                            <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Energy</span>
+                            <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{formatEnergy(displayCalories, unit, displayEnergy)}</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-2.5 py-1.5 rounded-xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[50px]">
-                            <span className="text-[6px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-1">Carbs</span>
-                            <span className="font-black text-xs text-slate-900 dark:text-white leading-none">{displayCarbs.toFixed(1)}g</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
+                            <span className="text-[7px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-1.5">Carbs</span>
+                            <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayCarbs.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-2.5 py-1.5 rounded-xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[50px]">
-                            <span className="text-[6px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-1">Fat</span>
-                            <span className="font-black text-xs text-slate-900 dark:text-white leading-none">{displayFat.toFixed(1)}g</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
+                            <span className="text-[7px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-1.5">Fat</span>
+                            <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayFat.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-2.5 py-1.5 rounded-xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[50px]">
-                            <span className="text-[6px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-1">Protein</span>
-                            <span className="font-black text-xs text-slate-900 dark:text-white leading-none">{displayProtein.toFixed(1)}g</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
+                            <span className="text-[7px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-1.5">Protein</span>
+                            <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayProtein.toFixed(1)}g</span>
                         </div>
                     </div>
                 </div>
