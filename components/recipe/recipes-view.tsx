@@ -455,9 +455,9 @@ export function RecipesView({
                             className={cn(
                                 'group relative rounded-[2rem] border transition-all cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
                                 isMix 
-                                    ? 'bg-indigo-50/80 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 hover:border-indigo-500/30' 
-                                    : 'bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-blue-500/30',
-                                'hover:shadow-xl hover:shadow-blue-500/5'
+                                    ? 'bg-indigo-50/80 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 hover:border-indigo-500/60' 
+                                    : 'bg-white/80 dark:bg-slate-900/60 border-emerald-500/40 hover:border-emerald-500/70',
+                                'hover:shadow-xl hover:shadow-emerald-500/10'
                             )}
                             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
                         >
@@ -521,7 +521,7 @@ export function RecipesView({
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
+                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-emerald-500/40 lg:pl-4 lg:w-52 justify-center">
                                     <div className="flex flex-wrap items-center justify-center gap-2 p-1 rounded-3xl bg-transparent border border-emerald-500/40 grow">
                                         {[
                                             { label: <Clock size={18} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
