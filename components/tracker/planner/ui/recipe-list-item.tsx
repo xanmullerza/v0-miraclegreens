@@ -111,27 +111,27 @@ export const RecipeListItem = ({
                 </div>
 
                 {/* Content Section */}
-                <div className="flex-1 min-w-0 space-y-2.5 sm:space-y-4">
+                <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
                     <div className="space-y-0.5">
-                        <h3 className="font-bold text-base sm:text-xl tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">{recipe.title}</h3>
+                        <h3 className="font-bold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">{recipe.title}</h3>
                     </div>
 
                     {/* Stats Grid - Enhanced size */}
                     <div className="flex flex-wrap gap-2.5">
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
-                            <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Energy</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{formatEnergy(displayCalories, unit, displayEnergy)}</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
-                            <span className="text-[7px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-1.5">Carbs</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                            <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayCarbs.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
-                            <span className="text-[7px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-1.5">Fat</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                            <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayFat.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[60px]">
-                            <span className="text-[7px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-1.5">Protein</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                            <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
                             <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{displayProtein.toFixed(1)}g</span>
                         </div>
                     </div>
