@@ -456,7 +456,7 @@ export function RecipesView({
                                 'group relative rounded-[2rem] border transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm',
                                 isMix 
                                     ? 'bg-indigo-950/80 border-indigo-900 hover:border-indigo-700' 
-                                    : 'bg-slate-950 border-slate-800 hover:border-slate-600'
+                                    : 'bg-slate-900 border-slate-800 hover:border-slate-600'
                             )}
                             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
                         >
