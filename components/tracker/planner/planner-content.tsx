@@ -145,6 +145,7 @@ export function PlannerContent({
     const [authReady, setAuthReady] = useState(false);
 
     const isAnonymous = authReady && user === null;
+    const effectiveServings = isAnonymous ? 1 : selectedServings;
     const effectivePlan = isAnonymous ? DEMO_PLAN : state.plan;
 
     useEffect(() => {
