@@ -57,7 +57,6 @@ export function PlannerContent({
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [planLength, setPlanLength] = useState<PlanLength>('daily');
     const [showLengthMenu, setShowLengthMenu] = useState(false);
-    const [selectedServings, setSelectedServings] = useState<number>(1);
     const [hasAttemptedInitial, setHasAttemptedInitial] = useState(false);
 
     // Override local state with external props if provided
@@ -69,7 +68,7 @@ export function PlannerContent({
     const { plan, eatenMeals, unit, generating } = state;
 
     const { navigateTo, setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
-    const { profile, profileLoaded, dailyTargets } = useUserPreferences();
+    const { profile, profileLoaded, dailyTargets, selectedServings, setSelectedServings } = useUserPreferences();
     const [user, setUser] = useState<any>(undefined);
     const [authReady, setAuthReady] = useState(false);
     useEffect(() => {

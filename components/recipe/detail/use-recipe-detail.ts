@@ -53,16 +53,12 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
     
-    // Nutrition Display Mode - servings multiplier for scaling
-    const [selectedServings, setSelectedServings] = useState<number>(1);
-    
     // Threshold state for minerals/vitamins
     const [mineralThreshold, setMineralThreshold] = useState<50 | 75 | 100>(75);
     const [waterSolubleThreshold, setWaterSolubleThreshold] = useState<50 | 75 | 100>(75);
     const [storedVitaminThreshold, setStoredVitaminThreshold] = useState<50 | 75 | 100>(75);
 
-    // User preferences and RDA
-    const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
+    const { profile, nutrientDisplayMode, energyUnit, selectedServings, setSelectedServings } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
     const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo, setSmartMatchPicker, setSmartMatchPortion, setIngredientMatch } = useActionPanel();
     const { user } = useDataPersistence();

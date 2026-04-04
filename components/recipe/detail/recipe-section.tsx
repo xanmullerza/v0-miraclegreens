@@ -31,7 +31,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                 </div>
                 <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700 h-fit">
                     <button
-                        onClick={() => setSelectedServings(Math.max(1, selectedServings - 1))}
+                        onClick={() => setSelectedServings(Math.max(0.5, selectedServings - 0.5))}
                         className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
                         title="Decrease servings"
                     >
@@ -41,7 +41,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                         {selectedServings.toFixed(1)} Serving{selectedServings !== 1 ? 's' : ''}
                     </div>
                     <button
-                        onClick={() => setSelectedServings(selectedServings + 1)}
+                        onClick={() => setSelectedServings(selectedServings + 0.5)}
                         className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
                         title="Increase servings"
                     >

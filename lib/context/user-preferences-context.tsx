@@ -63,6 +63,8 @@ interface UserPreferencesContextType {
     showRDADrawer: boolean;
     setShowRDADrawer: (show: boolean) => void;
     profileLoaded: boolean;
+    selectedServings: number;
+    setSelectedServings: (servings: number) => void;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(
@@ -95,6 +97,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
     const [showRDADrawer, setShowRDADrawer] = useState(false);
     const [profileLoaded, setProfileLoaded] = useState(false);
+    const [selectedServings, setSelectedServingsState] = useState<number>(1);
 
     // Load initial data from localStorage and cloud
     useEffect(() => {
@@ -126,6 +129,14 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         const savedHeaderStyle = localStorage.getItem("headerStyle") as HeaderStyle;
         if (savedHeaderStyle === 'labels' || savedHeaderStyle === 'icons') {
             setHeaderStyleState(savedHeaderStyle);
+        }
+
+        const savedServings = localStorage.getItem("selectedServings");
+        if (savedServings) {
+            const numVal = Number(savedServings);
+            if (!isNaN(numVal) && numVal > 0) {
+                setSelectedServingsState(numVal);
+            }
         }
 
         // (Removed dailyPlan loading from localStorage, force clear old ones)
@@ -316,6 +327,13 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("skipPlannerQuiz", String(skip));
     };
 
+    const setSelectedServings = (servings: number) => {
+        const rounded = Math.round(servings * 2) / 2; // Snap to 0.5 steps
+        const safe = Math.max(0.5, Math.min(20, rounded));
+        setSelectedServingsState(safe);
+        localStorage.setItem("selectedServings", String(safe));
+    };
+
     const dailyTargets = calculateIndividualTargets({
         weight: Number(profile.weight) || 70,
         height: Number(profile.height) || 170,
@@ -346,7 +364,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             dailyTargets,
             showRDADrawer,
             setShowRDADrawer,
-            profileLoaded
+            profileLoaded,
+            selectedServings,
+            setSelectedServings
         }}>
             {children}
         </UserPreferencesContext.Provider>
