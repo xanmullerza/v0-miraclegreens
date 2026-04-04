@@ -533,7 +533,7 @@ export function RecipesView({
                                                     if (t.includes('supplement')) return <Pill size={14} />;
                                                     return <UtensilsCrossed size={14} />;
                                                 })(), 
-                                                value: recipe.type || recipe.meal_type || 'Other', 
+                                                value: '', 
                                                 active: true 
                                             },
                                             { label: <Gauge size={14} />, value: recipe.difficulty || 'Medium' },
