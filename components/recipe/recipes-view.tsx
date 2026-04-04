@@ -13,6 +13,15 @@ import {
     CheckSquare,
     Square,
     Search,
+    Clock,
+    Users,
+    Coffee,
+    Sun,
+    Moon,
+    Apple,
+    Pill,
+    Gauge,
+    UtensilsCrossed
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -512,10 +521,22 @@ export function RecipesView({
                                 <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
                                     <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
                                         {[
-                                            { label: '', value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
-                                            { label: '', value: recipe.servings || 1 },
-                                            { label: 'Meal Type', value: recipe.type || recipe.meal_type || 'Other', active: true },
-                                            { label: 'Difficulty', value: recipe.difficulty || 'Medium' },
+                                            { label: <Clock size={11} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
+                                            { label: <Users size={11} />, value: recipe.servings || 1 },
+                                            { 
+                                                label: (() => {
+                                                    const t = (recipe.type || recipe.meal_type || 'Other').toLowerCase();
+                                                    if (t === 'breakfast') return <Coffee size={11} />;
+                                                    if (t === 'lunch') return <Sun size={11} />;
+                                                    if (t === 'dinner') return <Moon size={11} />;
+                                                    if (t === 'snack') return <Apple size={11} />;
+                                                    if (t.includes('supplement')) return <Pill size={11} />;
+                                                    return <UtensilsCrossed size={11} />;
+                                                })(), 
+                                                value: recipe.type || recipe.meal_type || 'Other', 
+                                                active: true 
+                                            },
+                                            { label: <Gauge size={11} />, value: recipe.difficulty || 'Medium' },
                                         ].map((tab, idx) => (
                                             <div
                                                 key={idx}
@@ -526,8 +547,15 @@ export function RecipesView({
                                                         : "text-slate-500 bg-white/5"
                                                 )}
                                             >
-                                                {tab.label && <span className="opacity-40 text-[6px] tracking-widest leading-none">{tab.label}</span>}
-                                                <span className={cn("truncate max-w-full italic leading-none", !tab.label && "text-[10px] font-black")}>{tab.value}</span>
+                                                {tab.label && (
+                                                    <span className={cn(
+                                                        "opacity-60 leading-none mb-0.5",
+                                                        tab.active ? "text-current" : "text-slate-400"
+                                                    )}>
+                                                        {tab.label}
+                                                    </span>
+                                                )}
+                                                <span className={cn("truncate max-w-full italic leading-none font-black", !tab.active ? "text-[10px]" : "text-[8px] uppercase tracking-wider")}>{tab.value}</span>
                                             </div>
                                         ))}
                                     </div>
