@@ -18,7 +18,7 @@ export function DashboardNav() {
             const tab = searchParams.get('tab');
             const view = searchParams.get('view');
             
-            if (pathname === '/recipes/planner') return 'planner';
+            if (pathname === '/planner') return 'planner';
             if (tab === 'planner') return 'planner';
             if (tab === 'foods') {
                 if (view === 'list') return 'shopping';
@@ -36,7 +36,7 @@ export function DashboardNav() {
     const buttons = [
         { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/recipes?tab=foods&view=list', color: 'amber' },
         { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/recipes?tab=foods&view=pantry', color: 'sky' },
-        { id: 'planner', icon: Calendar, label: 'Planner', path: '/recipes/planner', color: 'purple' },
+        { id: 'planner', icon: Calendar, label: 'Planner', path: '/planner', color: 'purple' },
     ];
 
     return (

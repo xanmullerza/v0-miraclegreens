@@ -19,7 +19,7 @@ export default function IngredientsPage() {
 
     const handleTabChange = (id: string) => {
         if (id === 'recipes') router.push('/recipes');
-        else if (id === 'planner') router.push('/recipes/planner');
+        else if (id === 'planner') router.push('/planner');
         else router.push('/foods');
     };
 

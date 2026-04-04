@@ -15,7 +15,7 @@ export function ContentNav() {
         { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
         { label: 'Recipes', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
         { label: 'Foods', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-        { label: 'Planner', path: '/recipes/planner', icon: Calendar, color: 'text-emerald-500' },
+        { label: 'Planner', path: '/planner', icon: Calendar, color: 'text-emerald-500' },
     ];
 
     return (

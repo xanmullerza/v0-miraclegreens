@@ -56,7 +56,7 @@ function RecipesPageContent() {
     const handleTabChange = (id: TabId) => {
         setActiveTab(id);
         if (id === 'recipes') router.push('/recipes');
-        else if (id === 'planner') router.push('/recipes/planner');
+        else if (id === 'planner') router.push('/planner');
         else {
             const viewQuery = id === 'foods' && inventoryView !== 'foods' ? `&view=${inventoryView}` : '';
             router.push(`/recipes?tab=${id}${viewQuery}`);

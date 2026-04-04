@@ -47,7 +47,7 @@ export default function RecipeDetailsPage() {
 
     const handleTabChange = (tabId: string) => {
         if (tabId === 'recipes') router.push('/recipes');
-        else if (tabId === 'planner') router.push('/recipes/planner');
+        else if (tabId === 'planner') router.push('/planner');
         else router.push(`/recipes?tab=${tabId}`);
     };
 

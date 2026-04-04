@@ -28,7 +28,7 @@ const nextConfig = {
       },
       {
         source: '/dashboard/meal-o-matic/planner',
-        destination: '/recipes/planner',
+        destination: '/planner',
         permanent: true,
       },
       {

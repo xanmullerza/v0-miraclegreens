@@ -63,7 +63,7 @@ export default function FoodDetailsPage() {
                     if (tabId === 'recipes') {
                         router.push('/recipes');
                     } else if (tabId === 'planner') {
-                        router.push('/recipes/planner');
+                        router.push('/planner');
                     } else {
                         router.push(`/recipes?tab=${tabId}`);
                     }
