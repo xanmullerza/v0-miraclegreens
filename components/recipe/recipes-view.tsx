@@ -512,13 +512,13 @@ export function RecipesView({
                                 <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
                                     <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
                                         {[
-                                            { label: 'Ready In', value: `${(recipe.prep_time || 0) + (recipe.cook_time || 0) || '-'} min` },
-                                            { label: 'Servings', value: `${recipe.servings || 1} Servings` },
+                                            { label: '', value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
+                                            { label: '', value: recipe.servings || 1 },
                                             { label: 'Meal Type', value: recipe.type || recipe.meal_type || 'Other', active: true },
                                             { label: 'Difficulty', value: recipe.difficulty || 'Medium' },
-                                        ].map((tab) => (
+                                        ].map((tab, idx) => (
                                             <div
-                                                key={tab.label}
+                                                key={idx}
                                                 className={cn(
                                                     'py-1.5 px-2.5 text-[7px] font-black uppercase tracking-[0.1em] rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-col items-center justify-center gap-0.5',
                                                     tab.active
@@ -526,8 +526,8 @@ export function RecipesView({
                                                         : "text-slate-500 bg-white/5"
                                                 )}
                                             >
-                                                <span className="opacity-40 text-[6px] tracking-widest leading-none">{tab.label}</span>
-                                                <span className="truncate max-w-full italic leading-none">{tab.value}</span>
+                                                {tab.label && <span className="opacity-40 text-[6px] tracking-widest leading-none">{tab.label}</span>}
+                                                <span className={cn("truncate max-w-full italic leading-none", !tab.label && "text-[10px] font-black")}>{tab.value}</span>
                                             </div>
                                         ))}
                                     </div>
