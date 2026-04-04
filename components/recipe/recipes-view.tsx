@@ -512,22 +512,23 @@ export function RecipesView({
                                 <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
                                     <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
                                         {[
-                                            { label: 'Recipe', active: true },
-                                            { label: 'Nutrition' },
-                                            { label: 'Related' },
-                                            { label: 'Management' },
+                                            { label: 'Ready In', value: `${recipe.prep_time || 0}m` },
+                                            { label: 'Servings', value: `${recipe.servings || 1}s` },
+                                            { label: 'Meal Type', value: recipe.meal_type || 'meal', active: true },
+                                            { label: 'Difficulty', value: recipe.difficulty || 'Med' },
                                         ].map((tab) => (
-                                            <button
+                                            <div
                                                 key={tab.label}
                                                 className={cn(
-                                                    'py-1.5 px-2.5 text-[7px] font-black uppercase tracking-[0.15em] rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%]',
+                                                    'py-1.5 px-2.5 text-[7px] font-black uppercase tracking-[0.1em] rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-col items-center justify-center gap-0.5',
                                                     tab.active
                                                         ? isMix ? "bg-slate-800/80 text-indigo-400 shadow-[0_0_15px_-5px_rgba(129,140,248,0.3)] ring-1 ring-white/10" : "bg-slate-800/80 text-emerald-400 shadow-[0_0_15px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
-                                                        : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                                                        : "text-slate-500 bg-white/5"
                                                 )}
                                             >
-                                                {tab.label}
-                                            </button>
+                                                <span className="opacity-40 text-[6px] tracking-widest">{tab.label}</span>
+                                                <span className="truncate max-w-full italic">{tab.value}</span>
+                                            </div>
                                         ))}
                                     </div>
                                     
