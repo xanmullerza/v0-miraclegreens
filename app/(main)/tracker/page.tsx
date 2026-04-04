@@ -17,9 +17,9 @@ function PlannerPageContent() {
     ];
 
     const handleTabChange = (id: string) => {
-        if (id === 'recipes') router.push('/recipes');
-        else if (id === 'planner') router.push('/planner');
-        else router.push(`/recipes?tab=${id}`);
+        if (id === 'recipes') router.push('/cookbook');
+        else if (id === 'planner') router.push('/tracker');
+        else router.push(`/cookbook?tab=${id}`);
     };
 
     return (

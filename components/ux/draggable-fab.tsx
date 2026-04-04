@@ -9,7 +9,7 @@ export function DraggableFab() {
     const router = useRouter();
     
     // Only show on recipes and foods pages (or add more if desired)
-    const isVisible = pathname === '/recipes' || pathname === '/foods' || pathname === '/meals' || pathname.startsWith('/foods/');
+    const isVisible = pathname === '/cookbook' || pathname === '/library' || pathname === '/meals' || pathname.startsWith('/library/');
     
     const [position, setPosition] = useState({ y: 0 }); // Offset from initial position
     const [isDragging, setIsDragging] = useState(false);
@@ -67,16 +67,16 @@ export function DraggableFab() {
             return;
         }
         
-        if (pathname === '/recipes') {
-            router.push('/foods');
+        if (pathname === '/cookbook') {
+            router.push('/library');
         } else {
-            router.push('/recipes');
+            router.push('/cookbook');
         }
     };
 
     if (!isVisible) return null;
 
-    const isRecipes = pathname === '/recipes';
+    const isRecipes = pathname === '/cookbook';
 
     return (
         <button
@@ -88,7 +88,7 @@ export function DraggableFab() {
                 touchAction: 'none' // Prevent browser touch actions like scrolling
             }}
             className="absolute bottom-16 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg shadow-black/20 bg-slate-900 dark:bg-slate-800 border-2 border-emerald-500/30 text-emerald-500 hover:scale-105 hover:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 transition-all duration-200 ease-out cursor-grab active:cursor-grabbing group select-none"
-            title={isRecipes ? "Go to Foods" : "Go to Recipes"}
+            title={isRecipes ? "Go to Library" : "Go to Cookbook"}
         >
             {isRecipes ? (
                 <Search size={24} className="group-hover:text-emerald-400 transition-colors" />

@@ -13,37 +13,62 @@ const nextConfig = {
     return [
       {
         source: '/dashboard/nutrients',
-        destination: '/recipes',
+        destination: '/cookbook',
         permanent: true,
       },
       {
         source: '/dashboard/meal-o-matic/shopping',
-        destination: '/recipes',
+        destination: '/cookbook',
         permanent: true,
       },
       {
         source: '/dashboard/meal-o-matic/pantry',
-        destination: '/recipes',
+        destination: '/cookbook',
         permanent: true,
       },
       {
         source: '/dashboard/meal-o-matic/planner',
-        destination: '/planner',
+        destination: '/tracker',
         permanent: true,
       },
       {
         source: '/dashboard/library/meals',
-        destination: '/recipes',
+        destination: '/cookbook',
         permanent: true,
       },
       {
         source: '/dashboard',
-        destination: '/recipes',
+        destination: '/cookbook',
         permanent: true,
       },
       {
         source: '/mixes',
-        destination: '/recipes?tab=mixes',
+        destination: '/cookbook?tab=mixes',
+        permanent: true,
+      },
+      {
+        source: '/recipes',
+        destination: '/cookbook',
+        permanent: true,
+      },
+      {
+        source: '/recipes/:path*',
+        destination: '/cookbook/:path*',
+        permanent: true,
+      },
+      {
+        source: '/foods',
+        destination: '/library',
+        permanent: true,
+      },
+      {
+        source: '/foods/:path*',
+        destination: '/library/:path*',
+        permanent: true,
+      },
+      {
+        source: '/planner',
+        destination: '/tracker',
         permanent: true,
       },
     ]

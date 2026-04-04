@@ -13,12 +13,12 @@ export function DashboardNav() {
 
     // Determine active button
     const getActiveButton = () => {
-        if (pathname.includes('/recipes')) {
+        if (pathname.includes('/cookbook')) {
             const searchParams = new URLSearchParams(window.location.search);
             const tab = searchParams.get('tab');
             const view = searchParams.get('view');
             
-            if (pathname === '/planner') return 'planner';
+            if (pathname === '/tracker') return 'planner';
             if (tab === 'planner') return 'planner';
             if (tab === 'foods') {
                 if (view === 'list') return 'shopping';
@@ -34,9 +34,9 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/recipes?tab=foods&view=list', color: 'amber' },
-        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/recipes?tab=foods&view=pantry', color: 'sky' },
-        { id: 'planner', icon: Calendar, label: 'Tracker', path: '/planner', color: 'purple' },
+        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/cookbook?tab=foods&view=list', color: 'amber' },
+        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/cookbook?tab=foods&view=pantry', color: 'sky' },
+        { id: 'planner', icon: Calendar, label: 'Tracker', path: '/tracker', color: 'purple' },
     ];
 
     return (

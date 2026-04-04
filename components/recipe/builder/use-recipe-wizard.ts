@@ -309,7 +309,7 @@ export function useRecipeWizard(defaultType: string = 'dinner', onSaveSuccess?: 
 
             toast.success('Recipe created!');
             if (onSaveSuccess) onSaveSuccess(recipeId);
-            else router.push('/recipes');
+            else router.push('/cookbook');
         } catch (error: any) { toast.error(`Save failed: ${error.message}`); }
         finally { setSaving(false); }
     };

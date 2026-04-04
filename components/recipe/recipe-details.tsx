@@ -477,7 +477,7 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
             console.error('Error fetching recipe:', error);
             toast.error('Failed to load meal details');
             if (isStandalone) {
-                 router.push('/recipes');
+                 router.push('/cookbook');
             } else if (onClose) {
                  onClose();
             }
@@ -789,7 +789,7 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                 await deleteRecipe(recipe.id);
                 toast.success("Recipe deleted successfully");
                 if (isStandalone) {
-                     router.push('/recipes');
+                     router.push('/cookbook');
                 } else if (onClose) {
                     onClose();
                 }

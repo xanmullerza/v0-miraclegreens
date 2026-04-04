@@ -13,9 +13,9 @@ export function ContentNav() {
 
     const navItems = [
         { label: 'Home', path: '/', icon: Home, color: 'text-emerald-500' },
-        { label: 'Cookbook', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
-        { label: 'Library', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-        { label: 'Tracker', path: '/planner', icon: Calendar, color: 'text-emerald-500' },
+        { label: 'Cookbook', path: '/cookbook', icon: ChefHat, color: 'text-emerald-500' },
+        { label: 'Library', path: '/library', icon: Leaf, color: 'text-emerald-500' },
+        { label: 'Tracker', path: '/tracker', icon: Calendar, color: 'text-emerald-500' },
     ];
 
     return (

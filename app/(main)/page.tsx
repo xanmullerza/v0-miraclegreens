@@ -125,7 +125,7 @@ export default function AboutUsPage() {
                                 </div>
                                 <div className="flex flex-col gap-4 relative z-10">
                                     <button
-                                        onClick={() => router.push('/recipes')}
+                                        onClick={() => router.push('/cookbook')}
                                         className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
                                     >
                                         <div className="flex items-center gap-4">
@@ -153,7 +153,7 @@ export default function AboutUsPage() {
                                 </div>
                                 <div className="flex flex-col gap-4 relative z-10">
                                     <button
-                                        onClick={() => router.push('/planner')}
+                                        onClick={() => router.push('/tracker')}
                                         className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-blue-500/20 hover:border-blue-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
                                     >
                                         <div className="flex items-center gap-4">

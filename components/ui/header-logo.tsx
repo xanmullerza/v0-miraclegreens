@@ -79,9 +79,9 @@ export function HeaderLogo({
                 <div className="flex items-center ml-2 sm:ml-6 gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
                     { [
                         { label: 'Mission', path: '/', icon: Info, color: 'text-purple-500' },
-                        { label: 'Cookbook', path: '/recipes', icon: ChefHat, color: 'text-emerald-500' },
-                        { label: 'Library', path: '/foods', icon: Leaf, color: 'text-emerald-500' },
-                        { label: 'Tracker', path: '/planner', icon: Calendar, color: 'text-emerald-500' },
+                        { label: 'Cookbook', path: '/cookbook', icon: ChefHat, color: 'text-emerald-500' },
+                        { label: 'Library', path: '/library', icon: Leaf, color: 'text-emerald-500' },
+                        { label: 'Tracker', path: '/tracker', icon: Calendar, color: 'text-emerald-500' },
                     ].map((item: any) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
