@@ -725,7 +725,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                             {expandedAccordion === 'admin' && (
                             <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-6 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
                                 <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black h-12 rounded-xl flex items-center justify-between px-6">
-                                    <Link href="/users/admin">
+                                    <Link href="/admin">
                                         <div className="flex items-center gap-3">
                                             <LayoutGrid size={16} />
                                             <span className="text-[10px] font-black uppercase tracking-widest">Admin Workspace</span>

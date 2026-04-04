@@ -43,11 +43,11 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
         defaultHref: '/foods',
-        matchPaths: ['/foods', '/dashboard/library/meals', '/users/admin/widgets'],
+        matchPaths: ['/foods', '/dashboard/library/meals', '/admin/widgets'],
         subtabs: [
             { id: 'foods', label: 'Foods', href: '/foods', icon: Leaf },
             { id: 'meals', label: 'Meals', href: '/dashboard/library/meals', icon: ChefHat },
-            { id: 'widgets', label: 'Widgets', href: '/users/admin/widgets', icon: LayoutGrid },
+            { id: 'widgets', label: 'Widgets', href: '/admin/widgets', icon: LayoutGrid },
         ],
     },
     {
@@ -73,11 +73,11 @@ const TAB_CONFIG: TopTab[] = [
         color: 'text-muted-foreground',
         activeColor: 'text-purple-400',
         activeBg: 'bg-purple-500/10 border-purple-500/30',
-        defaultHref: '/users/admin',
-        matchPaths: ['/users/admin'],
+        defaultHref: '/admin',
+        matchPaths: ['/admin'],
         adminOnly: true,
         subtabs: [
-            { id: 'dashboard', label: 'Dashboard', href: '/users/admin', icon: LayoutGrid },
+            { id: 'dashboard', label: 'Dashboard', href: '/admin', icon: LayoutGrid },
         ],
     },
 ];

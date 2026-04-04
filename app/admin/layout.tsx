@@ -210,7 +210,7 @@ function AdminLayoutContent({
                                 </Link>
                                 {(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
                                     <Link
-                                        href="/users/admin"
+                                        href="/admin"
                                         className="p-2 text-emerald-500 transition-colors ml-1 outline-none"
                                         title="Admin Dashboard"
                                     >

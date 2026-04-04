@@ -280,7 +280,7 @@ export function FoodItemCreatorContent() {
                 throw error;
             }
             toast.success('Food item saved successfully!');
-            router.push('/users/admin');
+            router.push('/admin');
         } catch (error: any) {
             toast.error(error.message);
         } finally {
