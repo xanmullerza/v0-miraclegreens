@@ -453,11 +453,10 @@ export function RecipesView({
                         <div
                             key={recipe.id}
                             className={cn(
-                                'group relative rounded-[2rem] border transition-all cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
+                                'group relative rounded-[2rem] border transition-all duration-300 cursor-pointer overflow-hidden backdrop-blur-sm',
                                 isMix 
-                                    ? 'bg-indigo-50/80 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 hover:border-indigo-500/60' 
-                                    : 'bg-white/80 dark:bg-slate-900/60 border-emerald-500/40 hover:border-emerald-500/70',
-                                'hover:shadow-xl hover:shadow-emerald-500/10'
+                                    ? 'bg-indigo-50/80 dark:bg-indigo-900/40 border-indigo-900 hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-500/10' 
+                                    : 'bg-white/80 dark:bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:shadow-[0_0_35px_-8px_rgba(16,185,129,0.35)]'
                             )}
                             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
                         >
@@ -481,7 +480,7 @@ export function RecipesView({
 
                                 <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
                                     <div className="space-y-0.5">
-                                        <h3 className="font-bold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">
+                                        <h3 className="font-bold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-emerald-400 transition-colors truncate">
                                             {recipe.title.toLowerCase().split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                                         </h3>
                                     </div>
@@ -521,45 +520,60 @@ export function RecipesView({
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-emerald-500/40 lg:pl-4 lg:w-52 justify-center">
-                                    <div className="flex flex-wrap items-center justify-center gap-2 p-1 rounded-3xl bg-transparent border border-emerald-500/40 grow">
-                                        {[
-                                            { label: <Clock size={18} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
-                                            { label: <Users size={18} />, value: recipe.servings || 1 },
-                                            { 
+                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-800 lg:pl-4 lg:w-52 justify-center">
+                                    <div className="flex flex-wrap items-center justify-center gap-1 p-2 rounded-3xl bg-transparent grow">
+                                        {([
+                                            {
+                                                label: <Clock size={17} />,
+                                                value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-',
+                                                color: 'text-sky-400'
+                                            },
+                                            {
+                                                label: <Users size={17} />,
+                                                value: recipe.servings || 1,
+                                                color: 'text-violet-400'
+                                            },
+                                            {
                                                 label: (() => {
                                                     const t = (recipe.type || recipe.meal_type || 'Other').toLowerCase();
-                                                    if (t === 'breakfast') return <Coffee size={18} />;
-                                                    if (t === 'lunch') return <Sun size={18} />;
-                                                    if (t === 'dinner') return <Moon size={18} />;
-                                                    if (t === 'snack') return <Apple size={18} />;
-                                                    if (t.includes('supplement')) return <Pill size={18} />;
-                                                    return <UtensilsCrossed size={18} />;
-                                                })(), 
-                                                value: '', 
-                                                active: true 
+                                                    if (t === 'breakfast') return <Coffee size={17} />;
+                                                    if (t === 'lunch') return <Sun size={17} />;
+                                                    if (t === 'dinner') return <Moon size={17} />;
+                                                    if (t === 'snack') return <Apple size={17} />;
+                                                    if (t.includes('supplement')) return <Pill size={17} />;
+                                                    return <UtensilsCrossed size={17} />;
+                                                })(),
+                                                value: '',
+                                                color: 'text-amber-400'
                                             },
-                                            { 
+                                            {
                                                 label: (() => {
                                                     const d = recipe.difficulty || 'Medium';
-                                                    if (d === 'Easy') return <SignalLow size={22} />;
-                                                    if (d === 'Hard') return <Signal size={22} />;
-                                                    return <SignalMedium size={22} />;
-                                                })(), 
-                                                value: '' 
+                                                    if (d === 'Easy') return <SignalLow size={20} />;
+                                                    if (d === 'Hard') return <Signal size={20} />;
+                                                    return <SignalMedium size={20} />;
+                                                })(),
+                                                value: '',
+                                                color: (() => {
+                                                    const d = recipe.difficulty || 'Medium';
+                                                    if (d === 'Easy') return 'text-emerald-400';
+                                                    if (d === 'Hard') return 'text-rose-400';
+                                                    return 'text-amber-400';
+                                                })()
                                             },
-                                        ].map((tab, idx) => (
+                                        ] as { label: React.ReactNode; value: string | number; color: string }[]).map((tab, idx) => (
                                             <div
                                                 key={idx}
-                                                className="py-5 px-2 text-sm font-black uppercase tracking-wider rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-row items-center justify-center gap-1.5 bg-transparent text-slate-400"
-                                            >
-                                                {tab.label && (
-                                                    <span className="opacity-70 leading-none shrink-0">
-                                                        {tab.label}
-                                                    </span>
+                                                className={cn(
+                                                    'py-4 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-col items-center justify-center gap-1.5 bg-transparent',
+                                                    tab.color
                                                 )}
+                                            >
+                                                <span className="opacity-85 leading-none shrink-0">
+                                                    {tab.label}
+                                                </span>
                                                 {tab.value !== '' && (
-                                                    <span className="truncate max-w-full leading-none font-black text-white/80 text-xs">{tab.value}</span>
+                                                    <span className="leading-none font-black text-white/70 text-[10px] tracking-widest">{tab.value}</span>
                                                 )}
                                             </div>
                                         ))}
