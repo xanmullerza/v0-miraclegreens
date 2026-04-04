@@ -215,6 +215,16 @@ export function FoodsView({
         return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
     }, [effectiveSearchQuery, authReady, showFavoritesOnly, selectedCategories, user, sortField, sortDirection, fetchFoods]);
 
+    const defaultDropdown = (
+        <button
+            className="h-10 px-4 rounded-xl bg-cyan-600 text-white border-cyan-500 shadow-lg shadow-cyan-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]"
+        >
+            <Leaf size={14} className="animate-pulse" />
+            <span className="hidden sm:inline">Foods</span>
+            <ChevronDown size={10} />
+        </button>
+    );
+
     const foodList = (
         <div className="space-y-4">
             {loading && foods.length === 0 && (
@@ -240,87 +250,93 @@ export function FoodsView({
             {foods.map((food) => (
                 <div
                     key={food.id}
-                    className="group bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-500 overflow-hidden"
+                    className={cn(
+                        'group relative rounded-[2rem] border transition-all cursor-pointer overflow-hidden backdrop-blur-sm shadow-sm',
+                        'bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5'
+                    )}
                 >
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-6 p-6">
-                        {/* Image & Main Info */}
-                        <div className="flex items-center gap-6 flex-1 min-w-0">
-                            <div className="relative aspect-square w-24 shrink-0 rounded-[1.5rem] bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform duration-500 shadow-xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 sm:p-4">
+                        {/* Image Section */}
+                        <div className="relative shrink-0 flex items-center">
+                            <div className="aspect-[16/9] sm:aspect-square w-full sm:w-24 bg-slate-100 dark:bg-slate-800 overflow-hidden relative rounded-2xl border border-slate-200 dark:border-slate-700">
                                 {food.image ? (
-                                    <Image src={food.image} alt={food.name} fill className="object-cover" />
+                                    <Image src={food.image} alt={food.name} fill className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
-                                        <Beef size={32} className="opacity-20" />
+                                    <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                        <Beef size={28} />
                                     </div>
                                 )}
                                 {food.is_in_pantry && (
-                                    <div className="absolute top-2 right-2 bg-emerald-500 text-white rounded-full p-1 shadow-lg z-10 border border-emerald-400">
-                                        <Check size={10} strokeWidth={4} />
+                                    <div className="absolute top-1.5 right-1.5 bg-emerald-500 text-white rounded-full p-1 shadow-lg z-10 border border-emerald-400">
+                                        <Check size={8} strokeWidth={4} />
                                     </div>
                                 )}
                             </div>
+                        </div>
 
-                            <div className="flex-1 min-w-0 space-y-3">
-                                <h3 className="font-black text-xl tracking-tight text-slate-900 dark:text-white leading-none capitalize truncate text-shadow-sm">
+                        {/* Content Section */}
+                        <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
+                            <div className="space-y-0.5">
+                                <h3 className="font-bold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">
                                     {formatFoodName(food.common_name || food.name)}
                                 </h3>
-                                
-                                {/* Nutrients Grid */}
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <div className="px-3 py-1.5 rounded-xl bg-blue-500/5 border border-blue-500/10 flex flex-col items-center min-w-[60px] shadow-inner">
-                                        <span className="text-[7px] font-black uppercase tracking-widest text-blue-500/60 mb-0.5">Energy</span>
-                                        <span className="text-[11px] font-black text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
-                                    </div>
-                                    <div className="px-3 py-1.5 rounded-xl bg-amber-500/5 border border-amber-500/10 flex flex-col items-center min-w-[60px] shadow-inner">
-                                        <span className="text-[7px] font-black uppercase tracking-widest text-amber-500/60 mb-0.5">Carbs</span>
-                                        <span className="text-[11px] font-black text-amber-500">{food.carbs_g.toFixed(1)}g</span>
-                                    </div>
-                                    <div className="px-3 py-1.5 rounded-xl bg-rose-500/5 border border-rose-500/10 flex flex-col items-center min-w-[60px] shadow-inner">
-                                        <span className="text-[7px] font-black uppercase tracking-widest text-rose-500/60 mb-0.5">Fat</span>
-                                        <span className="text-[11px] font-black text-rose-500">{food.fat_g.toFixed(1)}g</span>
-                                    </div>
-                                    <div className="px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col items-center min-w-[60px] shadow-inner">
-                                        <span className="text-[7px] font-black uppercase tracking-widest text-emerald-500/60 mb-0.5">Protein</span>
-                                        <span className="text-[11px] font-black text-emerald-500">{food.protein_g.toFixed(1)}g</span>
-                                    </div>
+                            </div>
+
+                            {/* Stats Grid - MATCHING PLANNER STYLE EXACTLY */}
+                            <div className="flex flex-wrap gap-2.5">
+                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
+                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                    <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
+                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{food.carbs_g.toFixed(1)}g</span>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                    <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
+                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{food.fat_g.toFixed(1)}g</span>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-2xl border border-slate-100 dark:border-slate-800/50 flex flex-col items-center min-w-[65px]">
+                                    <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
+                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none">{food.protein_g.toFixed(1)}g</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Action Panel Splitter (Vertical line on LG) */}
-                        <div className="hidden lg:block w-px h-16 bg-slate-100 dark:bg-slate-800 mx-2" />
-
-                        {/* Custom Navigation Tabs (Mockup) */}
-                        <div className="flex flex-wrap items-center justify-center gap-2 lg:gap-1 p-1 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-100 dark:border-slate-800">
-                            {[
-                                { label: 'About', icon: Info, color: 'emerald' },
-                                { label: 'Nutrition', icon: Activity, color: 'blue', hasDot: true },
-                                { label: 'Recipes', icon: List, color: 'slate' },
-                                { label: 'Management', icon: Settings, color: 'slate' },
-                            ].map((tab) => (
-                                <button
-                                    key={tab.label}
-                                    className={cn(
-                                        "h-10 px-4 rounded-xl flex items-center gap-2 text-[9px] font-black uppercase tracking-widest transition-all relative group/tab",
-                                        tab.label === 'About' 
-                                            ? "bg-white dark:bg-slate-800 text-emerald-500 shadow-sm border border-slate-100 dark:border-slate-700" 
-                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                                    )}
-                                >
-                                    <tab.icon size={14} className={cn(tab.label === 'About' ? "text-emerald-500" : "opacity-40 group-hover/tab:opacity-100")} />
-                                    <span>{tab.label}</span>
-                                    {tab.hasDot && (
-                                        <span className="absolute top-2 right-2 w-1 h-1 rounded-full bg-rose-500 animate-pulse" />
-                                    )}
-                                </button>
-                            ))}
+                        {/* Actions Section - MATCHING PLANNER STRUCTURE + FOOD DETAIL TABS */}
+                        <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-48 justify-center">
+                            <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 rounded-2xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner">
+                                {[
+                                    { label: 'About', active: true },
+                                    { label: 'Nutrition', hasDot: true },
+                                    { label: 'Recipes' },
+                                    { label: 'Management' },
+                                ].map((tab) => (
+                                    <button
+                                        key={tab.label}
+                                        className={cn(
+                                            'py-1.5 px-2.5 text-[7px] font-black uppercase tracking-[0.15em] rounded-lg transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%]',
+                                            tab.active
+                                                ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_15px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
+                                                : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                                        )}
+                                    >
+                                        <div className="relative inline-block">
+                                            {tab.label}
+                                            {tab.hasDot && (
+                                                <span className="absolute -top-1 -right-2 w-1 h-1 rounded-full bg-rose-500 animate-pulse" />
+                                            )}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
                             
                             <Link 
                                 href={`/foods/${food.id}`}
-                                className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-white hover:bg-emerald-600 hover:border-emerald-500 transition-all ml-2 shadow-lg active:scale-90"
-                                title="View Details"
+                                className="lg:w-full text-[9px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-slate-900/20 px-4 group/btn"
                             >
-                                <ChevronRight size={18} />
+                                <span>Details</span>
+                                <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform"/>
                             </Link>
                         </div>
                     </div>
@@ -355,7 +371,7 @@ export function FoodsView({
                     }}
                     hasActiveFilters={showFavoritesOnly || selectedCategories.length > 0}
                     activeFilterCount={selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
-                    dropdownContent={dropdownContent}
+                    dropdownContent={dropdownContent || defaultDropdown}
                 >
                     {foodList}
                 </TrackerTabShell>
