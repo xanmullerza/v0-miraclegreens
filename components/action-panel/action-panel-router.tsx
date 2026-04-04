@@ -19,6 +19,7 @@ import { Loader2, X } from 'lucide-react';
 import { PanelWrapper } from './panel-wrapper';
 import { PortionMatchPanel } from '@/components/recipe/detail/portion-match-panel';
 import { IngredientMatchDialog } from '@/components/recipe/detail/ingredient-match-dialog';
+import { AuthPromptPanel } from './auth-prompt-panel';
 
 // New View Components
 import { AssistantView } from './views/AssistantView';
@@ -302,6 +303,8 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                     )}
                 </div>
             );
+        case 'auth-prompt':
+            return <AuthPromptPanel />;
         default:
             if (activeView && typeof activeView === 'string' && activeView.startsWith('help-')) return <HelpSection type={activeView as any} />;
             return null;
