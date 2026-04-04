@@ -522,7 +522,7 @@ export function RecipesView({
                                 </div>
 
                                 <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:border-l lg:border-slate-100 lg:dark:border-slate-800 lg:pl-4 lg:w-52 justify-center">
-                                    <div className="flex flex-wrap items-center justify-center gap-2 p-1 rounded-3xl bg-slate-950/40 dark:bg-slate-800/60 border border-white/5 shadow-inner grow">
+                                    <div className="flex flex-wrap items-center justify-center gap-2 p-1 rounded-3xl bg-transparent border border-emerald-500/40 grow">
                                         {[
                                             { label: <Clock size={18} />, value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-' },
                                             { label: <Users size={18} />, value: recipe.servings || 1 },
