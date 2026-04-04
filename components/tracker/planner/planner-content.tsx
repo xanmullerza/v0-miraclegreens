@@ -78,26 +78,7 @@ const DEMO_PLAN = {
             'Astaxanthin': { description: 'The pigment that makes salmon pink; a potent antioxidant.', sources: ['Salmon', 'Shrimp'] }
         }
     },
-    snacks: [
-        {
-            id: 'demo-s1',
-            title: 'Roasted Spiced Chickpeas',
-            calories: 180,
-            energy_kj: 753,
-            protein: 7,
-            fat: 5,
-            carbs: 25,
-            image: 'https://images.unsplash.com/photo-1515544867661-30444936f2e8?w=400&q=80',
-            micronutrients: { 
-                'Fiber': 8, 'Iron': 2.4, 'Folate': 85, 'Manganese': 1.2, 
-                'B1 (Thiamine)': 0.2, 'Magnesium': 60, 'Potassium': 320, 'Zinc': 1.5,
-                'Sodium': 280, 'Choline': 45
-            },
-            phytonutrients: { 
-                'Genistein': { description: 'An isoflavone found in legumes that may have heart-protective effects.', sources: ['Soybeans', 'Chickpeas'] }
-            }
-        }
-    ]
+    snacks: []
 };
 
 export interface PlannerContentProps {
