@@ -21,6 +21,12 @@ import { CATEGORIES, FoodFiltersPanel } from '@/components/foods/food-filters-pa
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
 import { TrackerTabShell, SortOption } from '@/components/tracker/tracker-tab-shell';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const PAGE_SIZE = 20;
 
@@ -216,13 +222,65 @@ export function FoodsView({
     }, [effectiveSearchQuery, authReady, showFavoritesOnly, selectedCategories, user, sortField, sortDirection, fetchFoods]);
 
     const defaultDropdown = (
-        <button
-            className="h-10 px-4 rounded-xl bg-cyan-600 text-white border-cyan-500 shadow-lg shadow-cyan-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]"
-        >
-            <Leaf size={14} className="animate-pulse" />
-            <span className="hidden sm:inline">Foods</span>
-            <ChevronDown size={10} />
-        </button>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button
+                    className="h-10 px-4 rounded-xl bg-cyan-600 text-white border-cyan-500 shadow-lg shadow-cyan-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                    <Leaf size={14} className="animate-pulse" />
+                    <span className="hidden sm:inline">Foods</span>
+                    <ChevronDown size={10} />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-slate-900 border-slate-800 p-2 rounded-2xl shadow-2xl">
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-white font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1"
+                >
+                    <Leaf size={14} className="text-cyan-500" />
+                    Foods
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-slate-300 font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1"
+                    onClick={() => {
+                        setActiveView('nutridex');
+                        setIsActionPanelOpen(true);
+                    }}
+                >
+                    <Activity size={14} className="text-fuchsia-500" />
+                    Nutridex
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-slate-300 font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1"
+                    onClick={() => {
+                        setActiveView('planner');
+                        setIsActionPanelOpen(true);
+                    }}
+                >
+                    <List size={14} className="text-indigo-500" />
+                    List
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-slate-300 font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1"
+                    onClick={() => {
+                        setActiveView('pantry');
+                        setIsActionPanelOpen(true);
+                    }}
+                >
+                    <Package size={14} className="text-amber-500" />
+                    Pantry
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer focus:bg-slate-800 focus:text-white text-slate-300 font-bold tracking-widest uppercase text-[10px] rounded-xl"
+                    onClick={() => {
+                        setActiveView('shopping');
+                        setIsActionPanelOpen(true);
+                    }}
+                >
+                    <ShoppingCart size={14} className="text-rose-500" />
+                    Cart
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 
     const foodList = (
