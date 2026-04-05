@@ -19,51 +19,11 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
     return (
         <>
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Ready in</p>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">
-                        {recipe.prep_time + (recipe.cook_time || 0) > 0 
-                            ? `${recipe.prep_time + (recipe.cook_time || 0)} min` 
-                            : '-'}
-                    </p>
-                </div>
-                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700 h-fit">
-                    <button
-                        onClick={() => setSelectedServings(Math.max(0.5, selectedServings - 0.5))}
-                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
-                        title="Decrease servings"
-                    >
-                        <Minus size={14} />
-                    </button>
-                    <div className="px-3 py-1.5 text-[8px] font-bold uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap min-w-[60px] text-center">
-                        {selectedServings.toFixed(1)} Serving{selectedServings !== 1 ? 's' : ''}
-                    </div>
-                    <button
-                        onClick={() => setSelectedServings(selectedServings + 0.5)}
-                        className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
-                        title="Increase servings"
-                    >
-                        <Plus size={14} />
-                    </button>
-                </div>
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Meal Type</p>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">
-                        {recipe.type || 'Other'}
-                    </p>
-                </div>
-                <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Difficulty</p>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">
-                        {recipe.difficulty || 'Medium'}
-                    </p>
-                </div>
-                <button 
-                    onClick={() => ctx.navigateTo('recipe-tags')}
-                    className="col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors group"
-                >
+            {/* Tags & Categories Panel */}
+            <button 
+                onClick={() => ctx.navigateTo('recipe-tags')}
+                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors group"
+            >
                     <div className="flex items-center justify-between mb-3">
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tags & Categories</p>
                         <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
@@ -101,7 +61,6 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                         )}
                     </div>
                 </button>
-            </div>
 
             {/* Ingredients */}
             {ingredients.length > 0 && (

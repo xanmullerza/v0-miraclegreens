@@ -24,7 +24,9 @@ import {
     UtensilsCrossed,
     SignalLow,
     SignalMedium,
-    Signal
+    Signal,
+    Plus,
+    Minus
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -157,10 +159,14 @@ export function RecipesView({
 
     
     const [isAdmin, setIsAdmin] = useState(false);
+    const [servingsOverrides, setServingsOverrides] = useState<Record<string, number>>({});
 
-    useEffect(() => {
-        setShowOnlyMyRecipes(onlyMyRecipes);
-    }, [onlyMyRecipes]);
+    const handleUpdateServings = (e: React.MouseEvent, recipeId: string, delta: number, currentServings: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const next = Math.max(0.5, currentServings + delta);
+        setServingsOverrides(prev => ({ ...prev, [recipeId]: next }));
+    };
 
 
 
@@ -503,9 +509,11 @@ export function RecipesView({
                                         </h3>
                                     </div>
 
-                                    <div className="flex flex-wrap gap-2.5">
+                                     <div className="flex flex-wrap gap-2.5">
                                         {(() => {
-                                            const multiplier = filters.nutritionViewMode === 'per-serving' ? 1 / (recipe.servings || 1) : 1;
+                                            const baseServings = recipe.servings || 1;
+                                            const currentServings = servingsOverrides[recipe.id] || baseServings;
+                                            const multiplier = filters.nutritionViewMode === 'per-serving' ? (1 / baseServings) : (currentServings / baseServings);
                                             return (
                                                 <>
                                                     <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
@@ -549,8 +557,9 @@ export function RecipesView({
                                             },
                                             {
                                                 label: <Users size={17} />,
-                                                value: recipe.servings || 1,
-                                                color: 'text-violet-400'
+                                                value: servingsOverrides[recipe.id] || recipe.servings || 1,
+                                                color: 'text-violet-400',
+                                                isInteractive: true
                                             },
                                             {
                                                 label: (() => {
@@ -580,19 +589,36 @@ export function RecipesView({
                                                     return 'text-amber-400';
                                                 })()
                                             },
-                                        ] as { label: React.ReactNode; value: string | number; color: string }[]).map((tab, idx) => (
+                                        ] as { label: React.ReactNode; value: string | number; color: string; isInteractive?: boolean }[]).map((tab, idx) => (
                                             <div
                                                 key={idx}
                                                 className={cn(
-                                                    'py-4 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-col items-center justify-center gap-1.5 bg-transparent',
-                                                    tab.color
+                                                    'py-3 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-col items-center justify-center gap-1.5 bg-transparent relative',
+                                                    tab.color,
+                                                    tab.isInteractive && "bg-slate-800/40 shadow-inner ring-1 ring-white/5"
                                                 )}
                                             >
+                                                {tab.isInteractive && (
+                                                    <button
+                                                        onClick={(e) => handleUpdateServings(e, recipe.id, -0.5, Number(tab.value))}
+                                                        className="absolute -left-1 top-1/2 -translate-y-1/2 p-2 hover:text-white transition-colors"
+                                                    >
+                                                        <Minus size={12} strokeWidth={4} />
+                                                    </button>
+                                                )}
                                                 <span className="opacity-85 leading-none shrink-0">
                                                     {tab.label}
                                                 </span>
                                                 {tab.value !== '' && (
                                                     <span className="leading-none font-black text-white/70 text-[10px] tracking-widest">{tab.value}</span>
+                                                )}
+                                                {tab.isInteractive && (
+                                                    <button
+                                                        onClick={(e) => handleUpdateServings(e, recipe.id, 0.5, Number(tab.value))}
+                                                        className="absolute -right-1 top-1/2 -translate-y-1/2 p-2 hover:text-white transition-colors"
+                                                    >
+                                                        <Plus size={12} strokeWidth={4} />
+                                                    </button>
                                                 )}
                                             </div>
                                         ))}
