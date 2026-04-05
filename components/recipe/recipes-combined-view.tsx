@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import { RecipesView } from './recipes-view';
 import { RecipeTabShell } from './recipe-tab-shell';
-import { Lock, Globe, Sparkles, Zap, ChevronDown } from 'lucide-react';
+import { Lock, Globe, Sparkles, Zap, ChevronDown, Plus, Upload, Share2, Download } from 'lucide-react';
+import { useActionPanel } from '@/lib/context/action-panel-context';
+
 import { cn } from '@/lib/utils';
 
 type RecipeFilter = 'all' | 'remixes' | 'my-recipes' | 'mixes';
@@ -19,6 +21,8 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [recipeFilter, setRecipeFilter] = useState<RecipeFilter>('all');
     const [showFilterMenu, setShowFilterMenu] = useState(false);
+    const { navigateTo } = useActionPanel();
+
 
     const filterOptions: { value: RecipeFilter; label: string; icon: React.ReactNode; color: string }[] = [
         { value: 'all', label: 'All Recipes', icon: <Globe size={12} />, color: 'emerald' },
@@ -84,7 +88,7 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                                     className={cn(
                                         "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                         recipeFilter === option.value
-                                            ? `bg-${option.color}-600 text-white`
+                                            ? `bg-${option.color}-600 text-white shadow-md`
                                             : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                                     )}
                                 >
@@ -92,9 +96,45 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                                     {option.label}
                                 </button>
                             ))}
+
+                            <div className="my-1 border-t border-slate-100 dark:border-slate-700/50" />
+                            
+                            <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 px-3 py-1.5">Actions</p>
+
+                            <button
+                                onClick={() => {
+                                    navigateTo('recipe-builder');
+                                    setShowFilterMenu(false);
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all"
+                            >
+                                <Plus size={12} />
+                                Create Recipe
+                            </button>
+                            <button
+                                onClick={() => {
+                                    navigateTo('import');
+                                    setShowFilterMenu(false);
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all"
+                            >
+                                <Upload size={12} />
+                                Import Recipe
+                            </button>
+                            <button
+                                onClick={() => {
+                                    navigateTo('export-recipes');
+                                    setShowFilterMenu(false);
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-all"
+                            >
+                                <Download size={12} />
+                                Export
+                            </button>
                         </div>
                     )}
                 </div>
+
             }
         >
             <RecipesView 
