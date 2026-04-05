@@ -149,12 +149,21 @@ export function RecipesView({
     const effectiveSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
     
     const [showOnlyMyRecipes, setShowOnlyMyRecipes] = useState(onlyMyRecipes);
+    const [localIsMix, setLocalIsMix] = useState(isMix);
+    const [localIsRemix, setLocalIsRemix] = useState(isRemix);
+    
+    const activeIsMix = isMix !== undefined ? isMix : localIsMix;
+    const activeIsRemix = isRemix !== undefined ? isRemix : localIsRemix;
+
     
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         setShowOnlyMyRecipes(onlyMyRecipes);
-    }, [onlyMyRecipes]);
+        setLocalIsMix(isMix);
+        setLocalIsRemix(isRemix);
+    }, [onlyMyRecipes, isMix, isRemix]);
+
 
     useEffect(() => {
         if (user) {
@@ -169,7 +178,8 @@ export function RecipesView({
         if (!authLoading) {
             fetchRecipes(0, true);
         }
-    }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty, showOnlyMyRecipes, isMix, isRemix, user]);
+    }, [effectiveSearchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading, filters.pantryMode, filters.selectedDietType, filters.selectedExclusions, filters.showFlavours, filters.showSupplements, filters.selectedTags, filters.selectedDifficulty, showOnlyMyRecipes, activeIsMix, activeIsRemix, user]);
+
 
 
     const fetchRecipes = async (pageToLoad: number, isNewSearch = false) => {
@@ -205,16 +215,17 @@ export function RecipesView({
                 // Ownership check is now handled in fetchRecipesBridge with onlyMyRecipes param
                 
                 // Tab filtering (Remixes, Mixes, or base Recipes)
-                if (isRemix !== undefined) {
+                if (activeIsRemix !== undefined) {
                     const rIsRemix = !!(r as any).is_remix;
-                    if (rIsRemix !== isRemix) return false;
+                    if (rIsRemix !== activeIsRemix) return false;
                 }
-                if (isMix !== undefined) {
+                if (activeIsMix !== undefined) {
                     const rIsMix = !!(r as any).is_mix;
-                    if (rIsMix !== isMix) return false;
+                    if (rIsMix !== activeIsMix) return false;
                 }
                 return true;
             });
+
             
             // 1. Dietary Preference Filter
             if (filters.selectedDietType && filters.selectedDietType !== 'anything') {
@@ -699,12 +710,22 @@ export function RecipesView({
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent side="bottom" align="start" className="w-56 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
                                                     <div className="p-2">
-                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
+                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Collections</DropdownMenuLabel>
                                                         <DropdownMenuCheckboxItem checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer">
                                                             Favorites Only
                                                         </DropdownMenuCheckboxItem>
+                                                        <DropdownMenuCheckboxItem checked={showOnlyMyRecipes} onCheckedChange={setShowOnlyMyRecipes} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer">
+                                                            My Recipes
+                                                        </DropdownMenuCheckboxItem>
+                                                        <DropdownMenuCheckboxItem checked={activeIsRemix} onCheckedChange={(val) => setLocalIsRemix(val)} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer text-violet-500">
+                                                            Remixes
+                                                        </DropdownMenuCheckboxItem>
+                                                        <DropdownMenuCheckboxItem checked={activeIsMix} onCheckedChange={(val) => setLocalIsMix(val)} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer text-amber-500">
+                                                            Mixes
+                                                        </DropdownMenuCheckboxItem>
                                                     </div>
                                                 </DropdownMenuContent>
+
                                             </DropdownMenu>
                                         </div>
                                         <div className="relative">
