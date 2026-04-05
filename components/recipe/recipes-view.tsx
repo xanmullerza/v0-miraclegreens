@@ -513,7 +513,11 @@ export function RecipesView({
                                         {(() => {
                                             const baseServings = recipe.servings || 1;
                                             const currentServings = servingsOverrides[recipe.id] || baseServings;
-                                            const multiplier = filters.nutritionViewMode === 'per-serving' ? (1 / baseServings) : (currentServings / baseServings);
+                                            // If the user has explicitly overridden servings, we show the total for that amount.
+                                            // Otherwise, we respect the global nutritionViewMode.
+                                            const multiplier = (servingsOverrides[recipe.id] !== undefined)
+                                                ? (currentServings / baseServings)
+                                                : (filters.nutritionViewMode === 'per-serving' ? (1 / baseServings) : 1);
                                             return (
                                                 <>
                                                     <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
