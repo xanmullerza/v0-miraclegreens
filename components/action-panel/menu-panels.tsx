@@ -1,5 +1,6 @@
 import React from 'react';
-import { ActionPanelView } from '@/lib/context/action-panel-context';
+import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-context';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface MenuWrapperProps {
@@ -41,9 +42,11 @@ export function MenuButton({ onClick, icon, label, colorClass }: { onClick: () =
 }
 
 export function CookbookMenuPanel({ onBack, navigateTo }: { onBack: () => void; navigateTo: (v: ActionPanelView) => void }) {
+    const router = useRouter();
+    const { setIsActionPanelOpen } = useActionPanel();
     return (
         <MenuWrapper onBack={onBack}>
-            <MenuButton onClick={() => navigateTo('view-recipes')} icon="📖" label="View Recipes" colorClass="group-hover:text-emerald-500" />
+            <MenuButton onClick={() => { setIsActionPanelOpen(false); router.push('/cookbook'); }} icon="📖" label="View Recipes" colorClass="group-hover:text-emerald-500" />
             <MenuButton onClick={() => navigateTo('import-options')} icon="✍️" label="Add Recipes" colorClass="group-hover:text-indigo-500" />
             <MenuButton onClick={() => toast('Export is coming soon 👀')} icon="🤝" label="Share Recipes" colorClass="group-hover:text-cyan-500" />
         </MenuWrapper>
@@ -51,9 +54,11 @@ export function CookbookMenuPanel({ onBack, navigateTo }: { onBack: () => void; 
 }
 
 export function PlannerMenuPanel({ onBack, navigateTo }: { onBack: () => void; navigateTo: (v: ActionPanelView) => void }) {
+    const router = useRouter();
+    const { setIsActionPanelOpen } = useActionPanel();
     return (
         <MenuWrapper onBack={onBack}>
-            <MenuButton onClick={() => navigateTo('planner')} icon="🗂️" label="Meal Planner" colorClass="group-hover:text-blue-500" />
+            <MenuButton onClick={() => { setIsActionPanelOpen(false); router.push('/tracker'); }} icon="🗂️" label="Meal Planner" colorClass="group-hover:text-blue-500" />
             <MenuButton onClick={() => navigateTo('pantry')} icon="🧺" label="Pantry" colorClass="group-hover:text-green-500" />
             <MenuButton onClick={() => navigateTo('shopping')} icon="🛒" label="Shopping List" colorClass="group-hover:text-amber-500" />
             <div className="flex flex-col items-center justify-center gap-2 p-2 text-center opacity-40">

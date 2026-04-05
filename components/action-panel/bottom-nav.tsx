@@ -22,14 +22,17 @@ export function ActionPanelBottomNav({
             <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-2 py-2 flex items-center justify-between rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10">
                 {/* Recipes Button */}
                 <button
-                    onClick={() => navigateTo('view-recipes')}
+                    onClick={() => {
+                        setIsActionPanelOpen(false);
+                        router.push('/cookbook');
+                    }}
                     className={cn(
                         "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                        activeView === 'view-recipes' ? "text-emerald-500" : "text-slate-400 hover:text-emerald-500"
+                        pathname === '/cookbook' ? "text-emerald-500" : "text-slate-400 hover:text-emerald-500"
                     )}
                     title="Recipes"
                 >
-                    <BookOpen size={20} className={cn("transition-transform group-hover:scale-110", activeView === 'view-recipes' && "animate-pulse")} />
+                    <BookOpen size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
                     <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Recipes</span>
                 </button>
 
@@ -40,7 +43,7 @@ export function ActionPanelBottomNav({
                         router.push('/library');
                     }}
                     className={cn(
-                        "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
+                        "flex-1 flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
                         pathname.startsWith('/library') ? "text-cyan-500" : "text-slate-400 hover:text-cyan-500"
                     )}
                     title="Library"
@@ -84,14 +87,17 @@ export function ActionPanelBottomNav({
 
                 {/* Tracker Button */}
                 <button
-                    onClick={() => navigateTo('shopping')}
+                    onClick={() => {
+                        setIsActionPanelOpen(false);
+                        router.push('/tracker');
+                    }}
                     className={cn(
                         "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                        activeView === 'shopping' ? "text-blue-500" : "text-slate-400 hover:text-blue-500"
+                        pathname === '/tracker' ? "text-blue-500" : "text-slate-400 hover:text-blue-500"
                     )}
                     title="Tracker"
                 >
-                    <BarChart3 size={20} className={cn("transition-transform group-hover:scale-110", activeView === 'shopping' && "animate-pulse")} />
+                    <BarChart3 size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/tracker' && "animate-pulse")} />
                     <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Tracker</span>
                 </button>
             </div>

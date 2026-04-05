@@ -186,23 +186,10 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
             );
 
         // 6. Integrated Components
-        case 'view-recipes':
-            return (
-                <PanelWrapper title="Recipes" onClose={handleBack}>
-                    <div className="px-2 pb-20 mt-8">
-                        <RecipesCombinedView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
-                    </div>
-                </PanelWrapper>
-            );
+
         case 'recipe-detail':
             if (!effectiveRecipeId) {
-                return (
-                    <PanelWrapper title="Recipes" onClose={handleGoHome}>
-                        <div className="px-2 pb-20 mt-8">
-                            <RecipesCombinedView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
-                        </div>
-                    </PanelWrapper>
-                );
+                return null;
             }
             return (
                 <RecipeDetail 
@@ -213,13 +200,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
             );
         case 'recipe-tags':
             if (!effectiveRecipeId) {
-                return (
-                    <PanelWrapper title="Recipes" onClose={handleGoHome}>
-                        <div className="px-2 pb-20 mt-8">
-                            <RecipesCombinedView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
-                        </div>
-                    </PanelWrapper>
-                );
+                return null;
             }
             return (
                 <RecipeTagsPanel 

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
@@ -18,12 +19,13 @@ interface ActionPanelOrchestratorProps {
 }
 
 export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: ActionPanelOrchestratorProps) {
+    const router = useRouter();
     const { user, saveRecipe } = useDataPersistence();
     const { filters } = useRecipeFilter();
     const { 
         activeView, setActiveView, previousView, setPreviousView, 
         navigateTo, goBack, recipeToRemix, setRecipeToRemix, 
-        recipeToShare, setRecipeToShare 
+        recipeToShare, setRecipeToShare, setIsActionPanelOpen 
     } = useActionPanel();
     
     // Abstracted Zum Assistant Props (Directly from hook for primary conversation)
@@ -172,7 +174,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
             
             toast.success('Successfully saved to your library!');
             setSelectedRecipeId(recipeId);
-            setPreviousView('view-recipes');
+            setPreviousView(null);
             setActiveView('recipe-detail');
             importer.setSuccessRecipe(null);
             importer.setIsCreatingRecipe(false);
@@ -281,7 +283,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         }
     }, [recipeToRemix, handleRemixRecipe, setRecipeToRemix]);
 
-    const handleRecipeClick = (recipeId: string, fromView: 'view-recipes' | 'planner') => {
+    const handleRecipeClick = (recipeId: string, fromView: ActionPanelView) => {
         setSelectedRecipeId(recipeId);
         setPreviousView(fromView);
         setActiveView('recipe-detail');
@@ -293,15 +295,15 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     };
 
     const handleViewAllRecipes = () => {
-        navigateTo('view-recipes');
-        setShowOnlyMyRecipes(false);
+        setIsActionPanelOpen(false);
+        router.push('/cookbook');
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };
 
     const handleViewMyRecipes = () => {
-        navigateTo('view-recipes');
-        setShowOnlyMyRecipes(true);
+        setIsActionPanelOpen(false);
+        router.push('/cookbook?mine=true');
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };

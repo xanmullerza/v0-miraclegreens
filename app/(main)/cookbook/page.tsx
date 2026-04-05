@@ -23,7 +23,7 @@ function RecipesPageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { profile } = useUserPreferences();
-    const { setIsActionPanelOpen, setActiveView } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, setContextRecipeId } = useActionPanel();
     
     const initialTab = (searchParams.get('tab') as TabId) || 'recipes';
     const initialView = (searchParams.get('view') as InventoryView) || 'foods';
@@ -83,6 +83,12 @@ function RecipesPageContent() {
         setInventoryView(view);
         setShowInventoryMenu(false);
         router.push(`/recipes?tab=foods&view=${view}`);
+    };
+
+    const handleRecipeClick = (recipeId: string) => {
+        setContextRecipeId(recipeId);
+        setActiveView('recipe-detail');
+        setIsActionPanelOpen(true);
     };
 
     const inventorySwitcher = (
@@ -225,6 +231,7 @@ function RecipesPageContent() {
                         {activeTab === 'recipes' && (
                             <RecipesCombinedView 
                                 isPremium={profile.isPremium}
+                                onRecipeClick={handleRecipeClick}
                             />
                         )}
                         {activeTab === 'foods' && (
