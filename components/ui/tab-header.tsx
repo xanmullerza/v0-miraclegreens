@@ -36,7 +36,7 @@ export function TabHeader({
     rightButtons,
 }: TabHeaderProps) {
     return (
-        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl py-6 px-4">
+        <div className="hidden md:block sticky top-0 z-30 bg-background/80 backdrop-blur-xl py-6 px-4">
             <div className="flex items-center justify-center max-w-5xl mx-auto bg-slate-950/40 dark:bg-slate-900/60 p-1.5 rounded-[2rem] shadow-2xl overflow-x-auto no-scrollbar">
                 {tabs.map((tab) => {
                     const isActive = activeTab === tab.id;

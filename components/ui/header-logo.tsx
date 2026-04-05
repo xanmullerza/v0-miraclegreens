@@ -55,7 +55,7 @@ export function HeaderLogo({
 
     return (
         <div suppressHydrationWarning className={cn(
-            "flex items-center justify-between bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12"
+            "hidden md:flex items-center justify-between bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12"
         )}>
             {/* Left - Logo Area */}
             <div className="flex h-full items-center px-4 overflow-hidden">
