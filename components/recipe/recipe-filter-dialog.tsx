@@ -195,6 +195,7 @@ export function RecipeFilterContent({ onClose }: { onClose?: () => void }) {
       showMixes: false,
       showRemixes: false,
       nutritionViewMode: 'per-serving',
+      servingsOverrides: {},
     });
 
     toast.info('Filters reset to profile defaults');
