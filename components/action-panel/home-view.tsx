@@ -227,7 +227,7 @@ export function HomeView({
                 </div>
 
                 {/* 3. Mission / Info Section (From Home Page) */}
-                <div className="pt-8 pb-12 space-y-4">
+                <div className="pt-8 pb-32 space-y-4">
                     <div className="flex items-center gap-2 mb-4 px-1">
                         <Globe size={14} className="text-emerald-500" />
                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Our Commitment</h3>
