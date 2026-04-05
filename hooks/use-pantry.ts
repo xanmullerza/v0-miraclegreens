@@ -169,6 +169,8 @@ export function usePantry() {
         }
     };
 
+    const refresh = useCallback(() => fetchPantry(user), [fetchPantry, user]);
+
     return {
         pantryItems,
         quantities,
@@ -176,6 +178,7 @@ export function usePantry() {
         updateQuantity,
         addToPantry,
         removeFromPantry,
-        refresh: () => fetchPantry(user)
+        refresh
     };
 }
+
