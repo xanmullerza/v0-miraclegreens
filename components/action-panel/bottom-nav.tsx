@@ -32,6 +32,22 @@ export function ActionPanelBottomNav({
                 <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Recipes</span>
             </button>
 
+            {/* Library - Center-Left */}
+            <button
+                onClick={() => {
+                    setIsActionPanelOpen(false);
+                    router.push('/library');
+                }}
+                className={cn(
+                    "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-95 group",
+                    pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                )}
+                title="Library"
+            >
+                <Leaf size={20} />
+                <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
+            </button>
+
             {/* Home - Center */}
             <button
                 onClick={() => navigateTo('home')}
@@ -48,22 +64,6 @@ export function ActionPanelBottomNav({
                     <Home size={24} className={cn("transition-transform group-hover:scale-110", activeView === 'home' && "animate-pulse")} />
                 </div>
                 <span className="text-[9px] font-black uppercase tracking-widest scale-[0.7] origin-top opacity-60 mt-1">Home</span>
-            </button>
-
-            {/* Library - Center-Right */}
-            <button
-                onClick={() => {
-                    setIsActionPanelOpen(false);
-                    router.push('/library');
-                }}
-                className={cn(
-                    "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-95 group",
-                    pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                )}
-                title="Library"
-            >
-                <Leaf size={20} />
-                <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
             </button>
 
             {/* Tracker - Right Side */}
