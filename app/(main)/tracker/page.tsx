@@ -38,7 +38,7 @@ function PlannerPageContent() {
                     className="h-10 px-4 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10 bg-blue-600 text-white shadow-blue-500/20"
                 >
                     <Calendar size={14} className="animate-pulse" />
-                    <span className="hidden sm:inline">Tracker</span>
+                    <span className="hidden sm:inline">Planner</span>
                     <ChevronDown size={10} className="text-white/50" />
                 </button>
             </DropdownMenuTrigger>
@@ -48,7 +48,7 @@ function PlannerPageContent() {
                     onClick={() => {}}
                 >
                     <Calendar size={14} className="text-blue-500" />
-                    Tracker
+                    Planner
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                     className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1 text-slate-300 focus:bg-slate-800"
