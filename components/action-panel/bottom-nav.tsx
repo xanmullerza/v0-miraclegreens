@@ -1,6 +1,5 @@
-import React from 'react';
-import { Home, BookOpen, BarChart3, Wand2, Sparkles } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Home, BookOpen, BarChart3, Wand2, Sparkles, Leaf } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-context';
@@ -14,7 +13,9 @@ export function ActionPanelBottomNav({
     activeView,
     onClose
 }: ActionPanelBottomNavProps) {
-    const { navigateTo } = useActionPanel();
+    const { navigateTo, setIsActionPanelOpen } = useActionPanel();
+    const router = useRouter();
+    const pathname = usePathname();
 
     return (
         <div className="md:hidden mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-2 py-4 flex items-center justify-center pointer-events-auto shrink-0 z-50 gap-1">
@@ -47,6 +48,22 @@ export function ActionPanelBottomNav({
                     <Home size={24} className={cn("transition-transform group-hover:scale-110", activeView === 'home' && "animate-pulse")} />
                 </div>
                 <span className="text-[9px] font-black uppercase tracking-widest scale-[0.7] origin-top opacity-60 mt-1">Home</span>
+            </button>
+
+            {/* Library - Center-Right */}
+            <button
+                onClick={() => {
+                    setIsActionPanelOpen(false);
+                    router.push('/library');
+                }}
+                className={cn(
+                    "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-95 group",
+                    pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                )}
+                title="Library"
+            >
+                <Leaf size={20} />
+                <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
             </button>
 
             {/* Tracker - Right Side */}
