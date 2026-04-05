@@ -11,6 +11,7 @@ import { parseRecipeAmount, extractCoreName } from '@/lib/utils/parsing-utils';
 import { useSmartMatch } from '@/hooks/use-smart-match';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
+import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import type { Recipe, Ingredient, Instruction, CalculatedNutrition } from './types';
 
 interface UseRecipeDetailOptions {
@@ -61,6 +62,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     const { profile, nutrientDisplayMode, energyUnit, selectedServings, setSelectedServings } = useUserPreferences();
     const userRDAs = useRDA(profile?.age ? Number(profile.age) : undefined, profile?.gender, 2000);
     const { setIsActionPanelOpen, setActiveView, setRecipeToRemix, setRecipeToShare, navigateTo, setSmartMatchPicker, setSmartMatchPortion, setIngredientMatch } = useActionPanel();
+    const { filters } = useRecipeFilter();
     const { user } = useDataPersistence();
     const [smartMatchRunning, setSmartMatchRunning] = useState(false);
     
@@ -170,7 +172,12 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     useEffect(() => {
         fetchRecipeDetails();
-    }, [recipeId]);
+        
+        // Sync servings from global overrides if present
+        if (filters.servingsOverrides && filters.servingsOverrides[recipeId]) {
+            setSelectedServings(filters.servingsOverrides[recipeId]);
+        }
+    }, [recipeId, filters.servingsOverrides[recipeId]]);
 
     // Initialize stepTwoInputs with original quantities when ingredients load
     useEffect(() => {

@@ -123,7 +123,7 @@ export function RecipesView({
     const [hasMore, setHasMore] = useState(true);
     const { searchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
-    const { filters } = useRecipeFilter();
+    const { filters, updateFilter } = useRecipeFilter();
 
     const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading } = useDataPersistence();
     const { pantryItems, loading: pantryLoading } = usePantry();
@@ -159,13 +159,13 @@ export function RecipesView({
 
     
     const [isAdmin, setIsAdmin] = useState(false);
-    const [servingsOverrides, setServingsOverrides] = useState<Record<string, number>>({});
+    const servingsOverrides = filters.servingsOverrides || {};
 
     const handleUpdateServings = (e: React.MouseEvent, recipeId: string, delta: number, currentServings: number) => {
         e.preventDefault();
         e.stopPropagation();
         const next = Math.max(0.5, currentServings + delta);
-        setServingsOverrides(prev => ({ ...prev, [recipeId]: next }));
+        updateFilter('servingsOverrides', { ...servingsOverrides, [recipeId]: next });
     };
 
 

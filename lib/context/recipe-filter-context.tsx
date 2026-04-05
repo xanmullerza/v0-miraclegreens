@@ -17,6 +17,7 @@ export interface RecipeFilterState {
   showMixes: boolean;
   showRemixes: boolean;
   nutritionViewMode: 'per-serving' | 'total';
+  servingsOverrides: Record<string, number>;
 }
 
 interface RecipeFilterContextType {
@@ -52,6 +53,7 @@ export function RecipeFilterProvider({
     showMixes: false,
     showRemixes: false,
     nutritionViewMode: 'per-serving',
+    servingsOverrides: {},
   });
 
 
@@ -83,6 +85,7 @@ export function RecipeFilterProvider({
           showMixes: parsed.showMixes || false,
           showRemixes: parsed.showRemixes || false,
           nutritionViewMode: parsed.nutritionViewMode || 'per-serving',
+          servingsOverrides: parsed.servingsOverrides || {},
         }));
 
       } catch (e) {
@@ -106,9 +109,10 @@ export function RecipeFilterProvider({
         showMixes: filters.showMixes,
         showRemixes: filters.showRemixes,
         nutritionViewMode: filters.nutritionViewMode,
+        servingsOverrides: filters.servingsOverrides,
       })
     );
-  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements, filters.onlyMyRecipes, filters.showMixes, filters.showRemixes, filters.nutritionViewMode]);
+  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements, filters.onlyMyRecipes, filters.showMixes, filters.showRemixes, filters.nutritionViewMode, filters.servingsOverrides]);
 
 
   const updateFilter = (key: keyof RecipeFilterState, value: any) => {
@@ -133,6 +137,7 @@ export function RecipeFilterProvider({
       showMixes: false,
       showRemixes: false,
       nutritionViewMode: 'per-serving',
+      servingsOverrides: {},
     });
   };
 
@@ -151,6 +156,7 @@ export function RecipeFilterProvider({
       showMixes: false,
       showRemixes: false,
       nutritionViewMode: 'per-serving',
+      servingsOverrides: {},
     });
   };
 
