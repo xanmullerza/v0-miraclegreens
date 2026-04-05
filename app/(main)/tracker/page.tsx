@@ -27,12 +27,11 @@ function PlannerPageContent() {
     const [scannerOpen, setScannerOpen] = useState(false);
     const [refreshKey] = useState(0);
     const getTrackerLabel = () => {
-
-        if (subView === 'shopping') return 'Shopping';
         if (subView === 'shopping') return 'Shopping';
         if (subView === 'pantry') return 'Pantry';
         return 'Planner';
     };
+
 
     const tabs = [
         { id: 'recipes', label: 'Cookbook' },
