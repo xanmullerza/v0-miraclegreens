@@ -1,8 +1,9 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { Loader2, ArrowLeft, Sparkles, ShoppingBasket, Shapes, ChevronDown } from 'lucide-react';
+import { Loader2, ArrowLeft, Calendar, ShoppingBasket, Shapes, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,8 +29,9 @@ function PlannerPageContent() {
     const getTrackerLabel = () => {
 
         if (subView === 'shopping') return 'Shopping';
+        if (subView === 'shopping') return 'Shopping';
         if (subView === 'pantry') return 'Pantry';
-        return 'Tracker';
+        return 'Planner';
     };
 
     const tabs = [
@@ -39,12 +41,13 @@ function PlannerPageContent() {
             id: 'planner', 
             label: getTrackerLabel(),
             dropdownOptions: [
-                { id: 'p1', label: 'Planner', onClick: () => setSubView('planner'), icon: <Sparkles size={12} className="text-blue-500" /> },
-                { id: 'p2', label: 'Shopping List', onClick: () => setSubView('shopping'), icon: <ShoppingBasket size={12} className="text-amber-500" /> },
-                { id: 'p3', label: 'Pantry Inventory', onClick: () => setSubView('pantry'), icon: <Shapes size={12} className="text-sky-500" /> },
+                { id: 'p1', label: 'Planner', onClick: () => setSubView('planner'), icon: <Calendar size={12} className="text-blue-500" /> },
+                { id: 'p2', label: 'Shopping', onClick: () => setSubView('shopping'), icon: <ShoppingBasket size={12} className="text-amber-500" /> },
+                { id: 'p3', label: 'Pantry', onClick: () => setSubView('pantry'), icon: <Shapes size={12} className="text-sky-500" /> },
             ]
         },
     ];
+
 
 
     // Themed Tracker dropdown matching Cookbook/Library style
@@ -59,45 +62,47 @@ function PlannerPageContent() {
                         "bg-emerald-600 text-white shadow-emerald-500/20"
                     )}
                 >
-                    {subView === 'planner' ? <Sparkles size={14} className="animate-pulse" /> :
+                    {subView === 'planner' ? <Calendar size={14} className="animate-pulse" /> :
                      subView === 'shopping' ? <ShoppingBasket size={14} className="animate-pulse" /> :
                      <Shapes size={14} className="animate-pulse" />}
                     <span className="hidden sm:inline">{getTrackerLabel()}</span>
                     <ChevronDown size={10} />
                 </button>
+
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-800 p-2 rounded-2xl shadow-2xl">
                 <DropdownMenuItem 
                     className={cn(
-                        "gap-3 py-2.5 cursor-pointer font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1",
+                        "gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1",
                         subView === 'planner' ? "bg-blue-600/20 text-blue-400" : "text-slate-300 focus:bg-slate-800"
                     )}
                     onClick={() => setSubView('planner')}
                 >
-                    <Sparkles size={14} className="text-blue-500" />
-                    Meal Planner
+                    <Calendar size={14} className="text-blue-500" />
+                    Planner
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                     className={cn(
-                        "gap-3 py-2.5 cursor-pointer font-bold tracking-widest uppercase text-[10px] rounded-xl mb-1",
+                        "gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1",
                         subView === 'shopping' ? "bg-amber-600/20 text-amber-400" : "text-slate-300 focus:bg-slate-800"
                     )}
                     onClick={() => setSubView('shopping')}
                 >
                     <ShoppingBasket size={14} className="text-amber-500" />
-                    Shopping List
+                    Shopping
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                     className={cn(
-                        "gap-3 py-2.5 cursor-pointer font-bold tracking-widest uppercase text-[10px] rounded-xl",
+                        "gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl",
                         subView === 'pantry' ? "bg-emerald-600/20 text-emerald-400" : "text-slate-300 focus:bg-slate-800"
                     )}
                     onClick={() => setSubView('pantry')}
                 >
                     <Shapes size={14} className="text-emerald-500" />
-                    Pantry Inventory
+                    Pantry
                 </DropdownMenuItem>
             </DropdownMenuContent>
+
         </DropdownMenu>
     );
 
