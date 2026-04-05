@@ -24,19 +24,48 @@ function PlannerPageContent() {
     const { navigateTo } = useActionPanel();
     const [scannerOpen, setScannerOpen] = useState(false);
     const [refreshKey] = useState(0);
-
     const tabs = [
         { id: 'recipes', label: 'Cookbook' },
         { id: 'foods', label: 'Library' },
         { id: 'planner', label: 'Tracker' },
     ];
 
-    // Themed Tracker button (previously a dropdown)
-    const trackerButton = (
-        <div className="h-10 px-4 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest bg-blue-600 text-white shadow-lg shadow-blue-500/20 ring-1 ring-white/10">
-            <Calendar size={14} className="animate-pulse" />
-            <span className="hidden sm:inline">Tracker</span>
-        </div>
+    // Themed Tracker button with restored dropdown for Shopping/Pantry
+    const trackerDropdown = (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button
+                    className="h-10 px-4 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10 bg-blue-600 text-white shadow-blue-500/20"
+                >
+                    <Calendar size={14} className="animate-pulse" />
+                    <span className="hidden sm:inline">Tracker</span>
+                    <ChevronDown size={10} className="text-white/50" />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-800 p-2 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1 bg-blue-600/20 text-blue-400"
+                    onClick={() => {}}
+                >
+                    <Calendar size={14} className="text-blue-500" />
+                    Tracker
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1 text-slate-300 focus:bg-slate-800"
+                    onClick={() => navigateTo('shopping')}
+                >
+                    <ShoppingBasket size={14} className="text-amber-500" />
+                    Shopping
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                    className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl text-slate-300 focus:bg-slate-800"
+                    onClick={() => navigateTo('pantry')}
+                >
+                    <Shapes size={14} className="text-emerald-500" />
+                    Pantry
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 
     const handleTabChange = (id: string) => {
@@ -59,7 +88,7 @@ function PlannerPageContent() {
                 <div className="py-6 animate-in fade-in duration-300">
                     <MealPlannerContent
                         onSubViewChange={(view) => navigateTo(view as any)}
-                        dropdownContent={trackerButton}
+                        dropdownContent={trackerDropdown}
                     />
                 </div>
             </PageContainer>
