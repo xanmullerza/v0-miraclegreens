@@ -141,16 +141,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                             onRecipeDetected={handleRecipeDetected}
                         />
                         
-                        {/* Mobile Resize Button (should not appear on mobile since compartment hidden) */}
-                        {resizeMode !== 'dashboard-only' && (
-                            <button
-                                onClick={toggleResize}
-                                className="lg:hidden absolute top-20 right-4 z-30 flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400"
-                                title={getResizeTooltip()}
-                            >
-                                {getResizeIcon()}
-                            </button>
-                        )}
                     </div>
                 )}
 
@@ -166,6 +156,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
             {/* RDA Drawer */}
             <RDADrawer />
+
+            {/* Floating Action Button (Split View) */}
+            <DraggableFab />
 
             {/* Recipe Preview Modal */}
             <RecipePreview
