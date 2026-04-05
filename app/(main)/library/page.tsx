@@ -53,17 +53,36 @@ function LibraryContent() {
     const current = menuOptions.find(o => o.view === libraryView) || menuOptions[0];
 
     const inventorySwitcher = (
-        <div className="relative">
+        <div className="relative flex items-center gap-1.5">
+            {/* Primary Action Button */}
             <button
                 onClick={() => setShowMenu(!showMenu)}
                 className={cn(
-                    "h-10 px-4 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
+                    "h-10 px-5 rounded-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]",
                     current.activeClass
                 )}
             >
                 {current.icon}
                 <span>{current.label}</span>
-                <ChevronDown size={10} className={cn("transition-transform", showMenu && "rotate-180")} />
+            </button>
+
+            {/* Standalone Chevron Button */}
+            <button
+                onClick={() => setShowMenu(!showMenu)}
+                className={cn(
+                    "h-10 w-10 flex items-center justify-center rounded-2xl transition-all duration-300 ring-1 ring-white/10 shadow-lg",
+                    showMenu
+                        ? "bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                        : cn(
+                            "bg-white/50 dark:bg-slate-900/50 border",
+                            libraryView === 'foods' ? "text-cyan-500 border-cyan-500/20" :
+                            libraryView === 'nutridex' ? "text-fuchsia-500 border-fuchsia-500/20" :
+                            libraryView === 'comparator' ? "text-amber-500 border-amber-500/20" :
+                            "text-red-500 border-red-500/20"
+                        )
+                )}
+            >
+                <ChevronDown size={14} className={cn("transition-transform duration-300", showMenu && "rotate-180")} />
             </button>
 
             {showMenu && (

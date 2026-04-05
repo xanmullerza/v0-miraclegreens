@@ -37,14 +37,26 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
             additionalControls={
-                <div className="relative">
+                <div className="relative flex items-center gap-1.5">
+                    {/* Split Button - Main Action */}
                     <button
                         onClick={() => setShowFilterMenu(!showFilterMenu)}
-                        className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                        className="h-10 px-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
                     >
-                        <ChevronDown size={14} className={cn("transition-transform duration-300", showFilterMenu && "rotate-180")} />
                         <span>Actions</span>
                     </button>
+                    
+                    {/* Standalone Chevron Button */}
+                    <button
+                        onClick={() => setShowFilterMenu(!showFilterMenu)}
+                        className={cn(
+                            "h-10 w-10 flex items-center justify-center rounded-2xl transition-all duration-300 shadow-lg ring-1 ring-white/10",
+                            showFilterMenu ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-emerald-500/10" : "bg-emerald-600/10 dark:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                        )}
+                    >
+                        <ChevronDown size={14} className={cn("transition-transform duration-300", showFilterMenu && "rotate-180")} />
+                    </button>
+
                     {showFilterMenu && (
                         <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-lg shadow-2xl z-20 p-1 min-w-[180px]">
                             <button
