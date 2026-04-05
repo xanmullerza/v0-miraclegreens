@@ -192,24 +192,29 @@ export function RecipeFilterContent({ onClose }: { onClose?: () => void }) {
       selectedDifficulty: [],
       selectedTags: [],
       onlyMyRecipes: false,
+      showMixes: false,
+      showRemixes: false,
       nutritionViewMode: 'per-serving',
     });
+
     toast.info('Filters reset to profile defaults');
   };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="p-4 sm:p-6 space-y-6 overflow-y-auto overflow-x-hidden flex-1 scrollbar-thin">
-        {/* Ownership Section */}
-        <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
-          <div className="p-4 bg-white dark:bg-slate-900">
+        {/* Collection Filters Section */}
+        <div className="border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-900">
+          <div className="p-4 space-y-4">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Collections</p>
+            
             <label className="flex items-center justify-between cursor-pointer group">
               <div className="space-y-0.5">
                 <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">
-                  My Recipes Only
+                  My Recipes
                 </p>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                  Show only recipes you have created
+                  Only show recipes you've created
                 </p>
               </div>
               <Switch
@@ -222,8 +227,53 @@ export function RecipeFilterContent({ onClose }: { onClose?: () => void }) {
                 }
               />
             </label>
+
+            <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+            <label className="flex items-center justify-between cursor-pointer group">
+              <div className="space-y-0.5">
+                <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-violet-500 transition-colors">
+                  Remixes
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Show community adjustments
+                </p>
+              </div>
+              <Switch
+                checked={localFilters.showRemixes}
+                onCheckedChange={(checked) =>
+                  setLocalFilters((prev) => ({
+                    ...prev,
+                    showRemixes: checked,
+                  }))
+                }
+              />
+            </label>
+
+            <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+            <label className="flex items-center justify-between cursor-pointer group">
+              <div className="space-y-0.5">
+                <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                  Mixes
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Show blends and base mixes
+                </p>
+              </div>
+              <Switch
+                checked={localFilters.showMixes}
+                onCheckedChange={(checked) =>
+                  setLocalFilters((prev) => ({
+                    ...prev,
+                    showMixes: checked,
+                  }))
+                }
+              />
+            </label>
           </div>
         </div>
+
 
         {/* Nutrition View Mode Section */}
         <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">

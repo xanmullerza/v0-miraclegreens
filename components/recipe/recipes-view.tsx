@@ -160,9 +160,8 @@ export function RecipesView({
 
     useEffect(() => {
         setShowOnlyMyRecipes(onlyMyRecipes);
-        setLocalIsMix(isMix);
-        setLocalIsRemix(isRemix);
-    }, [onlyMyRecipes, isMix, isRemix]);
+    }, [onlyMyRecipes]);
+
 
 
     useEffect(() => {

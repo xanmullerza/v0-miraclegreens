@@ -14,6 +14,8 @@ export interface RecipeFilterState {
   selectedDifficulty: string[];
   selectedTags: string[];
   onlyMyRecipes: boolean;
+  showMixes: boolean;
+  showRemixes: boolean;
   nutritionViewMode: 'per-serving' | 'total';
 }
 
@@ -47,8 +49,11 @@ export function RecipeFilterProvider({
     selectedDifficulty: [],
     selectedTags: [],
     onlyMyRecipes: false,
+    showMixes: false,
+    showRemixes: false,
     nutritionViewMode: 'per-serving',
   });
+
 
   // Sync with profile changes
   useEffect(() => {
@@ -75,8 +80,11 @@ export function RecipeFilterProvider({
           selectedDifficulty: parsed.selectedDifficulty || [],
           selectedTags: parsed.selectedTags || [],
           onlyMyRecipes: parsed.onlyMyRecipes || false,
+          showMixes: parsed.showMixes || false,
+          showRemixes: parsed.showRemixes || false,
           nutritionViewMode: parsed.nutritionViewMode || 'per-serving',
         }));
+
       } catch (e) {
         console.error('Failed to load recipe filters from localStorage', e);
       }
@@ -95,10 +103,13 @@ export function RecipeFilterProvider({
         selectedDifficulty: filters.selectedDifficulty,
         selectedTags: filters.selectedTags,
         onlyMyRecipes: filters.onlyMyRecipes,
+        showMixes: filters.showMixes,
+        showRemixes: filters.showRemixes,
         nutritionViewMode: filters.nutritionViewMode,
       })
     );
-  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements, filters.onlyMyRecipes, filters.nutritionViewMode]);
+  }, [filters.selectedEquipment, filters.pantryMode, filters.showFlavours, filters.showSupplements, filters.onlyMyRecipes, filters.showMixes, filters.showRemixes, filters.nutritionViewMode]);
+
 
   const updateFilter = (key: keyof RecipeFilterState, value: any) => {
     setFilters((prev) => ({
@@ -119,6 +130,8 @@ export function RecipeFilterProvider({
       selectedDifficulty: [],
       selectedTags: [],
       onlyMyRecipes: false,
+      showMixes: false,
+      showRemixes: false,
       nutritionViewMode: 'per-serving',
     });
   };
@@ -135,9 +148,12 @@ export function RecipeFilterProvider({
       selectedDifficulty: [],
       selectedTags: [],
       onlyMyRecipes: false,
+      showMixes: false,
+      showRemixes: false,
       nutritionViewMode: 'per-serving',
     });
   };
+
 
   const hasActiveFilters =
     filters.selectedEquipment.length > 0 ||
@@ -147,7 +163,10 @@ export function RecipeFilterProvider({
     filters.showFlavours ||
     filters.selectedDifficulty.length > 0 ||
     filters.selectedTags.length > 0 ||
-    filters.onlyMyRecipes;
+    filters.onlyMyRecipes ||
+    filters.showMixes ||
+    filters.showRemixes;
+
 
   return (
     <RecipeFilterContext.Provider
