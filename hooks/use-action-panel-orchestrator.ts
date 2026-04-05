@@ -150,7 +150,18 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
-    }, [setActiveView, setPreviousView]);
+    }, [setActiveView, setPreviousView, handleBack, activeView]);
+
+    // View Cleanup Sync
+    useEffect(() => {
+        // If we move away from builder/import views, ensure their modal states are reset
+        if (activeView !== 'recipe-builder' && builder.showRecipeBuilder) {
+            builder.resetBuilder();
+        }
+        if (activeView !== 'import' && importer.isCreatingRecipe && activeView !== 'messages') {
+            importer.setIsCreatingRecipe(false);
+        }
+    }, [activeView, builder, importer]);
 
     // Complex Handlers
     const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
@@ -187,6 +198,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     const handleCreateNewRecipe = () => {
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
+        navigateTo('import');
         importer.setIsCreatingRecipe(true);
     };
 
@@ -262,7 +274,8 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
         builder.setShowRecipeBuilder(true);
         builder.setRecipeStep(1); 
-    }, [builder, importer]);
+        navigateTo('recipe-builder');
+    }, [builder, importer, navigateTo]);
 
     useEffect(() => {
         if (recipeToRemix) {

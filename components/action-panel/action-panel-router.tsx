@@ -78,86 +78,113 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
 
     const effectiveRecipeId = contextRecipeId || (selectedRecipeId as string | null);
 
-    // 1. Recipe Builder (Full Overlay Mode)
-    if (showRecipeBuilder) {
-        return (
-            <RecipeBuilderView
-                {...{
-                    recipeStep, setRecipeStep, recipeTitle, setRecipeTitle,
-                    recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
-                    recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
-                    recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
-                    handleCloseRecipeBuilder, recipeSaving, handleAddInstruction,
-                    handleUpdateInstruction, handleRemoveInstruction, builderRef,
-                    recipeUploading, handleRecipeImageUpload, handleSaveRecipe
-                }}
-            />
-        );
-    }
-
-    // 2. Menu Exploration (Dashboard, Cookbook, etc.)
-    const explorerViews = ['dashboard', 'desktop-guide', 'cookbook', 'plannerMenu', 'widgetsMenu'];
-    if (explorerViews.includes(activeView)) {
-        return (
-            <MenuExplorationView
-                {...{
-                    activeView, previousView, navigateTo, onBack: handleBack,
-                    handleGoHome, isAdmin, setShowOnlyMyRecipes
-                }}
-            />
-        );
-    }
-
-    // 3. Static Pages (Profile, Privacy, etc.)
-    const staticViews = ['profile', 'privacy', 'support', 'terms'];
-    if (staticViews.includes(activeView)) {
-        return <StaticPagesView activeView={activeView} onBack={handleBack} />;
-    }
-
-    // 4. Imports (Special Handling)
-    if (activeView === 'import' || (activeView === 'messages' && isCreatingRecipe && !successRecipe)) {
-        return (
-            <ImportWizardView
-                {...{
-                    onBack: handleBack, navigateTo, isLoading, recipeLoading,
-                    recipeSaving, successRecipe, setSuccessRecipe,
-                    pastedRecipeURL, setPastedRecipeURL,
-                    pastedRecipeContent, setPastedRecipeContent,
-                    handlePasteRecipeContent, handlePasteRecipeURL,
-                    handleSaveAndViewRecipe, handleManualRecipeCreation,
-                    isDragging, setIsDragging, processRecipeImage,
-                    fileInputRef, isRecording, recordingTime,
-                    startAudioRecording, stopAudioRecording,
-                    videoURL, setVideoURL
-                }}
-            />
-        );
-    }
-
-    // 5. Assistant (AI Chat)
-    if (activeView === 'messages') {
-        return (
-            <AssistantView
-                {...{
-                    messages, messagesEndRef, isLoading, recipeSaving,
-                    handleSaveAndViewRecipe, onBack: handleBack, input, setInput,
-                    handleSend, recipeLoading, showQuickActions,
-                    setShowQuickActions, isRecording, recordingTime,
-                    startAudioRecording, stopAudioRecording,
-                    handleRecipeImageUpload, fileInputRef, audioInputRef,
-                    handleLoadConversationHistory, startNewConversation,
-                    isLoadingHistory, expandedRecipeMenu, setExpandedRecipeMenu,
-                    expandedAppsMenu, setExpandedAppsMenu, expandedWidgetsMenu,
-                    setExpandedWidgetsMenu, activeView, navigateTo,
-                    previousView, handleViewAllRecipes, handleViewMyRecipes,
-                    handleCreateNewRecipe
-                }}
-            />
-        );
-    }
-
-    // 6. Integrated Components
+    // Consolidated Router Logic
     switch (activeView) {
+        // 1. Recipe Builder
+        case 'recipe-builder':
+            return (
+                <RecipeBuilderView
+                    {...{
+                        recipeStep, setRecipeStep, recipeTitle, setRecipeTitle,
+                        recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
+                        recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
+                        recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
+                        handleCloseRecipeBuilder, recipeSaving, handleAddInstruction,
+                        handleUpdateInstruction, handleRemoveInstruction, builderRef,
+                        recipeUploading, handleRecipeImageUpload, handleSaveRecipe
+                    }}
+                />
+            );
+
+        // 2. Menu Exploration (Dashboard, Cookbook, etc.)
+        case 'dashboard':
+        case 'desktop-guide':
+        case 'cookbook':
+        case 'plannerMenu':
+        case 'widgetsMenu':
+            return (
+                <MenuExplorationView
+                    {...{
+                        activeView, previousView, navigateTo, onBack: handleBack,
+                        handleGoHome, isAdmin, setShowOnlyMyRecipes
+                    }}
+                />
+            );
+
+        // 3. Static Pages (Profile, Privacy, etc.)
+        case 'profile':
+        case 'privacy':
+        case 'support':
+        case 'terms':
+            return <StaticPagesView activeView={activeView} onBack={handleBack} />;
+
+        // 4. Imports (Special Handling)
+        case 'import':
+        case 'import-options':
+        case 'import-bulk':
+        case 'import-paste-text':
+        case 'import-paste-url':
+        case 'import-upload-photo':
+        case 'import-voice':
+        case 'import-video':
+            return (
+                <ImportWizardView
+                    {...{
+                        onBack: handleBack, navigateTo, isLoading, recipeLoading,
+                        recipeSaving, successRecipe, setSuccessRecipe,
+                        pastedRecipeURL, setPastedRecipeURL,
+                        pastedRecipeContent, setPastedRecipeContent,
+                        handlePasteRecipeContent, handlePasteRecipeURL,
+                        handleSaveAndViewRecipe, handleManualRecipeCreation,
+                        isDragging, setIsDragging, processRecipeImage,
+                        fileInputRef, isRecording, recordingTime,
+                        startAudioRecording, stopAudioRecording,
+                        videoURL, setVideoURL
+                    }}
+                />
+            );
+
+        // 5. Assistant (AI Chat)
+        case 'messages':
+            // Special case: if we are in messages but specifically asked to import
+            if (isCreatingRecipe && !successRecipe) {
+                return (
+                    <ImportWizardView
+                        {...{
+                            onBack: handleBack, navigateTo, isLoading, recipeLoading,
+                            recipeSaving, successRecipe, setSuccessRecipe,
+                            pastedRecipeURL, setPastedRecipeURL,
+                            pastedRecipeContent, setPastedRecipeContent,
+                            handlePasteRecipeContent, handlePasteRecipeURL,
+                            handleSaveAndViewRecipe, handleManualRecipeCreation,
+                            isDragging, setIsDragging, processRecipeImage,
+                            fileInputRef, isRecording, recordingTime,
+                            startAudioRecording, stopAudioRecording,
+                            videoURL, setVideoURL
+                        }}
+                    />
+                );
+            }
+            return (
+                <AssistantView
+                    {...{
+                        messages, messagesEndRef, isLoading, recipeSaving,
+                        handleSaveAndViewRecipe, onBack: handleBack, input, setInput,
+                        handleSend, recipeLoading, showQuickActions,
+                        setShowQuickActions, isRecording, recordingTime,
+                        startAudioRecording, stopAudioRecording,
+                        handleRecipeImageUpload, fileInputRef, audioInputRef,
+                        handleLoadConversationHistory, startNewConversation,
+                        isLoadingHistory, expandedRecipeMenu, setExpandedRecipeMenu,
+                        expandedAppsMenu, setExpandedAppsMenu, expandedWidgetsMenu,
+                        setExpandedWidgetsMenu, activeView, navigateTo,
+                        previousView, handleViewAllRecipes, handleViewMyRecipes,
+                        handleCreateNewRecipe
+                    }}
+                />
+            );
+
+        // 6. Integrated Components
         case 'view-recipes':
             return (
                 <PanelWrapper title="Recipes" onClose={handleBack}>

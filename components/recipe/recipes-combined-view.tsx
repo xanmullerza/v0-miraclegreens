@@ -19,23 +19,17 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('title');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-    const [recipeFilter, setRecipeFilter] = useState<RecipeFilter>('all');
     const [showFilterMenu, setShowFilterMenu] = useState(false);
-    const { navigateTo } = useActionPanel();
+    const { navigateTo, activeView } = useActionPanel();
 
-
-    const filterOptions: { value: RecipeFilter; label: string; icon: React.ReactNode; color: string }[] = [
-        { value: 'all', label: 'All Recipes', icon: <Globe size={12} />, color: 'emerald' },
-        { value: 'remixes', label: 'Remixes', icon: <Sparkles size={12} />, color: 'violet' },
-        { value: 'my-recipes', label: 'My Recipes', icon: <Lock size={12} />, color: 'indigo' },
-        { value: 'mixes', label: 'Mixes', icon: <Zap size={12} />, color: 'amber' },
-    ];
-
-    const currentFilter = filterOptions.find(f => f.value === recipeFilter);
+    // Close menu when navigating elsewhere
+    React.useEffect(() => {
+        setShowFilterMenu(false);
+    }, [activeView]);
 
     return (
         <RecipeTabShell
-            title="Recipes"
+            title="Cookbook"
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             sortField={sortField}
@@ -58,7 +52,7 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                                     navigateTo('recipe-builder');
                                     setShowFilterMenu(false);
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all"
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all font-black"
                             >
                                 <Plus size={12} />
                                 Create Recipe
@@ -68,7 +62,7 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                                     navigateTo('import');
                                     setShowFilterMenu(false);
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all"
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all font-black"
                             >
                                 <Upload size={12} />
                                 Import Recipe
@@ -78,7 +72,7 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                                     navigateTo('export-recipes');
                                     setShowFilterMenu(false);
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-all"
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-all font-black"
                             >
                                 <Download size={12} />
                                 Export
