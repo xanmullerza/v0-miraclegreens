@@ -16,36 +16,30 @@ import { PageContainer } from '@/components/ui/page-container';
 import { TabHeader } from '@/components/ui/tab-header';
 import { useRouter } from 'next/navigation';
 import MealPlannerContent from '@/components/tracker/planner-content';
-import { ShoppingListView } from '@/components/tracker/shopping-list-view';
-import { PantryView } from '@/components/tracker/pantry-view';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 
-type TrackerSubView = 'planner' | 'shopping' | 'pantry';
 
 function PlannerPageContent() {
     const router = useRouter();
-    const [subView, setSubView] = useState<TrackerSubView>('planner');
+    const { navigateTo } = useActionPanel();
     const [scannerOpen, setScannerOpen] = useState(false);
     const [refreshKey] = useState(0);
-    const getTrackerLabel = () => {
-        if (subView === 'shopping') return 'Shopping';
-        if (subView === 'pantry') return 'Pantry';
-        return 'Planner';
-    };
-
 
     const tabs = [
+
         { id: 'recipes', label: 'Cookbook' },
         { id: 'foods', label: 'Library' },
         { 
             id: 'planner', 
-            label: getTrackerLabel(),
+            label: 'Planner',
             dropdownOptions: [
-                { id: 'p1', label: 'Planner', onClick: () => setSubView('planner'), icon: <Calendar size={12} className="text-blue-500" /> },
-                { id: 'p2', label: 'Shopping', onClick: () => setSubView('shopping'), icon: <ShoppingBasket size={12} className="text-amber-500" /> },
-                { id: 'p3', label: 'Pantry', onClick: () => setSubView('pantry'), icon: <Shapes size={12} className="text-sky-500" /> },
+                { id: 'p1', label: 'Planner', onClick: () => {}, icon: <Calendar size={12} className="text-blue-500" /> },
+                { id: 'p2', label: 'Shopping', onClick: () => navigateTo('shopping'), icon: <ShoppingBasket size={12} className="text-amber-500" /> },
+                { id: 'p3', label: 'Pantry', onClick: () => navigateTo('pantry'), icon: <Shapes size={12} className="text-sky-500" /> },
             ]
         },
     ];
+
 
 
 
@@ -54,56 +48,39 @@ function PlannerPageContent() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
-                    className={cn(
-                        "h-10 px-4 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10",
-                        subView === 'planner' ? "bg-blue-600 text-white shadow-blue-500/20" :
-                        subView === 'shopping' ? "bg-amber-600 text-white shadow-amber-500/20" :
-                        "bg-emerald-600 text-white shadow-emerald-500/20"
-                    )}
+                    className="h-10 px-4 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10 bg-blue-600 text-white shadow-blue-500/20"
                 >
-                    {subView === 'planner' ? <Calendar size={14} className="animate-pulse" /> :
-                     subView === 'shopping' ? <ShoppingBasket size={14} className="animate-pulse" /> :
-                     <Shapes size={14} className="animate-pulse" />}
-                    <span className="hidden sm:inline">{getTrackerLabel()}</span>
+                    <Calendar size={14} className="animate-pulse" />
+                    <span className="hidden sm:inline">Planner</span>
                     <ChevronDown size={10} />
                 </button>
-
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-800 p-2 rounded-2xl shadow-2xl">
                 <DropdownMenuItem 
-                    className={cn(
-                        "gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1",
-                        subView === 'planner' ? "bg-blue-600/20 text-blue-400" : "text-slate-300 focus:bg-slate-800"
-                    )}
-                    onClick={() => setSubView('planner')}
+                    className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1 bg-blue-600/20 text-blue-400"
+                    onClick={() => {}}
                 >
                     <Calendar size={14} className="text-blue-500" />
                     Planner
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                    className={cn(
-                        "gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1",
-                        subView === 'shopping' ? "bg-amber-600/20 text-amber-400" : "text-slate-300 focus:bg-slate-800"
-                    )}
-                    onClick={() => setSubView('shopping')}
+                    className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1 text-slate-300 focus:bg-slate-800"
+                    onClick={() => navigateTo('shopping')}
                 >
                     <ShoppingBasket size={14} className="text-amber-500" />
                     Shopping
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                    className={cn(
-                        "gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl",
-                        subView === 'pantry' ? "bg-emerald-600/20 text-emerald-400" : "text-slate-300 focus:bg-slate-800"
-                    )}
-                    onClick={() => setSubView('pantry')}
+                    className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl text-slate-300 focus:bg-slate-800"
+                    onClick={() => navigateTo('pantry')}
                 >
                     <Shapes size={14} className="text-emerald-500" />
                     Pantry
                 </DropdownMenuItem>
             </DropdownMenuContent>
-
         </DropdownMenu>
     );
+
 
     const handleTabChange = (id: string) => {
         if (id === 'recipes') router.push('/cookbook');
@@ -125,27 +102,12 @@ function PlannerPageContent() {
 
             <PageContainer maxWidth="max-w-7xl">
                 <div className="py-6 animate-in fade-in duration-300">
-                    {subView === 'planner' && (
-                        <MealPlannerContent
-                            onSubViewChange={(view) => setSubView(view)}
-                            dropdownContent={trackerDropdown}
-                        />
-                    )}
-                    {subView === 'shopping' && (
-                        <ShoppingListView
-                            scannerOpen={scannerOpen}
-                            onScannerOpenChange={setScannerOpen}
-                            dropdownContent={trackerDropdown}
-                        />
-                    )}
-                    {subView === 'pantry' && (
-                        <PantryView
-                            refreshKey={refreshKey}
-                            dropdownContent={trackerDropdown}
-                        />
-                    )}
-
+                    <MealPlannerContent
+                        onSubViewChange={(view) => navigateTo(view as any)}
+                        dropdownContent={trackerDropdown}
+                    />
                 </div>
+
             </PageContainer>
         </>
     );
