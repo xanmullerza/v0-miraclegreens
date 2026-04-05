@@ -88,7 +88,7 @@ export function TrackerTabShell({
                     </div>
 
                     {/* Controls Hub - Right Side */}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center justify-center gap-2 shrink-0 w-full md:w-auto md:justify-end">
                         {/* Filter Button (Optional) */}
                         {showFilters && (
                             <button 

@@ -90,7 +90,7 @@ export function RecipeTabShell({
                         </div>
 
                         {/* Controls Group - Consolidated on the Right */}
-                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        <div className="flex flex-wrap items-center justify-center gap-2 shrink-0 w-full md:w-auto md:justify-end">
                             {/* Filter Button */}
                             <button
                                 onClick={() => {
