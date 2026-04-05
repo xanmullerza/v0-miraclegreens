@@ -77,11 +77,11 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             const displayWeight = Math.round((ing.weight_g || 0) * weightScale * 10) / 10;
                             
                             const food = ing.food_items;
-                            const weight = ing.weight_g || 0;
+                            const currentWeight = (ing.weight_g || 0) * weightScale;
                             let ingCalories = 0, ingProtein = 0, ingCarbs = 0, ingFat = 0;
                             
-                            if (food && weight > 0) {
-                                const ratio = weight / 100;
+                            if (food && currentWeight > 0) {
+                                const ratio = currentWeight / 100;
                                 ingCalories = Math.round((food.energy_kcal || 0) * ratio);
                                 ingProtein = Math.round((food.protein_g || 0) * ratio * 10) / 10;
                                 ingCarbs = Math.round((food.carbs_g || 0) * ratio * 10) / 10;
