@@ -43,7 +43,7 @@ export function ActionPanelBottomNav({
                         router.push('/library');
                     }}
                     className={cn(
-                        "flex-1 flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
+                        "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
                         pathname.startsWith('/library') ? "text-cyan-500" : "text-slate-400 hover:text-cyan-500"
                     )}
                     title="Library"
