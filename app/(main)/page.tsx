@@ -142,14 +142,14 @@ export default function AboutUsPage() {
                                 </div>
                             </div>
 
-                            {/* Planner Card */}
+                            {/* Tracker Card */}
                             <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-3xl p-6 border border-blue-500/20 shadow-sm relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                     <Calendar size={120} className="text-blue-500 -rotate-12" />
                                 </div>
                                 <div className="flex items-center gap-2 mb-6">
                                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Planner</h3>
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Tracker</h3>
                                 </div>
                                 <div className="flex flex-col gap-4 relative z-10">
                                     <button
@@ -161,8 +161,8 @@ export default function AboutUsPage() {
                                                 <Calendar size={24} className="text-blue-600 dark:text-blue-400 group-hover/btn:text-white" />
                                             </div>
                                             <div className="text-left">
-                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Open Planner</h4>
-                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Plan your weekly molecular meals</p>
+                                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Open Tracker</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5 max-w-[200px] leading-tight break-words">Track your weekly molecular meals</p>
                                             </div>
                                         </div>
                                         <ChevronRight size={20} className="text-slate-300 group-hover/btn:text-blue-500 group-hover/btn:translate-x-1 transition-all" />

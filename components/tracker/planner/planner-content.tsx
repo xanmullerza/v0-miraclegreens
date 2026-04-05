@@ -326,7 +326,7 @@ export function PlannerContent({
     return (
         <div className="relative group/planner">
             <TrackerTabShell
-                title="Planner"
+                title="Tracker"
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 sortField={sortField}
