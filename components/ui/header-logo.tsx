@@ -145,6 +145,17 @@ export function HeaderLogo({
                     })}
                 </div>
 
+                {/* View Ratio Toggle (Split View) */}
+                <button
+                    onClick={toggleResize}
+                    className="hidden lg:flex h-12 w-12 border-l border-border items-center justify-center transition-all focus:outline-none text-muted-foreground hover:text-emerald-500 hover:bg-muted dark:hover:bg-slate-800/50 active:scale-95 group"
+                    title={getResizeTooltip()}
+                >
+                    <div className="relative w-[18px] h-[18px] flex items-center justify-center group-hover:scale-110 transition-transform">
+                        {getResizeIcon()}
+                    </div>
+                </button>
+
                 {/* Theme Toggle (Desktop Only) */}
                 <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

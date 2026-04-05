@@ -104,7 +104,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
-
+            <HeaderLogo />
+            
             {/* Main content flex container */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Content Area */}
@@ -127,18 +128,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </main>
                 </div>
 
-                {/* Divider + Resize Button */}
-                {pathname !== '/dashboard' && !isMobile && resizeMode !== 'dashboard-only' && (
-                    <>
-                        <button
-                            onClick={toggleResize}
-                            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-10 h-10 rounded-l-lg bg-slate-100 dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                            title={getResizeTooltip()}
-                        >
-                            {getResizeIcon()}
-                        </button>
-                    </>
-                )}
 
                 {/* Chat Area - Desktop only (mobile uses overlay button) */}
                 {pathname !== '/dashboard' && !isMobile && (
