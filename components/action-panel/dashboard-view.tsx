@@ -33,8 +33,8 @@ export function DashboardView({
                 <div className="flex flex-col gap-4">
                     <button
                         onClick={() => {
-                            setActiveView('view-recipes');
-                            setShowOnlyMyRecipes(false);
+                            setIsActionPanelOpen(false);
+                            router.push('/cookbook');
                         }}
                         className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group shadow-sm"
                     >

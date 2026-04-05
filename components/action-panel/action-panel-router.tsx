@@ -2,7 +2,7 @@ import React from 'react';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { useFoodFilter } from '@/lib/context/food-filter-context';
-import { RecipesViewPremium } from '@/components/recipe/recipes-view-premium';
+import { RecipesCombinedView } from '@/components/recipe/recipes-combined-view';
 import { RecipeDetail } from './recipe-detail';
 import { SharePanel } from './share-panel';
 import { ShoppingPanel } from './shopping-panel';
@@ -190,7 +190,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
             return (
                 <PanelWrapper title="Recipes" onClose={handleBack}>
                     <div className="px-2 pb-20 mt-8">
-                        <RecipesViewPremium onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
+                        <RecipesCombinedView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
                     </div>
                 </PanelWrapper>
             );
@@ -199,7 +199,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                 return (
                     <PanelWrapper title="Recipes" onClose={handleGoHome}>
                         <div className="px-2 pb-20 mt-8">
-                            <RecipesViewPremium onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
+                            <RecipesCombinedView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
                         </div>
                     </PanelWrapper>
                 );
@@ -216,7 +216,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                 return (
                     <PanelWrapper title="Recipes" onClose={handleGoHome}>
                         <div className="px-2 pb-20 mt-8">
-                            <RecipesViewPremium onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
+                            <RecipesCombinedView onRecipeClick={(recipeId) => handleRecipeClick(recipeId, 'view-recipes')} />
                         </div>
                     </PanelWrapper>
                 );

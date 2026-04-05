@@ -137,8 +137,8 @@ export function HomeView({
                         </div>
                         <button
                             onClick={() => {
-                                setActiveView('view-recipes');
-                                setShowOnlyMyRecipes(false);
+                                setIsActionPanelOpen(false);
+                                router.push('/cookbook');
                             }}
                             className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/card shadow-xs"
                         >
