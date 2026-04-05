@@ -37,17 +37,17 @@ function PlannerPageContent() {
                 {/* Main Action Button */}
                 <DropdownMenuTrigger asChild>
                     <button
-                        className="h-10 px-5 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10 bg-blue-600 text-white shadow-blue-500/20"
+                        className="h-11 px-5 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10 bg-blue-600 text-white shadow-blue-500/20"
                     >
                         <Calendar size={14} className="animate-pulse" />
-                        <span className="hidden sm:inline">Planner</span>
+                        <span>Tracker</span>
                     </button>
                 </DropdownMenuTrigger>
 
                 {/* Standalone Chevron Button */}
                 <DropdownMenuTrigger asChild>
                     <button
-                        className="h-10 w-10 flex items-center justify-center rounded-2xl transition-all duration-300 shadow-lg ring-1 ring-white/10 bg-blue-600/10 dark:bg-blue-600/20 border border-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white"
+                        className="h-11 w-11 flex items-center justify-center rounded-2xl transition-all duration-300 shadow-lg ring-1 ring-white/10 bg-blue-600/10 dark:bg-blue-600/20 border border-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white"
                     >
                         <ChevronDown size={14} />
                     </button>
