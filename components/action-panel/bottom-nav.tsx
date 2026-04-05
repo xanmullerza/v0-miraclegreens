@@ -1,4 +1,4 @@
-import { Home, BookOpen, BarChart3, Wand2, Sparkles, Leaf } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, Sparkles, Library as LibraryIcon } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -45,7 +45,7 @@ export function ActionPanelBottomNav({
                     </span>
                 </button>
 
-                {/* Recipes Button */}
+                {/* Cookbook Button */}
                 <button
                     onClick={() => {
                         setIsActionPanelOpen(false);
@@ -55,10 +55,10 @@ export function ActionPanelBottomNav({
                         "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
                         pathname === '/cookbook' ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
                     )}
-                    title="Recipes"
+                    title="Cookbook"
                 >
                     <BookOpen size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
-                    <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Recipes</span>
+                    <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Cookbook</span>
                 </button>
 
                 {/* Library Button */}
@@ -73,7 +73,7 @@ export function ActionPanelBottomNav({
                     )}
                     title="Library"
                 >
-                    <Leaf size={20} className={cn("transition-transform group-hover:scale-110", pathname.startsWith('/library') && "animate-pulse")} />
+                    <LibraryIcon size={20} className={cn("transition-transform group-hover:scale-110", pathname.startsWith('/library') && "animate-pulse")} />
                     <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
                 </button>
 

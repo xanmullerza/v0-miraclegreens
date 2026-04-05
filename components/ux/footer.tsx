@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, BookOpen, BarChart3, Wand2, Smartphone, TabletSmartphone, Monitor as Computer, Leaf } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, Smartphone, TabletSmartphone, Monitor as Computer, Library as LibraryIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useSplitView } from '@/lib/context/split-view-context';
@@ -39,7 +39,7 @@ export function Footer() {
             </span>
           </button>
 
-          {/* Recipes Button */}
+          {/* Cookbook Button */}
           <button
             onClick={() => {
               setIsActionPanelOpen(false);
@@ -52,7 +52,7 @@ export function Footer() {
             title="Cookbook"
           >
             <BookOpen size={20} />
-            <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Recipes</span>
+            <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Cookbook</span>
           </button>
 
           {/* Library Button */}
@@ -67,7 +67,7 @@ export function Footer() {
             )}
             title="Library"
           >
-            <Leaf size={20} />
+            <LibraryIcon size={20} />
             <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
           </button>
 
