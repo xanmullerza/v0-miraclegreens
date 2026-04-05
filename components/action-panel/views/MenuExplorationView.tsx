@@ -2,11 +2,22 @@ import React from 'react';
 import { CookbookMenuPanel, PlannerMenuPanel, WidgetsMenuPanel } from '../menu-panels';
 import { DashboardView } from '../dashboard-view';
 import { DesktopGuide } from '../desktop-guide';
+import { HomeView } from '../home-view';
 
 export function MenuExplorationView({
     activeView, previousView, navigateTo, onBack,
     handleGoHome, isAdmin, setShowOnlyMyRecipes
 }: any) {
+    if (activeView === 'home') {
+        return (
+            <HomeView
+                setActiveView={navigateTo}
+                setShowOnlyMyRecipes={setShowOnlyMyRecipes}
+                isAdmin={isAdmin}
+            />
+        );
+    }
+
     if (activeView === 'dashboard') {
         return (
             <DashboardView

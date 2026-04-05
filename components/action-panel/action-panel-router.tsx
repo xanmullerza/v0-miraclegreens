@@ -96,7 +96,8 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
                 />
             );
 
-        // 2. Menu Exploration (Dashboard, Cookbook, etc.)
+        // 2. Menu Exploration (Home, Dashboard, Cookbook, etc.)
+        case 'home':
         case 'dashboard':
         case 'desktop-guide':
         case 'cookbook':

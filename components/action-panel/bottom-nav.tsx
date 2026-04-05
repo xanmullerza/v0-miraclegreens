@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, BookOpen, BarChart3, Wand2 } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -31,22 +31,22 @@ export function ActionPanelBottomNav({
                 <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Recipes</span>
             </button>
 
-            {/* Desktop Guide - Center (Assistant) */}
+            {/* Home - Center */}
             <button
-                onClick={() => navigateTo('desktop-guide')}
+                onClick={() => navigateTo('home')}
                 className={cn(
                     "flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 group mx-4",
-                    activeView === 'desktop-guide' ? "text-blue-500" : "text-slate-400"
+                    activeView === 'home' ? "text-emerald-500" : "text-slate-400"
                 )}
-                title="Sidebar Assistant"
+                title="Home"
             >
                 <div className={cn(
                     "w-12 h-12 flex items-center justify-center rounded-2xl transition-all",
-                    activeView === 'desktop-guide' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" : "bg-slate-100 dark:bg-slate-800"
+                    activeView === 'home' ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/30" : "bg-slate-100 dark:bg-slate-800"
                 )}>
-                    <Wand2 size={24} className={cn("transition-transform group-hover:scale-110", activeView === 'desktop-guide' && "animate-pulse")} />
+                    <Home size={24} className={cn("transition-transform group-hover:scale-110", activeView === 'home' && "animate-pulse")} />
                 </div>
-                <span className="text-[9px] font-black uppercase tracking-widest scale-[0.7] origin-top opacity-60 mt-1">Assistant</span>
+                <span className="text-[9px] font-black uppercase tracking-widest scale-[0.7] origin-top opacity-60 mt-1">Home</span>
             </button>
 
             {/* Tracker - Right Side */}

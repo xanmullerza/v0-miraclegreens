@@ -21,7 +21,7 @@ export default function AboutUsPage() {
         setIsMobile(checkMobile);
         if (checkMobile) {
             setIsActionPanelOpen(true);
-            setActiveView('dashboard');
+            setActiveView('home');
         }
         setIsReady(true);
     }, [setIsActionPanelOpen, setActiveView]);

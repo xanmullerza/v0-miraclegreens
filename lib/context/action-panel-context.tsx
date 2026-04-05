@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type ActionPanelView = 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'ingredient-match' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters' | 'auth-prompt';
+export type ActionPanelView = 'home' | 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'view-recipes' | 'recipe-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'ingredient-match' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters' | 'auth-prompt';
 
 export interface SmartMatchPickerState {
     initialSearchQuery: string;
@@ -65,7 +65,7 @@ const ActionPanelContext = createContext<ActionPanelContextType | undefined>(und
 
 export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [isActionPanelOpen, setIsActionPanelOpen] = useState(false);
-    const [activeView, setActiveView] = useState<ActionPanelView>('desktop-guide');
+    const [activeView, setActiveView] = useState<ActionPanelView>('home');
     const [previousView, setPreviousView] = useState<ActionPanelView | null>(null);
     const [recipeToRemix, setRecipeToRemix] = useState<any | null>(null);
     const [recipeToShare, setRecipeToShare] = useState<any | null>(null);
@@ -77,11 +77,9 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [smartMatchPortion, setSmartMatchPortion] = useState<SmartMatchPortionState | null>(null);
     const [ingredientMatch, setIngredientMatch] = useState<IngredientMatchState | null>(null);
 
-    // Initialize correct default view based on screen size across all routes
+    // Initialize correct default view across all routes
     React.useEffect(() => {
-        if (typeof window !== 'undefined' && window.innerWidth < 768) {
-            setActiveView('dashboard');
-        }
+        setActiveView('home');
     }, []);
 
     const navigateTo = (view: ActionPanelView) => {
@@ -106,11 +104,7 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             // Default home behavior
             setPreviousView(null);
             setViewStack([]);
-            if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                setActiveView('dashboard');
-            } else {
-                setActiveView('desktop-guide');
-            }
+                setActiveView('home');
         }
     };
 

@@ -45,11 +45,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         if (fallback && fallback !== activeView) {
             setActiveView(fallback);
         } else {
-            if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                setActiveView('dashboard');
-            } else {
-                setActiveView('desktop-guide');
-            }
+            setActiveView('home');
         }
     };
 
