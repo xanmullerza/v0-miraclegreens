@@ -61,10 +61,10 @@ export function TrackerTabShell({
     const currentSortLabel = sortOptions.find(opt => opt.id === sortField)?.label.split(' ')[0] || 'Sort';
 
     return (
-        <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] shadow-xl">
+        <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] shadow-xl">
 
             {/* Sticky Header */}
-            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-[2rem]">
+            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-none sm:rounded-t-[2rem]">
                 <div className="flex flex-col md:flex-row md:items-center gap-4 px-6 py-5">
                     
                     {/* Search Bar - Main Focus on Left */}

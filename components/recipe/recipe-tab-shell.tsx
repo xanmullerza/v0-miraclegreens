@@ -61,9 +61,9 @@ export function RecipeTabShell({
     };
 
     return (
-        <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] shadow-xl">
+        <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] shadow-xl">
 
-            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-t-[2rem]">
+            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-none sm:rounded-t-[2rem]">
 
                 <div className="px-4 py-4 sm:px-6 sm:py-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center">

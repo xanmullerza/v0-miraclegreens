@@ -96,7 +96,7 @@ function PlannerPageContent() {
             />
 
             <PageContainer maxWidth="max-w-7xl">
-                <div className="py-6 animate-in fade-in duration-300">
+                <div className="py-2 sm:py-6 animate-in fade-in duration-300">
                     <MealPlannerContent
                         onSubViewChange={(view) => navigateTo(view as any)}
                         dropdownContent={trackerDropdown}

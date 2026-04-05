@@ -115,7 +115,7 @@ function LibraryContent() {
                 onTabChange={handleTabChange}
             />
             <PageContainer maxWidth="max-w-7xl">
-                <div className="py-6 animate-in slide-in-from-bottom-4 duration-700">
+                <div className="py-2 sm:py-6 animate-in slide-in-from-bottom-4 duration-700">
                     <FoodsView
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}

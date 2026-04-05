@@ -701,7 +701,7 @@ export function NutrientsView({
             {/* List Container */}
             {!noContainer ? (
                 <div className={cn(
-                    "w-full mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden",
+                    "w-full mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden",
                     !compact && "max-w-6xl"
                 )}>
                     

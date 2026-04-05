@@ -117,8 +117,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     {/* Main Content */}
                     <main className="flex-1 overflow-y-auto bg-background custom-scrollbar">
                         <div className={cn(
-                            "px-2 sm:px-4 flex justify-center",
-                            pathname !== '/dashboard' && "py-4"
+                            "px-0 sm:px-4 flex justify-center",
+                            pathname !== '/dashboard' && "py-0 sm:py-4"
                         )}>
                             <div className="w-full max-w-[900px]">
                                 {children}

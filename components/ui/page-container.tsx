@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -25,7 +25,7 @@ export function PageContainer({
     className,
 }: PageContainerProps) {
     return (
-        <div className={cn('w-full px-2 sm:px-4 mx-auto', maxWidth, className)}>
+        <div className={cn('w-full px-0 sm:px-4 mx-auto', maxWidth, className)}>
             {children}
         </div>
     );

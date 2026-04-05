@@ -226,7 +226,7 @@ function RecipesPageContent() {
             />
             {/* Content */}
             <PageContainer maxWidth="max-w-7xl">
-                <div className="space-y-6 animate-in fade-in duration-500 py-6">
+                <div className="space-y-6 animate-in fade-in duration-500 py-2 sm:py-6">
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                         {activeTab === 'recipes' && (
                             <RecipesCombinedView 
