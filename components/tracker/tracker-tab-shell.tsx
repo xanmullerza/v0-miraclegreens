@@ -114,14 +114,13 @@ export function TrackerTabShell({
                             <button
                                 onClick={() => setShowSortOptions(!showSortOptions)}
                                 className={cn(
-                                    "h-11 px-6 rounded-2xl flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ring-1 ring-white/10",
+                                    "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
                                     showSortOptions
                                         ? "bg-indigo-600 text-white shadow-indigo-500/20"
                                         : "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:text-indigo-500"
                                 )}
                             >
                                 <ArrowDownUp size={14} className={showSortOptions ? 'text-white' : 'text-slate-400'} />
-                                <span>{currentSortLabel}</span>
                             </button>
 
                             {showSortOptions && (
