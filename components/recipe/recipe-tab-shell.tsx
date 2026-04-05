@@ -98,16 +98,15 @@ export function RecipeTabShell({
                                     setIsActionPanelOpen(true);
                                 }}
                                 className={cn(
-                                    "h-11 px-6 rounded-2xl flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ring-1 ring-white/10",
+                                    "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
                                     (hasActiveFilters || (isActionPanelOpen && activeView === 'recipe-filters'))
                                         ? "bg-emerald-600 text-white shadow-emerald-500/20"
                                         : "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:text-emerald-500"
                                 )}
                             >
                                 <Filter size={14} className={(hasActiveFilters || (isActionPanelOpen && activeView === 'recipe-filters')) ? 'text-white' : 'text-slate-400'} />
-                                <span>Filter</span>
                                 {hasActiveFilters && (
-                                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-emerald-500 animate-pulse border border-emerald-600" />
                                 )}
                             </button>
 

@@ -94,16 +94,15 @@ export function TrackerTabShell({
                             <button 
                                 onClick={onFilterClick}
                                 className={cn(
-                                    "h-11 px-6 rounded-2xl flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ring-1 ring-white/10",
+                                    "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
                                     (hasActiveFilters || activeFilterCount > 0)
                                         ? "bg-emerald-600 text-white shadow-emerald-500/20"
                                         : "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:text-emerald-500"
                                 )}
                             >
                                 <Filter size={14} className={(hasActiveFilters || activeFilterCount > 0) ? 'text-white' : 'text-slate-400'} />
-                                <span>Filter</span>
                                 {activeFilterCount > 0 && (
-                                    <span className="w-4 h-4 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-emerald-500/10">
+                                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-emerald-500/10 shadow-sm">
                                         {activeFilterCount}
                                     </span>
                                 )}
