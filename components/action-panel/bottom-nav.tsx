@@ -31,7 +31,7 @@ export function ActionPanelBottomNav({
                     }}
                     className={cn(
                         "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                        activeView === 'home' ? "text-emerald-500" : "text-slate-400 hover:text-emerald-500"
+                        activeView === 'home' ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
                     )}
                     title={activeView === 'home' ? "Close" : "Home"}
                 >
@@ -53,7 +53,7 @@ export function ActionPanelBottomNav({
                     }}
                     className={cn(
                         "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                        pathname === '/cookbook' ? "text-emerald-500" : "text-slate-400 hover:text-emerald-500"
+                        pathname === '/cookbook' ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
                     )}
                     title="Recipes"
                 >
@@ -69,7 +69,7 @@ export function ActionPanelBottomNav({
                     }}
                     className={cn(
                         "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                        pathname.startsWith('/library') ? "text-cyan-500" : "text-slate-400 hover:text-cyan-500"
+                        pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
                     )}
                     title="Library"
                 >
@@ -87,7 +87,7 @@ export function ActionPanelBottomNav({
                     }}
                     className={cn(
                         "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                        pathname === '/tracker' ? "text-blue-500" : "text-slate-400 hover:text-blue-500"
+                        pathname === '/tracker' ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
                     )}
                     title="Tracker"
                 >
