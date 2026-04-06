@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { RecipesView } from './recipes-view';
 import { RecipeTabShell } from './recipe-tab-shell';
-import { Lock, Globe, Sparkles, Zap, ChevronDown, Plus, Upload, Share2, Download } from 'lucide-react';
+import { Lock, Globe, Sparkles, Zap, ChevronDown, Plus, Upload, Share2, Download, BookOpen } from 'lucide-react';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 
 import { cn } from '@/lib/utils';
@@ -37,24 +37,18 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
             additionalControls={
-                <div className="relative flex items-center gap-1.5">
-                    {/* Split Button - Main Action */}
+                <div className="relative">
                     <button
                         onClick={() => setShowFilterMenu(!showFilterMenu)}
-                        className="h-11 px-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                        className="h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg bg-emerald-600 shadow-emerald-500/20 overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     >
-                        <span>Cookbook</span>
-                    </button>
-                    
-                    {/* Standalone Chevron Button */}
-                    <button
-                        onClick={() => setShowFilterMenu(!showFilterMenu)}
-                        className={cn(
-                            "h-11 w-11 flex items-center justify-center rounded-2xl transition-all duration-300 shadow-lg ring-1 ring-white/10",
-                            showFilterMenu ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-emerald-500/10" : "bg-emerald-600/10 dark:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                        )}
-                    >
-                        <ChevronDown size={14} className={cn("transition-transform duration-300", showFilterMenu && "rotate-180")} />
+                        <div className="flex items-center gap-2 px-4 h-full">
+                            <BookOpen size={14} />
+                            <span>Cookbook</span>
+                        </div>
+                        <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
+                            <ChevronDown size={14} className={cn("transition-transform duration-300", showFilterMenu && "rotate-180")} />
+                        </div>
                     </button>
 
                     {showFilterMenu && (

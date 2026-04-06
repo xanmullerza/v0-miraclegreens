@@ -96,33 +96,37 @@ function RecipesPageContent() {
             <button
                 onClick={() => setShowInventoryMenu(!showInventoryMenu)}
                 className={cn(
-                    "h-10 px-4 rounded-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
+                    "h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all",
                     inventoryView === 'foods'
-                        ? "bg-cyan-600 text-white border-cyan-600 shadow-lg shadow-cyan-500/20"
+                        ? "bg-cyan-600 shadow-cyan-500/20"
                         : inventoryView === 'nutridex'
-                        ? "bg-fuchsia-600 text-white border-fuchsia-600 shadow-lg shadow-fuchsia-500/20"
+                        ? "bg-fuchsia-600 shadow-fuchsia-500/20"
                         : inventoryView === 'comparator'
-                        ? "bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/20"
+                        ? "bg-amber-500 shadow-amber-500/20"
                         : inventoryView === 'lifeguard'
-                        ? "bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20"
+                        ? "bg-red-500 shadow-red-500/20"
                         : inventoryView === 'list'
-                        ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                        ? "bg-emerald-600 shadow-emerald-500/20"
                         : inventoryView === 'pantry'
-                        ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
-                        : "bg-violet-600 text-white border-violet-600 shadow-lg shadow-violet-500/20"
+                        ? "bg-amber-600 shadow-amber-500/20"
+                        : "bg-violet-600 shadow-violet-500/20"
                 )}
             >
-                {inventoryView === 'foods' && <Leaf size={12} />}
-                {inventoryView === 'nutridex' && <Activity size={12} />}
-                {inventoryView === 'comparator' && <Scale size={12} />}
-                {inventoryView === 'lifeguard' && <LifeBuoy size={12} />}
-                {inventoryView === 'list' && <List size={12} />}
-                {inventoryView === 'pantry' && <Package size={12} />}
-                {inventoryView === 'cart' && <ShoppingCart size={12} />}
-                <span>
-                    {inventoryView === 'foods' ? 'Foods' : inventoryView === 'nutridex' ? 'Nutridex' : inventoryView === 'comparator' ? 'Comparator' : inventoryView === 'lifeguard' ? 'Lifeguard' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
-                </span>
-                <ChevronDown size={10} className={cn("transition-transform", showInventoryMenu && "rotate-180")} />
+                <div className="flex items-center gap-2 px-4 h-full">
+                    {inventoryView === 'foods' && <Leaf size={14} />}
+                    {inventoryView === 'nutridex' && <Activity size={14} />}
+                    {inventoryView === 'comparator' && <Scale size={14} />}
+                    {inventoryView === 'lifeguard' && <LifeBuoy size={14} />}
+                    {inventoryView === 'list' && <List size={14} />}
+                    {inventoryView === 'pantry' && <Package size={14} />}
+                    {inventoryView === 'cart' && <ShoppingCart size={14} />}
+                    <span>
+                        {inventoryView === 'foods' ? 'Foods' : inventoryView === 'nutridex' ? 'Nutridex' : inventoryView === 'comparator' ? 'Comparator' : inventoryView === 'lifeguard' ? 'Lifeguard' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
+                    </span>
+                </div>
+                <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
+                    <ChevronDown size={14} className={cn("transition-transform duration-300", showInventoryMenu && "rotate-180")} />
+                </div>
             </button>
 
             {showInventoryMenu && (

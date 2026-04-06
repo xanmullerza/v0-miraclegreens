@@ -254,15 +254,19 @@ export function PlannerContent({
                 </button>
             </div>
 
-            {/* Plan Length Switcher */}
+            {/* Plan Length/Module Switcher */}
             <div className="relative">
                 <button
                     onClick={() => setShowLengthMenu(!showLengthMenu)}
-                    className="h-10 px-4 rounded-xl bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border shrink-0 hover:scale-[1.02] active:scale-[0.98]"
+                    className="h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg bg-blue-600 shadow-blue-500/20 overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
-                    <Sparkles size={14} className="animate-pulse" />
-                    <span className="hidden sm:inline">{planLength}</span>
-                    <ChevronDown size={10} className={cn("transition-transform duration-300", showLengthMenu && "rotate-180")} />
+                    <div className="flex items-center gap-2 px-4 h-full">
+                        <Calendar size={14} />
+                        <span>Tracker</span>
+                    </div>
+                    <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
+                        <ChevronDown size={14} className={cn("transition-transform duration-300", showLengthMenu && "rotate-180")} />
+                    </div>
                 </button>
 
                 {showLengthMenu && (
