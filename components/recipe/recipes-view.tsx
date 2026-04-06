@@ -565,7 +565,6 @@ export function RecipesView({
                                                 label: <Users size={17} />,
                                                 value: servingsOverrides[recipe.id] !== undefined ? servingsOverrides[recipe.id] : (filters.globalServings !== null ? filters.globalServings : (recipe.servings || 1)),
                                                 color: 'text-violet-400',
-                                                isInteractive: true
                                             },
                                             {
                                                 label: (() => {
@@ -588,30 +587,13 @@ export function RecipesView({
                                                 className={cn(
                                                     'py-3 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-0 flex flex-col items-center justify-center gap-1.5 bg-transparent relative',
                                                     tab.color,
-                                                    tab.isInteractive ? "bg-white/10 dark:bg-slate-800/70 shadow-lg backdrop-blur-sm ring-1 ring-white/5" : ""
                                                 )}
                                             >
-                                                {tab.isInteractive && (
-                                                    <button
-                                                        onClick={(e) => handleUpdateServings(e, recipe.id, -0.5, Number(tab.value))}
-                                                        className="absolute -left-1 top-1/2 -translate-y-1/2 p-2 hover:text-white transition-colors"
-                                                    >
-                                                        <Minus size={12} strokeWidth={4} />
-                                                    </button>
-                                                )}
                                                 <span className="opacity-85 leading-none shrink-0">
                                                     {tab.label}
                                                 </span>
                                                 {tab.value !== '' && (
                                                     <span className="leading-none font-black text-white/70 text-[10px] tracking-widest">{tab.value}</span>
-                                                )}
-                                                {tab.isInteractive && (
-                                                    <button
-                                                        onClick={(e) => handleUpdateServings(e, recipe.id, 0.5, Number(tab.value))}
-                                                        className="absolute -right-1 top-1/2 -translate-y-1/2 p-2 hover:text-white transition-colors"
-                                                    >
-                                                        <Plus size={12} strokeWidth={4} />
-                                                    </button>
                                                 )}
                                             </div>
                                         ))}
