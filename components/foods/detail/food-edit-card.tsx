@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
-import { CATEGORIES } from '@/components/foods/food-filters-panel';
+import { CATEGORIES } from '@/lib/context/food-filter-context';
 import { useSplitView } from '@/lib/context/split-view-context';
 
 import { createPortal } from 'react-dom';
