@@ -584,7 +584,7 @@ export function RecipesView({
                                             <div
                                                 key={idx}
                                                 className={cn(
-                                                    'py-3 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-[45%] flex flex-col items-center justify-center gap-1.5 bg-transparent relative',
+                                                    'py-3 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-0 flex flex-col items-center justify-center gap-1.5 bg-transparent relative',
                                                     tab.color,
                                                     tab.isInteractive && "bg-slate-800/40 shadow-inner ring-1 ring-white/5"
                                                 )}
