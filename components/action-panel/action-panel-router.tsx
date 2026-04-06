@@ -34,9 +34,10 @@ import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 interface ActionPanelRouterProps {
     orchestrator: any; 
+    isInline?: boolean;
 }
 
-export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
+export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPanelRouterProps) {
     const { 
         activeView, previousView, navigateTo, excludeFlavour, 
         setExcludeFlavour, excludeSupplements, setExcludeSupplements,
@@ -73,7 +74,7 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
         startNewConversation, expandedRecipeMenu, setExpandedRecipeMenu,
         expandedAppsMenu, setExpandedAppsMenu, expandedWidgetsMenu, setExpandedWidgetsMenu,
         handleViewAllRecipes, handleViewMyRecipes, handleCreateNewRecipe, isCreatingRecipe,
-        handleGoHome
+        handleGoHome, handleCloseModal
     } = orchestrator;
 
     const effectiveRecipeId = contextRecipeId || (selectedRecipeId as string | null);
@@ -262,29 +263,31 @@ export function ActionPanelRouter({ orchestrator }: ActionPanelRouterProps) {
             return <ExportPanel onBack={() => navigateTo('cookbook')} />;
         case 'recipe-filters':
             return (
-                <PanelWrapper title="Filter Recipes" onClose={() => handleGoHome(previousView)} noPadding>
-                    <RecipeFilterContent onClose={() => handleGoHome(previousView)} />
+                <PanelWrapper title="Filter Recipes" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding>
+                    <RecipeFilterContent onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} />
                 </PanelWrapper>
             );
         case 'food-filters':
             return (
-                <PanelWrapper title="Filter Foods" onClose={() => handleGoHome(previousView)} noPadding>
+                <PanelWrapper title="Filter Foods" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding>
                     <FoodFiltersPanel
                         showFavoritesOnly={foodFilter.showFavoritesOnly}
                         setShowFavoritesOnly={foodFilter.setShowFavoritesOnly}
                         selectedCategories={foodFilter.selectedCategories}
                         setSelectedCategories={foodFilter.setSelectedCategories}
+                        onClose={isInline ? undefined : handleCloseModal}
                     />
                 </PanelWrapper>
             );
         case 'nutrient-filters':
             return (
-                <PanelWrapper title="Filter Nutrients" onClose={() => handleGoHome(previousView)} noPadding>
+                <PanelWrapper title="Filter Nutrients" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding>
                     <NutrientFilterPanel
                         excludeFlavour={excludeFlavour}
                         setExcludeFlavour={setExcludeFlavour}
                         excludeSupplements={excludeSupplements}
                         setExcludeSupplements={setExcludeSupplements}
+                        onClose={isInline ? undefined : handleCloseModal}
                     />
                 </PanelWrapper>
             );

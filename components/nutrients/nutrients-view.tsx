@@ -20,6 +20,7 @@ interface NutrientFilterPanelProps {
     setExcludeFlavour: (value: boolean) => void;
     excludeSupplements: boolean;
     setExcludeSupplements: (value: boolean) => void;
+    onClose?: () => void;
 }
 
 export function NutrientFilterPanel({
@@ -27,11 +28,12 @@ export function NutrientFilterPanel({
     setExcludeFlavour,
     excludeSupplements,
     setExcludeSupplements,
+    onClose,
 }: NutrientFilterPanelProps) {
     const activeCount = (excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0);
 
     return (
-        <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950">
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950">
             <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 p-5">
                 <div>
                     <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nutridex Filters</p>
@@ -70,6 +72,17 @@ export function NutrientFilterPanel({
                     </div>
                 </div>
             </div>
+
+            {onClose && (
+                <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    <button
+                        onClick={onClose}
+                        className="w-full h-12 rounded-xl bg-emerald-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-[0.98] transition-all"
+                    >
+                        Apply Filters
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

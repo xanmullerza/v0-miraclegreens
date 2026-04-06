@@ -38,7 +38,7 @@ export function ActionPanelContainer({ onClose, onRecipeDetected, isInline = fal
                     ? "relative w-full h-full flex-1" 
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
-                <ActionPanelRouter orchestrator={orchestrator} />
+                <ActionPanelRouter orchestrator={orchestrator} isInline={isInline} />
                 <ActionPanelBottomNav
                     activeView={activeView}
                     onClose={onClose}

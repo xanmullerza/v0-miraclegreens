@@ -23,7 +23,8 @@ export function ActionPanelBottomNav({
                 {/* Home / Close Button - Left */}
                 <button
                     onClick={() => {
-                        if (activeView === 'home') {
+                        const isFilterView = ['recipe-filters', 'food-filters', 'nutrient-filters'].includes(activeView);
+                        if (activeView === 'home' || isFilterView) {
                             onClose();
                         } else {
                             navigateTo('home');
@@ -31,17 +32,17 @@ export function ActionPanelBottomNav({
                     }}
                     className={cn(
                         "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                        activeView === 'home' ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
+                        (activeView === 'home') ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
                     )}
-                    title={activeView === 'home' ? "Close" : "Home"}
+                    title={(activeView === 'home' || ['recipe-filters', 'food-filters', 'nutrient-filters'].includes(activeView)) ? "Close" : "Home"}
                 >
-                    {activeView === 'home' ? (
+                    {(activeView === 'home' || ['recipe-filters', 'food-filters', 'nutrient-filters'].includes(activeView)) ? (
                         <Sparkles size={20} className="transition-transform group-hover:scale-110 animate-pulse" />
                     ) : (
                         <Home size={20} className="transition-transform group-hover:scale-110" />
                     )}
                     <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">
-                        {activeView === 'home' ? 'Close' : 'Home'}
+                        {(activeView === 'home' || ['recipe-filters', 'food-filters', 'nutrient-filters'].includes(activeView)) ? 'Close' : 'Home'}
                     </span>
                 </button>
 

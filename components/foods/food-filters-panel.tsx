@@ -22,6 +22,7 @@ interface FoodFiltersPanelProps {
   setShowFavoritesOnly: (value: boolean) => void;
   selectedCategories: string[];
   setSelectedCategories: Dispatch<SetStateAction<string[]>>;
+  onClose?: () => void;
 }
 
 export function FoodFiltersPanel({
@@ -29,6 +30,7 @@ export function FoodFiltersPanel({
   setShowFavoritesOnly,
   selectedCategories,
   setSelectedCategories,
+  onClose,
 }: FoodFiltersPanelProps) {
   const activeCount = selectedCategories.length + (showFavoritesOnly ? 1 : 0);
 
@@ -95,6 +97,17 @@ export function FoodFiltersPanel({
           </div>
         </div>
       </div>
+
+      {onClose && (
+        <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+           <button
+             onClick={onClose}
+             className="w-full h-12 rounded-xl bg-emerald-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-[0.98] transition-all"
+           >
+             Apply Filters
+           </button>
+        </div>
+      )}
     </div>
   );
 }
