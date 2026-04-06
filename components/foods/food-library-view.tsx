@@ -13,11 +13,11 @@ import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
-import { useFoodFilter } from '@/lib/context/food-filter-context';
+import { useFoodFilter, CATEGORIES } from '@/lib/context/food-filter-context';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
-import { CATEGORIES, FoodFiltersPanel } from '@/components/foods/food-filters-panel';
+import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
 import { TrackerTabShell, SortOption } from '@/components/tracker/tracker-tab-shell';
@@ -129,7 +129,7 @@ export function FoodsView({
             if (opts.favOnly) {
                 query = query.eq('is_favorite', true);
             }
-            if (opts.cats.length > 0 && opts.cats.length < CATEGORIES.length) {
+            if (opts.cats.length < CATEGORIES.length) {
                 query = query.in('category', opts.cats);
             }
 
@@ -464,8 +464,8 @@ export function FoodsView({
                         setActiveView('food-filters');
                         setIsActionPanelOpen(true);
                     }}
-                    hasActiveFilters={showFavoritesOnly || selectedCategories.length > 0}
-                    activeFilterCount={selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                    hasActiveFilters={showFavoritesOnly || selectedCategories.length < CATEGORIES.length}
+                    activeFilterCount={(showFavoritesOnly ? 1 : 0) + (CATEGORIES.length - selectedCategories.length)}
                     dropdownContent={dropdownContent || defaultDropdown}
                     scaleValue={portionGrams}
                     onScaleChange={(val) => setPortionGrams(val)}

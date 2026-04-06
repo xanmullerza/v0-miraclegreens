@@ -3,19 +3,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-
-export const CATEGORIES = [
-  'General',
-  'Vegetables',
-  'Grains',
-  'Legumes',
-  'Oils',
-  'Proteins',
-  'Fruit',
-  'Nuts',
-  'Flavour',
-  'Supplements',
-] as const;
+import { CATEGORIES } from '@/lib/context/food-filter-context';
 
 interface FoodFiltersPanelProps {
   showFavoritesOnly: boolean;
@@ -32,7 +20,7 @@ export function FoodFiltersPanel({
   setSelectedCategories,
   onClose,
 }: FoodFiltersPanelProps) {
-  const activeCount = selectedCategories.length + (showFavoritesOnly ? 1 : 0);
+  const isAllSelected = selectedCategories.length === CATEGORIES.length;
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950 pt-4">
@@ -51,9 +39,9 @@ export function FoodFiltersPanel({
           <div className="flex items-center justify-between gap-4 mb-4">
             <div>
               <p className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Categories</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Filter ingredients by food group.</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Manage visibility by food group.</p>
             </div>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">{selectedCategories.length} selected</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">{isAllSelected ? "ALL" : `${selectedCategories.length}/${CATEGORIES.length}`}</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {CATEGORIES.map(category => {
@@ -69,7 +57,7 @@ export function FoodFiltersPanel({
                     'h-9 px-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all',
                     active
                       ? 'bg-emerald-600 text-white border border-emerald-600'
-                      : 'bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                      : 'bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-400/50 hover:bg-slate-100 dark:hover:bg-slate-800'
                   )}
                 >
                   {category}
@@ -85,11 +73,11 @@ export function FoodFiltersPanel({
            <button
              onClick={() => {
                setShowFavoritesOnly(false);
-               setSelectedCategories([]);
+               setSelectedCategories([...CATEGORIES]);
              }}
              className="flex-1 h-12 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 text-[11px] font-black uppercase tracking-widest transition-all"
            >
-             Clear All
+             Show All
            </button>
            <button
              onClick={onClose}

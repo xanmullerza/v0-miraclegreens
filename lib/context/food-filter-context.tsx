@@ -2,6 +2,19 @@
 
 import React, { createContext, useContext, useState, type Dispatch, type SetStateAction, type ReactNode } from 'react';
 
+export const CATEGORIES = [
+  'General',
+  'Vegetables',
+  'Grains',
+  'Legumes',
+  'Oils',
+  'Proteins',
+  'Fruit',
+  'Nuts',
+  'Flavour',
+  'Supplements',
+] as const;
+
 interface FoodFilterContextType {
   showFavoritesOnly: boolean;
   setShowFavoritesOnly: (value: boolean) => void;
@@ -16,12 +29,12 @@ const FoodFilterContext = createContext<FoodFilterContextType | undefined>(undef
 
 export function FoodFilterProvider({ children }: { children: ReactNode }) {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([...CATEGORIES]);
   const [portionGrams, setPortionGrams] = useState(100);
 
   const resetFoodFilters = () => {
     setShowFavoritesOnly(false);
-    setSelectedCategories([]);
+    setSelectedCategories([...CATEGORIES]);
   };
 
   return (
