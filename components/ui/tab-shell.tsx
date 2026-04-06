@@ -34,6 +34,7 @@ interface TabShellProps {
     onScaleChange?: (val: number) => void;
     scaleMode?: 'multiplier' | 'grams';
     filterChildren?: React.ReactNode;
+    dropdownOptions?: { id: string; label: string; icon: React.ReactNode; onClick: () => void; active?: boolean }[];
 }
 
 const themeStyles = {
@@ -88,6 +89,7 @@ export function TabShell({
     onScaleChange,
     scaleMode = 'multiplier',
     filterChildren,
+    dropdownOptions,
 }: TabShellProps) {
     const [showSortOptions, setShowSortOptions] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -426,17 +428,46 @@ export function TabShell({
                                 {!isDropdownExpanded ? (
                                     <div 
                                         onClick={() => { setIsDropdownExpanded(true); setIsSearchExpanded(false); setIsScaleExpanded(false); setShowSortOptions(false); }}
-                                        className="h-full w-full cursor-pointer"
+                                        className="h-full w-full cursor-pointer flex items-center justify-center px-1"
                                     >
-                                        {/* Original content as trigger, but we intercept clicks */}
-                                        <div className="pointer-events-none scale-90 origin-center filter grayscale data-[active=true]:grayscale-0">
+                                        <div className="origin-center">
                                             {dropdownContent}
                                         </div>
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="flex-1 min-w-0 overflow-x-auto no-scrollbar py-1">
-                                            {dropdownContent}
+                                        <div className="flex items-center flex-1 gap-1 overflow-x-auto no-scrollbar scroll-smooth px-1">
+                                            {/* If we have specific options, show them horizontally */}
+                                            {dropdownOptions ? (
+                                                <>
+                                                    <div className="shrink-0 scale-90 opacity-70">
+                                                        {dropdownContent}
+                                                    </div>
+                                                    <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
+                                                    {dropdownOptions.map((opt) => (
+                                                        <button
+                                                            key={opt.id}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                opt.onClick();
+                                                            }}
+                                                            className={cn(
+                                                                "h-8 px-3 rounded-xl flex items-center gap-2 text-[8px] font-black uppercase tracking-tighter transition-all whitespace-nowrap",
+                                                                opt.active
+                                                                    ? cn(t.bg, "text-white shadow-lg")
+                                                                    : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                            )}
+                                                        >
+                                                            {opt.icon}
+                                                            <span className="hidden xs:inline">{opt.label}</span>
+                                                        </button>
+                                                    ))}
+                                                </>
+                                            ) : (
+                                                <div className="flex-1 min-w-0 py-1">
+                                                    {dropdownContent}
+                                                </div>
+                                            )}
                                         </div>
                                         <button
                                             onClick={() => setIsDropdownExpanded(false)}

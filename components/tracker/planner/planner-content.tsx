@@ -13,7 +13,7 @@ import {
     ChevronDown, Sparkles, ChefHat, 
     Search, Filter as FilterIcon, ArrowDownUp, 
     Clock, Flame, Dumbbell, List, Loader2,
-    ShoppingBasket, Shapes
+    ShoppingBasket, Shapes, Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -355,6 +355,33 @@ export function PlannerContent({
                 scaleValue={effectiveServings}
                 onScaleChange={(val) => setSelectedServings(Math.max(0.5, val))}
                 dropdownContent={dropdownContent || lengthSwitcher}
+                dropdownOptions={[
+                    ...(['daily', 'weekly', 'monthly'] as PlanLength[]).map(l => ({
+                        id: l,
+                        label: l,
+                        icon: <Calendar size={12} />,
+                        onClick: () => setPlanLength(l),
+                        active: planLength === l
+                    })),
+                    {
+                        id: 'shopping',
+                        label: 'Shopping',
+                        icon: <ShoppingBasket size={12} className="text-amber-500" />,
+                        onClick: () => onSubViewChange?.('shopping')
+                    },
+                    {
+                        id: 'pantry',
+                        label: 'Pantry',
+                        icon: <Shapes size={12} className="text-sky-500" />,
+                        onClick: () => onSubViewChange?.('pantry')
+                    },
+                    {
+                        id: 'nutridex',
+                        label: 'Nutridex',
+                        icon: <Zap size={12} className="text-emerald-500" />,
+                        onClick: () => navigateTo('nutridex')
+                    }
+                ]}
                 filterChildren={<RecipeFilterContent onClose={() => { setActiveView('home'); setIsActionPanelOpen(false); }} />}
             >
 
