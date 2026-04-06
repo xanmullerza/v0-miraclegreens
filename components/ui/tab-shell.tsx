@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, ArrowDownUp, Filter, Scale, Minus, Plus, Users, Weight } from 'lucide-react';
+import { Search, X, ArrowDownUp, Filter, Scale, Minus, Plus, Users, Weight, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface SortOption {
@@ -238,10 +238,10 @@ export function TabShell({
                                     {currentScale !== 100 && (
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleScaleUpdate(100); setGramInputValue('100'); }}
-                                            className="text-[8px] font-black text-slate-400 hover:text-slate-200 transition-colors shrink-0 px-1"
+                                            className="h-11 w-11 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0 px-1"
                                             title="Reset to 100g"
                                         >
-                                            100g
+                                            <RotateCcw size={12} className="text-slate-400 hover:text-slate-200" />
                                         </button>
                                     )}
 
@@ -268,6 +268,16 @@ export function TabShell({
                                             {currentScale}
                                         </span>
                                     </div>
+
+                                    {currentScale !== 1 && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleScaleUpdate(1); }}
+                                            className="h-11 w-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0"
+                                            title="Reset to 1x"
+                                        >
+                                            <RotateCcw size={10} className="text-slate-400 hover:text-slate-200" />
+                                        </button>
+                                    )}
                                     
                                     <button
                                         onClick={(e) => { e.stopPropagation(); handleScaleUpdate(currentScale + 0.5); }}
