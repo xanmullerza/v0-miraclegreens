@@ -493,10 +493,10 @@ export function RecipesView({
                                                 <ChefHat size={28} />
                                             </div>
                                         )}
-                                        {recipe.meal_type && (
+                                        {(recipe.type || recipe.meal_type) && (
                                             <div className="absolute top-1.5 left-1.5 bg-slate-900/80 backdrop-blur-md text-white text-[7px] font-black tracking-widest px-2 py-0.5 rounded-md uppercase">
 
-                                                {recipe.meal_type}
+                                                {(recipe.type || recipe.meal_type)}
                                             </div>
                                         )}
                                     </div>
