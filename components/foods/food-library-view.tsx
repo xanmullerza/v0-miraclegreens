@@ -466,8 +466,9 @@ export function FoodsView({
                     hasActiveFilters={showFavoritesOnly || selectedCategories.length > 0}
                     activeFilterCount={selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
                     dropdownContent={dropdownContent || defaultDropdown}
-                    scaleValue={portionGrams / 100}
-                    onScaleChange={(val) => setPortionGrams(Math.max(50, Math.round(val * 100)))}
+                    scaleValue={portionGrams}
+                    onScaleChange={(val) => setPortionGrams(val)}
+                    scaleMode="grams"
                 >
                     {foodList}
                 </TrackerTabShell>

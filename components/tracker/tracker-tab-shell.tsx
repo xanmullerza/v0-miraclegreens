@@ -21,6 +21,7 @@ interface TrackerTabShellProps {
     dropdownContent?: React.ReactNode;
     scaleValue?: number;
     onScaleChange?: (val: number) => void;
+    scaleMode?: 'multiplier' | 'grams';
 }
 
 export function TrackerTabShell(props: TrackerTabShellProps) {

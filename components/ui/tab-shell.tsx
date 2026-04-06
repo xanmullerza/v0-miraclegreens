@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, ArrowDownUp, Filter, Scale, Minus, Plus, Users } from 'lucide-react';
+import { Search, X, ArrowDownUp, Filter, Scale, Minus, Plus, Users, Weight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface SortOption {
@@ -31,6 +31,7 @@ interface TabShellProps {
     theme?: TabThemeColor;
     scaleValue?: number;
     onScaleChange?: (val: number) => void;
+    scaleMode?: 'multiplier' | 'grams';
 }
 
 const themeStyles = {
@@ -81,13 +82,16 @@ export function TabShell({
     dropdownContent,
     theme = 'blue',
     scaleValue,
-    onScaleChange
+    onScaleChange,
+    scaleMode = 'multiplier',
 }: TabShellProps) {
     const [showSortOptions, setShowSortOptions] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const [isScaleExpanded, setIsScaleExpanded] = useState(false);
-    const [internalScale, setInternalScale] = useState(1);
+    const [internalScale, setInternalScale] = useState(scaleMode === 'grams' ? 100 : 1);
+    const [gramInputValue, setGramInputValue] = useState('');
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const gramInputRef = useRef<HTMLInputElement>(null);
     const t = themeStyles[theme];
 
     const currentScale = scaleValue !== undefined ? scaleValue : internalScale;
@@ -95,6 +99,15 @@ export function TabShell({
         if (onScaleChange) onScaleChange(newVal);
         else setInternalScale(newVal);
     };
+
+    // Auto-focus gram input when scale expanded in grams mode
+    useEffect(() => {
+        if (isScaleExpanded && scaleMode === 'grams' && gramInputRef.current) {
+            setGramInputValue(String(currentScale));
+            gramInputRef.current.focus();
+            gramInputRef.current.select();
+        }
+    }, [isScaleExpanded]);
 
     // Auto-focus search input when expanded
     useEffect(() => {
@@ -179,7 +192,65 @@ export function TabShell({
                                 >
                                     <Scale size={14} />
                                 </button>
+                            ) : scaleMode === 'grams' ? (
+                                /* ── GRAMS MODE: free-type number input ── */
+                                <>
+                                    <div className={cn("h-11 w-11 flex items-center justify-center shrink-0 rounded-l-2xl", t.text)}>
+                                        <Weight size={14} />
+                                    </div>
+
+                                    <div className="flex items-center flex-1 min-w-0 px-1 gap-1">
+                                        <input
+                                            ref={gramInputRef}
+                                            type="number"
+                                            min="1"
+                                            max="9999"
+                                            value={gramInputValue}
+                                            onChange={(e) => {
+                                                setGramInputValue(e.target.value);
+                                            }}
+                                            onBlur={(e) => {
+                                                const num = parseInt(e.target.value);
+                                                if (!isNaN(num) && num > 0) handleScaleUpdate(num);
+                                                else setGramInputValue(String(currentScale));
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    const num = parseInt(gramInputValue);
+                                                    if (!isNaN(num) && num > 0) {
+                                                        handleScaleUpdate(num);
+                                                        setIsScaleExpanded(false);
+                                                    }
+                                                }
+                                                if (e.key === 'Escape') setIsScaleExpanded(false);
+                                            }}
+                                            className={cn(
+                                                "w-full bg-transparent text-center text-sm font-black outline-none",
+                                                t.text
+                                            )}
+                                        />
+                                        <span className={cn("text-[10px] font-black shrink-0", t.text)}>g</span>
+                                    </div>
+
+                                    {currentScale !== 100 && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleScaleUpdate(100); setGramInputValue('100'); }}
+                                            className="text-[8px] font-black text-slate-400 hover:text-slate-200 transition-colors shrink-0 px-1"
+                                            title="Reset to 100g"
+                                        >
+                                            100g
+                                        </button>
+                                    )}
+
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setIsScaleExpanded(false); }}
+                                        className="h-11 w-11 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-r-2xl border-l border-white/5 dark:border-white/5 shrink-0"
+                                    >
+                                        <X size={14} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />
+                                    </button>
+                                </>
                             ) : (
+                                /* ── MULTIPLIER MODE: +/- stepper (default) ── */
                                 <>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); if (currentScale > 0.5) handleScaleUpdate(currentScale - 0.5); }}
