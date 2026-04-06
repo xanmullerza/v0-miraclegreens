@@ -1,8 +1,9 @@
 import { TabShell } from '@/components/ui/tab-shell';
-import { Clock, ChefHat, Flame, ArrowDownUp } from 'lucide-react';
+import { Clock, ChefHat, Flame, ArrowDownUp, Book } from 'lucide-react';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
+import { getSharedNavOptions } from '@/lib/constants/nav-options';
 
 export const RECIPE_SORT_OPTIONS = [
     { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
@@ -24,7 +25,7 @@ interface RecipeTabShellProps {
 }
 
 export function RecipeTabShell(props: RecipeTabShellProps) {
-    const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, activeView, navigateTo } = useActionPanel();
     const { hasActiveFilters, filters, setFilters } = useRecipeFilter();
     
     // We add logic to artificially trigger the active filter highlight
@@ -51,7 +52,8 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
                 }
             }}
             hasActiveFilters={hasActiveFilters}
-            dropdownContent={props.additionalControls}
+            dropdownContent={props.additionalControls || <div className="h-11 w-11 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><Book size={18} /></div>}
+            dropdownOptions={getSharedNavOptions(navigateTo)}
             scaleValue={filters.globalServings || 1}
             onScaleChange={(val: number) => {
                 setFilters({

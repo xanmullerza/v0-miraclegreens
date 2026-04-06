@@ -21,6 +21,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { supabase } from '@/lib/supabase';
 import { TrackerTabShell, SortOption } from '../tracker-tab-shell';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
+import { getSharedNavOptions } from '@/lib/constants/nav-options';
 
 const DEMO_PLAN = {
     breakfast: {
@@ -95,7 +96,6 @@ export interface PlannerContentProps {
     onSubViewChange?: (view: 'shopping' | 'pantry') => void;
     dropdownContent?: React.ReactNode;
 }
-
 
 const PLANNER_SORT_OPTIONS: SortOption[] = [
     { id: 'time', label: 'Time (Schedule)', icon: <Clock size={12} /> },
@@ -231,7 +231,6 @@ export function PlannerContent({
 
         return meals;
     };
-
     const lengthSwitcher = (
         <div className="flex items-center gap-2">
             {/* Servings Adjuster */}
@@ -255,62 +254,11 @@ export function PlannerContent({
                 </button>
             </div>
 
-            {/* Plan Length/Module Switcher */}
-            <div className="relative">
-                <button
-                    onClick={() => setShowLengthMenu(!showLengthMenu)}
-                    className="h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg bg-blue-600 shadow-blue-500/20 overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all relative"
-                >
-                    <div className="flex items-center justify-center w-11 h-full z-10 transition-colors">
-                        <Calendar size={14} />
-                    </div>
-                    <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
-                        <ChevronDown size={14} className={cn("transition-transform duration-300", showLengthMenu && "rotate-180")} />
-                    </div>
-                </button>
-
-                {showLengthMenu && (
-                    <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl z-[100] p-1.5 min-w-[160px] animate-in fade-in zoom-in-95 duration-200">
-                        {/* Plan length options */}
-                        {(['daily', 'weekly', 'monthly'] as PlanLength[]).map((length) => (
-                            <button
-                                key={length}
-                                onClick={() => {
-                                    setPlanLength(length);
-                                    setShowLengthMenu(false);
-                                }}
-                                className={cn(
-                                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mb-1 last:mb-0",
-                                    planLength === length
-                                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/10"
-                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                )}
-                            >
-                                <Calendar size={12} className={planLength === length ? "text-white" : "text-blue-500"} />
-                                {length}
-                            </button>
-                        ))}
-
-                        {/* Divider */}
-                        <div className="my-1.5 border-t border-slate-200 dark:border-slate-700" />
-
-                        {/* Quick links — stay within Tracker */}
-                        <button
-                            onClick={() => { setShowLengthMenu(false); onSubViewChange?.('shopping'); }}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-600 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 mb-1"
-                        >
-                            <ShoppingBasket size={12} className="text-amber-500" />
-                            Shopping
-                        </button>
-                        <button
-                            onClick={() => { setShowLengthMenu(false); onSubViewChange?.('pantry'); }}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-600"
-                        >
-                            <Shapes size={12} className="text-sky-500" />
-                            Pantry
-                        </button>
-                    </div>
-                )}
+            {/* Module Trigger */}
+            <div className="h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg bg-blue-600 shadow-blue-500/20 overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all px-4 gap-2">
+                <Calendar size={14} />
+                <span className="hidden sm:inline">{planLength}</span>
+                <ChevronDown size={12} />
             </div>
         </div>
     );
@@ -363,24 +311,7 @@ export function PlannerContent({
                         onClick: () => setPlanLength(l),
                         active: planLength === l
                     })),
-                    {
-                        id: 'shopping',
-                        label: 'Shopping',
-                        icon: <ShoppingBasket size={12} className="text-amber-500" />,
-                        onClick: () => onSubViewChange?.('shopping')
-                    },
-                    {
-                        id: 'pantry',
-                        label: 'Pantry',
-                        icon: <Shapes size={12} className="text-sky-500" />,
-                        onClick: () => onSubViewChange?.('pantry')
-                    },
-                    {
-                        id: 'nutridex',
-                        label: 'Nutridex',
-                        icon: <Zap size={12} className="text-emerald-500" />,
-                        onClick: () => navigateTo('nutridex')
-                    }
+                    ...getSharedNavOptions(navigateTo, onSubViewChange).filter(opt => opt.id !== 'planner')
                 ]}
                 filterChildren={<RecipeFilterContent onClose={() => { setActiveView('home'); setIsActionPanelOpen(false); }} />}
             >

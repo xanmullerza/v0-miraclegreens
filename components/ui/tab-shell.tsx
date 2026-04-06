@@ -450,6 +450,7 @@ export function TabShell({
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 opt.onClick();
+                                                                setIsDropdownExpanded(false);
                                                             }}
                                                             className={cn(
                                                                 "h-8 px-3 rounded-xl flex items-center gap-2 text-[8px] font-black uppercase tracking-tighter transition-all whitespace-nowrap",

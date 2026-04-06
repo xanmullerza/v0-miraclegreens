@@ -18,6 +18,7 @@ import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
+import { getSharedNavOptions } from '@/lib/constants/nav-options';
 import { FoodFormDialog } from '@/components/admin/ingredients/food-form-dialog';
 import { usePantry } from '@/hooks/use-pantry';
 import { TrackerTabShell, SortOption } from '@/components/tracker/tracker-tab-shell';
@@ -440,6 +441,8 @@ export function FoodsView({
         </div>
     );
 
+    const { setIsActionPanelOpen, setActiveView, activeView, navigateTo } = useActionPanel();
+
     return (
         <div className={cn("space-y-8 animate-in fade-in duration-500", noContainer && "space-y-0")}>
             {/* List Container */}
@@ -476,6 +479,7 @@ export function FoodsView({
                     hasActiveFilters={showFavoritesOnly || selectedCategories.length < CATEGORIES.length}
                     activeFilterCount={(showFavoritesOnly ? 1 : 0) + (CATEGORIES.length - selectedCategories.length)}
                     dropdownContent={dropdownContent || defaultDropdown}
+                    dropdownOptions={getSharedNavOptions(navigateTo)}
                     scaleValue={portionGrams}
                     onScaleChange={(val) => setPortionGrams(val)}
                     scaleMode="grams"
