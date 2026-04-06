@@ -154,7 +154,7 @@ export function TabShell({
                     <div className={cn(
                         "transition-all duration-500 ease-in-out flex shrink-0",
                         (isSearchExpanded || searchQuery) 
-                            ? "flex-1 max-w-[500px] opacity-100" 
+                            ? "flex-1 max-w-[500px] opacity-100 mx-auto" 
                             : (isScaleExpanded || showSortOptions || isDropdownExpanded ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100")
                     )}>
                         <div className={cn(
