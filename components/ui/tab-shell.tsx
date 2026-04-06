@@ -92,6 +92,7 @@ export function TabShell({
     const [showSortOptions, setShowSortOptions] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const [isScaleExpanded, setIsScaleExpanded] = useState(false);
+    const [isDropdownExpanded, setIsDropdownExpanded] = useState(false);
     const [internalScale, setInternalScale] = useState(scaleMode === 'grams' ? 100 : 1);
     const [gramInputValue, setGramInputValue] = useState('');
     const [gramUnit, setGramUnit] = useState<'g' | 'kg'>('g');
@@ -150,7 +151,9 @@ export function TabShell({
                     {/* Animated Search Bar / Button */}
                     <div className={cn(
                         "transition-all duration-500 ease-in-out flex shrink-0",
-                        (isSearchExpanded || searchQuery) ? "flex-1 max-w-[500px] opacity-100" : (isScaleExpanded ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100")
+                        (isSearchExpanded || searchQuery) 
+                            ? "flex-1 max-w-[500px] opacity-100" 
+                            : (isScaleExpanded || showSortOptions || isDropdownExpanded ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100")
                     )}>
                         <div className={cn(
                             "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 rounded-2xl shadow-lg ring-1 ring-white/10 transition-colors",
@@ -195,7 +198,9 @@ export function TabShell({
                     {/* Animated Scale Bar / Button */}
                     <div className={cn(
                         "transition-all duration-500 ease-in-out flex shrink-0",
-                        isScaleExpanded ? "flex-1 max-w-[400px] opacity-100 ml-2" : ((isSearchExpanded || searchQuery) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100 ml-2")
+                        isScaleExpanded 
+                            ? "flex-1 max-w-[400px] opacity-100 ml-2" 
+                            : ((isSearchExpanded || searchQuery || showSortOptions || isDropdownExpanded) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100 ml-2")
                     )}>
                         <div className={cn(
                             "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 justify-between rounded-2xl shadow-lg ring-1 ring-white/10 transition-colors",
@@ -341,10 +346,114 @@ export function TabShell({
                         </div>
                     </div>
 
+                    {/* Animated Sort Section */}
+                    <div className={cn(
+                        "transition-all duration-700 ease-in-out flex shrink-0",
+                        showSortOptions 
+                            ? "flex-1 max-w-[600px] opacity-100 ml-2" 
+                            : ((isSearchExpanded || searchQuery || isScaleExpanded || isDropdownExpanded) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100 ml-2")
+                    )}>
+                        <div className={cn(
+                            "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 justify-between rounded-2xl shadow-lg ring-1 ring-white/10 transition-all px-1.5 gap-1",
+                            showSortOptions ? "bg-white dark:bg-slate-800" : cn("cursor-pointer text-slate-500", t.hoverText)
+                        )}
+                        onClick={() => { if (!showSortOptions) { setShowSortOptions(true); setIsSearchExpanded(false); setIsScaleExpanded(false); setIsDropdownExpanded(false); } }}
+                        >
+                            {!showSortOptions ? (
+                                <button className={cn(
+                                    "w-full h-full flex items-center justify-center outline-none shrink-0 transition-all rounded-2xl",
+                                    (sortField !== sortOptions[0]?.id || sortDirection !== 'asc')
+                                        ? cn("text-white", t.bg, t.shadow)
+                                        : cn("text-slate-500", t.hoverText)
+                                )}>
+                                    <ArrowDownUp size={14} className={cn("transition-transform duration-300", showSortOptions && "rotate-180")} />
+                                </button>
+                            ) : (
+                                <>
+                                    <div className="flex items-center flex-1 gap-1 overflow-x-auto no-scrollbar scroll-smooth px-1">
+                                        {sortOptions.map((opt) => (
+                                            <button
+                                                key={opt.id}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleSort(opt.id);
+                                                }}
+                                                className={cn(
+                                                    "h-8 px-3 rounded-xl flex items-center gap-2 text-[8px] font-black uppercase tracking-tighter transition-all whitespace-nowrap",
+                                                    sortField === opt.id
+                                                        ? cn(t.bg, "text-white shadow-lg")
+                                                        : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                {opt.icon}
+                                                <span className="hidden xs:inline">{opt.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-1 shrink-0 ml-1 pl-1 border-l border-slate-100 dark:border-slate-700">
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
+                                            className={cn("h-8 w-8 flex items-center justify-center rounded-xl transition-all", t.text, "hover:bg-slate-100 dark:hover:bg-slate-700")}
+                                        >
+                                            <ArrowDownUp size={14} className={cn("transition-transform duration-300", sortDirection === 'desc' ? "rotate-180" : "")} />
+                                        </button>
+                                        
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setShowSortOptions(false); }}
+                                            className="h-8 w-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-xl"
+                                        >
+                                            <X size={14} className="text-slate-400" />
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Animated Dropdown Section */}
+                    {dropdownContent && (
+                        <div className={cn(
+                            "transition-all duration-700 ease-in-out flex shrink-0",
+                            isDropdownExpanded 
+                                ? "flex-1 max-w-[600px] opacity-100 ml-2" 
+                                : ((isSearchExpanded || searchQuery || isScaleExpanded || showSortOptions) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-auto opacity-100 ml-2")
+                        )}>
+                            <div className={cn(
+                                "relative h-11 flex items-center bg-white/50 dark:bg-slate-900/50 rounded-2xl shadow-lg ring-1 ring-white/10 transition-all",
+                                isDropdownExpanded ? "w-full bg-white dark:bg-slate-800 px-1.5" : "w-auto"
+                            )}>
+                                {!isDropdownExpanded ? (
+                                    <div 
+                                        onClick={() => { setIsDropdownExpanded(true); setIsSearchExpanded(false); setIsScaleExpanded(false); setShowSortOptions(false); }}
+                                        className="h-full w-full cursor-pointer"
+                                    >
+                                        {/* Original content as trigger, but we intercept clicks */}
+                                        <div className="pointer-events-none scale-90 origin-center filter grayscale data-[active=true]:grayscale-0">
+                                            {dropdownContent}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex-1 min-w-0 overflow-x-auto no-scrollbar py-1">
+                                            {dropdownContent}
+                                        </div>
+                                        <button
+                                            onClick={() => setIsDropdownExpanded(false)}
+                                            className="h-8 w-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-xl shrink-0 ml-1"
+                                        >
+                                            <X size={14} className="text-slate-400" />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Controls Group */}
                     <div className={cn(
                         "flex items-center gap-2 flex-nowrap transition-all duration-500 ease-in-out shrink-0",
-                        (isSearchExpanded || searchQuery || isScaleExpanded) 
+                        (isSearchExpanded || searchQuery || isScaleExpanded || showSortOptions || isDropdownExpanded) 
                             ? "max-w-0 opacity-0 !gap-0 overflow-hidden" 
                             : "max-w-[400px] opacity-100 overflow-visible"
                     )}>
@@ -383,51 +492,6 @@ export function TabShell({
                                     <span className={cn("absolute top-2.5 right-2.5 h-2 w-2 rounded-full animate-pulse border", t.borderPulse)} />
                                 )}
                             </button>
-                        )}
-
-                        {/* Sort Button */}
-                        <div className="relative shrink-0">
-                             <button
-                                onClick={() => setShowSortOptions(!showSortOptions)}
-                                className={cn(
-                                    "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
-                                    (showSortOptions || (sortField !== sortOptions[0]?.id || sortDirection !== 'asc'))
-                                        ? cn("text-white", t.bg, t.shadow)
-                                        : cn("bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400", t.hoverText)
-                                )}
-                            >
-                                <ArrowDownUp size={14} className={(showSortOptions || (sortField !== sortOptions[0]?.id || sortDirection !== 'asc')) ? 'text-white' : 'text-slate-400'} />
-                            </button>
-
-                            {showSortOptions && (
-                                <div className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl z-[100] p-2 ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-200">
-                                    {sortOptions.map((opt) => (
-                                        <button
-                                            key={opt.id}
-                                            onClick={() => {
-                                                handleSort(opt.id);
-                                                setShowSortOptions(false);
-                                            }}
-                                            className={cn(
-                                                "w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mb-1 last:mb-0",
-                                                sortField === opt.id
-                                                    ? cn(t.bgSubtle, t.text)
-                                                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                            )}
-                                        >
-                                            {opt.icon}
-                                            {opt.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Dropdown Action Wrapper */}
-                        {dropdownContent && (
-                            <div className="flex items-center shrink-0">
-                                {dropdownContent}
-                            </div>
                         )}
                     </div>
                 </div>
