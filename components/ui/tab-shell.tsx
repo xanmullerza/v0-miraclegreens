@@ -341,12 +341,20 @@ export function TabShell({
                         {/* Filter Button */}
                         {showFilters && (
                             <button 
-                                onClick={onFilterClick}
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onFilterClick?.();
+                                }}
+                                title={isFiltersOpen ? "Close Filters" : "Open Filters"}
                                 className={cn(
-                                    "shrink-0 relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
-                                    (isFiltersOpen || hasActiveFilters || activeFilterCount > 0)
-                                        ? "bg-emerald-600 text-white shadow-emerald-500/20"
-                                        : cn("bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400", t.hoverText)
+                                    "shrink-0 relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10 z-[40]",
+                                    isFiltersOpen
+                                        ? "bg-rose-600 text-white shadow-rose-500/20 hover:bg-rose-700"
+                                        : (hasActiveFilters || activeFilterCount > 0)
+                                            ? "bg-emerald-600 text-white shadow-emerald-500/20 hover:bg-emerald-700"
+                                            : cn("bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400", t.hoverText)
                                 )}
                             >
                                 {isFiltersOpen ? (
