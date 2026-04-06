@@ -370,22 +370,22 @@ export function FoodsView({
                                 <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
 
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
-                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{formatEnergy(food.energy_kcal, energyUnit)}</span>
                                 </div>
                                 <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
 
                                     <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
-                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">{food.carbs_g.toFixed(1)}g</span>
+                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{food.carbs_g.toFixed(1)}g</span>
                                 </div>
                                 <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
 
                                     <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
-                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">{food.fat_g.toFixed(1)}g</span>
+                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{food.fat_g.toFixed(1)}g</span>
                                 </div>
                                 <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
 
                                     <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
-                                    <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">{food.protein_g.toFixed(1)}g</span>
+                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{food.protein_g.toFixed(1)}g</span>
                                 </div>
                             </div>
                         </div>
