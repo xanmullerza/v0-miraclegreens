@@ -121,22 +121,22 @@ export const RecipeListItem = ({
 
                     {/* Stats Grid - Enhanced size */}
                     <div className="flex flex-wrap gap-2">
-                        <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                        <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
 
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
                             <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{formatEnergy(displayCalories, unit, displayEnergy)}</span>
                         </div>
-                        <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                        <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
 
                             <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
                             <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayCarbs.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                        <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
 
                             <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
                             <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayProtein.toFixed(1)}g</span>
                         </div>
-                        <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                        <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
 
                             <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
                             <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayFat.toFixed(1)}g</span>
