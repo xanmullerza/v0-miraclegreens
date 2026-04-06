@@ -33,26 +33,16 @@ function PlannerPageContent() {
     // Themed Tracker button with restored dropdown for Shopping/Pantry
     const trackerDropdown = (
         <DropdownMenu>
-            <div className="flex items-center gap-1.5">
-                {/* Main Action Button */}
-                <DropdownMenuTrigger asChild>
-                    <button
-                        className="h-11 px-5 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] shadow-lg ring-1 ring-white/10 bg-blue-600 text-white shadow-blue-500/20"
-                    >
+            <DropdownMenuTrigger asChild>
+                <button className="h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg bg-blue-600 shadow-blue-500/20 overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all relative">
+                    <div className="flex items-center justify-center w-11 h-full z-10 transition-colors">
                         <Calendar size={14} className="animate-pulse" />
-                        <span>Tracker</span>
-                    </button>
-                </DropdownMenuTrigger>
-
-                {/* Standalone Chevron Button */}
-                <DropdownMenuTrigger asChild>
-                    <button
-                        className="h-11 w-11 flex items-center justify-center rounded-2xl transition-all duration-300 shadow-lg ring-1 ring-white/10 bg-blue-600/10 dark:bg-blue-600/20 border border-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white"
-                    >
-                        <ChevronDown size={14} />
-                    </button>
-                </DropdownMenuTrigger>
-            </div>
+                    </div>
+                    <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
+                        <ChevronDown size={14} className="transition-transform duration-300" />
+                    </div>
+                </button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-800 p-2 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                 <DropdownMenuItem 
                     className="gap-3 py-2.5 cursor-pointer font-black tracking-widest uppercase text-[10px] rounded-xl mb-1 bg-blue-600/20 text-blue-400"
