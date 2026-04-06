@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
     ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search, ShoppingCart, List, Package,
-    Info, Activity, Scale, LifeBuoy, Settings, FlaskConical, ChevronRight, Library
+    Info, Activity, Scale, LifeBuoy, Settings, FlaskConical, ChevronRight, Library, ALargeSmall
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
@@ -32,11 +32,11 @@ import {
 const PAGE_SIZE = 20;
 
 const FOOD_SORT_OPTIONS = [
-    { id: 'name', label: 'A-Z' },
-    { id: 'energy_kcal', label: 'Energy' },
-    { id: 'protein_g', label: 'Protein' },
-    { id: 'carbs_g', label: 'Carbs' },
-    { id: 'fat_g', label: 'Fat' },
+    { id: 'name', label: 'A-Z', icon: <ALargeSmall size={18} /> },
+    { id: 'energy_kcal', label: 'Energy', icon: <Activity size={18} /> },
+    { id: 'protein_g', label: 'Protein', icon: <Beef size={18} /> },
+    { id: 'carbs_g', label: 'Carbs', icon: <Leaf size={18} /> },
+    { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={18} /> },
 ] as const;
 
 interface FoodsViewProps {
@@ -378,11 +378,11 @@ export function FoodsView({
                     sortDirection={sortDirection}
                     setSortDirection={setSortDirection}
                     sortOptions={[
-                        { id: 'name', label: 'A-Z', icon: <ArrowDownUp size={14} /> },
-                        { id: 'energy_kcal', label: 'Energy', icon: <ArrowDownUp size={14} /> },
-                        { id: 'protein_g', label: 'Protein', icon: <ArrowDownUp size={14} /> },
-                        { id: 'carbs_g', label: 'Carbs', icon: <ArrowDownUp size={14} /> },
-                        { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={14} /> },
+                        { id: 'name', label: 'A-Z', icon: <ALargeSmall size={18} /> },
+                        { id: 'energy_kcal', label: 'Energy', icon: <ArrowDownUp size={18} /> },
+                        { id: 'protein_g', label: 'Protein', icon: <ArrowDownUp size={18} /> },
+                        { id: 'carbs_g', label: 'Carbs', icon: <ArrowDownUp size={18} /> },
+                        { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={18} /> },
                     ]}
                     showFilters={!hideControls}
                     isFiltersOpen={activeView === 'food-filters'}

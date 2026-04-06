@@ -98,9 +98,9 @@ export interface PlannerContentProps {
 }
 
 const PLANNER_SORT_OPTIONS: SortOption[] = [
-    { id: 'time', label: 'Time (Schedule)', icon: <Clock size={12} /> },
-    { id: 'calories', label: 'Calories', icon: <Flame size={12} /> },
-    { id: 'protein', label: 'Protein', icon: <Dumbbell size={12} /> },
+    { id: 'time', label: 'Time (Schedule)', icon: <Clock size={18} /> },
+    { id: 'calories', label: 'Calories', icon: <Flame size={18} /> },
+    { id: 'protein', label: 'Protein', icon: <Dumbbell size={18} /> },
 ];
 
 type PlanLength = 'daily' | 'weekly' | 'monthly';
