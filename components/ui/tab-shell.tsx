@@ -316,9 +316,9 @@ export function TabShell({
                                         <Minus size={14} className={t.text} />
                                     </button>
                                     
-                                    <div className="flex flex-col items-center justify-center flex-1 min-w-[3rem]">
-                                        <Users size={12} className={cn("mb-0.5", t.text)} />
-                                        <span className={cn("text-[10px] font-black leading-none", t.text)}>
+                                    <div className="flex items-center justify-center gap-1.5 flex-1 min-w-[4rem]">
+                                        <Users size={12} className={cn(t.text)} />
+                                        <span className={cn("text-[11px] font-black leading-none", t.text)}>
                                             {currentScale}
                                         </span>
                                     </div>
