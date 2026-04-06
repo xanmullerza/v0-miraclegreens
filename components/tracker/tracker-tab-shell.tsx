@@ -60,41 +60,78 @@ export function TrackerTabShell({
 
     const currentSortLabel = sortOptions.find(opt => opt.id === sortField)?.label.split(' ')[0] || 'Sort';
 
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+    // Auto-focus search input when expanded
+    React.useEffect(() => {
+        if (isSearchExpanded && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [isSearchExpanded]);
+
     return (
         <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] shadow-xl">
 
             {/* Sticky Header */}
             <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-none sm:rounded-t-[2rem]">
-                <div className="flex flex-col md:flex-row md:items-center gap-4 px-6 py-5">
+                <div className="flex items-center justify-between gap-2 px-4 py-4 md:px-6 md:py-5 min-h-[76px] w-full">
                     
-                    {/* Search Bar - Main Focus on Left */}
-                    <div className="relative flex-1 group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={14} />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                            placeholder={placeholder || `Search ${title.toLowerCase()}...`}
-                            className="w-full h-11 pl-11 pr-4 rounded-[1.25rem] text-[11px] font-bold tracking-tight transition-all duration-300 outline-none bg-white/50 dark:bg-slate-900/50 shadow-inner border border-slate-200/50 dark:border-slate-800/50 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/20"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => onSearchChange('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                            >
-                                <X size={12} />
-                            </button>
+                    {/* Animated Search Bar / Button */}
+                    <div className={cn(
+                        "transition-all duration-500 ease-in-out flex shrink-0",
+                        (isSearchExpanded || searchQuery) ? "flex-1 opacity-100" : "w-11 opacity-100"
+                    )}>
+                        <div className={cn(
+                            "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 rounded-2xl shadow-lg ring-1 ring-white/10 transition-colors",
+                            (isSearchExpanded || searchQuery) ? "bg-white dark:bg-slate-800" : "hover:text-blue-500 cursor-pointer text-slate-500"
                         )}
+                        onClick={() => { if (!isSearchExpanded && !searchQuery) setIsSearchExpanded(true); }}
+                        >
+                            <Search className={cn(
+                                "absolute transition-all duration-300 pointer-events-none",
+                                (isSearchExpanded || searchQuery) ? "left-4 text-blue-500" : "left-1/2 -translate-x-1/2 text-slate-400"
+                            )} size={14} />
+                            
+                            <input
+                                ref={searchInputRef}
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => onSearchChange(e.target.value)}
+                                placeholder={placeholder || `Search ${title.toLowerCase()}...`}
+                                className={cn(
+                                    "w-full h-full pl-11 pr-11 rounded-2xl text-[11px] font-bold tracking-tight bg-transparent outline-none transition-opacity duration-300",
+                                    (isSearchExpanded || searchQuery) ? "opacity-100 placeholder:text-slate-400 dark:placeholder:text-slate-500" : "opacity-0 pointer-events-none"
+                                )}
+                            />
+                            
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSearchChange('');
+                                    setIsSearchExpanded(false);
+                                }}
+                                className={cn(
+                                    "absolute right-3 p-1 transition-all duration-300",
+                                    (isSearchExpanded || searchQuery) ? "opacity-100 text-slate-400 hover:text-slate-600" : "opacity-0 pointer-events-none"
+                                )}
+                            >
+                                <X size={14} />
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Controls Hub - Right Side */}
-                    <div className="flex flex-wrap items-center justify-center gap-2 shrink-0 w-full md:w-auto md:justify-end">
-                        {/* Filter Button (Optional) */}
+                    {/* The Rest of the Controls */}
+                    <div className={cn(
+                        "flex items-center gap-2 flex-nowrap overflow-hidden transition-all duration-500 ease-in-out shrink-0",
+                        (isSearchExpanded || searchQuery) ? "max-w-0 opacity-0 !gap-0" : "max-w-[400px] opacity-100"
+                    )}>
+                        {/* Filter Button */}
                         {showFilters && (
                             <button 
                                 onClick={onFilterClick}
                                 className={cn(
-                                    "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
+                                    "shrink-0 relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
                                     (hasActiveFilters || activeFilterCount > 0)
                                         ? "bg-emerald-600 text-white shadow-emerald-500/20"
                                         : "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:text-emerald-500"
@@ -110,7 +147,7 @@ export function TrackerTabShell({
                         )}
 
                         {/* Sort Button */}
-                        <div className="relative">
+                        <div className="relative shrink-0">
                             <button
                                 onClick={() => setShowSortOptions(!showSortOptions)}
                                 className={cn(
