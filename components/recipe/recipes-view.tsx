@@ -509,7 +509,7 @@ export function RecipesView({
                                         </h3>
                                     </div>
 
-                                     <div className="flex flex-wrap gap-2.5">
+                                     <div className="flex flex-wrap gap-2">
                                         {(() => {
                                             const baseServings = recipe.servings || 1;
                                             const currentServings = servingsOverrides[recipe.id] || baseServings;
@@ -520,27 +520,27 @@ export function RecipesView({
                                                 : (filters.nutritionViewMode === 'per-serving' ? (1 / baseServings) : 1);
                                             return (
                                                 <>
-                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
                                                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">
                                                             {formatEnergy(recipe.calories * multiplier, energyUnit)}
                                                         </span>
                                                     </div>
-                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
                                                         <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">
                                                             {(recipe.carbs * multiplier).toFixed(1)}g
                                                         </span>
                                                     </div>
-                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
                                                         <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">
                                                             {(recipe.fat * multiplier).toFixed(1)}g
                                                         </span>
                                                     </div>
-                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-3 py-2 rounded-2xl flex flex-col items-center min-w-[70px] shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
                                                         <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none">
+                                                        <span className="font-black text-sm text-slate-900 dark:text-white leading-none truncate w-full text-center">
                                                             {(recipe.protein * multiplier).toFixed(1)}g
                                                         </span>
                                                     </div>
