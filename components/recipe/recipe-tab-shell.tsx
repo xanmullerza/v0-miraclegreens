@@ -22,6 +22,7 @@ interface RecipeTabShellProps {
     setSortDirection: (dir: 'asc' | 'desc') => void;
     title: string;
     additionalControls?: React.ReactNode;
+    dropdownOptions?: { id: string; label: string; icon: React.ReactNode; onClick: () => void; active?: boolean }[];
 }
 
 export function RecipeTabShell(props: RecipeTabShellProps) {
@@ -53,7 +54,7 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
             }}
             hasActiveFilters={hasActiveFilters}
             dropdownContent={props.additionalControls || <div className="h-11 w-11 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><Book size={18} /></div>}
-            dropdownOptions={getSharedNavOptions(navigateTo)}
+            dropdownOptions={props.dropdownOptions || getSharedNavOptions(navigateTo)}
             scaleValue={filters.globalServings || 1}
             onScaleChange={(val: number) => {
                 setFilters({

@@ -231,35 +231,9 @@ export function PlannerContent({
 
         return meals;
     };
-    const lengthSwitcher = (
-        <div className="flex items-center gap-2">
-            {/* Servings Adjuster */}
-            <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <button
-                    onClick={() => setSelectedServings(Math.max(0.5, selectedServings - 0.5))}
-                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
-                    title="Decrease servings"
-                >
-                    <ChevronDown size={12} />
-                </button>
-                <div className="px-2 py-1 text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white whitespace-nowrap min-w-[50px] text-center">
-                    {effectiveServings.toFixed(1)}x
-                </div>
-                <button
-                    onClick={() => setSelectedServings(effectiveServings + 0.5)}
-                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-600 dark:text-slate-400"
-                    title="Increase servings"
-                >
-                    <ChevronDown size={12} className="rotate-180" />
-                </button>
-            </div>
-
-            {/* Module Trigger */}
-            <div className="h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg bg-blue-600 shadow-blue-500/20 overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all px-4 gap-2">
-                <Calendar size={14} />
-                <span className="hidden sm:inline">{planLength}</span>
-                <ChevronDown size={12} />
-            </div>
+    const defaultDropdown = (
+        <div className="h-11 w-11 flex items-center justify-center text-blue-600 dark:text-blue-400">
+            <Calendar size={18} />
         </div>
     );
 
@@ -302,7 +276,7 @@ export function PlannerContent({
                 }}
                 scaleValue={effectiveServings}
                 onScaleChange={(val) => setSelectedServings(Math.max(0.5, val))}
-                dropdownContent={dropdownContent || lengthSwitcher}
+                dropdownContent={dropdownContent || defaultDropdown}
                 dropdownOptions={[
                     ...(['daily', 'weekly', 'monthly'] as PlanLength[]).map(l => ({
                         id: l,

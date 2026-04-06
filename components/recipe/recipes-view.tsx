@@ -51,6 +51,9 @@ import { supabase } from '@/lib/supabase';
 import { PANTRY_QUANTITIES_KEY } from '@/components/tracker/pantry/pantry-types';
 import { inferEquipmentFromRecipe } from '@/lib/utils/equipment-inference';
 import { usePantry } from '@/hooks/use-pantry';
+import { RecipeTabShell } from './recipe-tab-shell';
+import { getSharedNavOptions, getCookbookNavOptions } from '@/lib/constants/nav-options';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 
 
 interface RecipeWithIngredients extends Recipe {
@@ -114,6 +117,7 @@ export function RecipesView({
     const router = useRouter();
     const PAGE_SIZE = 20;
     const { profile } = useUserPreferences();
+    const { navigateTo } = useActionPanel();
     
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -121,7 +125,7 @@ export function RecipesView({
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const { searchQuery } = useSearch();
+    const { searchQuery, setSearchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
     const { filters, updateFilter } = useRecipeFilter();
 
@@ -631,126 +635,32 @@ export function RecipesView({
         );
     };
 
+    const recipeList = (
+        <div className="space-y-4">
+            {renderRecipesList()}
+        </div>
+    );
+
     return (
         <div className={cn("space-y-8 animate-in fade-in duration-500", noContainer && "space-y-0")}>
             {!noContainer ? (
-                <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
-                    {showAddRecipe && setShowAddRecipe ? (
-                        <RecipeFormDialog
-                            onClose={() => setShowAddRecipe(false)}
-                            onSave={() => fetchRecipes(0, true)}
-                            isMix={isMix}
-                        />
-                    ) : (
-                        <>
-                            {!hideControls && (
-                                <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 rounded-t-[2rem]">
-                                    <div className="flex md:hidden items-center gap-2 px-4 py-3">
-                                        <Sheet>
-                                            <SheetTrigger asChild>
-                                                <button className={cn(
-                                                    'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
-                                                    (showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length))
-                                                        ? isMix ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                                        : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 hover:text-slate-600 shadow-sm'
-                                                )}>
-                                                    <Filter size={11} />
-                                                    Filter
-                                                </button>
-                                            </SheetTrigger>
-                                            <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
-                                                <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
-                                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favorites only</span>
-                                                    <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className={isMix ? "data-[state=checked]:bg-indigo-600" : "data-[state=checked]:bg-blue-600"} />
-                                                </div>
-                                                <div className="mt-4">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Types</span>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {MEAL_TYPES.map(type => (
-                                                            <button
-                                                                key={type}
-                                                                onClick={() => {
-                                                                    if (selectedTypes.includes(type)) setSelectedTypes(prev => prev.filter(t => t !== type));
-                                                                    else setSelectedTypes(prev => [...prev, type]);
-                                                                }}
-                                                                className={cn(
-                                                                    'h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all',
-                                                                    selectedTypes.includes(type)
-                                                                        ? isMix ? 'bg-indigo-500 border-indigo-500 text-white' : 'bg-blue-500 border-blue-500 text-white'
-                                                                        : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-blue-300 hover:text-blue-600'
-                                                                )}
-                                                            >
-                                                                {type}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </SheetContent>
-                                        </Sheet>
-                                        <div className="flex-1 relative">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
-                                            <input
-                                                type="text"
-                                                value={effectiveSearchQuery ?? ''}
-                                                onChange={(e) => onSearchChange?.(e.target.value)}
-                                                placeholder="Search..."
-                                                className="w-full h-9 pl-9 pr-4 rounded-full border text-[10px] font-semibold bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="hidden md:flex gap-4 justify-between items-center px-10 py-4">
-                                        <div className="flex items-center gap-2">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <button className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2 outline-none shadow-sm">
-                                                        <Filter size={12} />
-                                                        Filter
-                                                        <ChevronDown size={10} className="opacity-50" />
-                                                    </button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent side="bottom" align="start" className="w-56 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                                                    <div className="p-2">
-                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Collections</DropdownMenuLabel>
-                                                        <DropdownMenuCheckboxItem checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer">
-                                                            Favorites Only
-                                                        </DropdownMenuCheckboxItem>
-                                                        <DropdownMenuCheckboxItem checked={showOnlyMyRecipes} onCheckedChange={setShowOnlyMyRecipes} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer">
-                                                            My Recipes
-                                                        </DropdownMenuCheckboxItem>
-                                                        <DropdownMenuCheckboxItem checked={activeIsRemix} onCheckedChange={(val) => setLocalIsRemix(val)} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer text-violet-500">
-                                                            Remixes
-                                                        </DropdownMenuCheckboxItem>
-                                                        <DropdownMenuCheckboxItem checked={activeIsMix} onCheckedChange={(val) => setLocalIsMix(val)} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer text-amber-500">
-                                                            Mixes
-                                                        </DropdownMenuCheckboxItem>
-                                                    </div>
-                                                </DropdownMenuContent>
-
-                                            </DropdownMenu>
-                                        </div>
-                                        <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
-                                            <input
-                                                type="text"
-                                                value={effectiveSearchQuery ?? ''}
-                                                onChange={(e) => onSearchChange?.(e.target.value)}
-                                                placeholder="Search recipes..."
-                                                className="w-64 h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 focus:bg-emerald-50 focus:border-emerald-200 transition-all outline-none shadow-sm"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="p-4 md:p-6">
-                                {renderRecipesList()}
-                            </div>
-                        </>
-                    )}
-                </div>
+                <RecipeTabShell
+                    title="Cookbook"
+                    searchQuery={effectiveSearchQuery}
+                    onSearchChange={(q) => onSearchChange ? onSearchChange(q) : setSearchQuery(q)}
+                    sortField={sortField}
+                    setSortField={(f) => handleSort(f)}
+                    sortDirection={sortDirection}
+                    setSortDirection={setLocalSortDirection}
+                    dropdownOptions={[
+                        ...getCookbookNavOptions(navigateTo),
+                        ...getSharedNavOptions(navigateTo).filter(opt => opt.id !== 'cookbook')
+                    ]}
+                >
+                    {recipeList}
+                </RecipeTabShell>
             ) : (
-                <div className="p-0">
-                    {renderRecipesList()}
-                </div>
+                recipeList
             )}
         </div>
     );
