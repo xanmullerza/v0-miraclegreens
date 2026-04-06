@@ -25,7 +25,7 @@ interface RecipeTabShellProps {
 
 export function RecipeTabShell(props: RecipeTabShellProps) {
     const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
-    const { hasActiveFilters } = useRecipeFilter();
+    const { hasActiveFilters, filters, setFilters } = useRecipeFilter();
     
     // We add logic to artificially trigger the active filter highlight
     // if the panel is open specifically for recipe-filters
@@ -43,6 +43,14 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
             }}
             hasActiveFilters={hasActiveFilters || isFilterOpen}
             dropdownContent={props.additionalControls}
+            scaleValue={filters.globalServings || 1}
+            onScaleChange={(val: number) => {
+                setFilters({
+                    ...filters,
+                    globalServings: val,
+                    servingsOverrides: {} // Reset individual tweaks when using global scale
+                });
+            }}
         />
     );
 }

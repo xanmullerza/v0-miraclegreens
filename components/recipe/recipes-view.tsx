@@ -512,10 +512,12 @@ export function RecipesView({
                                      <div className="flex flex-wrap gap-2">
                                         {(() => {
                                             const baseServings = recipe.servings || 1;
-                                            const currentServings = servingsOverrides[recipe.id] || baseServings;
-                                            // If the user has explicitly overridden servings, we show the total for that amount.
+                                            const currentServings = servingsOverrides[recipe.id] !== undefined 
+                                                ? servingsOverrides[recipe.id] 
+                                                : (filters.globalServings !== null ? filters.globalServings : baseServings);
+                                            // If the user has explicitly overridden servings or there's a global servings override, we show the total for that amount.
                                             // Otherwise, we respect the global nutritionViewMode.
-                                            const multiplier = (servingsOverrides[recipe.id] !== undefined)
+                                            const multiplier = (servingsOverrides[recipe.id] !== undefined || filters.globalServings !== null)
                                                 ? (currentServings / baseServings)
                                                 : (filters.nutritionViewMode === 'per-serving' ? (1 / baseServings) : 1);
                                             return (
@@ -561,7 +563,7 @@ export function RecipesView({
                                             },
                                             {
                                                 label: <Users size={17} />,
-                                                value: servingsOverrides[recipe.id] || recipe.servings || 1,
+                                                value: servingsOverrides[recipe.id] !== undefined ? servingsOverrides[recipe.id] : (filters.globalServings !== null ? filters.globalServings : (recipe.servings || 1)),
                                                 color: 'text-violet-400',
                                                 isInteractive: true
                                             },
