@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
     ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search, ShoppingCart, List, Package,
-    Info, Activity, Scale, LifeBuoy, Settings, FlaskConical, ChevronRight
+    Info, Activity, Scale, LifeBuoy, Settings, FlaskConical, ChevronRight, Library
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
@@ -71,12 +71,18 @@ export function FoodsView({
     const [cartLoading, setCartLoading] = useState<string | null>(null);
 
     const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories, portionGrams, setPortionGrams } = useFoodFilter();
-    const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView, navigateTo } = useActionPanel();
     const [sortField, setSortField] = useState<'name' | 'energy_kcal' | 'protein_g' | 'carbs_g' | 'fat_g'>('name');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
 
     const currentSortLabel = FOOD_SORT_OPTIONS.find(opt => opt.id === sortField)?.label || 'Sort';
+
+    const defaultDropdown = (
+        <div className="h-11 w-11 flex items-center justify-center text-blue-600 dark:text-blue-400">
+            <Library size={18} />
+        </div>
+    );
 
     const handleAddToCart = (e: React.MouseEvent, food: FoodItem) => {
         e.preventDefault();
@@ -441,7 +447,7 @@ export function FoodsView({
         </div>
     );
 
-    const { setIsActionPanelOpen, setActiveView, activeView, navigateTo } = useActionPanel();
+
 
     return (
         <div className={cn("space-y-8 animate-in fade-in duration-500", noContainer && "space-y-0")}>
