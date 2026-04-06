@@ -359,10 +359,15 @@ export function FoodsView({
 
                         {/* Content Section */}
                         <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
-                            <div className="space-y-0.5">
+                            <div className="flex items-baseline gap-2">
                                 <h3 className="font-bold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white capitalize leading-tight group-hover:text-blue-500 transition-colors truncate">
                                     {formatFoodName(food.common_name || food.name)}
                                 </h3>
+                                {portionGrams !== 100 && (
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded-full border border-cyan-500/20 shrink-0">
+                                        {portionGrams}g
+                                    </span>
+                                )}
                             </div>
 
                         {/* Stats Grid - scaled by portionGrams */}
@@ -370,11 +375,7 @@ export function FoodsView({
                             const ratio = portionGrams / 100;
                             return (
                                 <div className="flex flex-wrap gap-2 relative">
-                                    {portionGrams !== 100 && (
-                                        <span className="absolute -top-2 right-0 text-[8px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded-full border border-cyan-500/20">
-                                            per {portionGrams}g
-                                        </span>
-                                    )}
+
                                     <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
                                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
                                         <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{formatEnergy(food.energy_kcal * ratio, energyUnit)}</span>

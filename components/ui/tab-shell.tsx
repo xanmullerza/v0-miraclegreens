@@ -187,10 +187,13 @@ export function TabShell({
                         )}>
                             {!isScaleExpanded ? (
                                 <button 
-                                    className="w-full h-full flex items-center justify-center outline-none shrink-0" 
+                                    className={cn(
+                                        "w-full h-full flex items-center justify-center outline-none shrink-0 transition-colors",
+                                        (scaleMode === 'grams' ? currentScale !== 100 : currentScale !== 1) ? t.text : "text-slate-500"
+                                    )} 
                                     onClick={() => { setIsScaleExpanded(true); setIsSearchExpanded(false); }}
                                 >
-                                    <Scale size={14} />
+                                    <Scale size={14} className={cn("transition-transform duration-300", (scaleMode === 'grams' ? currentScale !== 100 : currentScale !== 1) && "scale-110")} />
                                 </button>
                             ) : scaleMode === 'grams' ? (
                                 /* ── GRAMS MODE: free-type number input ── */
