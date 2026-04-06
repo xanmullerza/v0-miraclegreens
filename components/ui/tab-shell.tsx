@@ -330,8 +330,10 @@ export function TabShell({
 
                     {/* Controls Group */}
                     <div className={cn(
-                        "flex items-center gap-2 flex-nowrap overflow-hidden transition-all duration-500 ease-in-out shrink-0",
-                        (isSearchExpanded || searchQuery || isScaleExpanded) ? "max-w-0 opacity-0 !gap-0" : "max-w-[400px] opacity-100"
+                        "flex items-center gap-2 flex-nowrap transition-all duration-500 ease-in-out shrink-0",
+                        (isSearchExpanded || searchQuery || isScaleExpanded) 
+                            ? "max-w-0 opacity-0 !gap-0 overflow-hidden" 
+                            : "max-w-[400px] opacity-100 overflow-visible"
                     )}>
                         {/* Filter Button */}
                         {showFilters && (
