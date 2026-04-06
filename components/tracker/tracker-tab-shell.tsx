@@ -19,6 +19,8 @@ interface TrackerTabShellProps {
     hasActiveFilters?: boolean;
     activeFilterCount?: number;
     dropdownContent?: React.ReactNode;
+    scaleValue?: number;
+    onScaleChange?: (val: number) => void;
 }
 
 export function TrackerTabShell(props: TrackerTabShellProps) {

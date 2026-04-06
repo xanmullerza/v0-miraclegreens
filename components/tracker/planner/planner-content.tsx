@@ -342,6 +342,8 @@ export function PlannerContent({
                     setActiveView('recipe-filters');
                     setIsActionPanelOpen(true);
                 }}
+                scaleValue={effectiveServings}
+                onScaleChange={(val) => setSelectedServings(Math.max(0.5, val))}
                 dropdownContent={dropdownContent || lengthSwitcher}
             >
 
