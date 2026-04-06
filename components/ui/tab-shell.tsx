@@ -90,6 +90,7 @@ export function TabShell({
     const [isScaleExpanded, setIsScaleExpanded] = useState(false);
     const [internalScale, setInternalScale] = useState(scaleMode === 'grams' ? 100 : 1);
     const [gramInputValue, setGramInputValue] = useState('');
+    const [gramUnit, setGramUnit] = useState<'g' | 'kg'>('g');
     const searchInputRef = useRef<HTMLInputElement>(null);
     const gramInputRef = useRef<HTMLInputElement>(null);
     const t = themeStyles[theme];
@@ -103,7 +104,11 @@ export function TabShell({
     // Auto-focus gram input when scale expanded in grams mode
     useEffect(() => {
         if (isScaleExpanded && scaleMode === 'grams' && gramInputRef.current) {
-            setGramInputValue(String(currentScale));
+            // Determine best unit for current scale
+            const unit = currentScale >= 1000 && currentScale % 1000 === 0 ? 'kg' : 'g';
+            setGramUnit(unit);
+            setGramInputValue(String(unit === 'kg' ? currentScale / 1000 : currentScale));
+            
             gramInputRef.current.focus();
             gramInputRef.current.select();
         }
@@ -202,7 +207,7 @@ export function TabShell({
                                         <Weight size={14} />
                                     </div>
 
-                                    <div className="flex items-center flex-1 min-w-0 px-1 gap-1">
+                                    <div className="flex items-center flex-1 min-w-0 px-1 gap-0.5">
                                         <input
                                             ref={gramInputRef}
                                             type="number"
@@ -213,15 +218,18 @@ export function TabShell({
                                                 setGramInputValue(e.target.value);
                                             }}
                                             onBlur={(e) => {
-                                                const num = parseInt(e.target.value);
-                                                if (!isNaN(num) && num > 0) handleScaleUpdate(num);
-                                                else setGramInputValue(String(currentScale));
+                                                const val = parseFloat(e.target.value);
+                                                if (!isNaN(val) && val > 0) {
+                                                    handleScaleUpdate(gramUnit === 'kg' ? val * 1000 : val);
+                                                } else {
+                                                    setGramInputValue(String(gramUnit === 'kg' ? currentScale / 1000 : currentScale));
+                                                }
                                             }}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
-                                                    const num = parseInt(gramInputValue);
-                                                    if (!isNaN(num) && num > 0) {
-                                                        handleScaleUpdate(num);
+                                                    const val = parseFloat(gramInputValue);
+                                                    if (!isNaN(val) && val > 0) {
+                                                        handleScaleUpdate(gramUnit === 'kg' ? val * 1000 : val);
                                                         setIsScaleExpanded(false);
                                                     }
                                                 }
@@ -232,7 +240,30 @@ export function TabShell({
                                                 t.text
                                             )}
                                         />
-                                        <span className={cn("text-[10px] font-black shrink-0", t.text)}>g</span>
+                                        <div className="flex bg-slate-900/50 rounded-lg p-0.5 border border-white/5 mx-1">
+                                            {(['g', 'kg'] as const).map(u => (
+                                                <button
+                                                    key={u}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const currentVal = parseFloat(gramInputValue) || (gramUnit === 'kg' ? currentScale / 1000 : currentScale);
+                                                        if (u === 'kg' && gramUnit === 'g') {
+                                                            setGramUnit('kg');
+                                                            setGramInputValue(String(currentVal / 1000));
+                                                        } else if (u === 'g' && gramUnit === 'kg') {
+                                                            setGramUnit('g');
+                                                            setGramInputValue(String(currentVal * 1000));
+                                                        }
+                                                    }}
+                                                    className={cn(
+                                                        "px-1.5 py-0.5 text-[8px] font-black uppercase rounded transition-all",
+                                                        gramUnit === u ? "bg-white text-slate-900" : "text-white/40 hover:text-white/60"
+                                                    )}
+                                                >
+                                                    {u}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     {currentScale !== 100 && (
