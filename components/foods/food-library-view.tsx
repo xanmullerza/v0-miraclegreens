@@ -69,7 +69,7 @@ export function FoodsView({
     const [authReady, setAuthReady] = useState(false);
     const [cartLoading, setCartLoading] = useState<string | null>(null);
 
-    const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories } = useFoodFilter();
+    const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories, portionGrams, setPortionGrams } = useFoodFilter();
     const { setIsActionPanelOpen, setActiveView } = useActionPanel();
     const [sortField, setSortField] = useState<'name' | 'energy_kcal' | 'protein_g' | 'carbs_g' | 'fat_g'>('name');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -365,29 +365,35 @@ export function FoodsView({
                                 </h3>
                             </div>
 
-                            {/* Stats Grid - MATCHING PLANNER STYLE EXACTLY */}
-                            <div className="flex flex-wrap gap-2">
-                                <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
-
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
-                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                        {/* Stats Grid - scaled by portionGrams */}
+                        {(() => {
+                            const ratio = portionGrams / 100;
+                            return (
+                                <div className="flex flex-wrap gap-2 relative">
+                                    {portionGrams !== 100 && (
+                                        <span className="absolute -top-2 right-0 text-[8px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded-full border border-cyan-500/20">
+                                            per {portionGrams}g
+                                        </span>
+                                    )}
+                                    <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Energy</span>
+                                        <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{formatEnergy(food.energy_kcal * ratio, energyUnit)}</span>
+                                    </div>
+                                    <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
+                                        <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
+                                        <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{(food.carbs_g * ratio).toFixed(1)}g</span>
+                                    </div>
+                                    <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
+                                        <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
+                                        <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{(food.protein_g * ratio).toFixed(1)}g</span>
+                                    </div>
+                                    <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
+                                        <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
+                                        <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{(food.fat_g * ratio).toFixed(1)}g</span>
+                                    </div>
                                 </div>
-                                <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
-
-                                    <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
-                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{food.carbs_g.toFixed(1)}g</span>
-                                </div>
-                                <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
-
-                                    <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
-                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{food.protein_g.toFixed(1)}g</span>
-                                </div>
-                                <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
-
-                                    <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
-                                    <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{food.fat_g.toFixed(1)}g</span>
-                                </div>
-                            </div>
+                            );
+                        })()}
                         </div>
 
                         {/* Actions Section - MATCHING PLANNER STRUCTURE + FOOD DETAIL TABS */}
@@ -460,6 +466,8 @@ export function FoodsView({
                     hasActiveFilters={showFavoritesOnly || selectedCategories.length > 0}
                     activeFilterCount={selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
                     dropdownContent={dropdownContent || defaultDropdown}
+                    scaleValue={portionGrams / 100}
+                    onScaleChange={(val) => setPortionGrams(Math.max(50, Math.round(val * 100)))}
                 >
                     {foodList}
                 </TrackerTabShell>

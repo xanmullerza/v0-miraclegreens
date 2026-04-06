@@ -8,6 +8,8 @@ interface FoodFilterContextType {
   selectedCategories: string[];
   setSelectedCategories: Dispatch<SetStateAction<string[]>>;
   resetFoodFilters: () => void;
+  portionGrams: number;
+  setPortionGrams: (grams: number) => void;
 }
 
 const FoodFilterContext = createContext<FoodFilterContextType | undefined>(undefined);
@@ -15,6 +17,7 @@ const FoodFilterContext = createContext<FoodFilterContextType | undefined>(undef
 export function FoodFilterProvider({ children }: { children: ReactNode }) {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [portionGrams, setPortionGrams] = useState(100);
 
   const resetFoodFilters = () => {
     setShowFavoritesOnly(false);
@@ -29,6 +32,8 @@ export function FoodFilterProvider({ children }: { children: ReactNode }) {
         selectedCategories,
         setSelectedCategories,
         resetFoodFilters,
+        portionGrams,
+        setPortionGrams,
       }}
     >
       {children}

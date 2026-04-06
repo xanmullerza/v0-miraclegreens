@@ -8,6 +8,7 @@ interface UseFoodNutritionProps {
     energyUnit: string;
     userRDAs?: Record<string, number> | null;
     nutrientDisplayMode?: string;
+    initialGrams?: number;
 }
 
 export function useFoodNutrition({
@@ -17,8 +18,9 @@ export function useFoodNutrition({
     energyUnit,
     userRDAs = {},
     nutrientDisplayMode = 'both',
+    initialGrams = 100,
 }: UseFoodNutritionProps) {
-    const [macroGrams, setMacroGrams] = useState(100);
+    const [macroGrams, setMacroGrams] = useState(initialGrams);
 
     // Get value from food at default portion
     const getVal = (keys: string[]) => {

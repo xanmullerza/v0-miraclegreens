@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { useFoodNutrition } from '@/hooks/use-food-nutrition';
 import { NutritionDisplay } from '@/components/nutrients/NutritionDisplay';
+import { useFoodFilter } from '@/lib/context/food-filter-context';
 
 export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
@@ -13,6 +14,9 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
         breakdownNutrient, setBreakdownNutrient
     } = ctx;
 
+    // Sync macroGrams with the shared Library portion context
+    const { portionGrams, setPortionGrams } = useFoodFilter();
+
     // Use nutrition hook for all calculations
     const { macroGrams, setMacroGrams, nutrition } = useFoodNutrition({
         food,
@@ -21,7 +25,15 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
         energyUnit,
         userRDAs,
         nutrientDisplayMode,
+        initialGrams: portionGrams,
     });
+
+    // Sync back to context when user edits the input in detail view
+    useEffect(() => {
+        if (macroGrams !== portionGrams) {
+            setPortionGrams(macroGrams);
+        }
+    }, [macroGrams]);
 
     if (!food) return null;
 
