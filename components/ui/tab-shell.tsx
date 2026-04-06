@@ -149,7 +149,10 @@ export function TabShell({
         <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] shadow-xl">
             {/* Sticky Header */}
             <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-none sm:rounded-t-[2rem]">
-                <div className="flex items-center justify-center px-4 py-4 md:px-6 md:py-5 min-h-[76px] w-full gap-2">
+                <div className={cn(
+                    "flex items-center justify-center px-4 py-4 md:px-6 md:py-5 min-h-[76px] w-full transition-all duration-500",
+                    (isSearchExpanded || searchQuery || isScaleExpanded || showSortOptions || isDropdownExpanded) ? "gap-0" : "gap-2"
+                )}>
                     {/* Animated Search Bar / Button */}
                     <div className={cn(
                         "transition-all duration-500 ease-in-out flex shrink-0",
