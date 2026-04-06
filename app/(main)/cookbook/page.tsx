@@ -112,7 +112,7 @@ function RecipesPageContent() {
                         : "bg-violet-600 shadow-violet-500/20"
                 )}
             >
-                <div className="flex items-center gap-2 px-4 h-full">
+                <div className="flex items-center justify-center w-11 h-full z-10 transition-colors">
                     {inventoryView === 'foods' && <Leaf size={14} />}
                     {inventoryView === 'nutridex' && <Activity size={14} />}
                     {inventoryView === 'comparator' && <Scale size={14} />}
@@ -120,9 +120,6 @@ function RecipesPageContent() {
                     {inventoryView === 'list' && <List size={14} />}
                     {inventoryView === 'pantry' && <Package size={14} />}
                     {inventoryView === 'cart' && <ShoppingCart size={14} />}
-                    <span>
-                        {inventoryView === 'foods' ? 'Foods' : inventoryView === 'nutridex' ? 'Nutridex' : inventoryView === 'comparator' ? 'Comparator' : inventoryView === 'lifeguard' ? 'Lifeguard' : inventoryView === 'list' ? 'List' : inventoryView === 'pantry' ? 'Pantry' : 'Cart'}
-                    </span>
                 </div>
                 <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
                     <ChevronDown size={14} className={cn("transition-transform duration-300", showInventoryMenu && "rotate-180")} />

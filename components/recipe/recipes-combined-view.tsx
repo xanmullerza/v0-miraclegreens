@@ -42,9 +42,8 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
                         onClick={() => setShowFilterMenu(!showFilterMenu)}
                         className="h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg bg-emerald-600 shadow-emerald-500/20 overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     >
-                        <div className="flex items-center gap-2 px-4 h-full">
+                        <div className="flex items-center justify-center w-11 h-full z-10 transition-colors">
                             <BookOpen size={14} />
-                            <span>Cookbook</span>
                         </div>
                         <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
                             <ChevronDown size={14} className={cn("transition-transform duration-300", showFilterMenu && "rotate-180")} />

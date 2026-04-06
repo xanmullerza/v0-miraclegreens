@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, ArrowDownUp, Filter } from 'lucide-react';
+import { Search, X, ArrowDownUp, Filter, Scale } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface SortOption {
@@ -218,6 +218,17 @@ export function TabShell({
                                 </div>
                             )}
                         </div>
+
+                        {/* Scale Button */}
+                        <button
+                            className={cn(
+                                "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10 shrink-0",
+                                "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400",
+                                t.hoverText
+                            )}
+                        >
+                            <Scale size={14} />
+                        </button>
 
                         {/* Dropdown Action Wrapper */}
                         {dropdownContent && (
