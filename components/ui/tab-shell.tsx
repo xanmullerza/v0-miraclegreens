@@ -33,6 +33,7 @@ interface TabShellProps {
     scaleValue?: number;
     onScaleChange?: (val: number) => void;
     scaleMode?: 'multiplier' | 'grams';
+    filterChildren?: React.ReactNode;
 }
 
 const themeStyles = {
@@ -86,6 +87,7 @@ export function TabShell({
     scaleValue,
     onScaleChange,
     scaleMode = 'multiplier',
+    filterChildren,
 }: TabShellProps) {
     const [showSortOptions, setShowSortOptions] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -93,9 +95,17 @@ export function TabShell({
     const [internalScale, setInternalScale] = useState(scaleMode === 'grams' ? 100 : 1);
     const [gramInputValue, setGramInputValue] = useState('');
     const [gramUnit, setGramUnit] = useState<'g' | 'kg'>('g');
+    const [isMobile, setIsMobile] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const gramInputRef = useRef<HTMLInputElement>(null);
     const t = themeStyles[theme];
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 640);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const currentScale = scaleValue !== undefined ? scaleValue : internalScale;
     const handleScaleUpdate = (newVal: number) => {
@@ -424,7 +434,13 @@ export function TabShell({
             </div>
 
             <div className="p-4 md:p-6">
-                {children}
+                {(isFiltersOpen && isMobile && filterChildren) ? (
+                    <div className="animate-in slide-in-from-top-4 duration-500">
+                        {filterChildren}
+                    </div>
+                ) : (
+                    children
+                )}
             </div>
         </div>
     );

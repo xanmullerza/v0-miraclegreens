@@ -460,13 +460,17 @@ export function FoodsView({
                         { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={14} /> },
                     ]}
                     showFilters={!hideControls}
-                    isFiltersOpen={isActionPanelOpen && activeView === 'food-filters'}
+                    isFiltersOpen={activeView === 'food-filters'}
                     onFilterClick={() => {
-                        if (isActionPanelOpen && activeView === 'food-filters') {
+                        if (activeView === 'food-filters') {
+                            setActiveView('home');
                             setIsActionPanelOpen(false);
                         } else {
                             setActiveView('food-filters');
-                            setIsActionPanelOpen(true);
+                            // Only open ActionPanel on desktop
+                            if (window.innerWidth >= 640) {
+                                setIsActionPanelOpen(true);
+                            }
                         }
                     }}
                     hasActiveFilters={showFavoritesOnly || selectedCategories.length < CATEGORIES.length}
@@ -475,6 +479,18 @@ export function FoodsView({
                     scaleValue={portionGrams}
                     onScaleChange={(val) => setPortionGrams(val)}
                     scaleMode="grams"
+                    filterChildren={
+                        <FoodFiltersPanel
+                            showFavoritesOnly={showFavoritesOnly}
+                            setShowFavoritesOnly={setShowFavoritesOnly}
+                            selectedCategories={selectedCategories}
+                            setSelectedCategories={setSelectedCategories}
+                            onClose={() => {
+                                setActiveView('home');
+                                setIsActionPanelOpen(false);
+                            }}
+                        />
+                    }
                 >
                     {foodList}
                 </TrackerTabShell>

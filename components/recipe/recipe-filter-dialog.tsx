@@ -203,8 +203,8 @@ export function RecipeFilterContent({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="p-4 sm:p-6 space-y-6 overflow-y-auto overflow-x-hidden flex-1 scrollbar-thin">
+    <div className="flex flex-col min-h-screen">
+      <div className="p-4 sm:p-6 space-y-6 overflow-visible flex-1">
         {/* Collection Filters Section */}
         <div className="border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-900">
           <div className="p-4 space-y-4">

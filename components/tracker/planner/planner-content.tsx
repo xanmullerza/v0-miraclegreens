@@ -20,6 +20,7 @@ import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { supabase } from '@/lib/supabase';
 import { TrackerTabShell, SortOption } from '../tracker-tab-shell';
+import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
 
 const DEMO_PLAN = {
     breakfast: {
@@ -338,18 +339,23 @@ export function PlannerContent({
                 setSortDirection={setSortDirection}
                 sortOptions={PLANNER_SORT_OPTIONS}
                 showFilters={true}
-                isFiltersOpen={isActionPanelOpen && activeView === 'recipe-filters'}
+                isFiltersOpen={activeView === 'recipe-filters'}
                 onFilterClick={() => {
-                    if (isActionPanelOpen && activeView === 'recipe-filters') {
+                    if (activeView === 'recipe-filters') {
+                        setActiveView('home');
                         setIsActionPanelOpen(false);
                     } else {
                         setActiveView('recipe-filters');
-                        setIsActionPanelOpen(true);
+                        // Only open ActionPanel on desktop
+                        if (window.innerWidth >= 640) {
+                            setIsActionPanelOpen(true);
+                        }
                     }
                 }}
                 scaleValue={effectiveServings}
                 onScaleChange={(val) => setSelectedServings(Math.max(0.5, val))}
                 dropdownContent={dropdownContent || lengthSwitcher}
+                filterChildren={<RecipeFilterContent onClose={() => { setActiveView('home'); setIsActionPanelOpen(false); }} />}
             >
 
                 <div className="space-y-6 py-4">

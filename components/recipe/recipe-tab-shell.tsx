@@ -1,8 +1,8 @@
-import React from 'react';
 import { TabShell } from '@/components/ui/tab-shell';
 import { Clock, ChefHat, Flame, ArrowDownUp } from 'lucide-react';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
+import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
 
 export const RECIPE_SORT_OPTIONS = [
     { id: 'title', label: 'Title (A-Z)', icon: <ArrowDownUp size={14} /> },
@@ -29,7 +29,7 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
     
     // We add logic to artificially trigger the active filter highlight
     // if the panel is open specifically for recipe-filters
-    const isFilterOpen = isActionPanelOpen && activeView === 'recipe-filters';
+    const isFilterOpen = activeView === 'recipe-filters';
 
     return (
         <TabShell 
@@ -40,10 +40,14 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
             isFiltersOpen={isFilterOpen}
             onFilterClick={() => {
                 if (isFilterOpen) {
+                    setActiveView('home');
                     setIsActionPanelOpen(false);
                 } else {
                     setActiveView('recipe-filters');
-                    setIsActionPanelOpen(true);
+                    // Only open ActionPanel on desktop
+                    if (window.innerWidth >= 640) {
+                        setIsActionPanelOpen(true);
+                    }
                 }
             }}
             hasActiveFilters={hasActiveFilters}
@@ -56,6 +60,7 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
                     servingsOverrides: {} // Reset individual tweaks when using global scale
                 });
             }}
+            filterChildren={<RecipeFilterContent onClose={() => { setActiveView('home'); setIsActionPanelOpen(false); }} />}
         />
     );
 }
