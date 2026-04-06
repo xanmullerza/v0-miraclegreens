@@ -586,7 +586,7 @@ export function RecipesView({
                                                 className={cn(
                                                     'py-3 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-0 flex flex-col items-center justify-center gap-1.5 bg-transparent relative',
                                                     tab.color,
-                                                    tab.isInteractive && "bg-slate-800/40 shadow-inner ring-1 ring-white/5"
+                                                    tab.isInteractive ? "bg-white/10 dark:bg-slate-800/70 shadow-lg backdrop-blur-sm ring-1 ring-white/5" : ""
                                                 )}
                                             >
                                                 {tab.isInteractive && (
