@@ -25,6 +25,7 @@ interface TabShellProps {
     sortOptions: SortOption[];
     showFilters?: boolean;
     onFilterClick?: () => void;
+    isFiltersOpen?: boolean;
     hasActiveFilters?: boolean;
     activeFilterCount?: number;
     dropdownContent?: React.ReactNode;
@@ -77,6 +78,7 @@ export function TabShell({
     sortOptions,
     showFilters = false,
     onFilterClick,
+    isFiltersOpen = false,
     hasActiveFilters = false,
     activeFilterCount = 0,
     dropdownContent,
@@ -342,20 +344,24 @@ export function TabShell({
                                 onClick={onFilterClick}
                                 className={cn(
                                     "shrink-0 relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
-                                    (hasActiveFilters || activeFilterCount > 0)
+                                    (isFiltersOpen || hasActiveFilters || activeFilterCount > 0)
                                         ? "bg-emerald-600 text-white shadow-emerald-500/20"
                                         : cn("bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400", t.hoverText)
                                 )}
                             >
-                                <Filter size={14} className={(hasActiveFilters || activeFilterCount > 0) ? 'text-white' : 'text-slate-400'} />
+                                {isFiltersOpen ? (
+                                    <X size={14} className="text-white" />
+                                ) : (
+                                    <Filter size={14} className={(hasActiveFilters || activeFilterCount > 0) ? 'text-white' : 'text-slate-400'} />
+                                )}
                                 
-                                {activeFilterCount > 0 && (
+                                {(activeFilterCount > 0 && !isFiltersOpen) && (
                                     <span className="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-emerald-500/10 shadow-sm">
                                         {activeFilterCount}
                                     </span>
                                 )}
                                 
-                                {(hasActiveFilters && activeFilterCount === 0) && (
+                                {(hasActiveFilters && activeFilterCount === 0 && !isFiltersOpen) && (
                                     <span className={cn("absolute top-2.5 right-2.5 h-2 w-2 rounded-full animate-pulse border", t.borderPulse)} />
                                 )}
                             </button>

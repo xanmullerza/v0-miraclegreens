@@ -16,6 +16,7 @@ interface TrackerTabShellProps {
     sortOptions: SortOption[];
     showFilters?: boolean;
     onFilterClick?: () => void;
+    isFiltersOpen?: boolean;
     hasActiveFilters?: boolean;
     activeFilterCount?: number;
     dropdownContent?: React.ReactNode;
@@ -29,6 +30,7 @@ export function TrackerTabShell(props: TrackerTabShellProps) {
         <TabShell 
             {...props} 
             theme="blue" 
+            isFiltersOpen={props.isFiltersOpen}
         />
     );
 }

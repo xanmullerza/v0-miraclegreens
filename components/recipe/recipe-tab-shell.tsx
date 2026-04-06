@@ -37,11 +37,16 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
             theme="emerald"
             sortOptions={[...RECIPE_SORT_OPTIONS]}
             showFilters={true}
+            isFiltersOpen={isFilterOpen}
             onFilterClick={() => {
-                setActiveView('recipe-filters');
-                setIsActionPanelOpen(true);
+                if (isFilterOpen) {
+                    setIsActionPanelOpen(false);
+                } else {
+                    setActiveView('recipe-filters');
+                    setIsActionPanelOpen(true);
+                }
             }}
-            hasActiveFilters={hasActiveFilters || isFilterOpen}
+            hasActiveFilters={hasActiveFilters}
             dropdownContent={props.additionalControls}
             scaleValue={filters.globalServings || 1}
             onScaleChange={(val: number) => {

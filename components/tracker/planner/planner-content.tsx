@@ -338,9 +338,14 @@ export function PlannerContent({
                 setSortDirection={setSortDirection}
                 sortOptions={PLANNER_SORT_OPTIONS}
                 showFilters={true}
+                isFiltersOpen={isActionPanelOpen && activeView === 'recipe-filters'}
                 onFilterClick={() => {
-                    setActiveView('recipe-filters');
-                    setIsActionPanelOpen(true);
+                    if (isActionPanelOpen && activeView === 'recipe-filters') {
+                        setIsActionPanelOpen(false);
+                    } else {
+                        setActiveView('recipe-filters');
+                        setIsActionPanelOpen(true);
+                    }
                 }}
                 scaleValue={effectiveServings}
                 onScaleChange={(val) => setSelectedServings(Math.max(0.5, val))}

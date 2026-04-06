@@ -70,7 +70,7 @@ export function FoodsView({
     const [cartLoading, setCartLoading] = useState<string | null>(null);
 
     const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories, portionGrams, setPortionGrams } = useFoodFilter();
-    const { setIsActionPanelOpen, setActiveView } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, isActionPanelOpen, activeView } = useActionPanel();
     const [sortField, setSortField] = useState<'name' | 'energy_kcal' | 'protein_g' | 'carbs_g' | 'fat_g'>('name');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -460,9 +460,14 @@ export function FoodsView({
                         { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={14} /> },
                     ]}
                     showFilters={!hideControls}
+                    isFiltersOpen={isActionPanelOpen && activeView === 'food-filters'}
                     onFilterClick={() => {
-                        setActiveView('food-filters');
-                        setIsActionPanelOpen(true);
+                        if (isActionPanelOpen && activeView === 'food-filters') {
+                            setIsActionPanelOpen(false);
+                        } else {
+                            setActiveView('food-filters');
+                            setIsActionPanelOpen(true);
+                        }
                     }}
                     hasActiveFilters={showFavoritesOnly || selectedCategories.length < CATEGORIES.length}
                     activeFilterCount={(showFavoritesOnly ? 1 : 0) + (CATEGORIES.length - selectedCategories.length)}
