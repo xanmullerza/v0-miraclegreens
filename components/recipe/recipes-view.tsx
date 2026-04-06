@@ -533,15 +533,15 @@ export function RecipesView({
                                                         </span>
                                                     </div>
                                                     <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
-                                                        <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
-                                                        <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">
-                                                            {(recipe.fat * multiplier).toFixed(1)}g
-                                                        </span>
-                                                    </div>
-                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
                                                         <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
                                                         <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">
                                                             {(recipe.protein * multiplier).toFixed(1)}g
+                                                        </span>
+                                                    </div>
+                                                    <div className="bg-white/10 dark:bg-slate-800/70 px-2 py-2 rounded-2xl flex flex-col items-center flex-1 min-w-0 shadow-lg backdrop-blur-sm ring-1 ring-white/5 transition-all group-hover:bg-white/15">
+                                                        <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
+                                                        <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">
+                                                            {(recipe.fat * multiplier).toFixed(1)}g
                                                         </span>
                                                     </div>
                                                 </>
