@@ -134,12 +134,11 @@ export function TabShell({
         <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] shadow-xl">
             {/* Sticky Header */}
             <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-none sm:rounded-t-[2rem]">
-                <div className="flex items-center justify-between gap-2 px-4 py-4 md:px-6 md:py-5 min-h-[76px] w-full">
-                    
+                <div className="flex items-center justify-center px-4 py-4 md:px-6 md:py-5 min-h-[76px] w-full gap-2">
                     {/* Animated Search Bar / Button */}
                     <div className={cn(
                         "transition-all duration-500 ease-in-out flex shrink-0",
-                        (isSearchExpanded || searchQuery) ? "flex-1 opacity-100" : (isScaleExpanded ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100")
+                        (isSearchExpanded || searchQuery) ? "flex-1 max-w-[500px] opacity-100" : (isScaleExpanded ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100")
                     )}>
                         <div className={cn(
                             "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 rounded-2xl shadow-lg ring-1 ring-white/10 transition-colors",
@@ -184,7 +183,7 @@ export function TabShell({
                     {/* Animated Scale Bar / Button */}
                     <div className={cn(
                         "transition-all duration-500 ease-in-out flex shrink-0",
-                        isScaleExpanded ? "flex-1 opacity-100 ml-2" : ((isSearchExpanded || searchQuery) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100 ml-2")
+                        isScaleExpanded ? "flex-1 max-w-[400px] opacity-100 ml-2" : ((isSearchExpanded || searchQuery) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100 ml-2")
                     )}>
                         <div className={cn(
                             "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 justify-between rounded-2xl shadow-lg ring-1 ring-white/10 transition-colors",
