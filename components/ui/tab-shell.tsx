@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, ArrowDownUp, Filter, Scale } from 'lucide-react';
+import { Search, X, ArrowDownUp, Filter, Scale, Minus, Plus, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface SortOption {
@@ -29,6 +29,8 @@ interface TabShellProps {
     activeFilterCount?: number;
     dropdownContent?: React.ReactNode;
     theme?: TabThemeColor;
+    scaleValue?: number;
+    onScaleChange?: (val: number) => void;
 }
 
 const themeStyles = {
@@ -77,12 +79,22 @@ export function TabShell({
     hasActiveFilters = false,
     activeFilterCount = 0,
     dropdownContent,
-    theme = 'blue'
+    theme = 'blue',
+    scaleValue,
+    onScaleChange
 }: TabShellProps) {
     const [showSortOptions, setShowSortOptions] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const [isScaleExpanded, setIsScaleExpanded] = useState(false);
+    const [internalScale, setInternalScale] = useState(1);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const t = themeStyles[theme];
+
+    const currentScale = scaleValue !== undefined ? scaleValue : internalScale;
+    const handleScaleUpdate = (newVal: number) => {
+        if (onScaleChange) onScaleChange(newVal);
+        else setInternalScale(newVal);
+    };
 
     // Auto-focus search input when expanded
     useEffect(() => {
@@ -109,13 +121,13 @@ export function TabShell({
                     {/* Animated Search Bar / Button */}
                     <div className={cn(
                         "transition-all duration-500 ease-in-out flex shrink-0",
-                        (isSearchExpanded || searchQuery) ? "flex-1 opacity-100" : "w-11 opacity-100"
+                        (isSearchExpanded || searchQuery) ? "flex-1 opacity-100" : (isScaleExpanded ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100")
                     )}>
                         <div className={cn(
                             "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 rounded-2xl shadow-lg ring-1 ring-white/10 transition-colors",
                             (isSearchExpanded || searchQuery) ? "bg-white dark:bg-slate-800" : cn("cursor-pointer text-slate-500", t.hoverText)
                         )}
-                        onClick={() => { if (!isSearchExpanded && !searchQuery) setIsSearchExpanded(true); }}
+                        onClick={() => { if (!isSearchExpanded && !searchQuery) { setIsSearchExpanded(true); setIsScaleExpanded(false); } }}
                         >
                             <Search className={cn(
                                 "absolute transition-all duration-300 pointer-events-none",
@@ -151,10 +163,60 @@ export function TabShell({
                         </div>
                     </div>
 
+                    {/* Animated Scale Bar / Button */}
+                    <div className={cn(
+                        "transition-all duration-500 ease-in-out flex shrink-0",
+                        isScaleExpanded ? "flex-1 opacity-100 ml-2" : ((isSearchExpanded || searchQuery) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100 ml-2")
+                    )}>
+                        <div className={cn(
+                            "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 justify-between rounded-2xl shadow-lg ring-1 ring-white/10 transition-colors",
+                            isScaleExpanded ? "bg-white dark:bg-slate-800" : cn("cursor-pointer text-slate-500", t.hoverText)
+                        )}>
+                            {!isScaleExpanded ? (
+                                <button 
+                                    className="w-full h-full flex items-center justify-center outline-none shrink-0" 
+                                    onClick={() => { setIsScaleExpanded(true); setIsSearchExpanded(false); }}
+                                >
+                                    <Scale size={14} />
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); if (currentScale > 0.5) handleScaleUpdate(currentScale - 0.5); }}
+                                        className={cn("h-11 w-11 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-l-2xl shrink-0", currentScale <= 0.5 ? 'opacity-30' : '')}
+                                    >
+                                        <Minus size={14} className={t.text} />
+                                    </button>
+                                    
+                                    <div className="flex flex-col items-center justify-center flex-1 min-w-[3rem]">
+                                        <Users size={12} className={cn("mb-0.5", t.text)} />
+                                        <span className={cn("text-[10px] font-black leading-none", t.text)}>
+                                            {currentScale}
+                                        </span>
+                                    </div>
+                                    
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleScaleUpdate(currentScale + 0.5); }}
+                                        className="h-11 w-11 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0"
+                                    >
+                                        <Plus size={14} className={t.text} />
+                                    </button>
+
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setIsScaleExpanded(false); }}
+                                        className="h-11 w-11 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors rounded-r-2xl border-l border-white/5 dark:border-white/5 shrink-0"
+                                    >
+                                        <X size={14} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Controls Group */}
                     <div className={cn(
                         "flex items-center gap-2 flex-nowrap overflow-hidden transition-all duration-500 ease-in-out shrink-0",
-                        (isSearchExpanded || searchQuery) ? "max-w-0 opacity-0 !gap-0" : "max-w-[400px] opacity-100"
+                        (isSearchExpanded || searchQuery || isScaleExpanded) ? "max-w-0 opacity-0 !gap-0" : "max-w-[400px] opacity-100"
                     )}>
                         {/* Filter Button */}
                         {showFilters && (
@@ -218,17 +280,6 @@ export function TabShell({
                                 </div>
                             )}
                         </div>
-
-                        {/* Scale Button */}
-                        <button
-                            className={cn(
-                                "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10 shrink-0",
-                                "bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400",
-                                t.hoverText
-                            )}
-                        >
-                            <Scale size={14} />
-                        </button>
 
                         {/* Dropdown Action Wrapper */}
                         {dropdownContent && (
