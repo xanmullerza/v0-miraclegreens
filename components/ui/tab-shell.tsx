@@ -193,8 +193,10 @@ export function TabShell({
                             {!isScaleExpanded ? (
                                 <button 
                                     className={cn(
-                                        "w-full h-full flex items-center justify-center outline-none shrink-0 transition-colors",
-                                        (scaleMode === 'grams' ? currentScale !== 100 : currentScale !== 1) ? t.text : "text-slate-500"
+                                        "w-full h-full flex items-center justify-center outline-none shrink-0 transition-all rounded-2xl",
+                                        (scaleMode === 'grams' ? currentScale !== 100 : currentScale !== 1) 
+                                            ? cn("text-white", t.bg, t.shadow) 
+                                            : cn("text-slate-500", t.hoverText)
                                     )} 
                                     onClick={() => { setIsScaleExpanded(true); setIsSearchExpanded(false); }}
                                 >
