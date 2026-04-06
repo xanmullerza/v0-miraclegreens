@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useUserPreferences } from './user-preferences-context';
 
 export interface RecipeFilterState {
@@ -39,8 +39,8 @@ export function RecipeFilterProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { profile } = useUserPreferences();
-  const [filters, setFilters] = useState<RecipeFilterState>({
+  const { profile, selectedServings, setSelectedServings } = useUserPreferences();
+  const [filters, setFiltersState] = useState<RecipeFilterState>({
     selectedEquipment: [],
     selectedDietType: profile?.dietType || 'anything',
     selectedExclusions: profile?.exclusions || [],
@@ -55,13 +55,31 @@ export function RecipeFilterProvider({
     showRemixes: false,
     nutritionViewMode: 'per-serving',
     servingsOverrides: {},
-    globalServings: null,
+    globalServings: selectedServings,
   });
+
+  // Keep globalServings in sync when selectedServings changes (e.g. from Tracker)
+  const prevSelectedServings = useRef(selectedServings);
+  useEffect(() => {
+    if (selectedServings !== prevSelectedServings.current) {
+      prevSelectedServings.current = selectedServings;
+      setFiltersState(prev => ({ ...prev, globalServings: selectedServings }));
+    }
+  }, [selectedServings]);
+
+  // Wrapper: when globalServings changes, also write back to the shared context
+  const setFilters = (newFilters: RecipeFilterState) => {
+    if (newFilters.globalServings !== null && newFilters.globalServings !== undefined && newFilters.globalServings !== filters.globalServings) {
+      prevSelectedServings.current = newFilters.globalServings;
+      setSelectedServings(newFilters.globalServings);
+    }
+    setFiltersState(newFilters);
+  };
 
 
   // Sync with profile changes
   useEffect(() => {
-    setFilters((prev) => ({
+    setFiltersState((prev: RecipeFilterState) => ({
       ...prev,
       selectedDietType: profile?.dietType || 'anything',
       selectedExclusions: profile?.exclusions || [],
@@ -75,7 +93,7 @@ export function RecipeFilterProvider({
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setFilters((prev) => ({
+        setFiltersState((prev: RecipeFilterState) => ({
           ...prev,
           selectedEquipment: parsed.selectedEquipment || [],
           pantryMode: parsed.pantryMode || 'all',
@@ -120,10 +138,8 @@ export function RecipeFilterProvider({
 
 
   const updateFilter = (key: keyof RecipeFilterState, value: any) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+    const updated = { ...filters, [key]: value };
+    setFilters(updated);
   };
 
   const resetToProfile = () => {
