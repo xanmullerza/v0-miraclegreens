@@ -35,25 +35,7 @@ export function FoodFiltersPanel({
   const activeCount = selectedCategories.length + (showFavoritesOnly ? 1 : 0);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950">
-      <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 p-5">
-        <div>
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Food Filters</p>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Refine the ingredient library.</p>
-        </div>
-        {activeCount > 0 && (
-          <button
-            onClick={() => {
-              setShowFavoritesOnly(false);
-              setSelectedCategories([]);
-            }}
-            className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-500"
-          >
-            Clear
-          </button>
-        )}
-      </div>
-
+    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950 pt-4">
       <div className="flex-1 overflow-y-auto p-6 space-y-5">
         <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
           <div className="flex items-center justify-between gap-4">
@@ -99,10 +81,19 @@ export function FoodFiltersPanel({
       </div>
 
       {onClose && (
-        <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex gap-3">
+           <button
+             onClick={() => {
+               setShowFavoritesOnly(false);
+               setSelectedCategories([]);
+             }}
+             className="flex-1 h-12 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 text-[11px] font-black uppercase tracking-widest transition-all"
+           >
+             Clear All
+           </button>
            <button
              onClick={onClose}
-             className="w-full h-12 rounded-xl bg-emerald-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-[0.98] transition-all"
+             className="flex-[2] h-12 rounded-xl bg-emerald-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-[0.98] transition-all"
            >
              Apply Filters
            </button>

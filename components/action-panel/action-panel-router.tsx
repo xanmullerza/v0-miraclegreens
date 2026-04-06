@@ -269,7 +269,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
             );
         case 'food-filters':
             return (
-                <PanelWrapper title="Filter Foods" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding>
+                <PanelWrapper title="Filter Foods" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding headerVariant="none">
                     <FoodFiltersPanel
                         showFavoritesOnly={foodFilter.showFavoritesOnly}
                         setShowFavoritesOnly={foodFilter.setShowFavoritesOnly}
