@@ -567,19 +567,6 @@ export function RecipesView({
                                             },
                                             {
                                                 label: (() => {
-                                                    const t = (recipe.type || recipe.meal_type || 'Other').toLowerCase();
-                                                    if (t === 'breakfast') return <Coffee size={17} />;
-                                                    if (t === 'lunch') return <Sun size={17} />;
-                                                    if (t === 'dinner') return <Moon size={17} />;
-                                                    if (t === 'snack') return <Apple size={17} />;
-                                                    if (t.includes('supplement')) return <Pill size={17} />;
-                                                    return <UtensilsCrossed size={17} />;
-                                                })(),
-                                                value: '',
-                                                color: 'text-amber-400'
-                                            },
-                                            {
-                                                label: (() => {
                                                     const d = recipe.difficulty || 'Medium';
                                                     if (d === 'Easy') return <SignalLow size={20} />;
                                                     if (d === 'Hard') return <Signal size={20} />;
