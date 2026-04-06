@@ -362,16 +362,16 @@ export function TabShell({
 
                         {/* Sort Button */}
                         <div className="relative shrink-0">
-                            <button
+                             <button
                                 onClick={() => setShowSortOptions(!showSortOptions)}
                                 className={cn(
                                     "relative h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10",
-                                    showSortOptions
+                                    (showSortOptions || (sortField !== sortOptions[0]?.id || sortDirection !== 'asc'))
                                         ? cn("text-white", t.bg, t.shadow)
                                         : cn("bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400", t.hoverText)
                                 )}
                             >
-                                <ArrowDownUp size={14} className={showSortOptions ? 'text-white' : 'text-slate-400'} />
+                                <ArrowDownUp size={14} className={(showSortOptions || (sortField !== sortOptions[0]?.id || sortDirection !== 'asc')) ? 'text-white' : 'text-slate-400'} />
                             </button>
 
                             {showSortOptions && (
