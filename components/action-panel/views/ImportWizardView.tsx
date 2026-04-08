@@ -3,7 +3,7 @@ import { ImportView } from '../import-view';
 import { PanelWrapper } from '../panel-wrapper';
 
 export function ImportWizardView({
-    onBack, navigateTo, isLoading, recipeLoading,
+    navigateTo, isLoading, recipeLoading,
     recipeSaving, successRecipe, setSuccessRecipe,
     pastedRecipeURL, setPastedRecipeURL,
     pastedRecipeContent, setPastedRecipeContent,
@@ -15,7 +15,7 @@ export function ImportWizardView({
     videoURL, setVideoURL
 }: any) {
     return (
-        <PanelWrapper title="Recipe Import" onClose={onBack} noPadding>
+        <PanelWrapper title="Recipe Import" noPadding>
             <ImportView
                 setActiveView={navigateTo}
                 isLoading={isLoading}

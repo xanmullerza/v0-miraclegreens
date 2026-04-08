@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Plus, Trash2, Save, Loader2, Camera, Wand2, Beaker } from 'lucide-react';
+import { Plus, Trash2, Save, Loader2, Camera, Wand2, Beaker } from 'lucide-react';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
 
 interface RecipeBuilderPanelProps {
@@ -19,7 +19,6 @@ interface RecipeBuilderPanelProps {
     setRecipeInstructions: (instructions: string[]) => void;
     recipeImage: string;
     setRecipeImage: (image: string) => void;
-    handleCloseRecipeBuilder: () => void;
     recipeSaving: boolean;
     handleAddInstruction: () => void;
     handleUpdateInstruction: (index: number, value: string) => void;
@@ -46,7 +45,6 @@ export function RecipeBuilderPanel({
     recipeInstructions,
     recipeImage,
     setRecipeImage,
-    handleCloseRecipeBuilder,
     recipeSaving,
     handleAddInstruction,
     handleUpdateInstruction,
@@ -58,18 +56,11 @@ export function RecipeBuilderPanel({
 }: RecipeBuilderPanelProps) {
     return (
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 p-4">
-            {/* Close Button */}
+            {/* Step Title */}
             <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">
                     {recipeStep === 1 ? 'Step 1: Recipe Details' : recipeStep === 2 ? 'Step 2: Ingredients' : recipeStep === 3 ? 'Step 3: Instructions' : 'Step 4: Finalize'}
                 </h3>
-                <button
-                    onClick={handleCloseRecipeBuilder}
-                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-red-500"
-                    title="Close"
-                >
-                    <X size={16} />
-                </button>
             </div>
 
             {recipeStep === 1 && (
