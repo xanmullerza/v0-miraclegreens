@@ -333,19 +333,16 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     };
 
     const handleCloseRecipeBuilderWithReset = () => {
-        console.log('📘 [Orchestrator] handleCloseRecipeBuilder: resetting builder and navigating to guide');
         builder.resetBuilder();
         navigateTo('guide');
     };
 
     const handleCloseImporterWithReset = () => {
-        console.log('📗 [Orchestrator] handleCloseImporter: resetting importer and navigating to guide');
         importer.resetImporter();
         navigateTo('guide');
     };
 
     const handleCloseExporter = () => {
-        console.log('📙 [Orchestrator] handleCloseExporter: closing export panel and navigating to guide');
         navigateTo('guide');
     };
 

@@ -82,7 +82,11 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             setPreviousView(activeView);
             setViewStack(prev => [...prev, activeView]);
             setActiveView(view);
-            setIsActionPanelOpen(true);
+            // Only force-open the panel when navigating to a real content view,
+            // not when resetting to guide (which can trigger re-open during tab switches)
+            if (view !== 'guide') {
+                setIsActionPanelOpen(true);
+            }
         }
     };
 
