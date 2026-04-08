@@ -57,6 +57,15 @@ export function useImportLogic({
         }
     };
 
+    const resetImporter = () => {
+        setIsCreatingRecipe(false);
+        setPastedRecipeContent('');
+        setPastedRecipeURL('');
+        setVideoURL('');
+        setSuccessRecipe(null);
+        setIsDragging(false);
+    };
+
     return {
         isCreatingRecipe, setIsCreatingRecipe,
         pastedRecipeContent, setPastedRecipeContent,
@@ -71,6 +80,7 @@ export function useImportLogic({
         startAudioRecording, stopAudioRecording,
         processRecipeImage,
         handlePasteRecipeContent,
-        handlePasteRecipeURL
+        handlePasteRecipeURL,
+        resetImporter
     };
 }

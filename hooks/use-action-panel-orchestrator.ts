@@ -329,6 +329,11 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         handleBack();
     };
 
+    const handleCloseImporterWithReset = () => {
+        importer.resetImporter();
+        handleBack();
+    };
+
     return {
         // Hooks
         builder,
@@ -376,6 +381,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         handleRecipeImageUpload: builder.handleRecipeImageUpload, 
         handleSaveRecipe: (m?: boolean, r?: boolean) => builder.handleSaveRecipe(m, r), 
         handleCloseRecipeBuilder: handleCloseRecipeBuilderWithReset,
+        handleCloseImporter: handleCloseImporterWithReset,
         handlePasteRecipeContent: () => importer.handlePasteRecipeContent(setMessages), 
         handlePasteRecipeURL: () => importer.handlePasteRecipeURL(setMessages), 
         loadConversationFromHistory,
