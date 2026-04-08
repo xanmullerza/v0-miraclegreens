@@ -6,7 +6,7 @@ export function RecipeBuilderView({
     recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
     recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
     recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
-    handleCloseRecipeBuilder, recipeSaving, handleAddInstruction,
+    recipeSaving, handleAddInstruction,
     handleUpdateInstruction, handleRemoveInstruction, builderRef,
     recipeUploading, handleRecipeImageUpload, handleSaveRecipe
 }: any) {
@@ -28,7 +28,6 @@ export function RecipeBuilderView({
             setRecipeInstructions={setRecipeInstructions}
             recipeImage={recipeImage}
             setRecipeImage={setRecipeImage}
-            handleCloseRecipeBuilder={handleCloseRecipeBuilder}
             recipeSaving={recipeSaving}
             handleAddInstruction={handleAddInstruction}
             handleUpdateInstruction={handleUpdateInstruction}

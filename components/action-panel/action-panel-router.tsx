@@ -58,7 +58,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
         recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
         recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
         recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
-        handleCloseRecipeBuilder, handleCloseImporter, recipeSaving, handleAddInstruction,
+        handleCloseImporter, recipeSaving, handleAddInstruction,
         handleUpdateInstruction, handleRemoveInstruction, builderRef,
         recipeUploading, handleRecipeImageUpload, handleSaveRecipe,
         isAdmin, showOnlyMyRecipes, setShowOnlyMyRecipes, handleBack,
@@ -95,7 +95,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
                         recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
                         recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
                         recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
-                        handleCloseRecipeBuilder, recipeSaving, handleAddInstruction,
+                        recipeSaving, handleAddInstruction,
                         handleUpdateInstruction, handleRemoveInstruction, builderRef,
                         recipeUploading, handleRecipeImageUpload, handleSaveRecipe
                     }}
