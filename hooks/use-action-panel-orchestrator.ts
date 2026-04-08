@@ -85,6 +85,12 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const audioInputRef = useRef<HTMLInputElement>(null);
     const isInitialMount = useRef(true);
+    const currentActiveViewRef = useRef(activeView);
+
+    // Sync ref with state
+    useEffect(() => {
+        currentActiveViewRef.current = activeView;
+    }, [activeView]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -126,7 +132,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
             }
             isInitialMount.current = false;
         }
-    }, [activeView]);
+    }, [activeView, previousView]);
 
     useEffect(() => {
         if (activeView === 'recipe-builder' && !builder.showRecipeBuilder) {
@@ -134,21 +140,23 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         }
     }, [activeView, builder.showRecipeBuilder]);
 
+    // Popstate handler - wrapped in useCallback to prevent re-creation on every render
     useEffect(() => {
         const handlePopState = (e: PopStateEvent) => {
+            const currentView = currentActiveViewRef.current;
             if (e.state?.activeView) {
                 setActiveView(e.state.activeView);
                 if (e.state.previousView) {
                     setPreviousView(e.state.previousView);
                 }
-            } else if (activeView !== 'dashboard' && activeView !== 'desktop-guide') {
+            } else if (currentView !== 'dashboard' && currentView !== 'desktop-guide') {
                 handleBack();
             }
         };
 
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
-    }, [setActiveView, setPreviousView, handleBack, activeView]);
+    }, [handleBack]);
 
     // View Cleanup Sync
     useEffect(() => {
