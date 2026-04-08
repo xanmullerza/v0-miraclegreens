@@ -326,12 +326,12 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
     const handleCloseRecipeBuilderWithReset = () => {
         builder.resetBuilder();
-        handleBack();
+        setActiveView('home');
     };
 
     const handleCloseImporterWithReset = () => {
         importer.resetImporter();
-        handleBack();
+        setActiveView('home');
     };
 
     return {
