@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -36,6 +36,11 @@ export function ActionPanelBottomNav({
             { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'text-fuchsia-500', onClick: () => { navigateTo('nutridex'); } },
             { id: 'comparator', label: 'Comparator', icon: Scale, color: 'text-amber-500', onClick: () => { navigateTo('comparator'); } },
             { id: 'lifeguard', label: 'Lifeguard', icon: LifeBuoy, color: 'text-red-500', onClick: () => { navigateTo('lifeguard'); } },
+        ],
+        tracker: [
+            { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { setIsActionPanelOpen(false); router.push('/tracker'); } },
+            { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'text-amber-500', onClick: () => { navigateTo('shopping'); } },
+            { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'text-emerald-500', onClick: () => { navigateTo('pantry'); } },
         ]
     };
 
@@ -149,12 +154,15 @@ export function ActionPanelBottomNav({
                     {/* Tracker Button */}
                     <button
                         onClick={() => {
-                            setIsActionPanelOpen(false);
-                            router.push('/tracker');
+                            if (expandedButton === 'tracker') {
+                                setExpandedButton(null);
+                            } else {
+                                setExpandedButton('tracker');
+                            }
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            pathname === '/tracker' ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
+                            expandedButton === 'tracker' || pathname === '/tracker' ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
                         )}
                         title="Tracker"
                     >
