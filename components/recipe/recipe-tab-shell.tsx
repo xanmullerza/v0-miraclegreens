@@ -1,5 +1,5 @@
 import { TabShell } from '@/components/ui/tab-shell';
-import { Clock, ChefHat, Flame, ALargeSmall, Book } from 'lucide-react';
+import { Clock, ChefHat, Flame, ALargeSmall } from 'lucide-react';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
@@ -53,8 +53,6 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
                 }
             }}
             hasActiveFilters={hasActiveFilters}
-            dropdownContent={props.additionalControls || <div className="h-11 w-11 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><Book size={18} /></div>}
-            dropdownOptions={undefined}
             scaleValue={filters.globalServings || 1}
             onScaleChange={(val: number) => {
                 setFilters({
