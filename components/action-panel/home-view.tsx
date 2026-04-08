@@ -136,10 +136,7 @@ export function HomeView({
                             <Salad size={80} className="text-emerald-500 -rotate-12" />
                         </div>
                         <button
-                            onClick={() => {
-                                setIsActionPanelOpen(false);
-                                router.push('/cookbook');
-                            }}
+                            onClick={() => setActiveView('recipes')}
                             className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/card shadow-xs"
                         >
                             <div className="flex items-center gap-3">
@@ -161,10 +158,7 @@ export function HomeView({
                             <TrendingUp size={80} className="text-blue-500 -rotate-12" />
                         </div>
                         <button
-                            onClick={() => {
-                                setIsActionPanelOpen(false);
-                                router.push('/cookbook');
-                            }}
+                            onClick={() => setActiveView('tracker')}
                             className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-blue-500/20 hover:border-blue-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/card shadow-xs"
                         >
                             <div className="flex items-center gap-3">
