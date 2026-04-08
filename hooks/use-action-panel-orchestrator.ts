@@ -152,14 +152,11 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
     // View Cleanup Sync
     useEffect(() => {
-        // If we move away from builder/import views, ensure their modal states are reset
-        if (activeView !== 'recipe-builder' && builder.showRecipeBuilder) {
-            builder.resetBuilder();
-        }
+        // Keep recipe builder state persistent - only cleared when user clicks close button
         if (activeView !== 'import' && importer.isCreatingRecipe && activeView !== 'messages') {
             importer.setIsCreatingRecipe(false);
         }
-    }, [activeView, builder, importer]);
+    }, [activeView, importer]);
 
     // Complex Handlers
     const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
