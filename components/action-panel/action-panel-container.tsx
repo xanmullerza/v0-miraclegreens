@@ -18,6 +18,18 @@ export function ActionPanelContainer({ onClose, onRecipeDetected, isInline = fal
     const orchestrator = useActionPanelOrchestrator({ onClose, onRecipeDetected });
     const { activeView } = useActionPanel();
 
+    // Determine the appropriate close handler based on current view
+    const handleContextualClose = () => {
+        if (activeView === 'recipe-builder') {
+            orchestrator.handleCloseRecipeBuilder();
+        } else if (activeView === 'import') {
+            orchestrator.handleCloseImporter();
+        } else {
+            // Fallback for other views
+            onClose();
+        }
+    };
+
     return (
         <div className={cn(
             "z-50",
@@ -41,7 +53,7 @@ export function ActionPanelContainer({ onClose, onRecipeDetected, isInline = fal
                 <ActionPanelRouter orchestrator={orchestrator} isInline={isInline} />
                 <ActionPanelBottomNav
                     activeView={activeView}
-                    onClose={onClose}
+                    onClose={handleContextualClose}
                 />
             </div>
         </div>
