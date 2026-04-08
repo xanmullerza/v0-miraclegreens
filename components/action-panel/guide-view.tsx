@@ -59,8 +59,8 @@ export function GuideView() {
                             className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 hover:shadow-lg transition-all group cursor-pointer"
                             onClick={() => {
                                 if (section.title === 'HOME') navigateTo('home');
-                                else if (section.title === 'COOKBOOK') navigateTo('recipes');
-                                else if (section.title === 'LIBRARY') navigateTo('foods');
+                                else if (section.title === 'COOKBOOK') navigateTo('cookbook');
+                                else if (section.title === 'LIBRARY') navigateTo('nutridex');
                                 else if (section.title === 'TRACKER') navigateTo('planner');
                             }}
                         >
