@@ -652,7 +652,6 @@ export function RecipesView({
                     setSortField={(f) => handleSort(f)}
                     sortDirection={sortDirection}
                     setSortDirection={setLocalSortDirection}
-                    dropdownOptions={getCookbookNavOptions(navigateTo)}
                 >
                     {recipeList}
                 </RecipeTabShell>

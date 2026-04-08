@@ -54,7 +54,7 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
             }}
             hasActiveFilters={hasActiveFilters}
             dropdownContent={props.additionalControls || <div className="h-11 w-11 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><Book size={18} /></div>}
-            dropdownOptions={props.dropdownOptions || getSharedNavOptions(navigateTo)}
+            dropdownOptions={undefined}
             scaleValue={filters.globalServings || 1}
             onScaleChange={(val: number) => {
                 setFilters({

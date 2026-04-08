@@ -32,7 +32,6 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
             setSortField={setSortField}
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
-            dropdownOptions={getCookbookNavOptions(navigateTo)}
         >
             <RecipesView 
                 onRecipeClick={onRecipeClick}

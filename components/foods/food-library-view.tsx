@@ -401,7 +401,6 @@ export function FoodsView({
                     hasActiveFilters={showFavoritesOnly || selectedCategories.length < CATEGORIES.length}
                     activeFilterCount={(showFavoritesOnly ? 1 : 0) + (CATEGORIES.length - selectedCategories.length)}
                     dropdownContent={dropdownContent || defaultDropdown}
-                    dropdownOptions={getSharedNavOptions(navigateTo)}
                     scaleValue={portionGrams}
                     onScaleChange={(val) => setPortionGrams(val)}
                     scaleMode="grams"
