@@ -47,7 +47,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         if (fallback && fallback !== activeView) {
             setActiveView(fallback);
         } else {
-            setActiveView('home');
+            setActiveView('guide');
         }
     };
 
@@ -326,12 +326,12 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
     const handleCloseRecipeBuilderWithReset = () => {
         builder.resetBuilder();
-        setActiveView('home');
+        setActiveView('guide');
     };
 
     const handleCloseImporterWithReset = () => {
         importer.resetImporter();
-        setActiveView('home');
+        setActiveView('guide');
     };
 
     return {

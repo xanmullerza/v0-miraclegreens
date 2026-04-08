@@ -27,6 +27,7 @@ import { RecipeBuilderView } from './views/RecipeBuilderView';
 import { ImportWizardView } from './views/ImportWizardView';
 import { MenuExplorationView } from './views/MenuExplorationView';
 import { StaticPagesView } from './views/StaticPagesView';
+import { GuideView } from './guide-view';
 import { ExportPanel } from './export-panel';
 import { HelpSection } from './help-section';
 import { RecipeTagsPanel } from '@/components/recipe/detail/recipe-tags-panel';
@@ -81,6 +82,10 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
 
     // Consolidated Router Logic
     switch (activeView) {
+        // 0. Guide (Default Landing View)
+        case 'guide':
+            return <GuideView />;
+
         // 1. Recipe Builder
         case 'recipe-builder':
             return (

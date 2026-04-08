@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type ActionPanelView = 'home' | 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'recipe-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'ingredient-match' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters' | 'auth-prompt';
+export type ActionPanelView = 'guide' | 'home' | 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'recipe-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'ingredient-match' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters' | 'auth-prompt';
 
 export interface SmartMatchPickerState {
     initialSearchQuery: string;
@@ -65,7 +65,7 @@ const ActionPanelContext = createContext<ActionPanelContextType | undefined>(und
 
 export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [isActionPanelOpen, setIsActionPanelOpen] = useState(false);
-    const [activeView, setActiveView] = useState<ActionPanelView>('home');
+    const [activeView, setActiveView] = useState<ActionPanelView>('guide');
     const [previousView, setPreviousView] = useState<ActionPanelView | null>(null);
     const [recipeToRemix, setRecipeToRemix] = useState<any | null>(null);
     const [recipeToShare, setRecipeToShare] = useState<any | null>(null);
@@ -101,10 +101,10 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
         } else if (fallbackProvider) {
             fallbackProvider();
         } else {
-            // Default home behavior
+            // Default guide behavior
             setPreviousView(null);
             setViewStack([]);
-                setActiveView('home');
+            setActiveView('guide');
         }
     };
 
