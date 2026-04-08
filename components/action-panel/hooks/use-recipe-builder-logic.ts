@@ -146,13 +146,17 @@ export function useRecipeBuilderLogic({
     const resetBuilder = () => {
         setShowRecipeBuilder(false);
         setRecipeTitle('');
+        setRecipeType('dinner');
+        setRecipePrepTime(30);
+        setRecipeCookTime(0);
+        setRecipeServings(4);
         setRecipeIngredients([]);
         setRecipeInstructions(['']);
         setRecipeImage('');
         setRecipeStep(1);
-        setRecipeCookTime(0);
         setIsMix(false);
         setIsRemix(false);
+        setEditingRecipeId(null);
     };
 
     return {
