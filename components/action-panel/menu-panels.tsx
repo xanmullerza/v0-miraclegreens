@@ -46,7 +46,7 @@ export function CookbookMenuPanel({ onBack, navigateTo }: { onBack: () => void; 
     const { setIsActionPanelOpen } = useActionPanel();
     return (
         <MenuWrapper onBack={onBack}>
-            <MenuButton onClick={() => navigateTo('recipes')} icon="📖" label="View Recipes" colorClass="group-hover:text-emerald-500" />
+            <MenuButton onClick={() => navigateTo('cookbook')} icon="📖" label="View Recipes" colorClass="group-hover:text-emerald-500" />
             <MenuButton onClick={() => navigateTo('import-options')} icon="✍️" label="Add Recipes" colorClass="group-hover:text-indigo-500" />
             <MenuButton onClick={() => toast('Export is coming soon 👀')} icon="🤝" label="Share Recipes" colorClass="group-hover:text-cyan-500" />
         </MenuWrapper>

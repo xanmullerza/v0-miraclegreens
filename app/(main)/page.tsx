@@ -127,7 +127,7 @@ export default function AboutUsPage() {
                                     <button
                                         onClick={() => {
                                             setIsActionPanelOpen(true);
-                                            setActiveView('recipes');
+                                            setActiveView('cookbook');
                                         }}
                                         className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/btn shadow-sm"
                                     >

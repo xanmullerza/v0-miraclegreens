@@ -136,7 +136,7 @@ export function HomeView({
                             <Salad size={80} className="text-emerald-500 -rotate-12" />
                         </div>
                         <button
-                            onClick={() => setActiveView('recipes')}
+                            onClick={() => setActiveView('cookbook')}
                             className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/card shadow-xs"
                         >
                             <div className="flex items-center gap-3">
@@ -145,7 +145,7 @@ export function HomeView({
                                 </div>
                                 <div className="text-left">
                                     <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Cookbook</h4>
-                                    <p className="text-[9px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest">Recipe Library</p>
+                                    <p className="text-[9px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest">Recipes, Menus & Meals</p>
                                 </div>
                             </div>
                             <ChevronRight size={16} className="text-slate-300 group-hover/card:text-emerald-500 group-hover/card:translate-x-1 transition-all" />
@@ -158,7 +158,10 @@ export function HomeView({
                             <TrendingUp size={80} className="text-blue-500 -rotate-12" />
                         </div>
                         <button
-                            onClick={() => setActiveView('tracker')}
+                            onClick={() => {
+                                setIsActionPanelOpen(false);
+                                router.push('/tracker');
+                            }}
                             className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-blue-500/20 hover:border-blue-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group/card shadow-xs"
                         >
                             <div className="flex items-center gap-3">

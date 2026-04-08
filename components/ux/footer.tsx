@@ -43,7 +43,7 @@ export function Footer() {
           <button
             onClick={() => {
               setIsActionPanelOpen(true);
-              setActiveView('recipes');
+              setActiveView('cookbook');
             }}
             className={cn(
               "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-95 group flex-1",

@@ -32,7 +32,7 @@ export function DashboardView({
                 </div>
                 <div className="flex flex-col gap-4">
                     <button
-                        onClick={() => setActiveView('recipes')}
+                        onClick={() => setActiveView('cookbook')}
                         className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group shadow-sm"
                     >
                         <div className="flex items-center gap-4">
@@ -60,7 +60,10 @@ export function DashboardView({
                 </div>
                 <div className="flex flex-col gap-4">
                     <button
-                        onClick={() => setActiveView('tracker')}
+                        onClick={() => {
+                            setIsActionPanelOpen(false);
+                            router.push('/tracker');
+                        }}
                         className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-green-500/20 hover:border-green-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all group shadow-sm"
                     >
                         <div className="flex items-center gap-4">
