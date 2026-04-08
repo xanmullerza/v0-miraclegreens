@@ -2,7 +2,7 @@
 
 import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-context';
@@ -20,6 +20,17 @@ export function ActionPanelBottomNav({
     const router = useRouter();
     const pathname = usePathname();
     const [expandedButton, setExpandedButton] = useState<string | null>(null);
+    
+    // Reset expanded state when pathname changes to allow auto-expansion on new pages
+    useEffect(() => {
+        setExpandedButton(null);
+    }, [pathname]);
+
+    // Determine the default category base on current path
+    const pathCategory = pathname === '/cookbook' ? 'cookbook' : pathname.startsWith('/library') ? 'library' : pathname === '/tracker' ? 'tracker' : null;
+    
+    // The active secondary menu to show
+    const activeCategory = expandedButton === 'none' ? null : (expandedButton || pathCategory);
 
     const isClosableView = activeView !== 'guide';
 
@@ -45,14 +56,14 @@ export function ActionPanelBottomNav({
     };
 
     // Check if we should show expanded menu
-    const showExpandedMenu = expandedButton && secondaryMenus[expandedButton as keyof typeof secondaryMenus];
+    const showExpandedMenu = activeCategory && secondaryMenus[activeCategory as keyof typeof secondaryMenus];
 
     return (
-        <div className="md:hidden absolute bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 transition-all duration-500 animate-in slide-in-from-bottom-8">
+        <div className="lg:hidden absolute bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 transition-all duration-500 animate-in slide-in-from-bottom-8">
             {showExpandedMenu ? (
                 // Expanded secondary menu
                 <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-4 py-2 flex items-center justify-start gap-4 overflow-x-auto no-scrollbar rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10 animate-in slide-in-from-bottom-3">
-                    {secondaryMenus[expandedButton as keyof typeof secondaryMenus]?.map((item) => {
+                    {secondaryMenus[activeCategory as keyof typeof secondaryMenus]?.map((item) => {
                         const Icon = item.icon;
                         return (
                             <button
@@ -74,7 +85,16 @@ export function ActionPanelBottomNav({
                     
                     {/* Close button to collapse menu */}
                     <button
-                        onClick={() => setExpandedButton(null)}
+                        onClick={() => {
+                            setExpandedButton(null);
+                            // If we were auto-expanded because of path, we need a way to 'minimize' 
+                            // maybe by setting expandedButton to a special 'hidden' string?
+                            // For now, let's just use navigateTo('guide') or something?
+                            // Actually, let's just set it to 'hidden' to avoid auto-path expansion until next click.
+                            if (!expandedButton && pathCategory) {
+                                setExpandedButton('none');
+                            }
+                        }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]",
                             "text-rose-500 bg-rose-500/5 hover:text-rose-600"
@@ -116,8 +136,8 @@ export function ActionPanelBottomNav({
                     {/* Cookbook Button - with dropdown */}
                     <button
                         onClick={() => {
-                            if (expandedButton === 'cookbook') {
-                                setExpandedButton(null);
+                            if (activeCategory === 'cookbook') {
+                                setExpandedButton('none');
                             } else {
                                 setExpandedButton('cookbook');
                             }
@@ -135,8 +155,8 @@ export function ActionPanelBottomNav({
                     {/* Library Button */}
                     <button
                         onClick={() => {
-                            if (expandedButton === 'library') {
-                                setExpandedButton(null);
+                            if (activeCategory === 'library') {
+                                setExpandedButton('none');
                             } else {
                                 setExpandedButton('library');
                             }
@@ -154,8 +174,8 @@ export function ActionPanelBottomNav({
                     {/* Tracker Button */}
                     <button
                         onClick={() => {
-                            if (expandedButton === 'tracker') {
-                                setExpandedButton(null);
+                            if (activeCategory === 'tracker') {
+                                setExpandedButton('none');
                             } else {
                                 setExpandedButton('tracker');
                             }
