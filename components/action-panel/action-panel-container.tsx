@@ -4,7 +4,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { useActionPanelOrchestrator } from '@/hooks/use-action-panel-orchestrator';
 import { ActionPanelRouter } from './action-panel-router';
-import { ActionPanelBottomNav } from './bottom-nav';
+
 import { ParsedRecipe } from '@/types/recipe';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 
@@ -63,10 +63,6 @@ export function ActionPanelContainer({ onClose, onRecipeDetected, isInline = fal
                     : "absolute inset-y-0 right-0 w-full md:w-1/3 border-l shadow-2xl"
             )}>
                 <ActionPanelRouter orchestrator={orchestrator} isInline={isInline} />
-                <ActionPanelBottomNav
-                    activeView={activeView}
-                    onClose={handleContextualClose}
-                />
             </div>
         </div>
     );

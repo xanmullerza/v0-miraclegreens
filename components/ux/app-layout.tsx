@@ -3,18 +3,20 @@
 import React, { useEffect, useState, ReactNode } from 'react';
 import { SplitLayout } from '@/components/ux/split-layout';
 import { ActionPanelContainer } from '@/components/action-panel/action-panel-container';
-import { useRouter } from 'next/navigation';
+import { ActionPanelBottomNav } from '@/components/action-panel/bottom-nav';
+import { useRouter, usePathname } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
+import { useActionPanel } from '@/lib/context/action-panel-context';
 
 interface AppLayoutProps {
     children: ReactNode; // The main app content
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-    const [isChatbotVisible, setIsChatbotVisible] = useState(true);
+    const { isActionPanelOpen, setIsActionPanelOpen, activeView } = useActionPanel();
     const [isMobile, setIsMobile] = useState(false);
-    const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -30,6 +32,10 @@ export function AppLayout({ children }: AppLayoutProps) {
         return () => mediaQuery.removeEventListener('change', updateMobile);
     }, []);
 
+    const handleClosePanel = () => {
+        setIsActionPanelOpen(false);
+    };
+
     return (
         <>
             <SplitLayout
@@ -41,9 +47,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                 chatbotArea={
                     isMobile
                         ? <div className="hidden" />
-                        : isChatbotVisible ? (
+                        : isActionPanelOpen ? (
                             <ActionPanelContainer
-                                onClose={() => setIsChatbotVisible(false)}
+                                onClose={handleClosePanel}
                                 isInline={true}
                             />
                         ) : (
@@ -60,21 +66,32 @@ export function AppLayout({ children }: AppLayoutProps) {
             />
 
             {isMobile && (
-                <button
-                    onClick={() => setIsMobileChatOpen(true)}
-                    className="fixed bottom-6 right-6 z-50 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
-                    title="Open Chat"
-                    aria-label="Open Chat"
-                >
-                    <MessageCircle size={24} />
-                </button>
-            )}
+                <>
+                    {/* Floating Chat Button - Only show if panel is closed */}
+                    {!isActionPanelOpen && (
+                        <button
+                            onClick={() => setIsActionPanelOpen(true)}
+                            className="fixed bottom-24 right-6 z-50 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
+                            title="Open Chat"
+                            aria-label="Open Chat"
+                        >
+                            <MessageCircle size={24} />
+                        </button>
+                    )}
 
-            {isMobile && isMobileChatOpen && (
-                <ActionPanelContainer
-                    onClose={() => setIsMobileChatOpen(false)}
-                    isInline={false}
-                />
+                    {isActionPanelOpen && (
+                        <ActionPanelContainer
+                            onClose={handleClosePanel}
+                            isInline={false}
+                        />
+                    )}
+
+                    {/* Always show Bottom Nav on mobile for global navigation - Rendered last to be on top */}
+                    <ActionPanelBottomNav
+                        activeView={activeView}
+                        onClose={handleClosePanel}
+                    />
+                </>
             )}
         </>
     );
