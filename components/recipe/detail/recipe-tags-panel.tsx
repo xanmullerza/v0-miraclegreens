@@ -23,7 +23,7 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
 
     if (loading) {
         return (
-            <PanelWrapper title="Manage Tags" onClose={onBack}>
+            <PanelWrapper title="Manage Tags">
                 <div className="flex items-center justify-center h-64">
                     <p className="text-slate-500 animate-pulse font-black uppercase tracking-widest text-[10px]">Loading...</p>
                 </div>

@@ -226,7 +226,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
         case 'smart-match-picker':
             if (!smartMatchPicker) return null;
             return (
-                <PanelWrapper title={`Matching: ${smartMatchPicker.initialSearchQuery}`} onClose={() => { smartMatchPicker.onClose(); handleBack(); }} noPadding>
+                <PanelWrapper title={`Matching: ${smartMatchPicker.initialSearchQuery}`} noPadding>
                     <FoodItemPicker
                         onSelect={smartMatchPicker.onSelect}
                         onSkip={smartMatchPicker.onSkip}
@@ -275,13 +275,13 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
             return <ExportPanel onBack={() => navigateTo('cookbook')} />;
         case 'recipe-filters':
             return (
-                <PanelWrapper title="Filter Recipes" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding>
+                <PanelWrapper title="Filter Recipes" noPadding>
                     <RecipeFilterContent onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} />
                 </PanelWrapper>
             );
         case 'food-filters':
             return (
-                <PanelWrapper title="Filter Foods" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding headerVariant="none">
+                <PanelWrapper title="Filter Foods" noPadding headerVariant="none">
                     <FoodFiltersPanel
                         showFavoritesOnly={foodFilter.showFavoritesOnly}
                         setShowFavoritesOnly={foodFilter.setShowFavoritesOnly}
@@ -293,7 +293,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
             );
         case 'nutrient-filters':
             return (
-                <PanelWrapper title="Filter Nutrients" onClose={isInline ? () => handleGoHome(previousView) : handleCloseModal} noPadding>
+                <PanelWrapper title="Filter Nutrients" noPadding>
                     <NutrientFilterPanel
                         excludeFlavour={excludeFlavour}
                         setExcludeFlavour={setExcludeFlavour}

@@ -7,7 +7,7 @@ import { ProfileContent } from '@/components/static/profile-content';
 
 export function PrivacyPanel({ onClose }: { onClose: () => void }) {
     return (
-        <PanelWrapper title="Privacy" onClose={onClose}>
+        <PanelWrapper title="Privacy">
             <div className="py-6">
                 <PrivacyContent />
             </div>
@@ -17,7 +17,7 @@ export function PrivacyPanel({ onClose }: { onClose: () => void }) {
 
 export function SupportPanel({ onClose }: { onClose: () => void }) {
     return (
-        <PanelWrapper title="Support" onClose={onClose}>
+        <PanelWrapper title="Support">
             <div className="py-6">
                 <SupportContent />
             </div>
@@ -27,7 +27,7 @@ export function SupportPanel({ onClose }: { onClose: () => void }) {
 
 export function TermsPanel({ onClose }: { onClose: () => void }) {
     return (
-        <PanelWrapper title="Terms" onClose={onClose}>
+        <PanelWrapper title="Terms">
             <div className="py-6">
                 <TermsContent />
             </div>
@@ -37,7 +37,7 @@ export function TermsPanel({ onClose }: { onClose: () => void }) {
 
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
     return (
-        <PanelWrapper title="Settings" onClose={onClose}>
+        <PanelWrapper title="Settings">
             <ProfileContent />
         </PanelWrapper>
     );

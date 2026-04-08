@@ -11,7 +11,7 @@ export function AuthPromptPanel() {
     const { goBack } = useActionPanel();
 
     return (
-        <PanelWrapper title="" onClose={() => goBack()} headerVariant="minimal" closeVariant="prominent">
+        <PanelWrapper title="" headerVariant="minimal">
             <div className="flex flex-col items-center text-center p-6 space-y-8 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="w-20 h-20 rounded-[2.5rem] bg-indigo-500/10 flex items-center justify-center text-indigo-500 mb-2 hover:scale-110 transition-transform duration-300 shadow-inner">
                     <TrendingUp size={40} />
