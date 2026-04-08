@@ -324,6 +324,11 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         setActiveView('conversation-history');
     };
 
+    const handleCloseRecipeBuilderWithReset = () => {
+        builder.resetBuilder();
+        handleBack();
+    };
+
     return {
         // Hooks
         builder,
@@ -370,7 +375,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         handleRemoveInstruction: builder.handleRemoveInstruction,
         handleRecipeImageUpload: builder.handleRecipeImageUpload, 
         handleSaveRecipe: (m?: boolean, r?: boolean) => builder.handleSaveRecipe(m, r), 
-        handleCloseRecipeBuilder: builder.resetBuilder,
+        handleCloseRecipeBuilder: handleCloseRecipeBuilderWithReset,
         handlePasteRecipeContent: () => importer.handlePasteRecipeContent(setMessages), 
         handlePasteRecipeURL: () => importer.handlePasteRecipeURL(setMessages), 
         loadConversationFromHistory,
