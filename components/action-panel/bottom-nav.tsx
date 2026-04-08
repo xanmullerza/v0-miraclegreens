@@ -154,13 +154,4 @@ export function ActionPanelBottomNav({
         </div>
     );
 }
-                        title="Tracker"
-                    >
-                        <BarChart3 size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/tracker' && "animate-pulse")} />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Tracker</span>
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-}
+
