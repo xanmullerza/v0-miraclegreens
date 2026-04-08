@@ -325,12 +325,14 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     };
 
     const handleCloseRecipeBuilderWithReset = () => {
+        console.log('📘 [Orchestrator] handleCloseRecipeBuilder: resetting builder and navigating to guide');
         builder.resetBuilder();
         setPreviousView(null);
         setActiveView('guide');
     };
 
     const handleCloseImporterWithReset = () => {
+        console.log('📗 [Orchestrator] handleCloseImporter: resetting importer and navigating to guide');
         importer.resetImporter();
         setPreviousView(null);
         setActiveView('guide');

@@ -20,12 +20,15 @@ export function ActionPanelContainer({ onClose, onRecipeDetected, isInline = fal
 
     // Determine the appropriate close handler based on current view
     const handleContextualClose = () => {
+        console.log('🔴 [ActionPanelContainer] Close button clicked, activeView:', activeView);
         if (activeView === 'recipe-builder') {
+            console.log('📘 [ActionPanelContainer] Calling handleCloseRecipeBuilder');
             orchestrator.handleCloseRecipeBuilder();
         } else if (activeView === 'import') {
+            console.log('📗 [ActionPanelContainer] Calling handleCloseImporter');
             orchestrator.handleCloseImporter();
         } else {
-            // Fallback for other views
+            console.log('📕 [ActionPanelContainer] Fallback close handler, calling onClose()');
             onClose();
         }
     };

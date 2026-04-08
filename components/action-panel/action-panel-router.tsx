@@ -84,6 +84,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
     switch (activeView) {
         // 0. Guide (Default Landing View)
         case 'guide':
+            console.log('🟢 [ActionPanelRouter] Switching to Guide view');
             return <GuideView />;
 
         // 1. Recipe Builder

@@ -6,6 +6,8 @@ import { useActionPanel } from '@/lib/context/action-panel-context';
 
 export function GuideView() {
     const { navigateTo } = useActionPanel();
+    
+    console.log('🎯 [GuideView] Rendering guide view');
 
     const sections = [
         {
