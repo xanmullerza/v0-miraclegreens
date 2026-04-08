@@ -21,7 +21,7 @@ export function ActionPanelBottomNav({
     const pathname = usePathname();
     const [expandedButton, setExpandedButton] = useState<string | null>(null);
 
-    const isClosableView = activeView === 'home' || ['recipe-filters', 'food-filters', 'nutrient-filters'].includes(activeView);
+    const isClosableView = activeView !== 'guide';
 
     // Secondary menu options for each button
     const secondaryMenus = {
@@ -90,7 +90,7 @@ export function ActionPanelBottomNav({
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
                             isClosableView ? "text-rose-500 bg-rose-500/5" : "text-rose-400/60 hover:text-rose-500"
                         )}
-                        title={isClosableView ? "Close" : "Home"}
+                        title={isClosableView ? "Close" : "Guide"}
                     >
                         {isClosableView ? (
                             <X size={20} className="transition-transform group-hover:scale-110" />
