@@ -77,11 +77,6 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [smartMatchPortion, setSmartMatchPortion] = useState<SmartMatchPortionState | null>(null);
     const [ingredientMatch, setIngredientMatch] = useState<IngredientMatchState | null>(null);
 
-    // Initialize correct default view across all routes
-    React.useEffect(() => {
-        setActiveView('home');
-    }, []);
-
     const navigateTo = (view: ActionPanelView) => {
         if (view !== activeView) {
             setPreviousView(activeView);
