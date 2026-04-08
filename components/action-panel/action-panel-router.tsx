@@ -97,11 +97,18 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
                 />
             );
 
-        // 2. Menu Exploration (Home, Dashboard, Cookbook, etc.)
+        // 2. Recipes List (Cookbook)
+        case 'cookbook':
+            return (
+                <RecipesCombinedView
+                    onRecipeClick={(id) => handleRecipeClick(id, 'cookbook')}
+                />
+            );
+
+        // 3. Menu Exploration (Home, Dashboard, etc.)
         case 'home':
         case 'dashboard':
         case 'desktop-guide':
-        case 'cookbook':
         case 'plannerMenu':
         case 'widgetsMenu':
             return (
@@ -113,7 +120,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
                 />
             );
 
-        // 3. Static Pages (Profile, Privacy, etc.)
+        // 4. Static Pages (Profile, Privacy, etc.)
         case 'profile':
         case 'privacy':
         case 'support':
