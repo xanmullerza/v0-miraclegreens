@@ -165,7 +165,6 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
     return (
         <PanelWrapper 
             title="Manage Tags" 
-            onClose={onBack}
             noPadding
         >
             <div className="flex flex-col h-full bg-white dark:bg-slate-900">
