@@ -338,6 +338,12 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         setActiveView('guide');
     };
 
+    const handleCloseExporter = () => {
+        console.log('📙 [Orchestrator] handleCloseExporter: closing export panel and navigating to guide');
+        setPreviousView(null);
+        setActiveView('guide');
+    };
+
     return {
         // Hooks
         builder,
@@ -386,6 +392,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         handleSaveRecipe: (m?: boolean, r?: boolean) => builder.handleSaveRecipe(m, r), 
         handleCloseRecipeBuilder: handleCloseRecipeBuilderWithReset,
         handleCloseImporter: handleCloseImporterWithReset,
+        handleCloseExporter,
         handlePasteRecipeContent: () => importer.handlePasteRecipeContent(setMessages), 
         handlePasteRecipeURL: () => importer.handlePasteRecipeURL(setMessages), 
         loadConversationFromHistory,

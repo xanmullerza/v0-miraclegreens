@@ -21,15 +21,31 @@ export function ActionPanelContainer({ onClose, onRecipeDetected, isInline = fal
     // Determine the appropriate close handler based on current view
     const handleContextualClose = () => {
         console.log('🔴 [ActionPanelContainer] Close button clicked, activeView:', activeView);
-        if (activeView === 'recipe-builder') {
+        
+        // On guide view, closing the entire panel makes sense
+        if (activeView === 'guide') {
+            console.log('📕 [ActionPanelContainer] On guide view, closing panel');
+            onClose();
+        }
+        // On recipe-builder, reset builder and go to guide
+        else if (activeView === 'recipe-builder') {
             console.log('📘 [ActionPanelContainer] Calling handleCloseRecipeBuilder');
             orchestrator.handleCloseRecipeBuilder();
-        } else if (activeView === 'import') {
+        }
+        // On import, reset importer and go to guide
+        else if (activeView === 'import') {
             console.log('📗 [ActionPanelContainer] Calling handleCloseImporter');
             orchestrator.handleCloseImporter();
-        } else {
-            console.log('📕 [ActionPanelContainer] Fallback close handler, calling onClose()');
-            onClose();
+        }
+        // On export-recipes, reset exporter state and go to guide
+        else if (activeView === 'export-recipes') {
+            console.log('📙 [ActionPanelContainer] Calling handleCloseExporter');
+            orchestrator.handleCloseExporter();
+        }
+        // On ANY other view, navigate to guide instead of closing panel
+        else {
+            console.log('🟢 [ActionPanelContainer] Other view, navigating to guide instead of closing');
+            orchestrator.handleGoHome('guide');
         }
     };
 

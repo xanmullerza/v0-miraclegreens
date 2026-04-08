@@ -273,7 +273,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
                 </div>
             );
         case 'export-recipes':
-            return <ExportPanel onBack={() => navigateTo('cookbook')} />;
+            return <ExportPanel onBack={() => navigateTo('guide')} />;
         case 'recipe-filters':
             return (
                 <PanelWrapper title="Filter Recipes" noPadding>
