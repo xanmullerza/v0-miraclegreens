@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, ChevronDown, Leaf, Activity, Scale, LifeBuoy } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { TabHeader } from '@/components/ui/tab-header';
 import { FoodsView } from '@/components/foods/food-library-view';
@@ -10,15 +10,12 @@ import { useSearch } from '@/lib/context/search-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { cn } from '@/lib/utils';
 
-type LibraryView = 'foods' | 'nutridex' | 'comparator' | 'lifeguard';
+
 
 function LibraryContent() {
     const router = useRouter();
     const { searchQuery, setSearchQuery } = useSearch();
     const { setIsActionPanelOpen, setActiveView } = useActionPanel();
-
-    const [libraryView, setLibraryView] = useState<LibraryView>('foods');
-    const [showMenu, setShowMenu] = useState(false);
 
     // Clear search on unmount
     useEffect(() => () => setSearchQuery(''), [setSearchQuery]);
@@ -35,61 +32,7 @@ function LibraryContent() {
         else router.push('/library');
     };
 
-    const handleViewChange = (view: LibraryView) => {
-        setShowMenu(false);
-        if (view === 'nutridex') { setActiveView('nutridex'); setIsActionPanelOpen(true); return; }
-        if (view === 'comparator') { setActiveView('comparator'); setIsActionPanelOpen(true); return; }
-        if (view === 'lifeguard') { setActiveView('lifeguard'); setIsActionPanelOpen(true); return; }
-        setLibraryView(view);
-    };
 
-    const menuOptions: { view: LibraryView; label: string; icon: React.ReactNode; activeClass: string }[] = [
-        { view: 'foods',      label: 'Foods',      icon: <Leaf size={12} />,     activeClass: 'bg-cyan-600 text-white border-cyan-600 shadow-cyan-500/20'    },
-        { view: 'nutridex',   label: 'Nutridex',   icon: <Activity size={12} />, activeClass: 'bg-fuchsia-600 text-white border-fuchsia-600 shadow-fuchsia-500/20' },
-        { view: 'comparator', label: 'Comparator', icon: <Scale size={12} />,    activeClass: 'bg-amber-500 text-white border-amber-500 shadow-amber-500/20'  },
-        { view: 'lifeguard',  label: 'Lifeguard',  icon: <LifeBuoy size={12} />, activeClass: 'bg-red-500 text-white border-red-500 shadow-red-500/20'        },
-    ];
-
-    const current = menuOptions.find(o => o.view === libraryView) || menuOptions[0];
-
-    const inventorySwitcher = (
-        <div className="relative">
-            <button
-                onClick={() => setShowMenu(!showMenu)}
-                className={cn(
-                    "h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all relative",
-                    current.activeClass
-                )}
-            >
-                <div className="flex items-center justify-center w-11 h-full z-10 transition-colors">
-                    {current.icon}
-                </div>
-                <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
-                    <ChevronDown size={14} className={cn("transition-transform duration-300", showMenu && "rotate-180")} />
-                </div>
-            </button>
-
-            {showMenu && (
-                <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xl z-50 p-1 min-w-[150px]">
-                    {menuOptions.map(({ view, label, icon }) => (
-                        <button
-                            key={view}
-                            onClick={() => handleViewChange(view)}
-                            className={cn(
-                                "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                                libraryView === view
-                                    ? "bg-cyan-600 text-white"
-                                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                            )}
-                        >
-                            {icon}
-                            {label}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
 
     return (
         <div className="animate-in fade-in duration-500">
@@ -103,7 +46,6 @@ function LibraryContent() {
                     <FoodsView
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
-                        dropdownContent={inventorySwitcher}
                     />
                 </div>
             </PageContainer>

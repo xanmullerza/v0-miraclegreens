@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,12 @@ export function ActionPanelBottomNav({
             { id: 'create', label: 'Create', icon: Plus, color: 'text-emerald-600', onClick: () => { navigateTo('recipe-builder'); } },
             { id: 'import', label: 'Import', icon: Upload, color: 'text-blue-500', onClick: () => { navigateTo('import'); } },
             { id: 'export', label: 'Export', icon: Download, color: 'text-amber-500', onClick: () => { navigateTo('export-recipes'); } },
+        ],
+        library: [
+            { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); router.push('/library'); } },
+            { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'text-fuchsia-500', onClick: () => { navigateTo('nutridex'); } },
+            { id: 'comparator', label: 'Comparator', icon: Scale, color: 'text-amber-500', onClick: () => { navigateTo('comparator'); } },
+            { id: 'lifeguard', label: 'Lifeguard', icon: LifeBuoy, color: 'text-red-500', onClick: () => { navigateTo('lifeguard'); } },
         ]
     };
 
@@ -40,7 +46,7 @@ export function ActionPanelBottomNav({
         <div className="md:hidden absolute bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 transition-all duration-500 animate-in slide-in-from-bottom-8">
             {showExpandedMenu ? (
                 // Expanded secondary menu
-                <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-2 py-2 flex items-center justify-between rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10 animate-in slide-in-from-bottom-3">
+                <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-4 py-2 flex items-center justify-start gap-4 overflow-x-auto no-scrollbar rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10 animate-in slide-in-from-bottom-3">
                     {secondaryMenus[expandedButton as keyof typeof secondaryMenus]?.map((item) => {
                         const Icon = item.icon;
                         return (
@@ -50,7 +56,7 @@ export function ActionPanelBottomNav({
                                     item.onClick();
                                 }}
                                 className={cn(
-                                    "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
+                                    "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]",
                                     item.color
                                 )}
                                 title={item.label}
@@ -65,7 +71,7 @@ export function ActionPanelBottomNav({
                     <button
                         onClick={() => setExpandedButton(null)}
                         className={cn(
-                            "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
+                            "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]",
                             "text-rose-500 bg-rose-500/5 hover:text-rose-600"
                         )}
                         title="Close"
@@ -124,12 +130,15 @@ export function ActionPanelBottomNav({
                     {/* Library Button */}
                     <button
                         onClick={() => {
-                            setIsActionPanelOpen(false);
-                            router.push('/library');
+                            if (expandedButton === 'library') {
+                                setExpandedButton(null);
+                            } else {
+                                setExpandedButton('library');
+                            }
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
+                            expandedButton === 'library' || pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
                         )}
                         title="Library"
                     >

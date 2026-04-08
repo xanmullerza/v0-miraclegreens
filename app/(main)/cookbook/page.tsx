@@ -13,11 +13,11 @@ import { useSearch } from '@/lib/context/search-context';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
-import { ChevronDown, ShoppingCart, Package, Leaf, List, Activity, Scale, LifeBuoy } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 type TabId = 'recipes' | 'foods' | 'planner';
-type InventoryView = 'foods' | 'nutridex' | 'comparator' | 'lifeguard' | 'list' | 'pantry' | 'cart';
+type InventoryView = 'foods' | 'list' | 'pantry' | 'cart';
 
 function RecipesPageContent() {
     const searchParams = useSearchParams();
@@ -30,7 +30,6 @@ function RecipesPageContent() {
     
     const [activeTab, setActiveTab] = useState<TabId>(initialTab);
     const [inventoryView, setInventoryView] = useState<InventoryView>(initialView);
-    const [showInventoryMenu, setShowInventoryMenu] = useState(false);
     const [scannerOpen, setScannerOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
 
@@ -61,27 +60,7 @@ function RecipesPageContent() {
     };
 
     const handleViewChange = (view: InventoryView) => {
-        if (view === 'nutridex') {
-            setShowInventoryMenu(false);
-            setActiveView('nutridex');
-            setIsActionPanelOpen(true);
-            return;
-        }
-        if (view === 'comparator') {
-            setShowInventoryMenu(false);
-            setActiveView('comparator');
-            setIsActionPanelOpen(true);
-            return;
-        }
-        if (view === 'lifeguard') {
-            setShowInventoryMenu(false);
-            setActiveView('lifeguard');
-            setIsActionPanelOpen(true);
-            return;
-        }
-        
         setInventoryView(view);
-        setShowInventoryMenu(false);
         router.push(`/recipes?tab=foods&view=${view}`);
     };
 
@@ -90,132 +69,6 @@ function RecipesPageContent() {
         setActiveView('recipe-detail');
         setIsActionPanelOpen(true);
     };
-
-    const inventorySwitcher = (
-        <div className="relative">
-            <button
-                onClick={() => setShowInventoryMenu(!showInventoryMenu)}
-                className={cn(
-                    "h-11 flex items-center rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg overflow-hidden ring-1 ring-white/10 shrink-0 hover:scale-[1.02] active:scale-[0.98] transition-all",
-                    inventoryView === 'foods'
-                        ? "bg-cyan-600 shadow-cyan-500/20"
-                        : inventoryView === 'nutridex'
-                        ? "bg-fuchsia-600 shadow-fuchsia-500/20"
-                        : inventoryView === 'comparator'
-                        ? "bg-amber-500 shadow-amber-500/20"
-                        : inventoryView === 'lifeguard'
-                        ? "bg-red-500 shadow-red-500/20"
-                        : inventoryView === 'list'
-                        ? "bg-emerald-600 shadow-emerald-500/20"
-                        : inventoryView === 'pantry'
-                        ? "bg-amber-600 shadow-amber-500/20"
-                        : "bg-violet-600 shadow-violet-500/20"
-                )}
-            >
-                <div className="flex items-center justify-center w-11 h-full z-10 transition-colors">
-                    {inventoryView === 'foods' && <Leaf size={14} />}
-                    {inventoryView === 'nutridex' && <Activity size={14} />}
-                    {inventoryView === 'comparator' && <Scale size={14} />}
-                    {inventoryView === 'lifeguard' && <LifeBuoy size={14} />}
-                    {inventoryView === 'list' && <List size={14} />}
-                    {inventoryView === 'pantry' && <Package size={14} />}
-                    {inventoryView === 'cart' && <ShoppingCart size={14} />}
-                </div>
-                <div className="flex items-center justify-center h-full px-3 border-l border-white/20 bg-black/10">
-                    <ChevronDown size={14} className={cn("transition-transform duration-300", showInventoryMenu && "rotate-180")} />
-                </div>
-            </button>
-
-            {showInventoryMenu && (
-                <div className="absolute top-full mt-2 right-0 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xl z-50 p-1 min-w-[140px]">
-                    <button
-                        onClick={() => handleViewChange('foods')}
-                        className={cn(
-                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            inventoryView === 'foods'
-                                ? "bg-cyan-600 text-white"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                        )}
-                    >
-                        <Leaf size={12} />
-                        Foods
-                    </button>
-                    <button
-                        onClick={() => handleViewChange('nutridex')}
-                        className={cn(
-                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            inventoryView === 'nutridex'
-                                ? "bg-fuchsia-600 text-white"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-900/20 hover:text-fuchsia-600"
-                        )}
-                    >
-                        <Activity size={12} className={inventoryView !== 'nutridex' ? 'text-fuchsia-500' : ''} />
-                        Nutridex
-                    </button>
-                    <button
-                        onClick={() => handleViewChange('comparator')}
-                        className={cn(
-                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            inventoryView === 'comparator'
-                                ? "bg-amber-500 text-white"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-500"
-                        )}
-                    >
-                        <Scale size={12} className={inventoryView !== 'comparator' ? 'text-amber-500' : ''} />
-                        Comparator
-                    </button>
-                    <button
-                        onClick={() => handleViewChange('lifeguard')}
-                        className={cn(
-                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            inventoryView === 'lifeguard'
-                                ? "bg-red-500 text-white"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500"
-                        )}
-                    >
-                        <LifeBuoy size={12} className={inventoryView !== 'lifeguard' ? 'text-red-500' : ''} />
-                        Lifeguard
-                    </button>
-                    <button
-                        onClick={() => handleViewChange('list')}
-                        className={cn(
-                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            inventoryView === 'list'
-                                ? "bg-emerald-600 text-white"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                        )}
-                    >
-                        <List size={12} />
-                        List
-                    </button>
-                    <button
-                        onClick={() => handleViewChange('pantry')}
-                        className={cn(
-                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            inventoryView === 'pantry'
-                                ? "bg-amber-600 text-white"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                        )}
-                    >
-                        <Package size={12} />
-                        Pantry
-                    </button>
-                    <button
-                        onClick={() => handleViewChange('cart')}
-                        className={cn(
-                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            inventoryView === 'cart'
-                                ? "bg-violet-600 text-white"
-                                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                        )}
-                    >
-                        <ShoppingCart size={12} />
-                        Cart
-                    </button>
-                </div>
-            )}
-        </div>
-    );
 
     return (
         <>
@@ -238,26 +91,23 @@ function RecipesPageContent() {
                         {activeTab === 'foods' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 {inventoryView === 'foods' && (
-                                    <FoodsView dropdownContent={inventorySwitcher} />
+                                    <FoodsView />
                                 )}
                                 {inventoryView === 'list' && (
                                     <ShoppingListView
                                         scannerOpen={scannerOpen}
                                         onScannerOpenChange={setScannerOpen}
-                                        dropdownContent={inventorySwitcher}
                                     />
                                 )}
                                 {inventoryView === 'pantry' && (
                                     <PantryView 
                                         refreshKey={refreshKey} 
-                                        dropdownContent={inventorySwitcher}
                                     />
                                 )}
                                 {inventoryView === 'cart' && (
                                     <ShoppingListView
                                         scannerOpen={scannerOpen}
                                         onScannerOpenChange={setScannerOpen}
-                                        dropdownContent={inventorySwitcher}
                                     />
                                 )}
                             </div>
