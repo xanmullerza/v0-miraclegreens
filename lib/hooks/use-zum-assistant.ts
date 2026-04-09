@@ -34,18 +34,9 @@ export function useZumAssistant() {
     const [conversationHistory, setConversationHistory] = useState<any[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-    const MediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-    const getWebhookUrl = () => {
-        const url = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
-        if (!url) {
-            toast.error('Assistant service is unset. Check environment variables.');
-            return null;
-        }
-        return url;
-    };
 
     // Initialize messages from local storage or default
     useEffect(() => {
@@ -103,8 +94,11 @@ export function useZumAssistant() {
             const { data: { user } } = await supabase.auth.getUser();
             const userId = user?.id || 'anonymous';
 
-            const webhookUrl = getWebhookUrl();
-            if (!webhookUrl) throw new Error('Unconfigured');
+            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            if (!webhookUrl) {
+                console.warn('Webhook URL not found in environment variables');
+                throw new Error('Assistant service is not configured');
+            }
 
             const response = await fetch(webhookUrl, {
                 method: 'POST',
@@ -149,7 +143,7 @@ export function useZumAssistant() {
             audioChunksRef.current = [];
             mediaRecorder.ondataavailable = (event) => audioChunksRef.current.push(event.data);
             mediaRecorder.onstop = () => stream.getTracks().forEach(track => track.stop());
-            MediaRecorderRef.current = mediaRecorder;
+            mediaRecorderRef.current = mediaRecorder;
             mediaRecorder.start();
             setIsRecording(true);
             setRecordingTime(0);
@@ -161,10 +155,10 @@ export function useZumAssistant() {
     };
 
     const stopAudioRecording = async () => {
-        if (!MediaRecorderRef.current) return;
+        if (!mediaRecorderRef.current) return;
         setIsRecording(false);
         if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
-        MediaRecorderRef.current.stop();
+        mediaRecorderRef.current.stop();
 
         setTimeout(async () => {
             if (audioChunksRef.current.length > 0) {
@@ -190,8 +184,8 @@ export function useZumAssistant() {
             formData.append('userId', user?.id || 'anonymous');
             formData.append('contentType', 'audio');
 
-            const webhookUrl = getWebhookUrl();
-            if (!webhookUrl) throw new Error('Unconfigured');
+            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
                 method: 'POST',
@@ -244,8 +238,8 @@ export function useZumAssistant() {
             formData.append('userId', user?.id || 'anonymous');
             formData.append('contentType', 'image');
 
-            const webhookUrl = getWebhookUrl();
-            if (!webhookUrl) throw new Error('Unconfigured');
+            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
                 method: 'POST',
@@ -311,8 +305,8 @@ export function useZumAssistant() {
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            const webhookUrl = getWebhookUrl();
-            if (!webhookUrl) throw new Error('Unconfigured');
+            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
                 method: 'POST',
@@ -364,8 +358,8 @@ export function useZumAssistant() {
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            const webhookUrl = getWebhookUrl();
-            if (!webhookUrl) throw new Error('Unconfigured');
+            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
                 method: 'POST',
