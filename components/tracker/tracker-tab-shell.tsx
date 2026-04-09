@@ -25,10 +25,11 @@ interface TrackerTabShellProps {
     theme?: TabThemeColor;
 }
 
-export function TrackerTabShell(props: TrackerTabShellProps) {
+export function TrackerTabShell({ fullHeight, ...props }: TrackerTabShellProps & { fullHeight?: boolean }) {
     return (
         <TabShell 
             {...props} 
+            fullHeight={fullHeight}
             theme={props.theme || "blue"} 
             isFiltersOpen={props.isFiltersOpen}
         />

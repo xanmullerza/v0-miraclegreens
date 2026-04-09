@@ -15,9 +15,10 @@ type RecipeFilter = 'all' | 'remixes' | 'my-recipes' | 'mixes';
 interface RecipesCombinedViewProps {
     onRecipeClick?: (recipeId: string) => void;
     isPremium?: boolean;
+    fullHeight?: boolean;
 }
 
-export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombinedViewProps) {
+export function RecipesCombinedView({ onRecipeClick, isPremium, fullHeight }: RecipesCombinedViewProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('title');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -26,6 +27,7 @@ export function RecipesCombinedView({ onRecipeClick, isPremium }: RecipesCombine
     return (
         <RecipeTabShell
             title="Cookbook"
+            fullHeight={fullHeight}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             sortField={sortField}

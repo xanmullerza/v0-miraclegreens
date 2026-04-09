@@ -25,7 +25,7 @@ interface RecipeTabShellProps {
     dropdownOptions?: { id: string; label: string; icon: React.ReactNode; onClick: () => void; active?: boolean }[];
 }
 
-export function RecipeTabShell(props: RecipeTabShellProps) {
+export function RecipeTabShell({ fullHeight, ...props }: RecipeTabShellProps & { fullHeight?: boolean }) {
     const { setIsActionPanelOpen, setActiveView, activeView, navigateTo } = useActionPanel();
     const { hasActiveFilters, filters, setFilters } = useRecipeFilter();
     
@@ -36,6 +36,7 @@ export function RecipeTabShell(props: RecipeTabShellProps) {
     return (
         <TabShell 
             {...props} 
+            fullHeight={fullHeight}
             theme="emerald"
             sortOptions={[...RECIPE_SORT_OPTIONS]}
             showFilters={true}

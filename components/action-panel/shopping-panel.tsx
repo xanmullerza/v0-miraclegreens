@@ -91,6 +91,7 @@ export function ShoppingPanel({ onBack }: ShoppingPanelProps) {
     return (
         <TrackerTabShell
             title="Shopping"
+            fullHeight={true}
             theme="amber"
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
@@ -120,7 +121,8 @@ export function ShoppingPanel({ onBack }: ShoppingPanelProps) {
                 />
             }
         >
-            <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-3 pt-0 pb-32">
+        >
+            <div className="flex flex-col p-3 pt-0 pb-32">
                 <div className="space-y-4">
                     {/* Search Results Dropdown Overlay Logic */}
                     {searchQuery.length >= 2 && (

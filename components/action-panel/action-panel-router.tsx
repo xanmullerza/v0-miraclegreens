@@ -108,6 +108,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
         case 'cookbook':
             return (
                 <RecipesCombinedView
+                    fullHeight={true}
                     onRecipeClick={(id) => handleRecipeClick(id, 'cookbook')}
                 />
             );

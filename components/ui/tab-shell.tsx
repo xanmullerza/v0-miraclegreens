@@ -35,6 +35,8 @@ interface TabShellProps {
     scaleMode?: 'multiplier' | 'grams';
     filterChildren?: React.ReactNode;
     dropdownOptions?: { id: string; label: string; icon: React.ReactNode; onClick: () => void; active?: boolean }[];
+    /** when true, the shell takes h-full and provides an internal scroller. useful for action panels. */
+    fullHeight?: boolean;
 }
 
 const themeStyles = {
@@ -99,6 +101,7 @@ export function TabShell({
     scaleMode = 'multiplier',
     filterChildren,
     dropdownOptions,
+    fullHeight = false,
 }: TabShellProps) {
     const [showSortOptions, setShowSortOptions] = useState(false);
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -155,9 +158,15 @@ export function TabShell({
     };
 
     return (
-        <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] shadow-xl">
-            {/* Sticky Header */}
-            <div className="sticky top-0 z-10 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-none sm:rounded-t-[2rem]">
+        <div className={cn(
+            "w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-none sm:rounded-[2rem] shadow-xl flex flex-col overflow-hidden",
+            fullHeight ? "h-full" : "min-h-0"
+        )}>
+            {/* Header */}
+            <div className={cn(
+                "shrink-0 z-20 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md rounded-none sm:rounded-t-[2rem] border-b border-slate-200 dark:border-slate-800",
+                !fullHeight && "sticky top-0"
+            )}>
                 <div className={cn(
                     "flex items-center justify-center px-4 py-4 md:px-6 md:py-5 min-h-[76px] w-full transition-all duration-500",
                     (isSearchExpanded || searchQuery || isScaleExpanded || showSortOptions || isDropdownExpanded) ? "gap-0" : "gap-2"
@@ -541,7 +550,10 @@ export function TabShell({
                 </div>
             </div>
 
-            <div className="p-4 md:p-6">
+            <div className={cn(
+                "p-4 md:p-6 pb-24",
+                fullHeight ? "flex-1 overflow-y-auto custom-scrollbar" : "min-h-0"
+            )}>
                 {(isFiltersOpen && isMobile && filterChildren) ? (
                     <div className="animate-in slide-in-from-top-4 duration-500">
                         {filterChildren}
