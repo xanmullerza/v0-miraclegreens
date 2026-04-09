@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { usePantry } from '@/hooks/use-pantry';
 import { useShoppingList } from '@/hooks/use-shopping-list';
+import { useFoodFilter, CATEGORIES } from '@/lib/context/food-filter-context';
 import {
     type PantryFoodItem,
     type QuantityEntry,
@@ -41,6 +42,7 @@ interface PantryItemListProps {
 export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
     const { pantryItems, loading: pantryLoading, updateQuantity, removeFromPantry: dbRemoveFromPantry, refresh } = usePantry();
     const { addItem: addShoppingListItem } = useShoppingList();
+    const { showFavoritesOnly, selectedCategories } = useFoodFilter();
 
     const [foods, setFoods] = useState<PantryFoodItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -318,7 +320,22 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
     };
 
     // ── Group items ─────────────────────────────────────────────
-    const grouped = foods.reduce((acc, food) => {
+    
+    // Filter based on global FoodFilterContext
+    const filtered = foods.filter(food => {
+        // Filter by category
+        if (selectedCategories.length < CATEGORIES.length) {
+            const group = getCategoryGroup(food.category);
+            if (!selectedCategories.includes(group)) return false;
+        }
+        
+        // Filter by favorites
+        if (showFavoritesOnly && !food.is_favorite) return false;
+
+        return true;
+    });
+
+    const grouped = filtered.reduce((acc, food) => {
         const g = getCategoryGroup(food.category);
         if (!acc[g]) acc[g] = [];
         acc[g].push(food);
@@ -357,7 +374,10 @@ export function PantryItemList({ refreshKey = 0 }: PantryItemListProps) {
         <div className="space-y-3">
             {/* Toolbar */}
             <div className="flex items-center justify-between">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{foods.length} item{foods.length !== 1 ? 's' : ''}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    {filtered.length} item{filtered.length !== 1 ? 's' : ''}
+                    {filtered.length < foods.length && <span className="ml-1 opacity-50">({foods.length} total)</span>}
+                </p>
                 <button onClick={clearPantry} className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-rose-500 transition-colors flex items-center gap-1.5">
                     <Trash2 size={12} /> Clear All
                 </button>

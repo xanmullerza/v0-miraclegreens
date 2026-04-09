@@ -27,11 +27,13 @@ import {
 } from './shopping-types';
 import { useShoppingList } from '@/hooks/use-shopping-list';
 import { usePantry } from '@/hooks/use-pantry';
+import { useFoodFilter, CATEGORIES } from '@/lib/context/food-filter-context';
 import { mergeQuantityStrings, stripZeroEntries } from '../pantry/pantry-types';
 
 export function ShoppingItemList() {
     const { items: hookItems, loading: hookLoading, removeItem: hookRemoveItem, addItem: hookAddItem, clearAll: hookClearAll } = useShoppingList();
     const { quantities, updateQuantity, addToPantry: dbAddToPantry } = usePantry();
+    const { showFavoritesOnly, selectedCategories } = useFoodFilter();
     const [items, setItems] = useState<ShoppingItem[]>([]);
     const [enriching, setEnriching] = useState(false);
 
@@ -87,7 +89,7 @@ export function ShoppingItemList() {
                 const idMap = new Map<string, any>();
                 if (needById.length > 0) {
                     const ids = needById.map(i => i.food_item_id).filter(Boolean) as string[];
-                    const { data } = await supabase.from('food_items').select('id, category, image, common_name').in('id', ids);
+                    const { data } = await supabase.from('food_items').select('id, category, image, common_name, is_favorite').in('id', ids);
                     data?.forEach((d: any) => { idMap.set(d.id, d); enrichmentCache.set(d.id, d); });
                 }
                 
@@ -95,7 +97,7 @@ export function ShoppingItemList() {
                 if (needByName.length > 0 && !cancelled) {
                     const names = [...new Set(needByName.map(i => i.name.toLowerCase()))];
                     const orConds = names.map(n => `name.ilike.%${n}%,common_name.ilike.%${n}%`).join(',');
-                    const { data } = await supabase.from('food_items').select('id, name, common_name, category, image').or(orConds).limit(names.length * 5);
+                    const { data } = await supabase.from('food_items').select('id, name, common_name, category, image, is_favorite').or(orConds).limit(names.length * 5);
                     if (data) {
                         for (const searchName of names) {
                             let best: any = null, bestScore = 0;
@@ -117,11 +119,11 @@ export function ShoppingItemList() {
                     combined = combined.map(item => {
                         if (item.food_item_id && idMap.has(item.food_item_id)) {
                             const d = idMap.get(item.food_item_id);
-                            return { ...item, category: item.category || d.category, image: item.image || d.image, common_name: item.common_name || d.common_name };
+                            return { ...item, category: item.category || d.category, image: item.image || d.image, common_name: item.common_name || d.common_name, is_favorite: d.is_favorite };
                         }
                         if (!item.category && nameMap.has(item.name.toLowerCase())) {
                             const d = nameMap.get(item.name.toLowerCase());
-                            return { ...item, category: d.category, image: d.image, common_name: d.common_name, food_item_id: d.id };
+                            return { ...item, category: d.category, image: d.image, common_name: d.common_name, food_item_id: d.id, is_favorite: d.is_favorite };
                         }
                         return item;
                     });
@@ -245,8 +247,22 @@ export function ShoppingItemList() {
     };
 
     // ── Group items by category ─────────────────────────────────
+    
+    // Filter based on global FoodFilterContext
+    const filtered = items.filter(item => {
+        // Filter by category
+        if (selectedCategories.length < CATEGORIES.length) {
+            const group = getCategoryGroup(item.category);
+            if (!selectedCategories.includes(group)) return false;
+        }
+        
+        // Filter by favorites
+        if (showFavoritesOnly && !(item as any).is_favorite) return false;
 
-    const grouped = items.reduce((acc, item) => {
+        return true;
+    });
+
+    const grouped = filtered.reduce((acc, item) => {
         const g = getCategoryGroup(item.category);
         if (!acc[g]) acc[g] = [];
         acc[g].push(item);
@@ -283,7 +299,8 @@ export function ShoppingItemList() {
             {/* Toolbar */}
             <div className="flex items-center justify-between">
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                    {items.length} item{items.length !== 1 ? 's' : ''}
+                    {filtered.length} item{filtered.length !== 1 ? 's' : ''}
+                    {filtered.length < items.length && <span className="ml-1 opacity-50">({items.length} total)</span>}
                 </p>
                 <button
                     onClick={async () => {

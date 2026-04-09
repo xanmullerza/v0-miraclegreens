@@ -23,7 +23,7 @@ export function FoodFiltersPanel({
   const isAllSelected = selectedCategories.length === CATEGORIES.length;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-0">
       <div className="p-4 sm:p-6 space-y-6 overflow-visible flex-1">
         <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
           <div className="flex items-center justify-between gap-4">

@@ -9,6 +9,10 @@ import { formatFoodName, cn } from '@/lib/utils';
 import { Leaf, ChevronRight, Grid3x3, ALargeSmall } from 'lucide-react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
+import { useActionPanel } from '@/lib/context/action-panel-context';
+import { useFoodFilter, CATEGORIES } from '@/lib/context/food-filter-context';
+import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
+
 const CAL_TO_KJ = 4.184;
 
 function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
@@ -22,6 +26,9 @@ interface PantryPanelProps {
 
 export function PantryPanel({ onBack }: PantryPanelProps) {
     const { energyUnit } = useUserPreferences();
+    const { showFavoritesOnly, setShowFavoritesOnly, selectedCategories, setSelectedCategories } = useFoodFilter();
+    const { activeView, setActiveView } = useActionPanel();
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -79,8 +86,22 @@ export function PantryPanel({ onBack }: PantryPanelProps) {
                 { id: 'category', label: 'Category', icon: <Grid3x3 size={18} /> },
                 { id: 'name', label: 'Name', icon: <ALargeSmall size={18} /> },
             ]}
+            showFilters={true}
+            onFilterClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            isFiltersOpen={isFiltersOpen}
+            hasActiveFilters={showFavoritesOnly || selectedCategories.length < CATEGORIES.length}
+            activeFilterCount={(showFavoritesOnly ? 1 : 0) + (CATEGORIES.length - selectedCategories.length)}
             scaleValue={scaleValue}
             onScaleChange={setScaleValue}
+            filterChildren={
+                <FoodFiltersPanel
+                    showFavoritesOnly={showFavoritesOnly}
+                    setShowFavoritesOnly={setShowFavoritesOnly}
+                    selectedCategories={selectedCategories}
+                    setSelectedCategories={setSelectedCategories}
+                    onClose={() => setIsFiltersOpen(false)}
+                />
+            }
         >
             <div className="flex-1 overflow-y-auto flex flex-col p-3 pt-0">
                 <div className="space-y-4">
