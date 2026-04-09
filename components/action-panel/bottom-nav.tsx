@@ -16,7 +16,7 @@ export function ActionPanelBottomNav({
     activeView,
     onClose
 }: ActionPanelBottomNavProps) {
-    const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton } = useActionPanel();
+    const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton, isActionPanelOpen } = useActionPanel();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -38,7 +38,7 @@ export function ActionPanelBottomNav({
     // The active secondary menu to show
     const activeCategory = expandedButton === 'none' ? null : (expandedButton || pathCategory);
 
-    const isClosableView = activeView !== 'guide';
+    const isClosable = isActionPanelOpen && activeView !== 'guide';
 
     // Secondary menu options for each button
     const secondaryMenus = {
@@ -55,7 +55,7 @@ export function ActionPanelBottomNav({
             { id: 'lifeguard', label: 'Lifeguard', icon: LifeBuoy, color: 'text-red-500', onClick: () => { navigateTo('lifeguard'); } },
         ],
         tracker: [
-            { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { setIsActionPanelOpen(false); router.push('/?tab=planner'); } },
+            { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { router.push('/?tab=planner'); setIsActionPanelOpen(false); } },
             { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'text-amber-500', onClick: () => { navigateTo('shopping'); } },
             { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'text-emerald-500', onClick: () => { navigateTo('pantry'); } },
         ]
@@ -65,7 +65,10 @@ export function ActionPanelBottomNav({
     const showExpandedMenu = activeCategory && secondaryMenus[activeCategory as keyof typeof secondaryMenus];
 
     return (
-        <div className="absolute bottom-6 left-0 right-0 z-[60] flex justify-center pointer-events-none px-4 transition-all duration-500 animate-in slide-in-from-bottom-8">
+        <div className={cn(
+            "fixed bottom-6 left-0 right-0 z-[100] flex justify-center pointer-events-none px-4 transition-all duration-500",
+            !isActionPanelOpen && "animate-in slide-in-from-bottom-8"
+        )}>
             {showExpandedMenu ? (
                 // Expanded secondary menu
                 <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-4 py-2 flex items-center justify-start gap-4 overflow-x-auto no-scrollbar rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10 animate-in slide-in-from-bottom-3">
@@ -117,7 +120,7 @@ export function ActionPanelBottomNav({
                     {/* Home / Close Button - Left */}
                     <button
                         onClick={() => {
-                            if (isClosableView) {
+                            if (isClosable) {
                                 onClose();
                             } else {
                                 navigateTo('home');
@@ -125,17 +128,17 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            isClosableView ? "text-rose-500 bg-rose-500/5" : "text-rose-400/60 hover:text-rose-500"
+                            isClosable ? "text-rose-500 bg-rose-500/5 font-black uppercase tracking-widest" : "text-slate-400/60 hover:text-rose-500"
                         )}
-                        title={isClosableView ? "Close" : "Guide"}
+                        title={isClosable ? "Close" : "Guide"}
                     >
-                        {isClosableView ? (
+                        {isClosable ? (
                             <X size={20} className="transition-transform group-hover:scale-110" />
                         ) : (
                             <Home size={20} className="transition-transform group-hover:scale-110" />
                         )}
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">
-                            {isClosableView ? 'Close' : 'Home'}
+                            {isClosable ? 'Close' : 'Home'}
                         </span>
                     </button>
 

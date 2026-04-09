@@ -6,8 +6,8 @@ import { Smartphone, TabletSmartphone, Monitor as Computer, MessageCircle, Arrow
 import { cn } from '@/lib/utils';
 import { HeaderLogo } from '@/components/ui/header-logo';
 import { ActionPanelContainer } from '@/components/action-panel/action-panel-container';
+import { ActionPanelBottomNav } from '@/components/action-panel/bottom-nav';
 import { RecipePreview } from '@/components/recipe/recipe-preview';
-import { Footer } from '@/components/ux/footer';
 import { RDADrawer } from '@/components/ux/rda-drawer';
 import { DraggableFab } from '@/components/ux/draggable-fab';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -36,7 +36,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
     const { profile, showRDADrawer } = useUserPreferences();
-    const { isActionPanelOpen, setIsActionPanelOpen } = useActionPanel();
+    const { isActionPanelOpen, setIsActionPanelOpen, activeView } = useActionPanel();
     const { resizeMode, toggleResize } = useSplitView();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
@@ -126,11 +126,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                 {children}
                             </div>
                         </div>
-                        {pathname !== '/dashboard' && !isDesktop && (
-                            <React.Suspense fallback={null}>
-                                <Footer />
-                            </React.Suspense>
-                        )}
                     </main>
                 </div>
 
@@ -163,6 +158,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     </React.Suspense>
                 )}
             </div>
+
+            {/* Global Bottom Navigation (Mobile Only) */}
+            {isMobile && pathname !== '/dashboard' && (
+                <ActionPanelBottomNav 
+                    activeView={activeView}
+                    onClose={() => setIsActionPanelOpen(false)}
+                />
+            )}
 
             {/* RDA Drawer */}
             <RDADrawer />
