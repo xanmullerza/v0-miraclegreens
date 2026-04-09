@@ -10,7 +10,7 @@ export interface SortOption {
     icon: React.ReactNode;
 }
 
-export type TabThemeColor = 'emerald' | 'blue' | 'cyan';
+export type TabThemeColor = 'emerald' | 'blue' | 'cyan' | 'amber';
 
 interface TabShellProps {
     children: React.ReactNode;
@@ -64,6 +64,15 @@ const themeStyles = {
         bgSubtle: 'bg-cyan-600/10',
         shadow: 'shadow-cyan-500/20',
         borderPulse: 'border-cyan-600 bg-cyan-500'
+    },
+    amber: {
+        text: 'text-amber-500',
+        hoverText: 'hover:text-amber-500',
+        ring: 'focus:ring-amber-500/20',
+        bg: 'bg-amber-600',
+        bgSubtle: 'bg-amber-600/10',
+        shadow: 'shadow-amber-500/20',
+        borderPulse: 'border-amber-600 bg-amber-500'
     }
 };
 

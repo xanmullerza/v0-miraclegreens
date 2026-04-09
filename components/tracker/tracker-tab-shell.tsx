@@ -1,5 +1,4 @@
-import React from 'react';
-import { TabShell, SortOption } from '@/components/ui/tab-shell';
+import { TabShell, SortOption, TabThemeColor } from '@/components/ui/tab-shell';
 
 export type { SortOption };
 
@@ -23,7 +22,7 @@ interface TrackerTabShellProps {
     onScaleChange?: (val: number) => void;
     scaleMode?: 'multiplier' | 'grams';
     filterChildren?: React.ReactNode;
-    theme?: 'blue' | 'emerald' | 'amber';
+    theme?: TabThemeColor;
 }
 
 export function TrackerTabShell(props: TrackerTabShellProps) {
