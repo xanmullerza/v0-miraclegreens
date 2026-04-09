@@ -40,7 +40,6 @@ export function ActionPanelBottomNav({
     // The active secondary menu to show
     const activeCategory = expandedButton === 'none' ? null : (expandedButton || pathCategory);
 
-    const isClosable = isActionPanelOpen && activeView !== 'guide';
 
     // Secondary menu options for each button
     const secondaryMenus = {
@@ -118,10 +117,10 @@ export function ActionPanelBottomNav({
             ) : (
                 // Main menu
                 <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-6 py-3 flex items-center justify-between rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
-                    {/* Home / Close Button - Left */}
+                    {/* Home Button - Left (Toggle behavior) */}
                     <button
                         onClick={() => {
-                            if (isClosable) {
+                            if (activeView === 'home') {
                                 onClose();
                             } else {
                                 navigateTo('home');
@@ -129,17 +128,13 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            isClosable ? "text-rose-500 bg-rose-500/5 font-black uppercase tracking-widest" : "text-slate-400/60 hover:text-rose-500"
+                            activeView === 'home' ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
                         )}
-                        title={isClosable ? "Close" : "Guide"}
+                        title="Home"
                     >
-                        {isClosable ? (
-                            <X size={20} className="transition-transform group-hover:scale-110" />
-                        ) : (
-                            <Home size={20} className="transition-transform group-hover:scale-110" />
-                        )}
+                        <Home size={20} className="transition-transform group-hover:scale-110" />
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">
-                            {isClosable ? 'Close' : 'Home'}
+                            Home
                         </span>
                     </button>
 
