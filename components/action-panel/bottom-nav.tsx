@@ -54,12 +54,12 @@ export function ActionPanelBottomNav({
             { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); router.push('/?tab=foods'); } },
             { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'text-fuchsia-500', onClick: () => { navigateTo('nutridex'); } },
             { id: 'comparator', label: 'Comparator', icon: Scale, color: 'text-amber-500', onClick: () => { navigateTo('comparator'); } },
-            { id: 'lifeguard', label: 'Lifeguard', icon: LifeBuoy, color: 'text-red-500', onClick: () => { navigateTo('lifeguard'); } },
         ],
         tracker: [
             { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { router.push('/?tab=planner'); setIsActionPanelOpen(false); } },
             { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'text-amber-500', onClick: () => { navigateTo('shopping'); } },
             { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'text-emerald-500', onClick: () => { navigateTo('pantry'); } },
+            { id: 'lifeguard', label: 'Lifeguard', icon: LifeBuoy, color: 'text-red-500', onClick: () => { navigateTo('lifeguard'); } },
         ]
     };
 
