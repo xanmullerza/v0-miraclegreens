@@ -100,7 +100,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
             const userId = user?.id || 'anonymous';
 
             // Call n8n webhook to parse recipe
-            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) {
                 toast.error('Recipe parsing service is not configured. Please check environment variables.');
                 setParsingUrl(false);

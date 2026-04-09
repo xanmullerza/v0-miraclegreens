@@ -94,7 +94,7 @@ export function useZumAssistant() {
             const { data: { user } } = await supabase.auth.getUser();
             const userId = user?.id || 'anonymous';
 
-            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) {
                 console.warn('Webhook URL not found in environment variables');
                 throw new Error('Assistant service is not configured');
@@ -184,7 +184,7 @@ export function useZumAssistant() {
             formData.append('userId', user?.id || 'anonymous');
             formData.append('contentType', 'audio');
 
-            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
@@ -238,7 +238,7 @@ export function useZumAssistant() {
             formData.append('userId', user?.id || 'anonymous');
             formData.append('contentType', 'image');
 
-            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
@@ -305,7 +305,7 @@ export function useZumAssistant() {
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
@@ -358,7 +358,7 @@ export function useZumAssistant() {
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) throw new Error('Assistant service is not configured');
 
             const response = await fetch(webhookUrl, {
