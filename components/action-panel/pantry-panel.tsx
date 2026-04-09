@@ -6,7 +6,7 @@ import { PantryQuickAdd } from '@/components/tracker/pantry/pantry-quick-add';
 import { PantryItemList } from '@/components/tracker/pantry/pantry-item-list';
 import { supabase } from '@/lib/supabase';
 import { formatFoodName, cn } from '@/lib/utils';
-import { Leaf, ChevronRight } from 'lucide-react';
+import { Leaf, ChevronRight, Grid3x3, ALargeSmall } from 'lucide-react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const CAL_TO_KJ = 4.184;
@@ -76,8 +76,8 @@ export function PantryPanel({ onBack }: PantryPanelProps) {
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
             sortOptions={[
-                { id: 'category', label: 'Category' },
-                { id: 'name', label: 'Name' },
+                { id: 'category', label: 'Category', icon: <Grid3x3 size={18} /> },
+                { id: 'name', label: 'Name', icon: <ALargeSmall size={18} /> },
             ]}
             scaleValue={scaleValue}
             onScaleChange={setScaleValue}

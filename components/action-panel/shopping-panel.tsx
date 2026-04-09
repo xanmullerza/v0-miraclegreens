@@ -7,7 +7,7 @@ import { ShoppingItemList } from '@/components/tracker/shopping/shopping-item-li
 import { SHOPPING_STORAGE_KEY } from '@/components/tracker/shopping/shopping-types';
 import { supabase } from '@/lib/supabase';
 import { formatFoodName, cn } from '@/lib/utils';
-import { Leaf, ChevronRight, Search } from 'lucide-react';
+import { Leaf, ChevronRight, Search, Grid3x3, ALargeSmall } from 'lucide-react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const CAL_TO_KJ = 4.184;
@@ -93,8 +93,8 @@ export function ShoppingPanel({ onBack }: ShoppingPanelProps) {
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
             sortOptions={[
-                { id: 'category', label: 'Category' },
-                { id: 'name', label: 'Name' },
+                { id: 'category', label: 'Category', icon: <Grid3x3 size={18} /> },
+                { id: 'name', label: 'Name', icon: <ALargeSmall size={18} /> },
             ]}
             scaleValue={scaleValue}
             onScaleChange={setScaleValue}
