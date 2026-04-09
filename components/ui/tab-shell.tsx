@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, ArrowDownUp, Filter, Scale, Minus, Plus, Users, Weight, RotateCcw } from 'lucide-react';
+import { Search, X, ArrowDownUp, ArrowUp, ArrowDown, Filter, Scale, Minus, Plus, Users, Weight, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface SortOption {
@@ -419,7 +419,7 @@ export function TabShell({
                                             onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
                                             className={cn("h-8 w-8 flex items-center justify-center rounded-xl transition-all", t.text, "hover:bg-slate-100 dark:hover:bg-slate-700")}
                                         >
-                                            <ArrowDownUp size={14} className={cn("transition-transform duration-300", sortDirection === 'desc' ? "rotate-180" : "")} />
+                                            {sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
                                         </button>
                                         
                                         <button
