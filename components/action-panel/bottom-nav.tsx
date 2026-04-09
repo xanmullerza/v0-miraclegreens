@@ -10,11 +10,13 @@ import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-cont
 interface ActionPanelBottomNavProps {
     activeView: ActionPanelView;
     onClose: () => void;
+    isInline?: boolean;
 }
 
 export function ActionPanelBottomNav({
     activeView,
-    onClose
+    onClose,
+    isInline = false
 }: ActionPanelBottomNavProps) {
     const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton, isActionPanelOpen } = useActionPanel();
     const router = useRouter();
@@ -66,12 +68,13 @@ export function ActionPanelBottomNav({
 
     return (
         <div className={cn(
-            "fixed bottom-6 left-0 right-0 z-[100] flex justify-center pointer-events-none px-4 transition-all duration-500",
+            isInline ? "sticky bottom-0 w-full" : "fixed bottom-0 left-0 right-0",
+            "z-[100] flex justify-center pointer-events-none transition-all duration-500",
             !isActionPanelOpen && "animate-in slide-in-from-bottom-8"
         )}>
             {showExpandedMenu ? (
                 // Expanded secondary menu
-                <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-4 py-2 flex items-center justify-start gap-4 overflow-x-auto no-scrollbar rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10 animate-in slide-in-from-bottom-3">
+                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-6 py-3 flex items-center justify-center gap-8 overflow-x-auto no-scrollbar rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
                     {secondaryMenus[activeCategory as keyof typeof secondaryMenus]?.map((item) => {
                         const Icon = item.icon;
                         return (
@@ -116,7 +119,7 @@ export function ActionPanelBottomNav({
                 </div>
             ) : (
                 // Main menu
-                <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-2 py-2 flex items-center justify-between rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10">
+                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-6 py-3 flex items-center justify-between rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
                     {/* Home / Close Button - Left */}
                     <button
                         onClick={() => {

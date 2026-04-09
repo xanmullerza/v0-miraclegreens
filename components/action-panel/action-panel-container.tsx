@@ -67,6 +67,7 @@ export function ActionPanelContainer({ onClose, onRecipeDetected, isInline = fal
                     <ActionPanelBottomNav 
                         activeView={activeView}
                         onClose={() => {}}
+                        isInline={true}
                     />
                 )}
             </div>
