@@ -359,8 +359,8 @@ export function TabShell({
                             : ((isSearchExpanded || searchQuery || isScaleExpanded || isDropdownExpanded) ? "max-w-0 opacity-0 overflow-hidden !ml-0" : "w-11 opacity-100 ml-2")
                     )}>
                         <div className={cn(
-                            "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 justify-between rounded-2xl shadow-lg ring-1 ring-white/10 transition-all px-1.5 gap-1",
-                            showSortOptions ? "bg-white dark:bg-slate-800" : cn("cursor-pointer text-slate-500", t.hoverText)
+                            "relative w-full h-11 flex items-center bg-white/50 dark:bg-slate-900/50 justify-between rounded-2xl shadow-lg ring-1 ring-white/10 transition-all",
+                            showSortOptions ? "bg-white dark:bg-slate-800 px-1.5 gap-1" : cn("cursor-pointer text-slate-500", t.hoverText)
                         )}
                         onClick={() => { if (!showSortOptions) { setShowSortOptions(true); setIsSearchExpanded(false); setIsScaleExpanded(false); setIsDropdownExpanded(false); } }}
                         >
