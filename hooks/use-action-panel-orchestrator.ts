@@ -121,7 +121,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     // OS Browser History Injection
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const isStandalonePage = window.location.pathname.includes('/recipe/') || window.location.pathname.includes('/foods/');
+            const isStandalonePage = window.location.pathname.includes('/recipes/') || window.location.pathname.includes('/foods/');
             
             if (!isInitialMount.current && !isStandalonePage) {
                 window.history.pushState(
