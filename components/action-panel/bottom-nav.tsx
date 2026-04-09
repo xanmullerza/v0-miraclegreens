@@ -28,17 +28,24 @@ export function ActionPanelBottomNav({
         setExpandedButton(null);
     }, [pathname]);
 
-    // Determine the default category base on current path - only if tab is explicitly active
-    const pathCategory = (pathname === '/' && searchParams.get('tab') === 'recipes') 
-        ? 'cookbook' 
-        : (pathname === '/' && searchParams.get('tab') === 'foods') 
-            ? 'library' 
-            : (pathname === '/' && searchParams.get('tab') === 'planner') 
-                ? 'tracker' 
-                : null;
-    
     // The active secondary menu to show
-    const activeCategory = expandedButton === 'none' ? null : (expandedButton || (activeView === 'home' || activeView === 'guide' ? null : pathCategory));
+    // Robust Logic: Submenus should only appear if explicitly requested (expandedButton)
+    // or if the action panel is open to a specific module view.
+    // We NO LONGER auto-expand based on the background page URL (?tab=...) to prevent "jumping" menus.
+    const activeCategory = (() => {
+        if (expandedButton === 'none') return null;
+        if (expandedButton) return expandedButton;
+        
+        // If panel is closed, we always show the primary navigation
+        if (!isActionPanelOpen) return null;
+        
+        // Auto-expand based on active panel view for context
+        if (activeView === 'cookbook' || activeView === 'recipe-detail' || activeView === 'recipe-builder' || activeView === 'import') return 'cookbook';
+        if (activeView === 'nutridex' || activeView === 'comparator') return 'library';
+        if (activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') return 'tracker';
+        
+        return null;
+    })();
 
 
     // Secondary menu options for each button
