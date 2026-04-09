@@ -28,8 +28,8 @@ export function ActionPanelBottomNav({
         setExpandedButton(null);
     }, [pathname]);
 
-    // Determine the default category base on current path
-    const pathCategory = (pathname === '/' && (!searchParams.get('tab') || searchParams.get('tab') === 'recipes')) 
+    // Determine the default category base on current path - only if tab is explicitly active
+    const pathCategory = (pathname === '/' && searchParams.get('tab') === 'recipes') 
         ? 'cookbook' 
         : (pathname === '/' && searchParams.get('tab') === 'foods') 
             ? 'library' 
