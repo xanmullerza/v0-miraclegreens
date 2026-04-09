@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
@@ -37,7 +37,14 @@ export function NutrientGrid({
     energyUnit = 'kcal',
     dailyTargets = { energy: 2000, protein: 50, carbs: 300, fat: 65 },
 }: NutrientGridProps) {
-    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+
+    const handleNutrientClick = (nutrientName: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('nutrientId', nutrientName);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
 
     const themes = {
         indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
@@ -109,7 +116,7 @@ export function NutrientGrid({
                     const hasBreakdown = breakdownLabels.includes(label);
 
                     return (
-                        <div key={label} onClick={() => router.push(`/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
+                        <div key={label} onClick={() => handleNutrientClick(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                             <p className={cn(
                                 "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
                                 title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'

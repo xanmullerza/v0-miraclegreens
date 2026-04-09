@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Layers } from 'lucide-react';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -11,7 +11,15 @@ interface RecipeRelatedProps {
 }
 
 export function RecipeRelated({ ctx }: RecipeRelatedProps) {
-    const { relatedRecipes, loadingRelated } = ctx;
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const handleRelatedClick = (recipeId: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('recipeId', recipeId);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
 
     // Create array of 4 slots, filled with recipes or empty
     const gridSlots = Array.from({ length: 4 }, (_, i) => relatedRecipes[i] || null);
@@ -32,9 +40,9 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
                     gridSlots.map((meal, idx) => (
                         meal ? (
                             // Recipe card
-                            <a
+                            <button
                                 key={meal.id}
-                                href={`/recipes/${meal.id}`}
+                                onClick={() => handleRelatedClick(meal.id)}
                                 className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden hover:border-emerald-400/50 dark:hover:border-emerald-500/50"
                             >
                                 {/* Background image */}
@@ -60,7 +68,7 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
 
                                 {/* Icon indicator */}
                                 <Layers size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors relative z-10" />
-                            </a>
+                            </button>
                         ) : (
                             // Empty slot - "Recipe not found"
                             <div

@@ -59,9 +59,15 @@ export function MainAppContent() {
     };
 
     const handleRecipeClick = (recipeId: string) => {
-        setContextRecipeId(recipeId);
-        setActiveView('recipe-detail');
-        setIsActionPanelOpen(true);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('recipeId', recipeId);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
+    const handleFoodClick = (foodId: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('foodId', foodId);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
     return (
@@ -84,7 +90,7 @@ export function MainAppContent() {
                         {activeTab === 'foods' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 {inventoryView === 'foods' && (
-                                    <FoodsView />
+                                    <FoodsView onFoodClick={handleFoodClick} />
                                 )}
                                 {inventoryView === 'list' && (
                                     <ShoppingListView

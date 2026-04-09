@@ -192,10 +192,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     );
 }
 
+import { URLOrchestrator } from '@/components/layout/url-orchestrator';
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <SplitViewProvider>
             <ActionPanelProvider>
+                <React.Suspense fallback={null}>
+                    <URLOrchestrator />
+                </React.Suspense>
                 <SearchProvider>
                     <HeaderActionsProvider>
                         <RecipeFilterProvider>

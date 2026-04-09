@@ -44,6 +44,7 @@ interface FoodsViewProps {
     setShowAddFood?: Dispatch<SetStateAction<boolean>>;
     searchQuery?: string;
     onSearchChange?: (query: string) => void;
+    onFoodClick?: (foodId: string) => void;
     hideControls?: boolean;
     noContainer?: boolean;
 }
@@ -53,6 +54,7 @@ export function FoodsView({
     setShowAddFood,
     searchQuery: externalSearchQuery,
     onSearchChange,
+    onFoodClick,
     hideControls = false,
     noContainer = false,
 }: FoodsViewProps) {
@@ -247,6 +249,7 @@ export function FoodsView({
             {foods.map((food) => (
                 <div
                     key={food.id}
+                    onClick={() => onFoodClick?.(food.id)}
                     className={cn(
                         'group relative rounded-[2.5rem] transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1',
                         'bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800/90'
@@ -343,13 +346,16 @@ export function FoodsView({
                                 ))}
                             </div>
                             
-                            <Link 
-                                href={`/foods/${food.id}`}
+                            <button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onFoodClick?.(food.id);
+                                }}
                                 className="lg:w-full text-[9px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-slate-900/20 px-4 group/btn"
                             >
                                 <span>Details</span>
                                 <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform"/>
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </div>

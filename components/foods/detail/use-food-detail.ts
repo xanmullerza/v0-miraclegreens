@@ -11,10 +11,10 @@ import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { mergeQuantityStrings, stripZeroEntries, buildQuantityString } from '@/components/tracker/pantry/pantry-types';
 import { FoodItem, ActiveFoodSection, FoodDetailContextType } from './types';
 
-export function useFoodDetail(): FoodDetailContextType {
+export function useFoodDetail(overrideId?: string): FoodDetailContextType {
     const router = useRouter();
     const params = useParams();
-    const id = params?.id as string;
+    const id = overrideId || (params?.id as string);
     
     // External states & hooks
     const { quantities, updateQuantity, addToPantry: dbAddToPantry } = usePantry();

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type ActionPanelView = 'guide' | 'home' | 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'recipe-detail' | 'nutrient-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'ingredient-match' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters' | 'auth-prompt';
+export type ActionPanelView = 'guide' | 'home' | 'dashboard' | 'desktop-guide' | 'cookbook' | 'plannerMenu' | 'widgetsMenu' | 'profile' | 'messages' | 'comingSoon' | 'recipe-builder' | 'recipe-detail' | 'food-detail' | 'nutrient-detail' | 'recipe-share' | 'recipe-tags' | 'smart-match-picker' | 'ingredient-match' | 'portion-match-picker' | 'shopping' | 'pantry' | 'planner' | 'nutridex' | 'comparator' | 'lifeguard' | 'conversation-history' | 'import' | 'import-options' | 'import-bulk' | 'import-paste-text' | 'import-paste-url' | 'import-upload-photo' | 'import-voice' | 'import-video' | 'help-cookbook' | 'help-planner' | 'help-widgets' | 'export-recipes' | 'recommended-intake' | 'privacy' | 'support' | 'terms' | 'recipe-filters' | 'food-filters' | 'nutrient-filters' | 'auth-prompt';
 
 export interface SmartMatchPickerState {
     initialSearchQuery: string;
@@ -53,6 +53,10 @@ interface ActionPanelContextType {
     setExcludeSupplements: (value: boolean) => void;
     contextRecipeId: string | null;
     setContextRecipeId: (id: string | null) => void;
+    contextFoodId: string | null;
+    setContextFoodId: (id: string | null) => void;
+    contextNutrientId: string | null;
+    setContextNutrientId: (id: string | null) => void;
     smartMatchPicker: SmartMatchPickerState | null;
     setSmartMatchPicker: (state: SmartMatchPickerState | null) => void;
     smartMatchPortion: SmartMatchPortionState | null;
@@ -75,6 +79,8 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [excludeFlavour, setExcludeFlavour] = useState(true);
     const [excludeSupplements, setExcludeSupplements] = useState(true);
     const [contextRecipeId, setContextRecipeId] = useState<string | null>(null);
+    const [contextFoodId, setContextFoodId] = useState<string | null>(null);
+    const [contextNutrientId, setContextNutrientId] = useState<string | null>(null);
     const [smartMatchPicker, setSmartMatchPicker] = useState<SmartMatchPickerState | null>(null);
     const [smartMatchPortion, setSmartMatchPortion] = useState<SmartMatchPortionState | null>(null);
     const [ingredientMatch, setIngredientMatch] = useState<IngredientMatchState | null>(null);
@@ -131,6 +137,10 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             setExcludeSupplements,
             contextRecipeId,
             setContextRecipeId,
+            contextFoodId,
+            setContextFoodId,
+            contextNutrientId,
+            setContextNutrientId,
             smartMatchPicker,
             setSmartMatchPicker,
             smartMatchPortion,

@@ -18,6 +18,7 @@ import { NutrientDetailContent } from '@/components/nutrients/nutrient-detail-co
 import { findNutrientById } from '@/lib/utils/nutrient-utils';
 import { Loader2, X } from 'lucide-react';
 import { PanelWrapper } from './panel-wrapper';
+import { FoodDetail } from './food-detail';
 import { PortionMatchPanel } from '@/components/recipe/detail/portion-match-panel';
 import { IngredientMatchDialog } from '@/components/recipe/detail/ingredient-match-dialog';
 import { AuthPromptPanel } from './auth-prompt-panel';
@@ -43,7 +44,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
     const { 
         activeView, previousView, navigateTo, excludeFlavour, 
         setExcludeFlavour, excludeSupplements, setExcludeSupplements,
-        contextRecipeId, smartMatchPicker, setSmartMatchPicker, smartMatchPortion, ingredientMatch
+        contextRecipeId, contextFoodId, contextNutrientId, smartMatchPicker, setSmartMatchPicker, smartMatchPortion, ingredientMatch
     } = useActionPanel();
     
     const { filters } = useRecipeFilter();
@@ -213,6 +214,16 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
                     onRemix={handleRemixRecipe}
                 />
             );
+        case 'food-detail':
+            if (!contextFoodId) {
+                return null;
+            }
+            return (
+                <FoodDetail 
+                    foodId={contextFoodId} 
+                    onBack={handleBack} 
+                />
+            );
         case 'recipe-tags':
             if (!effectiveRecipeId) {
                 return null;
@@ -266,7 +277,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
         case 'planner': return <PlannerPanel onRecipeClick={(id) => handleRecipeClick(id, 'planner')} />;
         case 'nutridex': return <NutrientsView compact={true} />;
         case 'nutrient-detail': {
-            const nutrient = findNutrientById(contextRecipeId || '');
+            const nutrient = findNutrientById(contextNutrientId || '');
             if (!nutrient) return <div className="p-8 text-center text-xs font-black uppercase tracking-widest text-slate-400">Nutrient Intelligence Offline</div>;
             return (
                 <PanelWrapper title={nutrient.label}>

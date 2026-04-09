@@ -725,8 +725,14 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
 
                         const hasBreakdown = breakdownLabels.includes(label);
 
+                        const handleNutrientClick = (label: string) => {
+                            const params = new URLSearchParams(window.location.search);
+                            params.set('nutrientId', label);
+                            router.push(`${window.location.pathname}?${params.toString()}`, { scroll: false });
+                        };
+
                         return (
-                            <div key={label} onClick={() => router.push(`/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-card cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
+                            <div key={label} onClick={() => handleNutrientClick(label)} className={cn("p-4 rounded-2xl border bg-card cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                                 <p className={cn(
                                     "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
                                     title === 'Biological Ratios' ? 'text-muted-foreground' : 'uppercase text-foreground/60'
