@@ -38,7 +38,7 @@ export function ActionPanelBottomNav({
                 : null;
     
     // The active secondary menu to show
-    const activeCategory = expandedButton === 'none' ? null : (expandedButton || pathCategory);
+    const activeCategory = expandedButton === 'none' ? null : (expandedButton || (activeView === 'home' || activeView === 'guide' ? null : pathCategory));
 
 
     // Secondary menu options for each button
