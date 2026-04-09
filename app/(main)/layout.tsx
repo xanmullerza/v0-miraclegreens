@@ -161,10 +161,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
             {/* Global Bottom Navigation (Mobile Only) */}
             {isMobile && pathname !== '/dashboard' && (
-                <ActionPanelBottomNav 
-                    activeView={activeView}
-                    onClose={() => setIsActionPanelOpen(false)}
-                />
+                <React.Suspense fallback={null}>
+                    <ActionPanelBottomNav 
+                        activeView={activeView}
+                        onClose={() => setIsActionPanelOpen(false)}
+                    />
+                </React.Suspense>
             )}
 
             {/* RDA Drawer */}
