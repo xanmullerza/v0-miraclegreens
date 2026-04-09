@@ -149,7 +149,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            expandedButton === 'cookbook' || (pathname === '/' && (!searchParams.get('tab') || searchParams.get('tab') === 'recipes')) ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
+                            (expandedButton === 'cookbook' || activeView === 'cookbook' || activeView === 'recipe-builder' || activeView === 'import' || activeView === 'recipe-detail') || (!isActionPanelOpen && pathname === '/' && (!searchParams.get('tab') || searchParams.get('tab') === 'recipes')) ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
                         )}
                         title="Cookbook"
                     >
@@ -168,7 +168,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            expandedButton === 'library' || (pathname === '/' && searchParams.get('tab') === 'foods') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
+                            (expandedButton === 'library' || activeView === 'nutridex' || activeView === 'comparator') || (!isActionPanelOpen && pathname === '/' && searchParams.get('tab') === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
                         )}
                         title="Library"
                     >
@@ -187,7 +187,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            expandedButton === 'tracker' || (pathname === '/' && searchParams.get('tab') === 'planner') ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
+                            (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && (pathname === '/tracker' || (pathname === '/' && searchParams.get('tab') === 'planner'))) ? "text-blue-500 bg-blue-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-blue-500"
                         )}
                         title="Tracker"
                     >
