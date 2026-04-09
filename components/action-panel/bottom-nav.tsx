@@ -101,7 +101,15 @@ export function ActionPanelBottomNav({
                             'create': 'recipe-builder'
                         };
                         const targetView = viewMap[item.id] || item.id;
-                        const isActive = activeView === targetView;
+                        
+                        let isActive = false;
+                        if (item.id === 'foods' || item.id === 'planner') {
+                            isActive = !isActionPanelOpen && activeMainTab === item.id;
+                        } else if (item.id === 'view') {
+                            isActive = (isActionPanelOpen && activeView === 'cookbook') || (!isActionPanelOpen && activeMainTab === 'recipes');
+                        } else {
+                            isActive = isActionPanelOpen && activeView === targetView;
+                        }
 
                         return (
                             <button
