@@ -100,7 +100,13 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
             const userId = user?.id || 'anonymous';
 
             // Call n8n webhook to parse recipe
-            const response = await fetch('https://yourtestsite.app.n8n.cloud/webhook/chat', {
+            const webhookUrl = process.env.NEXT_PUBLIC_N8N_CRONOMETER_WEBHOOK_URL;
+            if (!webhookUrl) {
+                toast.error('Recipe parsing service is not configured. Please check environment variables.');
+                setParsingUrl(false);
+                return;
+            }
+            const response = await fetch(webhookUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
