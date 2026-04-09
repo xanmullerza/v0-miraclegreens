@@ -18,8 +18,8 @@ export function URLOrchestrator() {
         activeView
     } = useActionPanel();
 
-    // Track initialization to avoid infinite loops
-    const initialized = useRef(false);
+    // Guard: prevents the cleanup effect from firing immediately after a URL-driven open
+    const justOpenedRef = useRef(false);
 
     // 1. Sync URL -> Context (On Load & URL Change)
     useEffect(() => {
@@ -31,20 +31,29 @@ export function URLOrchestrator() {
             setContextRecipeId(recipeId);
             setActiveView('recipe-detail');
             setIsActionPanelOpen(true);
+            justOpenedRef.current = true;
         } else if (foodId) {
             setContextFoodId(foodId);
             setActiveView('food-detail');
             setIsActionPanelOpen(true);
+            justOpenedRef.current = true;
         } else if (nutrientId) {
             setContextNutrientId(nutrientId);
             setActiveView('nutrient-detail');
             setIsActionPanelOpen(true);
+            justOpenedRef.current = true;
         }
     }, [searchParams]);
 
-    // 2. Sync Context -> URL (Clean up URL when panel is closed)
+    // 2. Sync Context -> URL (Clean up URL when panel is explicitly closed by user)
     useEffect(() => {
-        if (!isActionPanelOpen && pathname === '/') {
+        // Skip cleanup if the orchestrator just opened the panel (prevents race condition)
+        if (justOpenedRef.current) {
+            justOpenedRef.current = false;
+            return;
+        }
+
+        if (!isActionPanelOpen) {
             const params = new URLSearchParams(searchParams.toString());
             let changed = false;
             
@@ -53,10 +62,11 @@ export function URLOrchestrator() {
             if (params.has('nutrientId')) { params.delete('nutrientId'); changed = true; }
 
             if (changed) {
-                router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+                const remaining = params.toString();
+                router.replace(`${pathname}${remaining ? `?${remaining}` : ''}`, { scroll: false });
             }
         }
-    }, [isActionPanelOpen, pathname, searchParams, router]);
+    }, [isActionPanelOpen]);
 
     return null;
 }
