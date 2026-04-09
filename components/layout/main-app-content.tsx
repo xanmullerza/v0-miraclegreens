@@ -1,7 +1,6 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { TabHeader } from '@/components/ui/tab-header';
 import { RecipesCombinedView } from '@/components/recipe/recipes-combined-view';
@@ -9,21 +8,19 @@ import { FoodsView } from '@/components/foods/food-library-view';
 import MealPlannerContent from '@/components/tracker/planner-content';
 import { ShoppingListView } from '@/components/tracker/shopping-list-view';
 import { PantryView } from '@/components/tracker/pantry-view';
-import { useSearch } from '@/lib/context/search-context';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
-
-import { cn } from '@/lib/utils';
 
 type TabId = 'recipes' | 'foods' | 'planner';
 type InventoryView = 'foods' | 'list' | 'pantry' | 'cart';
 
-function RecipesPageContent() {
+export function MainAppContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const pathname = usePathname();
     const { profile } = useUserPreferences();
-    const { setIsActionPanelOpen, setActiveView, setContextRecipeId } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, setContextRecipeId, navigateTo } = useActionPanel();
     
     const initialTab = (searchParams.get('tab') as TabId) || 'recipes';
     const initialView = (searchParams.get('view') as InventoryView) || 'foods';
@@ -46,22 +43,19 @@ function RecipesPageContent() {
         }
     }, [searchParams]);
 
-    const tabs: { id: TabId; label: string; activeColor: string }[] = [
-        { id: 'recipes', label: 'Cookbook', activeColor: 'text-emerald-500' },
-        { id: 'foods', label: 'Library', activeColor: 'text-cyan-500' },
-        { id: 'planner', label: 'Tracker', activeColor: 'text-blue-500' },
+    const tabs: { id: TabId; label: string }[] = [
+        { id: 'recipes', label: 'Cookbook' },
+        { id: 'foods', label: 'Library' },
+        { id: 'planner', label: 'Tracker' },
     ];
 
     const handleTabChange = (id: TabId) => {
         setActiveTab(id);
-        if (id === 'recipes') router.push('/cookbook');
-        else if (id === 'planner') router.push('/tracker');
-        else router.push('/library');
-    };
-
-    const handleViewChange = (view: InventoryView) => {
-        setInventoryView(view);
-        router.push(`/recipes?tab=foods&view=${view}`);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', id);
+        // Clean up other params if needed
+        if (id !== 'foods') params.delete('view');
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
     const handleRecipeClick = (recipeId: string) => {
@@ -71,20 +65,19 @@ function RecipesPageContent() {
     };
 
     return (
-        <>
-            {/* Tab Bar - Standardized */}
+        <div className="flex flex-col w-full min-h-screen">
             <TabHeader
-                tabs={tabs.map(t => ({ id: t.id, label: t.label }))}
+                tabs={tabs}
                 activeTab={activeTab}
                 onTabChange={(id) => handleTabChange(id as TabId)}
             />
-            {/* Content */}
+            
             <PageContainer maxWidth="max-w-7xl">
                 <div className="space-y-6 animate-in fade-in duration-500 py-2 sm:py-6">
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                         {activeTab === 'recipes' && (
                             <RecipesCombinedView 
-                                isPremium={profile.isPremium}
+                                isPremium={profile?.isPremium}
                                 onRecipeClick={handleRecipeClick}
                             />
                         )}
@@ -114,25 +107,14 @@ function RecipesPageContent() {
                         )}
                         {activeTab === 'planner' && (
                             <div className="animate-in fade-in duration-300">
-                                <MealPlannerContent />
+                                <MealPlannerContent 
+                                    onSubViewChange={(view) => navigateTo(view as any)}
+                                />
                             </div>
                         )}
                     </div>
                 </div>
             </PageContainer>
-        </>
-    );
-}
-
-export default function RecipesPage() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
-                <Loader2 className="animate-spin text-emerald-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Recipes...</p>
-            </div>
-        }>
-            <RecipesPageContent />
-        </Suspense>
+        </div>
     );
 }

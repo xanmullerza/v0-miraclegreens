@@ -1,7 +1,7 @@
 'use client';
 
 import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar } from 'lucide-react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +19,7 @@ export function ActionPanelBottomNav({
     const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton } = useActionPanel();
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     // Reset expanded state when pathname changes to allow auto-expansion on new pages
     useEffect(() => {
@@ -26,7 +27,13 @@ export function ActionPanelBottomNav({
     }, [pathname]);
 
     // Determine the default category base on current path
-    const pathCategory = pathname === '/cookbook' ? 'cookbook' : pathname.startsWith('/library') ? 'library' : pathname === '/tracker' ? 'tracker' : null;
+    const pathCategory = (pathname === '/' && (!searchParams.get('tab') || searchParams.get('tab') === 'recipes')) 
+        ? 'cookbook' 
+        : (pathname === '/' && searchParams.get('tab') === 'foods') 
+            ? 'library' 
+            : (pathname === '/' && searchParams.get('tab') === 'planner') 
+                ? 'tracker' 
+                : null;
     
     // The active secondary menu to show
     const activeCategory = expandedButton === 'none' ? null : (expandedButton || pathCategory);
@@ -42,13 +49,13 @@ export function ActionPanelBottomNav({
             { id: 'export', label: 'Export', icon: Download, color: 'text-amber-500', onClick: () => { navigateTo('export-recipes'); } },
         ],
         library: [
-            { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); router.push('/library'); } },
+            { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); router.push('/?tab=foods'); } },
             { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'text-fuchsia-500', onClick: () => { navigateTo('nutridex'); } },
             { id: 'comparator', label: 'Comparator', icon: Scale, color: 'text-amber-500', onClick: () => { navigateTo('comparator'); } },
             { id: 'lifeguard', label: 'Lifeguard', icon: LifeBuoy, color: 'text-red-500', onClick: () => { navigateTo('lifeguard'); } },
         ],
         tracker: [
-            { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { setIsActionPanelOpen(false); router.push('/tracker'); } },
+            { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { setIsActionPanelOpen(false); router.push('/?tab=planner'); } },
             { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'text-amber-500', onClick: () => { navigateTo('shopping'); } },
             { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'text-emerald-500', onClick: () => { navigateTo('pantry'); } },
         ]
@@ -143,7 +150,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            expandedButton === 'cookbook' || pathname === '/cookbook' ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
+                            expandedButton === 'cookbook' || (pathname === '/' && (!searchParams.get('tab') || searchParams.get('tab') === 'recipes')) ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
                         )}
                         title="Cookbook"
                     >
@@ -162,7 +169,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            expandedButton === 'library' || pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
+                            expandedButton === 'library' || (pathname === '/' && searchParams.get('tab') === 'foods') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
                         )}
                         title="Library"
                     >
@@ -181,7 +188,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            expandedButton === 'tracker' || pathname === '/tracker' ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
+                            expandedButton === 'tracker' || (pathname === '/' && searchParams.get('tab') === 'planner') ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
                         )}
                         title="Tracker"
                     >

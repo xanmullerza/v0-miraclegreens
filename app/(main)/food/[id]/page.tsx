@@ -61,11 +61,11 @@ export default function FoodDetailsPage() {
                 activeTab="foods"
                 onTabChange={(tabId) => {
                     if (tabId === 'recipes') {
-                        router.push('/cookbook');
+                        router.push('/');
                     } else if (tabId === 'planner') {
-                        router.push('/tracker');
+                        router.push('/?tab=planner');
                     } else {
-                        router.push(`/cookbook?tab=${tabId}`);
+                        router.push(`/?tab=${tabId}`);
                     }
                 }}
             />

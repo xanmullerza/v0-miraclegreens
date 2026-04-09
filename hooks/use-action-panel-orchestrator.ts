@@ -121,7 +121,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     // OS Browser History Injection
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const isStandalonePage = window.location.pathname.includes('/cookbook/') || window.location.pathname.includes('/library/');
+            const isStandalonePage = window.location.pathname.includes('/recipe/') || window.location.pathname.includes('/food/');
             
             if (!isInitialMount.current && !isStandalonePage) {
                 window.history.pushState(
@@ -301,14 +301,14 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
     const handleViewAllRecipes = () => {
         setIsActionPanelOpen(false);
-        router.push('/cookbook');
+        router.push('/');
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };
 
     const handleViewMyRecipes = () => {
         setIsActionPanelOpen(false);
-        router.push('/cookbook?mine=true');
+        router.push('/?mine=true');
         setShowQuickActions(false);
         setExpandedRecipeMenu(false);
     };

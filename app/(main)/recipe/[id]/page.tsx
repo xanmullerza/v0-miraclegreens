@@ -46,9 +46,9 @@ export default function RecipeDetailsPage() {
     }, [recipe?.title, setCustomSegmentLabel]);
 
     const handleTabChange = (tabId: string) => {
-        if (tabId === 'recipes') router.push('/cookbook');
-        else if (tabId === 'planner') router.push('/tracker');
-        else router.push(`/cookbook?tab=${tabId}`);
+        if (tabId === 'recipes') router.push('/');
+        else if (tabId === 'planner') router.push('/?tab=planner');
+        else router.push(`/?tab=${tabId}`);
     };
 
     // ── Loading state ─────────────────────────────────────────

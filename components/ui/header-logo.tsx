@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Calendar, Info, Shield, HelpCircle, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
@@ -24,6 +24,7 @@ export function HeaderLogo({
 }: HeaderLogoProps) {
     const pathname = usePathname();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { theme, setTheme } = useTheme();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
     const { isActionPanelOpen, setIsActionPanelOpen, setActiveView, activeView } = useActionPanel();
@@ -78,13 +79,16 @@ export function HeaderLogo({
                 {/* Main App Navigation (Next to Logo) */}
                 <div className="flex items-center ml-2 sm:ml-6 gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
                     { [
-                        { label: 'Mission', path: '/', icon: Info, color: 'text-purple-500' },
-                        { label: 'Cookbook', path: '/cookbook', icon: ChefHat, color: 'text-emerald-500' },
-                        { label: 'Library', path: '/library', icon: Leaf, color: 'text-emerald-500' },
-                        { label: 'Tracker', path: '/tracker', icon: Calendar, color: 'text-emerald-500' },
+                        { id: 'mission', label: 'Mission', path: '/', icon: Info, color: 'text-purple-500' },
+                        { id: 'recipes', label: 'Cookbook', path: '/?tab=recipes', icon: ChefHat, color: 'text-emerald-500' },
+                        { id: 'foods', label: 'Library', path: '/?tab=foods', icon: Leaf, color: 'text-emerald-500' },
+                        { id: 'planner', label: 'Tracker', path: '/?tab=planner', icon: Calendar, color: 'text-emerald-500' },
                     ].map((item: any) => {
                         const Icon = item.icon;
-                        const isActive = pathname === item.path || (pathname.startsWith(`${item.path}/`) && item.path !== '/');
+                        const isMission = item.id === 'mission';
+                        const isActive = isMission
+                            ? (pathname === '/' && !searchParams.get('tab'))
+                            : (pathname === '/' && searchParams.get('tab') === item.id);
                         
                         return (
                             <Link

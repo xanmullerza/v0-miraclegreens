@@ -68,7 +68,7 @@ export function Header() {
 						)}
 						{showDashboard && (
 							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
-								<Link href="/cookbook">
+								<Link href="/">
 									<LayoutDashboard className="h-4 w-4" />
 									Cookbook
 								</Link>

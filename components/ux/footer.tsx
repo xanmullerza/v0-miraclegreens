@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Home, BookOpen, BarChart3, Wand2, Smartphone, TabletSmartphone, Monitor as Computer, Library as LibraryIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -9,11 +9,12 @@ import { useSplitView } from '@/lib/context/split-view-context';
 export function Footer() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { isActionPanelOpen, setIsActionPanelOpen, setActiveView } = useActionPanel();
   const { resizeMode, toggleResize, setResizeMode } = useSplitView();
 
 
-  const isHome = pathname === '/dashboard' || pathname === '/';
+  const isHome = pathname === '/';
 
   // Mobile bottom navigation bar - Standardized 4-button floating bar
   return (
@@ -47,7 +48,7 @@ export function Footer() {
             }}
             className={cn(
               "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-95 group flex-1",
-              pathname === '/cookbook' ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
+              pathname === '/' && (!searchParams.get('tab') || searchParams.get('tab') === 'recipes') ? "text-emerald-500 bg-emerald-500/5" : "text-slate-400 hover:text-emerald-500"
             )}
             title="Cookbook"
           >
@@ -59,11 +60,11 @@ export function Footer() {
           <button
             onClick={() => {
               setIsActionPanelOpen(false);
-              router.push('/library');
+              router.push('/?tab=foods');
             }}
             className={cn(
               "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-95 group",
-              pathname.startsWith('/library') ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
+              pathname === '/' && searchParams.get('tab') === 'foods' ? "text-cyan-500 bg-cyan-500/5" : "text-slate-400 hover:text-cyan-500"
             )}
             title="Library"
           >
@@ -77,11 +78,11 @@ export function Footer() {
           <button
             onClick={() => {
               setIsActionPanelOpen(false);
-              router.push('/tracker');
+              router.push('/?tab=planner');
             }}
             className={cn(
               "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-95 group",
-              pathname === '/tracker' ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
+              pathname === '/' && searchParams.get('tab') === 'planner' ? "text-blue-500 bg-blue-500/5" : "text-slate-400 hover:text-blue-500"
             )}
             title="Tracker"
           >
