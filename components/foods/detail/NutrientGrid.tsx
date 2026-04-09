@@ -38,6 +38,7 @@ export function NutrientGrid({
     dailyTargets = { energy: 2000, protein: 50, carbs: 300, fat: 65 },
 }: NutrientGridProps) {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const pathname = usePathname();
 
     const handleNutrientClick = (nutrientName: string) => {
