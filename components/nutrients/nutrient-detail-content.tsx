@@ -208,7 +208,7 @@ export function NutrientDetailContent({
                             </div>
                         ) : topFoods.length > 0 ? (
                             topFoods.map(food => (
-                                <Link key={food.name} href={`/food/${encodeURIComponent(food.name)}`} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-emerald-400/50 hover:shadow-lg transition-all group">
+                                <Link key={food.name} href={`/foods/${encodeURIComponent(food.name)}`} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-emerald-400/50 hover:shadow-lg transition-all group">
                                     <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-800">
                                         {food.image_url ? <img src={food.image_url} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /> : <div className="w-full h-full flex items-center justify-center text-slate-300"><Leaf size={24} className="opacity-10" /></div>}
                                     </div>
