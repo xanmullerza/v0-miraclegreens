@@ -332,7 +332,6 @@ export function RecipesView({
             }
 
             // --- LOCAL SORTING ---
-            const difficultyOrder: Record<string, number> = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
             
             let sortedItems = [...filteredItems].sort((a, b) => {
                 let valA: any, valB: any;
@@ -342,17 +341,21 @@ export function RecipesView({
                         valA = (a.title || '').toLowerCase();
                         valB = (b.title || '').toLowerCase();
                         break;
-                    case 'prep_time':
-                        valA = a.prep_time || 0;
-                        valB = b.prep_time || 0;
-                        break;
-                    case 'difficulty':
-                        valA = difficultyOrder[a.difficulty || 'Medium'] || 2;
-                        valB = difficultyOrder[b.difficulty || 'Medium'] || 2;
-                        break;
                     case 'calories':
                         valA = a.calories || 0;
                         valB = b.calories || 0;
+                        break;
+                    case 'protein':
+                        valA = a.protein || 0;
+                        valB = b.protein || 0;
+                        break;
+                    case 'carbs':
+                        valA = a.carbs || 0;
+                        valB = b.carbs || 0;
+                        break;
+                    case 'fat':
+                        valA = a.fat || 0;
+                        valB = b.fat || 0;
                         break;
                     default:
                         valA = (a.title || '').toLowerCase();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TabShell } from '@/components/ui/tab-shell';
-import { Clock, ChefHat, Flame, ALargeSmall } from 'lucide-react';
+import { ALargeSmall, Activity, Beef, Leaf, Droplet } from 'lucide-react';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useRecipeFilter } from '@/lib/context/recipe-filter-context';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
@@ -8,9 +8,10 @@ import { getSharedNavOptions } from '@/lib/constants/nav-options';
 
 export const RECIPE_SORT_OPTIONS = [
     { id: 'title', label: 'Title (A-Z)', icon: <ALargeSmall size={18} /> },
-    { id: 'prep_time', label: 'Prep Time', icon: <Clock size={18} /> },
-    { id: 'difficulty', label: 'Difficulty', icon: <ChefHat size={18} /> },
-    { id: 'calories', label: 'Calories', icon: <Flame size={18} /> }
+    { id: 'calories', label: 'Energy', icon: <Activity size={18} /> },
+    { id: 'protein', label: 'Protein', icon: <Beef size={18} /> },
+    { id: 'carbs', label: 'Carbs', icon: <Leaf size={18} /> },
+    { id: 'fat', label: 'Fat', icon: <Droplet size={18} /> }
 ] as const;
 
 interface RecipeTabShellProps {
