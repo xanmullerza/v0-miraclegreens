@@ -23,10 +23,10 @@ export function ActionPanelBottomNav({
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // Reset expanded state when pathname changes to allow auto-expansion on new pages
+    // Reset expanded state when pathname or search modifiers change to allow auto-expansion on new pages
     useEffect(() => {
         setExpandedButton(null);
-    }, [pathname]);
+    }, [pathname, searchParams]);
 
     // The active secondary menu to show
     // Robust Logic: Submenus should only appear if explicitly requested (expandedButton)
