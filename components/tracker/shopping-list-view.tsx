@@ -70,13 +70,12 @@ interface ShoppingListItem {
 interface ShoppingListViewProps {
     scannerOpen?: boolean;
     onScannerOpenChange?: (open: boolean) => void;
-    dropdownContent?: React.ReactNode;
 }
 
 // Module-level cache for enrichment data to avoid re-fetching on re-renders
 const enrichmentCache = new Map<string, { id: string; category: string; image: string; common_name: string; price?: number; stocked?: boolean }>();
 
-export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOpenChange, dropdownContent }: ShoppingListViewProps = {}) {
+export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOpenChange }: ShoppingListViewProps = {}) {
     const router = useRouter();
     const { items: manualItems, loading: shoppingLoading, addItem: addShoppingListItem, toggleChecked, removeItem: removeShoppingListItem, clearChecked, clearAll: clearShoppingList } = useShoppingList();
     const { addToPantry, updateQuantity, quantities } = usePantry();
@@ -711,7 +710,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 setSortField('category');
             }}
             hasActiveFilters={sortField === 'category'}
-            dropdownContent={dropdownContent}
         >
             <div className="space-y-8">
             {/* Barcode Scanner Modal */}

@@ -94,7 +94,6 @@ export interface PlannerContentProps {
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     onRecipeClick?: (recipeId: string) => void;
     onSubViewChange?: (view: 'shopping' | 'pantry') => void;
-    dropdownContent?: React.ReactNode;
 }
 
 const PLANNER_SORT_OPTIONS: SortOption[] = [
@@ -115,7 +114,6 @@ export function PlannerContent({
     setIsFilterOpen: externalSetIsFilterOpen,
     onRecipeClick,
     onSubViewChange,
-    dropdownContent,
 }: PlannerContentProps) {
 
     const { state, actions } = usePlannerState();
@@ -231,11 +229,7 @@ export function PlannerContent({
 
         return meals;
     };
-    const defaultDropdown = (
-        <div className="h-11 w-11 flex items-center justify-center text-blue-600 dark:text-blue-400">
-            <Calendar size={18} />
-        </div>
-    );
+
 
     // Auto-generate plan when navigating to empty planner if authenticated & setup
     useEffect(() => {
@@ -276,17 +270,6 @@ export function PlannerContent({
                 }}
                 scaleValue={effectiveServings}
                 onScaleChange={(val) => setSelectedServings(Math.max(0.5, val))}
-                dropdownContent={dropdownContent || defaultDropdown}
-                dropdownOptions={[
-                    ...(['daily', 'weekly', 'monthly'] as PlanLength[]).map(l => ({
-                        id: l,
-                        label: l,
-                        icon: <Calendar size={12} />,
-                        onClick: () => setPlanLength(l),
-                        active: planLength === l
-                    })),
-                    ...getSharedNavOptions(navigateTo, onSubViewChange).filter(opt => opt.id !== 'planner')
-                ]}
                 filterChildren={<RecipeFilterContent onClose={() => { setActiveView('home'); setIsActionPanelOpen(false); }} />}
             >
 

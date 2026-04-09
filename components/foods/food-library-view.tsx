@@ -46,7 +46,6 @@ interface FoodsViewProps {
     onSearchChange?: (query: string) => void;
     hideControls?: boolean;
     noContainer?: boolean;
-    dropdownContent?: React.ReactNode;
 }
 
 export function FoodsView({
@@ -56,7 +55,6 @@ export function FoodsView({
     onSearchChange,
     hideControls = false,
     noContainer = false,
-    dropdownContent
 }: FoodsViewProps) {
     const { energyUnit } = useUserPreferences();
     const { searchQuery, setSearchQuery } = useSearch();
@@ -78,11 +76,7 @@ export function FoodsView({
 
     const currentSortLabel = FOOD_SORT_OPTIONS.find(opt => opt.id === sortField)?.label || 'Sort';
 
-    const defaultDropdown = (
-        <div className="h-11 w-11 flex items-center justify-center text-blue-600 dark:text-blue-400">
-            <Library size={18} />
-        </div>
-    );
+
 
     const handleAddToCart = (e: React.MouseEvent, food: FoodItem) => {
         e.preventDefault();

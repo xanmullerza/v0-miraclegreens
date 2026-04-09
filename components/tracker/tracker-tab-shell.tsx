@@ -19,12 +19,10 @@ interface TrackerTabShellProps {
     isFiltersOpen?: boolean;
     hasActiveFilters?: boolean;
     activeFilterCount?: number;
-    dropdownContent?: React.ReactNode;
     scaleValue?: number;
     onScaleChange?: (val: number) => void;
     scaleMode?: 'multiplier' | 'grams';
     filterChildren?: React.ReactNode;
-    dropdownOptions?: { id: string; label: string; icon: React.ReactNode; onClick: () => void; active?: boolean }[];
 }
 
 export function TrackerTabShell(props: TrackerTabShellProps) {
