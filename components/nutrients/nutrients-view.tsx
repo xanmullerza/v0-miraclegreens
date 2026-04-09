@@ -224,7 +224,6 @@ export function NutrientsView({
     // UI state
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
-    const [selectedNutrient, setSelectedNutrient] = useState<NutrientNode | null>(null);
     const [nutrientSortField, setNutrientSortField] = useState<'section' | 'name'>('section');
     const [nutrientSortDirection, setNutrientSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -425,124 +424,6 @@ export function NutrientsView({
         );
     };
 
-    // ─── Toggle helpers ───────────────────────────────────────
-
-    const toggleSection = (sectionId: string) => {
-        setExpandedSections(prev => {
-            const next = new Set(prev);
-            next.has(sectionId) ? next.delete(sectionId) : next.add(sectionId);
-            return next;
-        });
-    };
-
-    const toggleParent = (parentId: string) => {
-        setExpandedParents(prev => {
-            const next = new Set(prev);
-            next.has(parentId) ? next.delete(parentId) : next.add(parentId);
-            return next;
-        });
-    };
-
-    // ─── Count leaves in a section ────────────────────────────
-
-    function countLeaves(nodes: NutrientNode[]): number {
-        let c = 0;
-        for (const n of nodes) {
-            if (n.children) c += countLeaves(n.children);
-            else c++;
-        }
-        return c;
-    }
-
-    // ─── Render a nutrient row ────────────────────────────────
-
-    const renderNutrientRow = (node: NutrientNode, sectionTheme: typeof THEMES['orange'], depth: number = 0) => {
-        const theme = node.theme ? (THEMES[node.theme] || sectionTheme) : sectionTheme;
-        const isExpanded = expandedParents.has(node.id);
-        const rda = getRDA(node.id);
-        const isGroupHeader = node.id.startsWith('_');
-
-        return (
-            <div key={node.id}>
-                <div
-                    className={cn(
-                        "w-full text-left flex items-center gap-3 py-3 px-4 rounded-xl transition-all group",
-                        node.isParent
-                            ? cn("border-l-[3px]", theme.parentBorder, theme.parentBg, "hover:shadow-md cursor-pointer")
-                            : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-[3px] border-l-transparent",
-                        depth > 0 && "ml-4"
-                    )}
-                    onClick={() => {
-                        if (node.isParent) toggleParent(node.id);
-                        else if (!isGroupHeader) selectNutrient(node);
-                    }}
-                >
-                    {/* Expand chevron for parents */}
-                    {node.isParent ? (
-                        <ChevronDown
-                            size={14}
-                            className={cn(
-                                "shrink-0 transition-transform duration-200",
-                                theme.text,
-                                isExpanded ? "rotate-0" : "-rotate-90"
-                            )}
-                        />
-                    ) : (
-                        <div className="w-[14px] shrink-0" />
-                    )}
-
-                    {/* Label */}
-                    <span className={cn(
-                        "flex-1 text-[10px] font-black uppercase tracking-widest",
-                        (node.isParent || node.theme || depth > 0) ? theme.text : "text-slate-700 dark:text-slate-300",
-                        (node.isParent || node.theme) && "text-[11px]"
-                    )}>
-                        {node.label}
-                    </span>
-
-                    {/* RDA value */}
-                    {rda > 0 && !isGroupHeader && (
-                        <span className="text-[10px] font-bold text-slate-400 tabular-nums">
-                            {rda >= 100 ? Math.round(rda) : parseFloat(rda.toFixed(1))} {node.unit}
-                        </span>
-                    )}
-
-                    {/* Children count badge */}
-                    {node.isParent && node.children && (
-                        <span className={cn("text-[8px] font-black px-2 py-0.5 rounded-full", theme.badge)}>
-                            {node.children.length}
-                        </span>
-                    )}
-
-                    {/* Learn Button for clickable items */}
-                    {!isGroupHeader && !node.isParent && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                selectNutrient(node);
-                            }}
-                            title={`Learn about ${node.label}`}
-                            className={cn(
-                                "flex-shrink-0 p-1.5 rounded-md transition-colors",
-                                theme.text,
-                                "hover:bg-black/5 dark:hover:bg-white/10"
-                            )}
-                        >
-                            <BookOpen size={16} />
-                        </button>
-                    )}
-                </div>
-
-                {/* Children (expanded) */}
-                {node.isParent && isExpanded && node.children && (
-                    <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-                        {node.children.map(child => renderNutrientRow(child, theme, depth + 1))}
-                    </div>
-                )}
-            </div>
-        );
-    };
-
     // ═══════════════════════════════════════════════════════════
     //  MAIN RENDER
     // ═══════════════════════════════════════════════════════════
@@ -560,229 +441,103 @@ export function NutrientsView({
                     {/* Sticky Header */}
                     <div className="sticky top-0 z-20 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
                         
-                        {/* Mobile header (Drawer for filters + Search) */}
-                        <div className="flex md:hidden items-center justify-between gap-2 px-4 py-3">
-                            {!selectedNutrient && (
-                                <>
-                                    <button
-                                        onClick={() => {
-                                            setActiveView('nutrient-filters');
-                                            setIsActionPanelOpen(true);
-                                        }}
-                                        className={cn(
-                                            'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
-                                            (excludeFlavour || excludeSupplements)
-                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
-                                        )}
-                                    >
-                                        <Filter size={11} />
-                                        Filter
-                                        {(excludeFlavour || excludeSupplements) && (
-                                            <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
-                                                {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
-                                            </span>
-                                        )}
-                                    </button>
-
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setShowSortOptions(prev => !prev)}
-                                            className={cn(
-                                                "h-9 px-4 rounded-full flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
-                                                showSortOptions
-                                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
-                                                    : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
-                                            )}
-                                            title="Sort Options"
-                                        >
-                                            <ArrowDownUp size={13} />
-                                            <span className="hidden sm:inline">{currentSortLabel}</span>
-                                        </button>
-                                        {showSortOptions && (
-                                            <div className="absolute left-0 top-full mt-2 w-40 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
-                                                {NUTRIENT_SORT_OPTIONS.map(option => (
-                                                    <button
-                                                        key={option.id}
-                                                        onClick={() => {
-                                                            if (nutrientSortField === option.id) {
-                                                                setNutrientSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                                            } else {
-                                                                setNutrientSortField(option.id);
-                                                                setNutrientSortDirection('asc');
-                                                            }
-                                                            setShowSortOptions(false);
-                                                        }}
-                                                        className={cn(
-                                                            "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                            nutrientSortField === option.id
-                                                                ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
-                                                                : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                                        )}
-                                                    >
-                                                        {option.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex-1 relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
-                                        <input
-                                            type="text"
-                                            value={heroQuery}
-                                            onChange={(e) => handleHeroInput(e.target.value)}
-                                            placeholder="Search nutrients..."
-                                            className={cn(
-                                                "w-full h-9 pl-9 pr-4 rounded-full border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
-                                                "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
-                                                "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
-                                                "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
-                                            )}
-                                        />
-                                    </div>
-                                </>
-                            )}
-                            {selectedNutrient && (
+                        <div className="flex items-center justify-between gap-4 px-6 md:px-10 py-4 w-full">
+                            <div className="flex items-center gap-4">
                                 <button
-                                    onClick={() => { setSelectedNutrient(null); setTopFoods([]); setDetailTab('foods'); }}
-                                    className="flex items-center gap-2 h-9 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-full transition-all"
+                                    onClick={() => {
+                                        setActiveView('nutrient-filters');
+                                        setIsActionPanelOpen(true);
+                                    }}
+                                    className={cn(
+                                        'flex items-center gap-2 h-9 px-4 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative shrink-0',
+                                        (excludeFlavour || excludeSupplements)
+                                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                            : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
+                                    )}
                                 >
-                                    <ChevronLeft size={14} /> Back to Nutrients
+                                    <Filter size={11} />
+                                    Filter
+                                    {(excludeFlavour || excludeSupplements) && (
+                                        <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[8px] font-black rounded-full border border-white dark:border-slate-900">
+                                            {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
+                                        </span>
+                                    )}
                                 </button>
-                            )}
-                        </div>
 
-                        {/* Desktop header row */}
-                        {!compact && (
-                            <div className="hidden md:flex md:items-center gap-4 px-10 py-4 w-full">
-                                {!selectedNutrient ? (
-                                    <>
-                                        <div className="flex items-center gap-4">
-                                            <button
-                                                onClick={() => {
-                                                    setActiveView('nutrient-filters');
-                                                    setIsActionPanelOpen(true);
-                                                }}
-                                                className={cn(
-                                                    'h-9 px-4 rounded-xl flex items-center gap-2 transition-all border relative shadow-sm text-[10px] font-black uppercase tracking-widest',
-                                                    (excludeFlavour || excludeSupplements)
-                                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                        : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
-                                                )}
-                                            >
-                                                <Filter size={13} />
-                                                Filter
-                                                {(excludeFlavour || excludeSupplements) && (
-                                                    <span className="w-3.5 h-3.5 flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 text-[7px] font-black rounded-full border border-white dark:border-slate-900">
-                                                        {(excludeFlavour ? 1 : 0) + (excludeSupplements ? 1 : 0)}
-                                                    </span>
-                                                )}
-                                            </button>
-
-                                            <div className="relative">
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowSortOptions(prev => !prev)}
+                                        className={cn(
+                                            "h-9 px-4 rounded-full flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
+                                            showSortOptions
+                                                ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
+                                                : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
+                                        )}
+                                        title="Sort Options"
+                                    >
+                                        <ArrowDownUp size={13} />
+                                        <span className="hidden sm:inline">{currentSortLabel}</span>
+                                    </button>
+                                    {showSortOptions && (
+                                        <div className="absolute left-0 top-full mt-2 w-40 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
+                                            {NUTRIENT_SORT_OPTIONS.map(option => (
                                                 <button
-                                                    onClick={() => setShowSortOptions(prev => !prev)}
+                                                    key={option.id}
+                                                    onClick={() => {
+                                                        if (nutrientSortField === option.id) {
+                                                            setNutrientSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                                        } else {
+                                                            setNutrientSortField(option.id);
+                                                            setNutrientSortDirection('asc');
+                                                        }
+                                                        setShowSortOptions(false);
+                                                    }}
                                                     className={cn(
-                                                        "h-9 px-4 rounded-xl flex items-center gap-2 transition-all border text-[10px] font-black uppercase tracking-widest",
-                                                        showSortOptions
-                                                            ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 border-indigo-200'
-                                                            : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-indigo-200 hover:text-indigo-500'
+                                                        "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
+                                                        nutrientSortField === option.id
+                                                            ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
+                                                            : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
                                                     )}
-                                                    title="Sort Options"
                                                 >
-                                                    <ArrowDownUp size={13} />
-                                                    <span>{currentSortLabel}</span>
+                                                    {option.label}
                                                 </button>
-                                                {showSortOptions && (
-                                                    <div className="absolute left-0 top-full mt-2 w-44 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-20 p-1.5">
-                                                        {NUTRIENT_SORT_OPTIONS.map(option => (
-                                                            <button
-                                                                key={option.id}
-                                                                onClick={() => {
-                                                                    if (nutrientSortField === option.id) {
-                                                                        setNutrientSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                                                    } else {
-                                                                        setNutrientSortField(option.id);
-                                                                        setNutrientSortDirection('asc');
-                                                                    }
-                                                                    setShowSortOptions(false);
-                                                                }}
-                                                                className={cn(
-                                                                    "w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all",
-                                                                    nutrientSortField === option.id
-                                                                        ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600'
-                                                                        : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                                                )}
-                                                            >
-                                                                {option.label}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
 
-                                            <div className="relative">
-                                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
-                                                <input
-                                                    type="text"
-                                                    value={heroQuery}
-                                                    onChange={(e) => handleHeroInput(e.target.value)}
-                                                    placeholder="Search nutrients..."
-                                                    className={cn(
-                                                        "w-64 h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
-                                                        "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
-                                                        "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
-                                                        "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
-                                                    )}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Nutrients Library</div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            onClick={() => { setSelectedNutrient(null); setTopFoods([]); setDetailTab('foods'); }}
-                                            className="flex items-center gap-2 h-9 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
-                                        >
-                                            <ChevronLeft size={14} /> Back to Nutrients
-                                        </button>
-                                        <div className="ml-auto flex items-center gap-3">
-                                            <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 dark:text-white">{selectedNutrient?.label}</h3>
-                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Nutrient Intelligence</div>
-                                        </div>
-                                    </>
-                                )}
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={13} />
+                                    <input
+                                        type="text"
+                                        value={heroQuery}
+                                        onChange={(e) => handleHeroInput(e.target.value)}
+                                        placeholder="Search nutrients..."
+                                        className={cn(
+                                            "w-32 sm:w-64 h-9 pl-9 pr-4 rounded-xl border text-[10px] font-semibold tracking-wide transition-all duration-300 outline-none",
+                                            "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800",
+                                            "placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white",
+                                            "focus:bg-white dark:focus:bg-slate-800 focus:border-emerald-400 dark:focus:border-emerald-600 focus:ring-0"
+                                        )}
+                                    />
+                                </div>
                             </div>
-                        )}
+                            <div className="hidden lg:block ml-auto text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/50">Nutrients Library</div>
+                        </div>
                     </div>
 
-                    <div className={cn("p-4 md:p-10", selectedNutrient ? "space-y-6" : "space-y-8")}>
-                        {selectedNutrient && renderNutrientDetail()}
-                        {!selectedNutrient && renderNutrientList()}
+                    <div className="p-4 md:p-10 space-y-8">
+                        {renderNutrientList()}
                     </div>
                 </div>
             ) : (
-                <div className={cn("p-4 md:p-10", selectedNutrient ? "space-y-6" : "space-y-8")}>
-                    {selectedNutrient ? renderNutrientDetail() : renderNutrientList()}
+                <div className="p-4 md:p-10 space-y-8">
+                    {renderNutrientList()}
                 </div>
             )}
         </div>
     );
 
-    function renderNutrientDetail() {
-        if (!selectedNutrient) return null;
-        return (
-            <NutrientDetailContent 
-                nutrient={selectedNutrient} 
-                excludeFlavour={excludeFlavour} 
-                excludeSupplements={excludeSupplements} 
-            />
-        );
-    }
 
     function renderNutrientList() {
         return (
