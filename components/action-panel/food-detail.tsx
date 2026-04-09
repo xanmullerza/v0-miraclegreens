@@ -34,7 +34,7 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
                 <FoodHeader ctx={ctx} />
                 
                 <div className="px-5 py-4 space-y-6">
-                    {activeSection === 'management' && <FoodManagement ctx={ctx} />}
+                    {activeSection === 'management' && <FoodManagement ctx={ctx} user={ctx.user} />}
                     {activeSection === 'facts' && (food.details || FOOD_DETAILS[food.id]) && <FoodFacts ctx={ctx} />}
                     {activeSection === 'recipes' && <FoodRecipes ctx={ctx} />}
                     {activeSection === 'nutrition' && <FoodNutrition ctx={ctx} />}

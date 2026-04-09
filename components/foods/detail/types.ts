@@ -29,6 +29,7 @@ export interface FoodDetailContextType {
     id: string;
 
     // Permissions & user pref
+    user: any;
     isAdmin: boolean;
     energyUnit: 'kcal' | 'kJ';
     nutrientDisplayMode: 'percentage' | 'value' | 'both';

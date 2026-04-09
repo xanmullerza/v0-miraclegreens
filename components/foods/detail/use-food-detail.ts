@@ -40,6 +40,7 @@ export function useFoodDetail(overrideId?: string): FoodDetailContextType {
     const [managementSubView, setManagementSubView] = useState<'pantry' | 'shopping' | null>(null);
 
     // Permissions & User
+    const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
 
     // Recipes
@@ -74,13 +75,17 @@ export function useFoodDetail(overrideId?: string): FoodDetailContextType {
     // ─── Auth ──────────────────────────────────────────
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
-            const email = session?.user?.email ?? null;
+            const u = session?.user ?? null;
+            setUser(u);
+            const email = u?.email ?? null;
             const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
             setIsAdmin(email?.toLowerCase() === adminEmail.toLowerCase());
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            const email = session?.user?.email ?? null;
+            const u = session?.user ?? null;
+            setUser(u);
+            const email = u?.email ?? null;
             const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
             setIsAdmin(email?.toLowerCase() === adminEmail.toLowerCase());
         });
@@ -383,6 +388,7 @@ export function useFoodDetail(overrideId?: string): FoodDetailContextType {
         food,
         loading,
         id,
+        user,
         isAdmin,
         energyUnit,
         nutrientDisplayMode,
