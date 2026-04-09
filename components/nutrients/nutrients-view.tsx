@@ -429,7 +429,10 @@ export function NutrientsView({
     // ═══════════════════════════════════════════════════════════
 
     return (
-        <div className={cn("space-y-8 animate-in fade-in duration-500", compact ? "max-h-full" : "pb-32")}>
+        <div className={cn(
+            "space-y-8 animate-in fade-in duration-500 overflow-y-auto custom-scrollbar pb-32",
+            compact ? "h-full" : "min-h-screen"
+        )}>
             
             {/* List Container */}
             {!noContainer ? (

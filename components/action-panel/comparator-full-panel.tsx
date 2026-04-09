@@ -226,7 +226,7 @@ export function ComparatorFullPanel() {
     };
 
     return (
-        <div className="space-y-4 max-h-[600px] overflow-y-auto">
+        <div className="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar pb-32">
             {/* Search Bar */}
             <div className="relative">
                 <Search className="absolute left-2 top-2.5 text-muted-foreground" size={16} />

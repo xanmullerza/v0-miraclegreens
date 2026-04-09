@@ -10,7 +10,7 @@ interface PlannerPanelProps {
 
 export function PlannerPanel({ onBack, onRecipeClick }: PlannerPanelProps) {
     return (
-        <div className="flex-1 overflow-y-auto flex flex-col relative w-full h-full">
+        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col relative w-full h-full pb-32">
             <MealPlannerContent onRecipeClick={onRecipeClick} />
         </div>
     );

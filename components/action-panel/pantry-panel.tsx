@@ -103,7 +103,7 @@ export function PantryPanel({ onBack }: PantryPanelProps) {
                 />
             }
         >
-            <div className="flex-1 overflow-y-auto flex flex-col p-3 pt-0">
+            <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-3 pt-0 pb-32">
                 <div className="space-y-4">
                     {/* Search Results Dropdown Overlay Logic */}
                     {searchQuery.length >= 2 && (

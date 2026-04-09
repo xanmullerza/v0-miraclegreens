@@ -478,7 +478,7 @@ export function LifeguardFullIntegration() {
     }, [comparisonMode, comparisonAdjustedInventory, simulationDay, profileType, comparisonWaterStatus]);
 
     return (
-        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+        <div className="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar pb-32 pr-2">
             {/* Boost Toasts */}
             <div className="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw]">
                 {boosts.map(boost => (
