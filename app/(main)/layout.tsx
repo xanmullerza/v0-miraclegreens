@@ -104,7 +104,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
-            <HeaderLogo />
+            <React.Suspense fallback={<div className="h-12 border-b bg-background" />}>
+                <HeaderLogo />
+            </React.Suspense>
             
             {/* Main content flex container */}
             <div className="flex flex-1 overflow-hidden">
@@ -124,7 +126,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                                 {children}
                             </div>
                         </div>
-                        {pathname !== '/dashboard' && !isDesktop && <Footer />}
+                        {pathname !== '/dashboard' && !isDesktop && (
+                            <React.Suspense fallback={null}>
+                                <Footer />
+                            </React.Suspense>
+                        )}
                     </main>
                 </div>
 
@@ -135,22 +141,26 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         "flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative",
                         getChatWidth()
                     )}>
-                        <ActionPanelContainer
-                            onClose={() => {}}
-                            isInline={true}
-                            onRecipeDetected={handleRecipeDetected}
-                        />
+                        <React.Suspense fallback={<div className="flex-1 bg-slate-50 animate-pulse" />}>
+                            <ActionPanelContainer
+                                onClose={() => {}}
+                                isInline={true}
+                                onRecipeDetected={handleRecipeDetected}
+                            />
+                        </React.Suspense>
                         
                     </div>
                 )}
 
                 {/* Mobile chatbot Modal */}
                 {isMobile && isActionPanelOpen && (
-                    <ActionPanelContainer
-                        onClose={() => setIsActionPanelOpen(false)}
-                        isInline={false}
-                        onRecipeDetected={handleRecipeDetected}
-                    />
+                    <React.Suspense fallback={null}>
+                        <ActionPanelContainer
+                            onClose={() => setIsActionPanelOpen(false)}
+                            isInline={false}
+                            onRecipeDetected={handleRecipeDetected}
+                        />
+                    </React.Suspense>
                 )}
             </div>
 
