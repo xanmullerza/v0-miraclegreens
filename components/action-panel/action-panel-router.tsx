@@ -269,7 +269,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
             const nutrient = findNutrientById(contextRecipeId || '');
             if (!nutrient) return <div className="p-8 text-center text-xs font-black uppercase tracking-widest text-slate-400">Nutrient Intelligence Offline</div>;
             return (
-                <PanelWrapper title={nutrient.label} onBack={handleBack}>
+                <PanelWrapper title={nutrient.label}>
                     <NutrientDetailContent 
                         nutrient={nutrient} 
                         excludeFlavour={excludeFlavour} 
