@@ -23,13 +23,14 @@ interface TrackerTabShellProps {
     onScaleChange?: (val: number) => void;
     scaleMode?: 'multiplier' | 'grams';
     filterChildren?: React.ReactNode;
+    theme?: 'blue' | 'emerald' | 'amber';
 }
 
 export function TrackerTabShell(props: TrackerTabShellProps) {
     return (
         <TabShell 
             {...props} 
-            theme="blue" 
+            theme={props.theme || "blue"} 
             isFiltersOpen={props.isFiltersOpen}
         />
     );
