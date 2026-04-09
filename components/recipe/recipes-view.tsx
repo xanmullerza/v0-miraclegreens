@@ -440,7 +440,7 @@ export function RecipesView({
 
     const handleEdit = (e: React.MouseEvent, recipeId: string) => {
         e.stopPropagation();
-        router.push(`/recipes/${recipeId}`);
+        router.push(`/?recipeId=${recipeId}`);
     };
 
     const renderRecipesList = () => {
@@ -483,7 +483,7 @@ export function RecipesView({
                             )}
 
 
-                            onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
+                            onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/?recipeId=${recipe.id}`)}
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 sm:p-4">
                                 <div className="relative shrink-0 flex items-center">

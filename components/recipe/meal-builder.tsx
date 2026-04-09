@@ -23,7 +23,7 @@ export function MealBuilderContent({ onBack }: { onBack?: () => void }) {
             <UserRecipeBuilder 
                 defaultType="meal" 
                 onSaveSuccess={(id) => {
-                    router.push(`/recipes/${id}`);
+                    router.push(`/?recipeId=${id}`);
                 }}
             />
         </div>

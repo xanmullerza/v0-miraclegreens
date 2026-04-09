@@ -303,7 +303,7 @@ export function NutrientsView({
         if (node.id.startsWith('_')) return;
         
         // Navigate to dedicated nutrient page
-        router.push(`/nutrients/${encodeURIComponent(node.id)}`);
+        router.push(`/?nutrientId=${encodeURIComponent(node.id)}`);
     }, [router]);
 
     // ─── Toggle helpers ───────────────────────────────────────

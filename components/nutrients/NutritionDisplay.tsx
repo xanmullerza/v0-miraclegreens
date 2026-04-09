@@ -95,7 +95,7 @@ export function NutritionDisplay({
                 
                 {/* Carbs */}
                 <Link 
-                    href="/nutrients/Carbs"
+                    href="/?nutrientId=Carbs"
                     className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
                 >
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
@@ -113,7 +113,7 @@ export function NutritionDisplay({
                 
                 {/* Protein */}
                 <Link 
-                    href="/nutrients/Protein"
+                    href="/?nutrientId=Protein"
                     className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
                 >
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
@@ -131,7 +131,7 @@ export function NutritionDisplay({
                 
                 {/* Fat */}
                 <Link 
-                    href="/nutrients/Fat"
+                    href="/?nutrientId=Fat"
                     className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
                 >
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
@@ -240,7 +240,7 @@ export function NutritionDisplay({
                             return (
                                 <Link 
                                     key={v.label} 
-                                    href={`/nutrients/${encodeURIComponent(v.fullName || v.label)}`}
+                                    href={`/?nutrientId=${encodeURIComponent(v.fullName || v.label)}`}
                                     className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
                                 >
                                     <span className={cn('text-sm font-semibold group-hover/nut:text-violet-400', meetsThreshold ? 'text-violet-300' : 'text-slate-400')}>
@@ -261,7 +261,7 @@ export function NutritionDisplay({
                         })}
                         <div className="border-t border-slate-700 pt-2 mt-2">
                             <Link 
-                                href="/nutrients/Choline"
+                                href="/?nutrientId=Choline"
                                 className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
                             >
                                 <span
@@ -305,7 +305,7 @@ export function NutritionDisplay({
                             return (
                                 <Link 
                                     key={m.label} 
-                                    href={`/nutrients/${encodeURIComponent(m.label)}`}
+                                    href={`/?nutrientId=${encodeURIComponent(m.label)}`}
                                     className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
                                 >
                                     <span className={cn('text-sm font-semibold group-hover/nut:text-cyan-400', meetsThreshold ? 'text-cyan-300' : 'text-slate-400')}>

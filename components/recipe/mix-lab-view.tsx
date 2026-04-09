@@ -210,7 +210,7 @@ export function MixLabView() {
                     {filteredMixes.map((mix) => (
                         <div
                             key={mix.id}
-                            onClick={() => router.push(`/recipes/${mix.id}`)}
+                            onClick={() => router.push(`/?recipeId=${mix.id}`)}
                             className="group bg-card rounded-2xl border border-border hover:border-purple-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
                         >
                             <div className="aspect-video bg-gradient-to-br from-purple-100 to-fuchsia-100 dark:from-purple-900/30 dark:to-fuchsia-900/30 flex items-center justify-center">

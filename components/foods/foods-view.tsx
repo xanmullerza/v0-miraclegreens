@@ -302,7 +302,7 @@ export function FoodsView() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => router.push(`/foods/${food.id}`)}
+                                                                onClick={() => router.push(`/?foodId=${food.id}`)}
                                                                 className="h-9 w-9 rounded-xl text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
                                                                 title="Details"
                                                             >

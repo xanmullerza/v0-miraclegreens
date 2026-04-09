@@ -89,7 +89,7 @@ export const RecipeListItem = ({
 
     return (
         <div 
-            onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/recipes/${recipe.id}`)}
+            onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/?recipeId=${recipe.id}`)}
             className={cn(
                 'group relative rounded-[2.5rem] transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1',
                 isEaten 

@@ -218,7 +218,7 @@ export default function ManageRecipesPage() {
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    onClick={() => router.push(`/recipes/${recipe.id}`)}
+                                    onClick={() => router.push(`/?recipeId=${recipe.id}`)}
                                     className="w-10 h-10 rounded-xl border-slate-200 dark:border-slate-800 text-slate-400 hover:text-violet-600 hover:bg-violet-50 p-0"
                                 >
                                     <ExternalLink size={14} />

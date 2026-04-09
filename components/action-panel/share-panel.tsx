@@ -21,7 +21,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
     const [copied, setCopied] = useState(false);
     const [showMore, setShowMore] = useState(false);
 
-    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/recipes/${recipe?.id || ''}` : '';
+    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/?recipeId=${recipe?.id || ''}` : '';
     const shareText = recipe 
         ? `Check out this delicious recipe for ${recipe.title} on Miracle Greens! 🥗`
         : `Check out Miracle Greens - Modern Nutrition & Recipe Management! 🥗`;

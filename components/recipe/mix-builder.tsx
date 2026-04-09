@@ -23,7 +23,7 @@ export function MixBuilderContent({ onBack }: { onBack?: () => void }) {
             <UserRecipeBuilder 
                 defaultType="mix" 
                 onSaveSuccess={(id) => {
-                    router.push(`/recipes/${id}`);
+                    router.push(`/?recipeId=${id}`);
                 }}
             />
         </div>
