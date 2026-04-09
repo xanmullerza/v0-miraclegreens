@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Activity } from 'lucide-react';
 
@@ -93,49 +94,58 @@ export function NutritionDisplay({
                 </div>
                 
                 {/* Carbs */}
-                <button 
-                    onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
-                    className="text-center hover:opacity-80 transition-opacity group relative"
+                <Link 
+                    href="/nutrients/Carbs"
+                    className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
                 >
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
                     <div className="text-lg font-black text-slate-900 dark:text-white">
                         {Math.round(carbs.value)}
                     </div>
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
-                    <div className="absolute top-0 right-0 text-slate-400 group-hover:text-blue-500 transition-colors">
+                    <button 
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs'); }}
+                        className="absolute top-0 right-0 text-slate-400 group-hover:text-blue-500 transition-colors"
+                    >
                         {expandedMacro === 'carbs' ? '▼' : '▶'}
-                    </div>
-                </button>
+                    </button>
+                </Link>
                 
                 {/* Protein */}
-                <button 
-                    onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
-                    className="text-center hover:opacity-80 transition-opacity group relative"
+                <Link 
+                    href="/nutrients/Protein"
+                    className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
                 >
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
                     <div className="text-lg font-black text-slate-900 dark:text-white">
                         {Math.round(protein.value)}
                     </div>
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
-                    <div className="absolute top-0 right-0 text-slate-400 group-hover:text-rose-500 transition-colors">
+                    <button 
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedMacro(expandedMacro === 'protein' ? null : 'protein'); }}
+                        className="absolute top-0 right-0 text-slate-400 group-hover:text-rose-500 transition-colors"
+                    >
                         {expandedMacro === 'protein' ? '▼' : '▶'}
-                    </div>
-                </button>
+                    </button>
+                </Link>
                 
                 {/* Fat */}
-                <button 
-                    onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
-                    className="text-center hover:opacity-80 transition-opacity group relative"
+                <Link 
+                    href="/nutrients/Fat"
+                    className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
                 >
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
                     <div className="text-lg font-black text-slate-900 dark:text-white">
                         {Math.round(fat.value)}
                     </div>
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
-                    <div className="absolute top-0 right-0 text-slate-400 group-hover:text-amber-500 transition-colors">
+                    <button 
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedMacro(expandedMacro === 'fat' ? null : 'fat'); }}
+                        className="absolute top-0 right-0 text-slate-400 group-hover:text-amber-500 transition-colors"
+                    >
                         {expandedMacro === 'fat' ? '▼' : '▶'}
-                    </div>
-                </button>
+                    </button>
+                </Link>
             </div>
 
             {/* Expanded Macro Details */}
@@ -228,8 +238,12 @@ export function NutritionDisplay({
                         {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).map(v => {
                             const meetsThreshold = v.pct >= universalThreshold;
                             return (
-                                <div key={v.label} className="flex items-center justify-between">
-                                    <span className={cn('text-sm font-semibold', meetsThreshold ? 'text-violet-300' : 'text-slate-400')}>
+                                <Link 
+                                    key={v.label} 
+                                    href={`/nutrients/${encodeURIComponent(v.fullName || v.label)}`}
+                                    className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
+                                >
+                                    <span className={cn('text-sm font-semibold group-hover/nut:text-violet-400', meetsThreshold ? 'text-violet-300' : 'text-slate-400')}>
                                         {v.label}
                                     </span>
                                     <span
@@ -242,14 +256,17 @@ export function NutritionDisplay({
                                         {ndm === 'percentage' && `${v.pct}%`}
                                         {ndm === 'both' && `${v.val.toFixed(1)} (${v.pct}%)`}
                                     </span>
-                                </div>
+                                </Link>
                             );
                         })}
                         <div className="border-t border-slate-700 pt-2 mt-2">
-                            <div className="flex items-center justify-between">
+                            <Link 
+                                href="/nutrients/Choline"
+                                className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
+                            >
                                 <span
                                     className={cn(
-                                        'text-sm font-semibold',
+                                        'text-sm font-semibold group-hover/nut:text-violet-400',
                                         micronutrients.choline.pct >= universalThreshold ? 'text-violet-300' : 'text-slate-400'
                                     )}
                                 >
@@ -265,7 +282,7 @@ export function NutritionDisplay({
                                     {ndm === 'percentage' && `${micronutrients.choline.pct}%`}
                                     {ndm === 'both' && `${micronutrients.choline.val.toFixed(1)} mg (${micronutrients.choline.pct}%)`}
                                 </span>
-                            </div>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -286,8 +303,12 @@ export function NutritionDisplay({
                         {micronutrients.electrolytes.concat(micronutrients.trace).map(m => {
                             const meetsThreshold = m.pct >= universalThreshold;
                             return (
-                                <div key={m.label} className="flex items-center justify-between">
-                                    <span className={cn('text-sm font-semibold', meetsThreshold ? 'text-cyan-300' : 'text-slate-400')}>
+                                <Link 
+                                    key={m.label} 
+                                    href={`/nutrients/${encodeURIComponent(m.label)}`}
+                                    className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
+                                >
+                                    <span className={cn('text-sm font-semibold group-hover/nut:text-cyan-400', meetsThreshold ? 'text-cyan-300' : 'text-slate-400')}>
                                         {m.label}
                                     </span>
                                     <span
@@ -300,7 +321,7 @@ export function NutritionDisplay({
                                         {ndm === 'percentage' && `${m.pct}%`}
                                         {ndm === 'both' && `${m.val.toFixed(1)} mg (${m.pct}%)`}
                                     </span>
-                                </div>
+                                </Link>
                             );
                         })}
                     </div>

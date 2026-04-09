@@ -14,6 +14,8 @@ import { useRDA } from '@/hooks/use-rda';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { Switch } from '@/components/ui/switch';
+import { NutrientNode, AccordionSection, ACCORDION_SECTIONS } from './nutrients-view-data';
+import { NutrientDetailContent } from './nutrient-detail-content';
 
 interface NutrientFilterPanelProps {
     excludeFlavour: boolean;
@@ -87,192 +89,7 @@ export function NutrientFilterPanel({
     );
 }
 
-// ─── Types ────────────────────────────────────────────────────
-
-interface NutrientNode {
-    id: string;           // key used in the JSON data & RDA lookups
-    label: string;        // display name
-    unit: string;
-    isParent?: boolean;   // has children → accent color
-    children?: NutrientNode[];
-    theme?: string;       // override theme for this node & children
-}
-
-interface AccordionSection {
-    id: string;
-    label: string;
-    subtitle: string;
-    icon: any;
-    theme: string;
-    nutrients: NutrientNode[];
-}
-
-interface FoodRanking {
-    rank: number;
-    name: string;
-    common_name?: string;
-    image_url: string | null;
-    value: number;
-}
-
-// ─── Hierarchical Nutrient Data ───────────────────────────────
-
-const ACCORDION_SECTIONS: AccordionSection[] = [
-    {
-        id: 'macronutrients',
-        label: 'Macronutrients',
-        subtitle: 'Energy sources, structural compounds, and hydration',
-        icon: Zap,
-        theme: 'emerald',
-        nutrients: [
-            {
-                id: 'Carbs', label: 'Carbohydrates', unit: 'g', isParent: true,
-                theme: 'orange',
-                children: [
-                    {
-                        id: 'Sugars', label: 'Sugars', unit: 'g', isParent: true,
-                        theme: 'violet',
-                        children: [
-                            { id: 'Fructose', label: 'Fructose', unit: 'g' },
-                            { id: 'Glucose', label: 'Glucose', unit: 'g' },
-                            { id: 'Galactose', label: 'Galactose', unit: 'g' },
-                            { id: 'Sucrose', label: 'Sucrose', unit: 'g' },
-                            { id: 'Lactose', label: 'Lactose', unit: 'g' },
-                            { id: 'Maltose', label: 'Maltose', unit: 'g' },
-                            { id: 'Allulose', label: 'Allulose', unit: 'g' },
-                        ]
-                    },
-                    { id: 'Starch', label: 'Starch', unit: 'g', theme: 'amber' },
-                    { id: 'Fiber', label: 'Fiber', unit: 'g', theme: 'teal' },
-                    { id: 'Sugar Alcohol', label: 'Sugar Alcohol', unit: 'g', theme: 'sky' },
-                ]
-            },
-            {
-                id: 'Fat', label: 'Fat', unit: 'g', isParent: true,
-                theme: 'rose',
-                children: [
-                    {
-                        id: 'Polyunsaturated Fat', label: 'Polyunsaturated Fat', unit: 'g', isParent: true,
-                        theme: 'teal',
-                        children: [
-                            { id: 'Omega-3', label: 'Omega-3', unit: 'g' },
-                            { id: 'Omega-6', label: 'Omega-6', unit: 'g' },
-                        ]
-                    },
-                    { id: 'Saturated Fat', label: 'Saturated Fat', unit: 'g', theme: 'orange' },
-                    { id: 'Monounsaturated Fat', label: 'Monounsaturated Fat', unit: 'g', theme: 'amber' },
-                    { id: 'Trans Fat', label: 'Trans Fat', unit: 'g', theme: 'sky' },
-                    { id: 'Cholesterol', label: 'Cholesterol', unit: 'mg', theme: 'violet' },
-                    { id: 'Phytosterol', label: 'Phytosterol', unit: 'mg', theme: 'emerald' },
-                ]
-            },
-            {
-                id: 'Protein', label: 'Protein', unit: 'g', isParent: true,
-                theme: 'blue',
-                children: [
-                    {
-                        id: '_essential_aa', label: 'Essential Amino Acids', unit: 'g', isParent: true,
-                        theme: 'purple',
-                        children: [
-                            { id: 'Histidine', label: 'Histidine', unit: 'g' },
-                            { id: 'Isoleucine', label: 'Isoleucine', unit: 'g' },
-                            { id: 'Leucine', label: 'Leucine', unit: 'g' },
-                            { id: 'Lysine', label: 'Lysine', unit: 'g' },
-                            { id: 'Methionine', label: 'Methionine', unit: 'g' },
-                            { id: 'Phenylalanine', label: 'Phenylalanine', unit: 'g' },
-                            { id: 'Threonine', label: 'Threonine', unit: 'g' },
-                            { id: 'Tryptophan', label: 'Tryptophan', unit: 'g' },
-                            { id: 'Valine', label: 'Valine', unit: 'g' },
-                        ]
-                    },
-                    {
-                        id: '_nonessential_aa', label: 'Non-Essential Amino Acids', unit: 'g', isParent: true,
-                        theme: 'pink',
-                        children: [
-                            { id: 'Alanine', label: 'Alanine', unit: 'g' },
-                            { id: 'Arginine', label: 'Arginine', unit: 'g' },
-                            { id: 'Aspartic acid', label: 'Aspartic Acid', unit: 'g' },
-                            { id: 'Glutamic acid', label: 'Glutamic Acid', unit: 'g' },
-                            { id: 'Glycine', label: 'Glycine', unit: 'g' },
-                            { id: 'Proline', label: 'Proline', unit: 'g' },
-                            { id: 'Serine', label: 'Serine', unit: 'g' },
-                            { id: 'Tyrosine', label: 'Tyrosine', unit: 'g' },
-                        ]
-                    },
-                ]
-            },
-        ]
-    },
-    {
-        id: 'minerals',
-        label: 'Minerals',
-        subtitle: 'Essential elements for cellular function and structure',
-        icon: Gem,
-        theme: 'emerald',
-        nutrients: [
-            { id: 'Calcium', label: 'Calcium', unit: 'mg' },
-            { id: 'Iron', label: 'Iron', unit: 'mg' },
-            { id: 'Magnesium', label: 'Magnesium', unit: 'mg' },
-            { id: 'Phosphorus', label: 'Phosphorus', unit: 'mg' },
-            { id: 'Potassium', label: 'Potassium', unit: 'mg' },
-            { id: 'Sodium', label: 'Sodium', unit: 'mg' },
-            { id: 'Zinc', label: 'Zinc', unit: 'mg' },
-            { id: 'Copper', label: 'Copper', unit: 'mg' },
-            { id: 'Manganese', label: 'Manganese', unit: 'mg' },
-            { id: 'Selenium', label: 'Selenium', unit: 'µg' },
-            { id: 'Chromium', label: 'Chromium', unit: 'µg' },
-            { id: 'Molybdenum', label: 'Molybdenum', unit: 'µg' },
-            { id: 'Iodine', label: 'Iodine', unit: 'µg' },
-            { id: 'Fluoride', label: 'Fluoride', unit: 'mg' },
-        ]
-    },
-    {
-        id: 'vitamins',
-        label: 'Vitamins',
-        subtitle: 'Organic compounds vital for metabolic processes',
-        icon: Battery,
-        theme: 'emerald',
-        nutrients: [
-            {
-                id: 'Vitamin A', label: 'Vitamin A', unit: 'µg', isParent: true,
-                theme: 'orange',
-                children: [
-                    { id: 'Retinol', label: 'Retinol', unit: 'µg' },
-                    { id: 'Beta-carotene', label: 'Beta-carotene', unit: 'µg' },
-                    { id: 'Alpha-carotene', label: 'Alpha-carotene', unit: 'µg' },
-                    { id: 'Beta-cryptoxanthin', label: 'Beta-cryptoxanthin', unit: 'µg' },
-                ]
-            },
-            {
-                id: 'Vitamin E', label: 'Vitamin E', unit: 'mg', isParent: true,
-                theme: 'pink',
-                children: [
-                    { id: 'Alpha-tocopherol', label: 'Alpha-tocopherol', unit: 'mg' },
-                    { id: 'Beta-tocopherol', label: 'Beta-tocopherol', unit: 'mg' },
-                    { id: 'Delta-tocopherol', label: 'Delta-tocopherol', unit: 'mg' },
-                    { id: 'Gamma-tocopherol', label: 'Gamma-tocopherol', unit: 'mg' },
-                ]
-            },
-            { id: 'Vitamin C', label: 'Vitamin C', unit: 'mg', theme: 'sky' },
-            { id: 'Vitamin D', label: 'Vitamin D', unit: 'µg', theme: 'amber' },
-            { id: 'Vitamin K', label: 'Vitamin K', unit: 'µg', theme: 'rose' },
-            {
-                id: '_b_vitamins', label: 'B Vitamins', unit: '', isParent: true,
-                theme: 'purple',
-                children: [
-                    { id: 'B1 (Thiamine)', label: 'B1 (Thiamine)', unit: 'mg' },
-                    { id: 'B2 (Riboflavin)', label: 'B2 (Riboflavin)', unit: 'mg' },
-                    { id: 'B3 (Niacin)', label: 'B3 (Niacin)', unit: 'mg' },
-                    { id: 'B5 (Pantothenic Acid)', label: 'B5 (Pantothenic Acid)', unit: 'mg' },
-                    { id: 'B6 (Pyridoxine)', label: 'B6 (Pyridoxine)', unit: 'mg' },
-                    { id: 'B9 (Folate)', label: 'B9 (Folate)', unit: 'µg' },
-                    { id: 'B12 (Cobalamin)', label: 'B12 (Cobalamin)', unit: 'µg' },
-                ]
-            },
-            { id: 'Choline', label: 'Choline', unit: 'mg', theme: 'teal' },
-        ]
-    },
-];
+// Data moved to nutrients-view-data.ts
 
 // ─── Theme Map ────────────────────────────────────────────────
 
@@ -408,9 +225,6 @@ export function NutrientsView({
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
     const [selectedNutrient, setSelectedNutrient] = useState<NutrientNode | null>(null);
-    const [topFoods, setTopFoods] = useState<FoodRanking[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [detailTab, setDetailTab] = useState<'foods' | 'learn'>('foods');
     const [nutrientSortField, setNutrientSortField] = useState<'section' | 'name'>('section');
     const [nutrientSortDirection, setNutrientSortDirection] = useState<'asc' | 'desc'>('asc');
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -485,106 +299,131 @@ export function NutrientsView({
 
     // ─── Detail View: fetch top foods ─────────────────────────
 
-    const selectNutrient = useCallback(async (node: NutrientNode) => {
+    const selectNutrient = useCallback((node: NutrientNode) => {
         // Group headers like "_essential_aa" are not clickable for detail
         if (node.id.startsWith('_')) return;
+        
+        // Navigate to dedicated nutrient page
+        router.push(`/nutrients/${encodeURIComponent(node.id)}`);
+    }, [router]);
 
-        setSelectedNutrient(node);
-        setDetailTab('foods');
-        setIsLoading(true);
+    // ─── Toggle helpers ───────────────────────────────────────
 
-        try {
-            const col = COLUMN_MAP[node.id];
-            if (!col) {
-                // Try micronutrients JSONB
-                const { data: jsonMatch, error: jsonError } = await supabase
-                    .from('food_items')
-                    .select('id, name, common_name, image, micronutrients, category')
-                    .not('micronutrients', 'is', null)
-                    .limit(200);
+    const toggleSection = (sectionId: string) => {
+        setExpandedSections(prev => {
+            const next = new Set(prev);
+            next.has(sectionId) ? next.delete(sectionId) : next.add(sectionId);
+            return next;
+        });
+    };
 
-                if (!jsonError && jsonMatch) {
-                    const sorted = jsonMatch
-                        .filter(f => {
-                            if (!f.micronutrients || f.micronutrients[node.id] === undefined) return false;
-                            if (excludeFlavour && f.category === 'Flavour') return false;
-                            if (excludeSupplements && f.category === 'Supplements') return false;
-                            return true;
-                        })
-                        .sort((a, b) => (b.micronutrients[node.id] || 0) - (a.micronutrients[node.id] || 0))
-                        .slice(0, 10);
+    const toggleParent = (parentId: string) => {
+        setExpandedParents(prev => {
+            const next = new Set(prev);
+            next.has(parentId) ? next.delete(parentId) : next.add(parentId);
+            return next;
+        });
+    };
 
-                    setTopFoods(sorted.map((item: any, idx) => ({
-                        rank: idx + 1,
-                        name: item.name,
-                        common_name: item.common_name,
-                        image_url: item.image || null,
-                        value: item.micronutrients[node.id] || 0
-                    })));
-                } else {
-                    setTopFoods([]);
-                }
-                return;
-            }
+    // ─── Count leaves in a section ────────────────────────────
 
-            const { data, error } = await supabase
-                .from('food_items')
-                .select('id, name, common_name, image, category, ' + col)
-                .not(col, 'is', null)
-                .order(col, { ascending: false })
-                .limit(20);
-
-            const filterData = (items: any[]) => items.filter(item => {
-                if (excludeFlavour && item.category === 'Flavour') return false;
-                if (excludeSupplements && item.category === 'Supplements') return false;
-                return true;
-            }).slice(0, 10);
-
-            if (error || !data || data.length === 0) {
-                // Fallback to JSONB
-                const { data: jsonMatch } = await supabase
-                    .from('food_items')
-                    .select('id, name, common_name, image, micronutrients, category')
-                    .not('micronutrients', 'is', null)
-                    .limit(200);
-
-                if (jsonMatch) {
-                    const sorted = jsonMatch
-                        .filter(f => {
-                            if (!f.micronutrients || f.micronutrients[node.id] === undefined) return false;
-                            if (excludeFlavour && f.category === 'Flavour') return false;
-                            if (excludeSupplements && f.category === 'Supplements') return false;
-                            return true;
-                        })
-                        .sort((a, b) => (b.micronutrients[node.id] || 0) - (a.micronutrients[node.id] || 0))
-                        .slice(0, 10);
-
-                    setTopFoods(sorted.map((item: any, idx) => ({
-                        rank: idx + 1, name: item.name, common_name: item.common_name,
-                        image_url: item.image || null, value: item.micronutrients[node.id] || 0
-                    })));
-                } else {
-                    setTopFoods([]);
-                }
-            } else {
-                const filtered = filterData(data);
-                setTopFoods(filtered.map((item: any, idx) => ({
-                    rank: idx + 1, name: item.name, common_name: item.common_name,
-                    image_url: item.image || null, value: item[col] || 0
-                })));
-            }
-        } catch (err) {
-            console.error('Error fetching nutrient data:', err);
-            setTopFoods([]);
-        } finally {
-            setIsLoading(false);
+    function countLeaves(nodes: NutrientNode[]): number {
+        let c = 0;
+        for (const n of nodes) {
+            if (n.children) c += countLeaves(n.children);
+            else c++;
         }
-    }, [excludeFlavour, excludeSupplements]);
+        return c;
+    }
 
-    // Re-fetch when filters change
-    useEffect(() => {
-        if (selectedNutrient) selectNutrient(selectedNutrient);
-    }, [excludeFlavour, excludeSupplements]);
+    // ─── Render a nutrient row ────────────────────────────────
+
+    const renderNutrientRow = (node: NutrientNode, sectionTheme: typeof THEMES['orange'], depth: number = 0) => {
+        const theme = node.theme ? (THEMES[node.theme] || sectionTheme) : sectionTheme;
+        const isExpanded = expandedParents.has(node.id);
+        const rda = getRDA(node.id);
+        const isGroupHeader = node.id.startsWith('_');
+
+        return (
+            <div key={node.id}>
+                <div
+                    className={cn(
+                        "w-full text-left flex items-center gap-3 py-3 px-4 rounded-xl transition-all group",
+                        node.isParent
+                            ? cn("border-l-[3px]", theme.parentBorder, theme.parentBg, "hover:shadow-md cursor-pointer")
+                            : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-[3px] border-l-transparent",
+                        depth > 0 && "ml-4"
+                    )}
+                    onClick={() => {
+                        if (node.isParent) toggleParent(node.id);
+                        else if (!isGroupHeader) selectNutrient(node);
+                    }}
+                >
+                    {/* Expand chevron for parents */}
+                    {node.isParent ? (
+                        <ChevronDown
+                            size={14}
+                            className={cn(
+                                "shrink-0 transition-transform duration-200",
+                                theme.text,
+                                isExpanded ? "rotate-0" : "-rotate-90"
+                            )}
+                        />
+                    ) : (
+                        <div className="w-[14px] shrink-0" />
+                    )}
+
+                    {/* Label */}
+                    <span className={cn(
+                        "flex-1 text-[10px] font-black uppercase tracking-widest",
+                        (node.isParent || node.theme || depth > 0) ? theme.text : "text-slate-700 dark:text-slate-300",
+                        (node.isParent || node.theme) && "text-[11px]"
+                    )}>
+                        {node.label}
+                    </span>
+
+                    {/* RDA value */}
+                    {rda > 0 && !isGroupHeader && (
+                        <span className="text-[10px] font-bold text-slate-400 tabular-nums">
+                            {rda >= 100 ? Math.round(rda) : parseFloat(rda.toFixed(1))} {node.unit}
+                        </span>
+                    )}
+
+                    {/* Children count badge */}
+                    {node.isParent && node.children && (
+                        <span className={cn("text-[8px] font-black px-2 py-0.5 rounded-full", theme.badge)}>
+                            {node.children.length}
+                        </span>
+                    )}
+
+                    {/* Learn Button for clickable items */}
+                    {!isGroupHeader && !node.isParent && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                selectNutrient(node);
+                            }}
+                            title={`Learn about ${node.label}`}
+                            className={cn(
+                                "flex-shrink-0 p-1.5 rounded-md transition-colors",
+                                theme.text,
+                                "hover:bg-black/5 dark:hover:bg-white/10"
+                            )}
+                        >
+                            <BookOpen size={16} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Children (expanded) */}
+                {node.isParent && isExpanded && node.children && (
+                    <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+                        {node.children.map(child => renderNutrientRow(child, theme, depth + 1))}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     // ─── Toggle helpers ───────────────────────────────────────
 
@@ -937,114 +776,11 @@ export function NutrientsView({
     function renderNutrientDetail() {
         if (!selectedNutrient) return null;
         return (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/40 dark:to-emerald-900/20 rounded-3xl p-6 md:p-8 border border-emerald-200 dark:border-emerald-800/50 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <Activity size={120} />
-                    </div>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                <Activity size={24} />
-                            </div>
-                            <div>
-                                <h3 className="font-black text-2xl text-emerald-900 dark:text-emerald-100 uppercase tracking-tighter italic italic-bold">{selectedNutrient?.label}</h3>
-                                <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mt-0.5 opacity-75">
-                                    Target: {getRDA(selectedNutrient?.id || '') >= 100 ? Math.round(getRDA(selectedNutrient?.id || '')) : parseFloat(getRDA(selectedNutrient?.id || '').toFixed(1))} {selectedNutrient?.unit}
-                                </p>
-                            </div>
-                        </div>
-                        {selectedNutrient && nutrientInfo[selectedNutrient.id]?.importance && (
-                            <p className="text-sm font-bold text-emerald-800 dark:text-emerald-300/80 leading-relaxed max-w-2xl">
-                                {nutrientInfo[selectedNutrient.id].importance}
-                            </p>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex gap-2 bg-slate-100 dark:bg-slate-900 rounded-2xl p-1.5 border border-slate-200 dark:border-slate-800 max-w-md">
-                    <button onClick={() => setDetailTab('foods')} className={cn("flex-1 text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all", detailTab === 'foods' ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-md border border-slate-200 dark:border-slate-700" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")}>
-                        <span className="inline-flex items-center gap-2"><UtensilsCrossed size={14} /> Top Foods</span>
-                    </button>
-                    <button onClick={() => setDetailTab('learn')} className={cn("flex-1 text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all", detailTab === 'learn' ? "bg-white dark:bg-slate-800 text-amber-600 shadow-md border border-slate-200 dark:border-slate-700" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white")}>
-                        <span className="inline-flex items-center gap-2"><Lightbulb size={14} /> Information</span>
-                    </button>
-                </div>
-
-                {detailTab === 'foods' ? (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {isLoading ? (
-                                <div className="col-span-full py-20 text-center animate-pulse">
-                                    <Loader2 size={32} className="mx-auto text-emerald-500 animate-spin mb-4" />
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Scanning Library...</p>
-                                </div>
-                            ) : topFoods.length > 0 ? (
-                                topFoods.map(food => (
-                                    <Link key={food.name} href={`/foods/${food.name}`} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-emerald-400/50 hover:shadow-lg transition-all group">
-                                        <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-800">
-                                            {food.image_url ? <img src={food.image_url} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /> : <div className="w-full h-full flex items-center justify-center text-slate-300"><Leaf size={24} className="opacity-10" /></div>}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="font-black text-emerald-600 dark:text-emerald-400 text-[10px] uppercase tracking-wider">#{food.rank}</span>
-                                                <p className="font-bold text-sm text-slate-900 dark:text-white truncate capitalize">{food.common_name || food.name}</p>
-                                            </div>
-                                            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                                                {food.value >= 100 ? Math.round(food.value) : food.value.toFixed(1)} {selectedNutrient?.unit} <span className="text-[8px] opacity-40 ml-1">/ 100G</span>
-                                            </p>
-                                        </div>
-                                        {profile.isPremium && food.value >= ((getRDA(selectedNutrient.id) || 0) / 10) && (
-                                            <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-[8px] font-black uppercase tracking-widest whitespace-nowrap shrink-0 border border-emerald-500/20">PREMIUM SOURCE</span>
-                                        )}
-                                    </Link>
-                                ))
-                            ) : (
-                                <div className="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">No food data available for this nutrient.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {(() => {
-                            const info = nutrientInfo[selectedNutrient.id];
-                            if (!info) return <p className="text-center text-slate-400 italic">No scientific briefing available yet.</p>;
-                            return (
-                                <>
-                                    <div className="space-y-6">
-                                        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800">
-                                            <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-amber-500 mb-4 flex items-center gap-2"><Activity size={14} /> Biological Role</h4>
-                                            <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-medium">{info.history}</p>
-                                        </div>
-                                        {info.benefits && (
-                                            <div className="bg-emerald-500/5 dark:bg-emerald-500/5 rounded-3xl p-6 border border-emerald-500/10">
-                                                <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 mb-4">Core Benefits</h4>
-                                                <ul className="space-y-3">{info.benefits.map((b, i) => (<li key={i} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300 font-medium"><span className="text-emerald-500 shrink-0 mt-0.5">✓</span><span>{b}</span></li>))}</ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-6">
-                                        {info.relatedFacts && (
-                                            <div className="bg-blue-500/5 dark:bg-blue-500/5 rounded-3xl p-6 border border-blue-500/10">
-                                                <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400 mb-4">Discovery & Science</h4>
-                                                <div className="space-y-4">{info.relatedFacts.map((f, i) => (<div key={i} className="flex gap-4 group"><span className="w-6 h-6 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-black shrink-0 text-[10px]">{i + 1}</span><p className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-400 font-medium">{f}</p></div>))}</div>
-                                            </div>
-                                        )}
-                                        {info.deficiencySigns && (
-                                            <div className="bg-rose-500/5 dark:bg-rose-500/5 rounded-3xl p-6 border border-rose-500/10">
-                                                <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400 mb-4">Deficiency Signals</h4>
-                                                <ul className="space-y-3">{info.deficiencySigns.map((s, i) => (<li key={i} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300 font-medium"><span className="text-rose-500 shrink-0 mt-1">●</span><span>{s}</span></li>))}</ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            );
-                        })()}
-                    </div>
-                )}
-            </div>
+            <NutrientDetailContent 
+                nutrient={selectedNutrient} 
+                excludeFlavour={excludeFlavour} 
+                excludeSupplements={excludeSupplements} 
+            />
         );
     }
 

@@ -15,6 +15,8 @@ import { RDAContent } from '@/components/ux/rda-content';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
 import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
 import { NutrientFilterPanel } from '@/components/nutrients/nutrients-view';
+import { NutrientDetailContent } from '@/components/nutrients/nutrient-detail-content';
+import { findNutrientById } from '@/lib/utils/nutrient-utils';
 import { Loader2, X } from 'lucide-react';
 import { PanelWrapper } from './panel-wrapper';
 import { PortionMatchPanel } from '@/components/recipe/detail/portion-match-panel';
@@ -263,6 +265,19 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
         case 'pantry': return <PantryPanel />;
         case 'planner': return <PlannerPanel onRecipeClick={(id) => handleRecipeClick(id, 'planner')} />;
         case 'nutridex': return <NutrientsView compact={true} />;
+        case 'nutrient-detail': {
+            const nutrient = findNutrientById(contextRecipeId || '');
+            if (!nutrient) return <div className="p-8 text-center text-xs font-black uppercase tracking-widest text-slate-400">Nutrient Intelligence Offline</div>;
+            return (
+                <PanelWrapper title={nutrient.label} onBack={handleBack}>
+                    <NutrientDetailContent 
+                        nutrient={nutrient} 
+                        excludeFlavour={excludeFlavour} 
+                        excludeSupplements={excludeSupplements} 
+                    />
+                </PanelWrapper>
+            );
+        }
         case 'comparator': return <ComparatorFullPanel />;
         case 'lifeguard': return <LifeguardFullIntegration />;
         case 'recommended-intake':
