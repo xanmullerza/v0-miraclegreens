@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
     ArrowDownUp, Loader2, Check, Beef, Filter, ChevronDown, Leaf, Search, ShoppingCart, List, Package,
-    Info, Activity, Scale, LifeBuoy, Settings, FlaskConical, ChevronRight, Library, ALargeSmall
+    Info, Activity, Scale, LifeBuoy, Settings, FlaskConical, ChevronRight, Library, ALargeSmall, Droplet
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
@@ -36,7 +36,7 @@ const FOOD_SORT_OPTIONS = [
     { id: 'energy_kcal', label: 'Energy', icon: <Activity size={18} /> },
     { id: 'protein_g', label: 'Protein', icon: <Beef size={18} /> },
     { id: 'carbs_g', label: 'Carbs', icon: <Leaf size={18} /> },
-    { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={18} /> },
+    { id: 'fat_g', label: 'Fat', icon: <Droplet size={18} /> },
 ] as const;
 
 interface FoodsViewProps {
@@ -377,13 +377,7 @@ export function FoodsView({
                     setSortField={(f: any) => setSortField(f)}
                     sortDirection={sortDirection}
                     setSortDirection={setSortDirection}
-                    sortOptions={[
-                        { id: 'name', label: 'A-Z', icon: <ALargeSmall size={18} /> },
-                        { id: 'energy_kcal', label: 'Energy', icon: <ArrowDownUp size={18} /> },
-                        { id: 'protein_g', label: 'Protein', icon: <ArrowDownUp size={18} /> },
-                        { id: 'carbs_g', label: 'Carbs', icon: <ArrowDownUp size={18} /> },
-                        { id: 'fat_g', label: 'Fat', icon: <ArrowDownUp size={18} /> },
-                    ]}
+                    sortOptions={[...FOOD_SORT_OPTIONS]}
                     showFilters={!hideControls}
                     isFiltersOpen={activeView === 'food-filters'}
                     onFilterClick={() => {
