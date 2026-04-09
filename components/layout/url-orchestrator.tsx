@@ -45,7 +45,7 @@ export function URLOrchestrator() {
         }
     }, [searchParams]);
 
-    // 2. Sync Context -> URL (Clean up URL when panel is explicitly closed by user)
+    // 2. Sync Context -> URL (Clean up URL when panel is explicitly closed by user or view changes)
     useEffect(() => {
         // Skip cleanup if the orchestrator just opened the panel (prevents race condition)
         if (justOpenedRef.current) {
@@ -53,7 +53,9 @@ export function URLOrchestrator() {
             return;
         }
 
-        if (!isActionPanelOpen) {
+        const isDetailView = activeView === 'recipe-detail' || activeView === 'food-detail' || activeView === 'nutrient-detail';
+
+        if (!isActionPanelOpen || !isDetailView) {
             const params = new URLSearchParams(searchParams.toString());
             let changed = false;
             
@@ -66,7 +68,7 @@ export function URLOrchestrator() {
                 router.replace(`${pathname}${remaining ? `?${remaining}` : ''}`, { scroll: false });
             }
         }
-    }, [isActionPanelOpen]);
+    }, [isActionPanelOpen, activeView, pathname, router, searchParams]);
 
     return null;
 }
