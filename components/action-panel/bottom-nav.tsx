@@ -72,6 +72,19 @@ export function ActionPanelBottomNav({
             {showExpandedMenu ? (
                 // Expanded secondary menu
                 <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-6 py-3 flex items-center justify-start sm:justify-center gap-4 sm:gap-8 overflow-x-auto no-scrollbar rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
+                    {/* Permanent Home Button */}
+                    <button
+                        onClick={() => {
+                            setExpandedButton(null);
+                            navigateTo('home');
+                        }}
+                        className="flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px] text-slate-400 hover:text-emerald-500"
+                        title="Home"
+                    >
+                        <Home size={20} className="transition-transform group-hover:scale-110" />
+                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Home</span>
+                    </button>
+
                     {secondaryMenus[activeCategory as keyof typeof secondaryMenus]?.map((item) => {
                         const Icon = item.icon;
                         return (
@@ -91,28 +104,6 @@ export function ActionPanelBottomNav({
                             </button>
                         );
                     })}
-                    
-                    {/* Close button to collapse menu */}
-                    <button
-                        onClick={() => {
-                            setExpandedButton(null);
-                            // If we were auto-expanded because of path, we need a way to 'minimize' 
-                            // maybe by setting expandedButton to a special 'hidden' string?
-                            // For now, let's just use navigateTo('guide') or something?
-                            // Actually, let's just set it to 'hidden' to avoid auto-path expansion until next click.
-                            if (!expandedButton && pathCategory) {
-                                setExpandedButton('none');
-                            }
-                        }}
-                        className={cn(
-                            "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]",
-                            "text-rose-500 bg-rose-500/5 hover:text-rose-600"
-                        )}
-                        title="Close"
-                    >
-                        <X size={20} className="transition-transform group-hover:scale-110" />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Close</span>
-                    </button>
                 </div>
             ) : (
                 // Main menu
