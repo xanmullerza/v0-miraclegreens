@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { TabShell } from '@/components/ui/tab-shell';
 import { Clock, ChefHat, Flame, ALargeSmall } from 'lucide-react';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -29,9 +30,19 @@ export function RecipeTabShell({ fullHeight, ...props }: RecipeTabShellProps & {
     const { setIsActionPanelOpen, setActiveView, activeView, navigateTo } = useActionPanel();
     const { hasActiveFilters, filters, setFilters } = useRecipeFilter();
     
-    // We add logic to artificially trigger the active filter highlight
-    // if the panel is open specifically for recipe-filters
-    const isFilterOpen = activeView === 'recipe-filters';
+    // Add local state for mobile filters to keep TabShell visible
+    const [isMobile, setIsMobile] = useState(false);
+    const [localFiltersOpen, setLocalFiltersOpen] = useState(false);
+    
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+    
+    // It's open if local state is open (mobile) or if the action panel view says so
+    const isFilterOpen = localFiltersOpen || activeView === 'recipe-filters';
 
     return (
         <TabShell 
@@ -42,13 +53,16 @@ export function RecipeTabShell({ fullHeight, ...props }: RecipeTabShellProps & {
             showFilters={true}
             isFiltersOpen={isFilterOpen}
             onFilterClick={() => {
-                if (isFilterOpen) {
-                    setActiveView('home');
-                    setIsActionPanelOpen(false);
+                if (isMobile) {
+                    setLocalFiltersOpen(!localFiltersOpen);
+                    if (activeView === 'recipe-filters') {
+                        setActiveView('cookbook'); // Fallback if it was somehow open
+                    }
                 } else {
-                    setActiveView('recipe-filters');
-                    // Only open ActionPanel on desktop
-                    if (window.innerWidth >= 640) {
+                    if (activeView === 'recipe-filters') {
+                        setActiveView('cookbook');
+                    } else {
+                        setActiveView('recipe-filters');
                         setIsActionPanelOpen(true);
                     }
                 }
@@ -62,7 +76,13 @@ export function RecipeTabShell({ fullHeight, ...props }: RecipeTabShellProps & {
                     servingsOverrides: {} // Reset individual tweaks when using global scale
                 });
             }}
-            filterChildren={<RecipeFilterContent onClose={() => { setActiveView('home'); setIsActionPanelOpen(false); }} />}
+            filterChildren={<RecipeFilterContent onClose={() => { 
+                if (isMobile) {
+                    setLocalFiltersOpen(false);
+                } else {
+                    setActiveView('cookbook'); 
+                }
+            }} />}
         />
     );
 }
