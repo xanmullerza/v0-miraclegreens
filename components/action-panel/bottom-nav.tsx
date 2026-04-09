@@ -74,7 +74,7 @@ export function ActionPanelBottomNav({
         )}>
             {showExpandedMenu ? (
                 // Expanded secondary menu
-                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-6 py-3 flex items-center justify-center gap-8 overflow-x-auto no-scrollbar rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
+                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-6 py-3 flex items-center justify-start sm:justify-center gap-4 sm:gap-8 overflow-x-auto no-scrollbar rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
                     {secondaryMenus[activeCategory as keyof typeof secondaryMenus]?.map((item) => {
                         const Icon = item.icon;
                         return (
