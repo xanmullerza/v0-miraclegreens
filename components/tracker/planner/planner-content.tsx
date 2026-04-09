@@ -13,7 +13,7 @@ import {
     ChevronDown, Sparkles, ChefHat, 
     Search, Filter as FilterIcon, ArrowDownUp, 
     Clock, Flame, Dumbbell, List, Loader2,
-    ShoppingBasket, Shapes, Zap, ALargeSmall, Activity, Beef, Leaf, Droplet
+    ShoppingBasket, Shapes, Zap, Activity, Beef, Leaf, Droplet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -98,7 +98,6 @@ export interface PlannerContentProps {
 
 const PLANNER_SORT_OPTIONS: SortOption[] = [
     { id: 'time', label: 'Schedule', icon: <Clock size={18} /> },
-    { id: 'title', label: 'Title (A-Z)', icon: <ALargeSmall size={18} /> },
     { id: 'calories', label: 'Energy', icon: <Activity size={18} /> },
     { id: 'protein', label: 'Protein', icon: <Beef size={18} /> },
     { id: 'carbs', label: 'Carbs', icon: <Leaf size={18} /> },
@@ -214,9 +213,6 @@ export function PlannerContent({
                 const order: any = { 'breakfast': 1, 'lunch': 2, 'dinner': 3 };
                 valA = order[a.mealLabel] || 4;
                 valB = order[b.mealLabel] || 4;
-            } else if (sortField === 'title') {
-                valA = (a.title || '').toLowerCase();
-                valB = (b.title || '').toLowerCase();
             } else if (sortField === 'calories') {
                 valA = a.calories || 0;
                 valB = b.calories || 0;
