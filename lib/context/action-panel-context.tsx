@@ -99,6 +99,9 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             if (view !== 'guide') {
                 setIsActionPanelOpen(true);
             }
+        } else if (!isActionPanelOpen && view !== 'guide') {
+            // Re-open if it's already the active view but the panel was closed
+            setIsActionPanelOpen(true);
         }
     };
 
