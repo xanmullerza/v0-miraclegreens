@@ -45,8 +45,8 @@ export function ActionPanelBottomNav({
     const secondaryMenus = {
         cookbook: [
             { id: 'view', label: 'Recipes', icon: BookOpen, color: 'text-emerald-500', onClick: () => { navigateTo('cookbook'); } },
-            { id: 'create', label: 'Create', icon: Plus, color: 'text-emerald-600', onClick: () => { navigateTo('recipe-builder'); } },
-            { id: 'import', label: 'Import', icon: Upload, color: 'text-blue-500', onClick: () => { navigateTo('import'); } },
+            { id: 'create', label: 'Maker', icon: Plus, color: 'text-emerald-600', onClick: () => { navigateTo('recipe-builder'); } },
+            { id: 'import', label: 'Importer', icon: Upload, color: 'text-blue-500', onClick: () => { navigateTo('import'); } },
         ],
         library: [
             { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); router.push('/?tab=foods'); } },
@@ -87,6 +87,15 @@ export function ActionPanelBottomNav({
 
                     {secondaryMenus[activeCategory as keyof typeof secondaryMenus]?.map((item) => {
                         const Icon = item.icon;
+                        
+                        // Check if this item matches activeView - handle specific mappings
+                        const viewMap: Record<string, string> = {
+                            'view': 'cookbook',
+                            'create': 'recipe-builder'
+                        };
+                        const targetView = viewMap[item.id] || item.id;
+                        const isActive = activeView === targetView;
+
                         return (
                             <button
                                 key={item.id}
@@ -95,12 +104,15 @@ export function ActionPanelBottomNav({
                                 }}
                                 className={cn(
                                     "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]",
-                                    item.color
+                                    isActive ? item.color : "text-slate-400 hover:text-slate-200"
                                 )}
                                 title={item.label}
                             >
                                 <Icon size={20} className="transition-transform group-hover:scale-110" />
-                                <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">{item.label}</span>
+                                <span className={cn(
+                                    "text-[8px] font-black uppercase tracking-widest mt-1 opacity-60",
+                                    isActive && "opacity-100"
+                                )}>{item.label}</span>
                             </button>
                         );
                     })}
