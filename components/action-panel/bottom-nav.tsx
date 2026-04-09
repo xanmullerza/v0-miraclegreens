@@ -44,7 +44,7 @@ export function ActionPanelBottomNav({
     // Secondary menu options for each button
     const secondaryMenus = {
         cookbook: [
-            { id: 'view', label: 'View', icon: BookOpen, color: 'text-emerald-500', onClick: () => { navigateTo('cookbook'); } },
+            { id: 'view', label: 'Recipes', icon: BookOpen, color: 'text-emerald-500', onClick: () => { navigateTo('cookbook'); } },
             { id: 'create', label: 'Create', icon: Plus, color: 'text-emerald-600', onClick: () => { navigateTo('recipe-builder'); } },
             { id: 'import', label: 'Import', icon: Upload, color: 'text-blue-500', onClick: () => { navigateTo('import'); } },
         ],
