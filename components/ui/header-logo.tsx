@@ -27,7 +27,7 @@ export function HeaderLogo({
     const searchParams = useSearchParams();
     const { theme, setTheme } = useTheme();
     const { resizeMode, toggleResize, setResizeMode } = useSplitView();
-    const { isActionPanelOpen, setIsActionPanelOpen, setActiveView, activeView } = useActionPanel();
+    const { isActionPanelOpen, setIsActionPanelOpen, setActiveView, activeView, activeMainTab, setActiveMainTab } = useActionPanel();
     const { profile } = useUserPreferences();
     const [isMobile, setIsMobile] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -79,29 +79,30 @@ export function HeaderLogo({
                 {/* Main App Navigation (Next to Logo) */}
                 <div className="flex items-center ml-2 sm:ml-6 gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
                     { [
-                        { id: 'mission', label: 'Mission', path: '/', icon: Info, color: 'text-purple-500' },
-                        { id: 'recipes', label: 'Cookbook', path: '/?tab=recipes', icon: ChefHat, color: 'text-emerald-500' },
-                        { id: 'foods', label: 'Library', path: '/?tab=foods', icon: Leaf, color: 'text-emerald-500' },
-                        { id: 'planner', label: 'Tracker', path: '/?tab=planner', icon: Calendar, color: 'text-emerald-500' },
+                        { id: 'recipes', label: 'Home', icon: Info, color: 'text-purple-500' },
+                        { id: 'recipes', label: 'Cookbook', icon: ChefHat, color: 'text-emerald-500' },
+                        { id: 'foods', label: 'Library', icon: Leaf, color: 'text-emerald-500' },
+                        { id: 'planner', label: 'Tracker', icon: Calendar, color: 'text-emerald-500' },
                     ].map((item: any) => {
                         const Icon = item.icon;
-                        const isMission = item.id === 'mission';
-                        const isActive = isMission
-                            ? (pathname === '/' && !searchParams.get('tab'))
-                            : (pathname === '/' && searchParams.get('tab') === item.id);
-                        
+                        const isHome = item.label === 'Home';
+                        const isActive = activeMainTab === item.id;
+
+                        if (isHome && activeMainTab !== 'recipes') return null;
+
                         return (
-                            <Link
-                                key={item.path}
-                                href={item.path}
+                            <button
+                                key={item.label}
                                 onClick={() => {
+                                    setActiveMainTab(item.id);
                                     if (item.label === 'Home') {
                                         setResizeMode('content-focus');
                                     }
+                                    router.push('/');
                                 }}
                                 className={cn(
                                     "flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-full transition-all text-[10px] font-black uppercase tracking-widest shrink-0",
-                                    isActive
+                                    (isActive && (isHome || item.label !== 'Home'))
                                         ? "bg-slate-800/5 dark:bg-slate-800 text-foreground"
                                         : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-emerald-500 active:scale-95"
                                 )}
@@ -109,7 +110,7 @@ export function HeaderLogo({
                             >
                                 <Icon size={14} className={isActive ? item.color : 'opacity-70'} />
                                 <span className="hidden sm:inline">{item.label}</span>
-                            </Link>
+                            </button>
                         );
                     })}
                 </div>

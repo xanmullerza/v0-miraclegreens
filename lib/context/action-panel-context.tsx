@@ -65,6 +65,8 @@ interface ActionPanelContextType {
     setIngredientMatch: (state: IngredientMatchState | null) => void;
     expandedButton: string | null;
     setExpandedButton: (button: string | null) => void;
+    activeMainTab: 'recipes' | 'foods' | 'planner';
+    setActiveMainTab: (tab: 'recipes' | 'foods' | 'planner') => void;
 }
 
 const ActionPanelContext = createContext<ActionPanelContextType | undefined>(undefined);
@@ -85,6 +87,7 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [smartMatchPortion, setSmartMatchPortion] = useState<SmartMatchPortionState | null>(null);
     const [ingredientMatch, setIngredientMatch] = useState<IngredientMatchState | null>(null);
     const [expandedButton, setExpandedButton] = useState<string | null>(null);
+    const [activeMainTab, setActiveMainTab] = useState<'recipes' | 'foods' | 'planner'>('recipes');
 
     const navigateTo = (view: ActionPanelView) => {
         if (view !== activeView) {
@@ -149,6 +152,8 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             setIngredientMatch,
             expandedButton,
             setExpandedButton,
+            activeMainTab,
+            setActiveMainTab,
         }}>
             {children}
         </ActionPanelContext.Provider>
