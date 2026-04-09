@@ -16,11 +16,10 @@ export function ActionPanelBottomNav({
     activeView,
     onClose
 }: ActionPanelBottomNavProps) {
-    const { navigateTo, setIsActionPanelOpen } = useActionPanel();
+    const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton } = useActionPanel();
     const router = useRouter();
     const pathname = usePathname();
-    const [expandedButton, setExpandedButton] = useState<string | null>(null);
-    
+
     // Reset expanded state when pathname changes to allow auto-expansion on new pages
     useEffect(() => {
         setExpandedButton(null);
@@ -59,7 +58,7 @@ export function ActionPanelBottomNav({
     const showExpandedMenu = activeCategory && secondaryMenus[activeCategory as keyof typeof secondaryMenus];
 
     return (
-        <div className="lg:hidden absolute bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 transition-all duration-500 animate-in slide-in-from-bottom-8">
+        <div className="absolute bottom-6 left-0 right-0 z-[60] flex justify-center pointer-events-none px-4 transition-all duration-500 animate-in slide-in-from-bottom-8">
             {showExpandedMenu ? (
                 // Expanded secondary menu
                 <div className="pointer-events-auto max-w-[340px] w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-3xl px-4 py-2 flex items-center justify-start gap-4 overflow-x-auto no-scrollbar rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/5 dark:ring-emerald-500/10 animate-in slide-in-from-bottom-3">

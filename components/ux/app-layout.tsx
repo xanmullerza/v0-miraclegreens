@@ -65,33 +65,29 @@ export function AppLayout({ children }: AppLayoutProps) {
                 }}
             />
 
-            {isMobile && (
-                <>
-                    {/* Floating Chat Button - Only show if panel is closed */}
-                    {!isActionPanelOpen && (
-                        <button
-                            onClick={() => setIsActionPanelOpen(true)}
-                            className="fixed bottom-24 right-6 z-50 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
-                            title="Open Chat"
-                            aria-label="Open Chat"
-                        >
-                            <MessageCircle size={24} />
-                        </button>
-                    )}
+            {!isActionPanelOpen && (
+                <ActionPanelBottomNav
+                    activeView={activeView}
+                    onClose={handleClosePanel}
+                />
+            )}
 
-                    {isActionPanelOpen && (
-                        <ActionPanelContainer
-                            onClose={handleClosePanel}
-                            isInline={false}
-                        />
-                    )}
+            {isMobile && !isActionPanelOpen && (
+                <button
+                    onClick={() => setIsActionPanelOpen(true)}
+                    className="fixed bottom-24 right-6 z-50 lg:hidden flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all active:scale-95"
+                    title="Open Chat"
+                    aria-label="Open Chat"
+                >
+                    <MessageCircle size={24} />
+                </button>
+            )}
 
-                    {/* Always show Bottom Nav on mobile for global navigation - Rendered last to be on top */}
-                    <ActionPanelBottomNav
-                        activeView={activeView}
-                        onClose={handleClosePanel}
-                    />
-                </>
+            {isMobile && isActionPanelOpen && (
+                <ActionPanelContainer
+                    onClose={handleClosePanel}
+                    isInline={false}
+                />
             )}
         </>
     );
