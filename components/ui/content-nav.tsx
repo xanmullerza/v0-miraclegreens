@@ -47,7 +47,7 @@ export function ContentNav() {
                             }}
                             className={cn(
                                 "flex items-center gap-2 px-4 py-2 rounded-full transition-all text-[10px] font-black uppercase tracking-widest whitespace-nowrap",
-                                (isActive && (isHome || item.label !== 'Home')) // Visual hack since we have two recipe buttons
+                                isActive
                                     ? "bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10"
                                     : "text-muted-foreground hover:bg-slate-200 dark:hover:bg-slate-800/50 hover:text-foreground active:scale-95"
                             )}

@@ -102,7 +102,7 @@ export function HeaderLogo({
                                 }}
                                 className={cn(
                                     "flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-full transition-all text-[10px] font-black uppercase tracking-widest shrink-0",
-                                    (isActive && (isHome || item.label !== 'Home'))
+                                    isActive
                                         ? "bg-slate-800/5 dark:bg-slate-800 text-foreground"
                                         : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-emerald-500 active:scale-95"
                                 )}
