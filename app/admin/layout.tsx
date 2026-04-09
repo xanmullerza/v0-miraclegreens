@@ -275,7 +275,9 @@ function AdminLayoutContent({
                         {children}
                     </div>
 
-                    <Footer />
+                    <React.Suspense fallback={null}>
+                        <Footer />
+                    </React.Suspense>
                 </main>
             </div>
         </div>

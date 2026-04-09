@@ -188,7 +188,7 @@ function LoginContent() {
                         </Link>
 
                         <Link
-                            href="/library"
+                            href="/?tab=foods"
                             className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-rose-500/50 hover:bg-rose-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-rose-500/10"
                         >
                             <div className="w-12 h-12 shrink-0 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover/nudge:scale-110 transition-transform duration-500">
@@ -201,7 +201,7 @@ function LoginContent() {
                         </Link>
 
                         <Link
-                            href="/dashboard/library/meals"
+                            href="/?tab=recipes"
                             className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 hover:bg-amber-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-amber-500/10"
                         >
                             <div className="w-12 h-12 shrink-0 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/nudge:scale-110 transition-transform duration-500">
@@ -214,15 +214,15 @@ function LoginContent() {
                         </Link>
 
                         <Link
-                            href="/admin/widgets/comparator"
+                            href="/admin"
                             className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-500/[0.05] transition-all group/nudge shadow-sm hover:shadow-lg hover:shadow-indigo-500/10"
                         >
                             <div className="w-12 h-12 shrink-0 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover/nudge:scale-110 transition-transform duration-500">
                                 <LayoutGrid size={24} />
                             </div>
                             <div className="min-w-0">
-                                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">Widgets</span>
-                                <p className="text-[11px] text-slate-500 truncate font-medium">Comparative analytics.</p>
+                                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200">Admin</span>
+                                <p className="text-[11px] text-slate-500 truncate font-medium">Database management.</p>
                             </div>
                         </Link>
                     </div>
