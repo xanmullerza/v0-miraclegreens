@@ -10,7 +10,6 @@ import { PantryPanel } from './pantry-panel';
 import { PlannerPanel } from './planner-panel';
 import { NutrientsView } from '@/components/nutrients/nutrients-view';
 import { ComparatorFullPanel } from './comparator-full-panel';
-import { LifeguardFullIntegration } from './lifeguard-full-integration';
 import { RDAContent } from '@/components/ux/rda-content';
 import { RecipeFilterContent } from '@/components/recipe/recipe-filter-dialog';
 import { FoodFiltersPanel } from '@/components/foods/food-filters-panel';
@@ -280,7 +279,6 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
             );
         }
         case 'comparator': return <ComparatorFullPanel />;
-        case 'lifeguard': return <LifeguardFullIntegration />;
         case 'recommended-intake':
             return (
                 <div className="flex-1 overflow-hidden">
