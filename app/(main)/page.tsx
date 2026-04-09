@@ -1,3 +1,5 @@
+'use client';
+
 import React, { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import { MainAppContent } from '@/components/layout/main-app-content';
