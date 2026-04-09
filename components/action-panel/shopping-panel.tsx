@@ -121,7 +121,6 @@ export function ShoppingPanel({ onBack }: ShoppingPanelProps) {
                 />
             }
         >
-        >
             <div className="flex flex-col p-3 pt-0 pb-32">
                 <div className="space-y-4">
                     {/* Search Results Dropdown Overlay Logic */}
