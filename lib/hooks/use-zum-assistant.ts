@@ -33,7 +33,7 @@ export function useZumAssistant() {
     const [recordingTime, setRecordingTime] = useState(0);
     const [conversationHistory, setConversationHistory] = useState<any[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-    
+
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -94,7 +94,7 @@ export function useZumAssistant() {
             const { data: { user } } = await supabase.auth.getUser();
             const userId = user?.id || 'anonymous';
 
-            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://yourtestsite.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -107,7 +107,7 @@ export function useZumAssistant() {
             if (!response.ok) throw new Error(`API error: ${response.status}`);
 
             const data = await response.json();
-            
+
             let botResponse = data.output || data.response || data.content || data.message || (typeof data === 'string' ? data : JSON.stringify(data));
 
             const botMessage: Message = {
@@ -153,7 +153,7 @@ export function useZumAssistant() {
         setIsRecording(false);
         if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
         mediaRecorderRef.current.stop();
-        
+
         setTimeout(async () => {
             if (audioChunksRef.current.length > 0) {
                 const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
@@ -178,7 +178,7 @@ export function useZumAssistant() {
             formData.append('userId', user?.id || 'anonymous');
             formData.append('contentType', 'audio');
 
-            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://yourtestsite.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 body: formData
             });
@@ -229,7 +229,7 @@ export function useZumAssistant() {
             formData.append('userId', user?.id || 'anonymous');
             formData.append('contentType', 'image');
 
-            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://yourtestsite.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 body: formData
             });
@@ -293,7 +293,7 @@ export function useZumAssistant() {
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://yourtestsite.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: content, userId: user?.id || 'anonymous', contentType: 'recipe-content' })
@@ -343,7 +343,7 @@ export function useZumAssistant() {
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://yourtestsite.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: url, userId: user?.id || 'anonymous', contentType: 'recipe-url' })

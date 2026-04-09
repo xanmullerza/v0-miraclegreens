@@ -55,7 +55,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [isMix, setIsMix] = useState(initialIsMix);
     const [instructions, setInstructions] = useState<string[]>(
-        initialData?.instructions_text 
+        initialData?.instructions_text
             ? initialData.instructions_text.split('\n').filter(i => i?.trim?.())
             : ['']
     );
@@ -100,7 +100,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
             const userId = user?.id || 'anonymous';
 
             // Call n8n webhook to parse recipe
-            const response = await fetch('https://miraclegreens.app.n8n.cloud/webhook/chat', {
+            const response = await fetch('https://yourtestsite.app.n8n.cloud/webhook/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -149,7 +149,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
                         setUploading(false);
                     }
                 }
-                
+
                 setRecipeUrl('');
                 toast.success('Recipe parsed! Fill in the remaining details and ingredients.');
                 setStep(2);
