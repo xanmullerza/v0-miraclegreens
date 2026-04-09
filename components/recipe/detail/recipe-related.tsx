@@ -11,6 +11,7 @@ interface RecipeRelatedProps {
 }
 
 export function RecipeRelated({ ctx }: RecipeRelatedProps) {
+    const { relatedRecipes, loadingRelated } = ctx;
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
