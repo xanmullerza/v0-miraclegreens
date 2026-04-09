@@ -80,7 +80,7 @@ export function InputSection({
     handleCreateNewRecipe
 }: InputSectionProps) {
     return (
-        <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0">
+        <div className="relative border-t border-slate-200 dark:border-slate-800 shrink-0 pb-24">
             {/* Quick Actions Drawer */}
             <QuickActions
                 showQuickActions={showQuickActions}
