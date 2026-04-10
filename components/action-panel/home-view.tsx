@@ -16,9 +16,11 @@ import {
     Shield, 
     HelpCircle, 
     BookOpen, 
-    Upload,
     Globe,
-    Scale
+    Scale,
+    Flame,
+    Dna,
+    Target
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -136,27 +138,52 @@ export function HomeView({
                     <div className="space-y-3">
                         {([
                             { 
+                                icon: Flame, 
+                                title: "Let me cook :--)", 
+                                desc: "Minimal friction. No nag screens. We stay out of the way so you can just use the app.",
+                                color: "orange"
+                            },
+                            { 
                                 icon: Globe, 
                                 title: "Molecular Focus", 
-                                desc: "Precision nutritional intelligence at the molecular level.",
+                                desc: "Precision nutritional intelligence at the molecular level, tracking beyond just the basics.",
                                 color: "emerald"
+                            },
+                            { 
+                                icon: Dna, 
+                                title: "Ancestral Alignment", 
+                                desc: "Bridging modern biological science with your evolutionary dietary blueprint.",
+                                color: "purple"
+                            },
+                            { 
+                                icon: Target, 
+                                title: "Precision Calibration", 
+                                desc: "Mass-conserving math ensures what you track in the lab matches what enters your body.",
+                                color: "rose"
                             },
                             { 
                                 icon: Shield, 
                                 title: "Data Privacy", 
-                                desc: "Your health data is encrypted and yours alone.",
+                                desc: "Your health data is local, encrypted, and yours alone. We don't sell your DNA.",
                                 color: "blue"
                             },
                             { 
                                 icon: Scale, 
                                 title: "Scientific Accuracy", 
-                                desc: "Verified nutrient databases and scientific verification.",
+                                desc: "Strictly verified nutrient databases and evidence-based metabolic equations.",
                                 color: "amber"
                             }
                         ]).map((item, i) => (
                             <div key={i} className="p-4 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50">
                                 <div className="flex items-start gap-3">
-                                    <div className={cn("mt-1", `text-${item.color}-500 flex-shrink-0`)}>
+                                    <div className={cn("mt-1 flex-shrink-0", {
+                                        "text-orange-500": item.color === 'orange',
+                                        "text-emerald-500": item.color === 'emerald',
+                                        "text-purple-500": item.color === 'purple',
+                                        "text-rose-500": item.color === 'rose',
+                                        "text-blue-500": item.color === 'blue',
+                                        "text-amber-500": item.color === 'amber'
+                                    })}>
                                         <item.icon size={16} />
                                     </div>
                                     <div>
