@@ -396,24 +396,22 @@ function ProfileContentInner({ className }: { className?: string }) {
                 </div>
 
                 <div className="flex items-center gap-2 pt-4">
-                    <Button
-                        variant="outline"
-                        disabled={!user}
-                        className={cn(
-                            "h-9 px-4 text-[10px] font-black uppercase tracking-widest border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all",
-                            !user && "opacity-50 grayscale pointer-events-none"
-                        )}
-                        onClick={() => {
-                            if (activeView !== undefined && activeView !== null) {
-                                navigateTo('recommended-intake');
-                            } else {
-                                setShowRDADrawer(true);
-                            }
-                        }}
-                    >
-                        <Target size={14} className="mr-2" />
-                        Recommended Intake
-                    </Button>
+                    {user && (
+                        <Button
+                            variant="outline"
+                            className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
+                            onClick={() => {
+                                if (activeView !== undefined && activeView !== null) {
+                                    navigateTo('recommended-intake');
+                                } else {
+                                    setShowRDADrawer(true);
+                                }
+                            }}
+                        >
+                            <Target size={14} className="mr-2" />
+                            Recommended Intake
+                        </Button>
+                    )}
 
                     {user ? (
                         <Button
@@ -477,6 +475,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                             
                             {expandedAccordion === 'measures' && (
                             <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
+                                {user && (
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
                                     <div className="grid grid-cols-3 gap-2">
@@ -494,6 +493,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                                         ))}
                                     </div>
                                 </div>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
                                     <div className="space-y-3">
@@ -530,6 +530,8 @@ function ProfileContentInner({ className }: { className?: string }) {
                                     </div>
                                 </div>
 
+                                {user && (
+                                <>
                                 <div className="space-y-3 pt-6 border-t border-slate-100 dark:border-slate-800">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Nutrient Display Mode</Label>
                                     <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
@@ -558,6 +560,8 @@ function ProfileContentInner({ className }: { className?: string }) {
                                         </div>
                                     </div>
                                 </div>
+                                </>
+                                )}
                             </div>
                             )}
                         </section>
@@ -649,6 +653,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                                     </div>
                                 </div>
 
+                                {user && (
                                 <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
@@ -668,6 +673,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                                         </div>
                                     </div>
                                 </div>
+                                )}
                             </div>
                             )}
                         </section>
