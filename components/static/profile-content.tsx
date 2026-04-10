@@ -511,6 +511,53 @@ function ProfileContentInner({ className }: { className?: string }) {
                                         </div>
                                     </div>
                                 </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Interface Theme</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button onClick={() => setTheme("light")} className={cn("flex-1 py-2 rounded-lg transition-all flex items-center justify-center", theme === "light" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")} title="Light Mode"><Sun size={14} /></button>
+                                            <button onClick={() => setTheme("dark")} className={cn("flex-1 py-2 rounded-lg transition-all flex items-center justify-center", theme === "dark" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")} title="Dark Mode"><Moon size={14} /></button>
+                                            <button onClick={() => setTheme("system")} className={cn("flex-1 py-2 rounded-lg transition-all flex items-center justify-center", theme === "system" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")} title="System Mode"><Monitor size={14} /></button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Label Style</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button onClick={() => setHeaderStyle("labels")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", headerStyle === "labels" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Text</button>
+                                            <button onClick={() => setHeaderStyle("icons")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", headerStyle === "icons" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Icons</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Nutrient Display Mode</Label>
+                                    <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                        <button onClick={() => setNutrientDisplayMode("value")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Value</button>
+                                        <button onClick={() => setNutrientDisplayMode("percentage")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>% RDA</button>
+                                        <button onClick={() => setNutrientDisplayMode("both")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Both</button>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
+                                            <Flame size={16} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Basal Metabolic Rate</h4>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated using Mifflin-St Jeor equation</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="flex items-baseline gap-1 justify-end">
+                                            <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+                                                {energyUnit === 'kJ' ? Math.round(bmr * 4.184).toLocaleString() : Math.round(bmr).toLocaleString()}
+                                            </span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{energyUnit === 'kJ' ? 'kJ' : 'kcal'}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             )}
                         </section>
