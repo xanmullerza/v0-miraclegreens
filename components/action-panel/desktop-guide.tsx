@@ -4,9 +4,10 @@ import { ActionPanelView } from '@/lib/context/action-panel-context';
 
 interface DesktopGuideProps {
     setActiveView: (view: ActionPanelView) => void;
+    isAdmin: boolean;
 }
 
-export function DesktopGuide({ setActiveView }: DesktopGuideProps) {
+export function DesktopGuide({ setActiveView, isAdmin }: DesktopGuideProps) {
     return (
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-900/50">
             {/* Header Section */}
@@ -52,19 +53,21 @@ export function DesktopGuide({ setActiveView }: DesktopGuideProps) {
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Quick Actions</h3>
                 </div>
 
-                <button
-                    onClick={() => setActiveView('messages')}
-                    className="w-full flex items-center p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 hover:shadow-md transition-all group"
-                >
-                    <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center mr-4 group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                        <MessageSquarePlus size={20} className="text-cyan-600 dark:text-cyan-400 group-hover:text-white transition-colors" />
-                    </div>
-                    <div className="flex-1 text-left">
-                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">Ask Coach</h4>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Start a new chat</p>
-                    </div>
-                    <ChevronRight size={18} className="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
-                </button>
+                {isAdmin && (
+                    <button
+                        onClick={() => setActiveView('messages')}
+                        className="w-full flex items-center p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 hover:shadow-md transition-all group"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center mr-4 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                            <MessageSquarePlus size={20} className="text-cyan-600 dark:text-cyan-400 group-hover:text-white transition-colors" />
+                        </div>
+                        <div className="flex-1 text-left">
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white">Ask Coach</h4>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Start a new chat</p>
+                        </div>
+                        <ChevronRight size={18} className="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
+                    </button>
+                )}
 
                 <button
                     onClick={() => setActiveView('recipe-builder')}

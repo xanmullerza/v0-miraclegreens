@@ -86,19 +86,21 @@ export function HomeView({
                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Quick Start</h3>
                     </div>
 
-                    <button
-                        onClick={() => setActiveView('messages')}
-                        className="w-full flex items-center p-4 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/5 transition-all group"
-                    >
-                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center mr-4 group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                            <MessageCircle size={24} className="text-cyan-600 dark:text-cyan-400 group-hover:text-white transition-colors" />
-                        </div>
-                        <div className="flex-1 text-left">
-                            <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Ask Coach</h4>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5">Start AI Chat</p>
-                        </div>
-                        <ChevronRight size={18} className="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
-                    </button>
+                    {isAdmin && (
+                        <button
+                            onClick={() => setActiveView('messages')}
+                            className="w-full flex items-center p-4 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/5 transition-all group"
+                        >
+                            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center mr-4 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                                <MessageCircle size={24} className="text-cyan-600 dark:text-cyan-400 group-hover:text-white transition-colors" />
+                            </div>
+                            <div className="flex-1 text-left">
+                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 dark:text-white">Ask Coach</h4>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest mt-0.5">Start AI Chat</p>
+                            </div>
+                            <ChevronRight size={18} className="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
+                        </button>
+                    )}
 
                     <div className="grid grid-cols-2 gap-3">
                         <button

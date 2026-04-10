@@ -29,7 +29,7 @@ export function MenuExplorationView({
     }
 
     if (activeView === 'desktop-guide') {
-        return <DesktopGuide setActiveView={navigateTo} />;
+        return <DesktopGuide setActiveView={navigateTo} isAdmin={isAdmin} />;
     }
 
     if (activeView === 'cookbook') {

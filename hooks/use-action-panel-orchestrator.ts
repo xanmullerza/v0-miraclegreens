@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { RecipeIngredient } from '@/components/recipe/builder/types';
 import { useRecipeBuilderLogic } from '@/components/action-panel/hooks/use-recipe-builder-logic';
 import { useImportLogic } from '@/components/action-panel/hooks/use-import-logic';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface ActionPanelOrchestratorProps {
     onClose: () => void;
@@ -73,7 +74,8 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     });
 
     // --- Local Orchestrator State ---
-    const [isAdmin, setIsAdmin] = useState(false);
+    const { profile } = useUserPreferences();
+    const isAdmin = profile.isAdmin;
     const [showQuickActions, setShowQuickActions] = useState(false);
     const [expandedRecipeMenu, setExpandedRecipeMenu] = useState(false);
     const [expandedAppsMenu, setExpandedAppsMenu] = useState(false);
@@ -100,23 +102,7 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         scrollToBottom();
     }, [messages]);
 
-    // Admin Verification
-    useEffect(() => {
-        const checkAdminStatus = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
-                    const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase();
-                    setIsAdmin(userEmail === adminEmail && !!adminEmail);
-                }
-            } catch (error) {
-                console.error('Error checking admin status:', error);
-                setIsAdmin(false);
-            }
-        };
-        checkAdminStatus();
-    }, []);
+
 
     // OS Browser History Injection
     useEffect(() => {
