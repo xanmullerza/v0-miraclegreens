@@ -140,37 +140,37 @@ export function HomeView({
                             { 
                                 icon: Flame, 
                                 title: "Let me cook :--)", 
-                                desc: "Minimal friction. No nag screens. We stay out of the way so you can just use the app.",
+                                desc: "No pesky popups. No annoying emails. We stay out of the way so you can just focus on your food.",
                                 color: "orange"
                             },
                             { 
                                 icon: Globe, 
-                                title: "Molecular Focus", 
-                                desc: "Precision nutritional intelligence at the molecular level, tracking beyond just the basics.",
+                                title: "Beyond the Label", 
+                                desc: "We look deeper than just calories. We track the tiny nutrients that actually make a difference.",
                                 color: "emerald"
                             },
                             { 
                                 icon: Dna, 
-                                title: "Ancestral Alignment", 
-                                desc: "Bridging modern biological science with your evolutionary dietary blueprint.",
+                                title: "Built for Humans", 
+                                desc: "Forget fad diets. We match modern science with what our bodies were actually built to eat.",
                                 color: "purple"
                             },
                             { 
                                 icon: Target, 
-                                title: "Precision Calibration", 
-                                desc: "Mass-conserving math ensures what you track in the lab matches what enters your body.",
+                                title: "No Guesswork", 
+                                desc: "We do the messy math for you behind the scenes. What you track is exactly what you get.",
                                 color: "rose"
                             },
                             { 
                                 icon: Shield, 
-                                title: "Data Privacy", 
-                                desc: "Your health data is local, encrypted, and yours alone. We don't sell your DNA.",
+                                title: "Your Data, Your Rules", 
+                                desc: "Your health info stays on your device. We think your data belongs to you, not a big corp.",
                                 color: "blue"
                             },
                             { 
                                 icon: Scale, 
-                                title: "Scientific Accuracy", 
-                                desc: "Strictly verified nutrient databases and evidence-based metabolic equations.",
+                                title: "Real Science", 
+                                desc: "No marketing hype or trend-chasing. Just verified data and calculations experts trust.",
                                 color: "amber"
                             }
                         ]).map((item, i) => (
