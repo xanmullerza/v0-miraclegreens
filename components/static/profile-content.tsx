@@ -398,7 +398,11 @@ function ProfileContentInner({ className }: { className?: string }) {
                 <div className="flex items-center gap-2 pt-4">
                     <Button
                         variant="outline"
-                        className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all"
+                        disabled={!user}
+                        className={cn(
+                            "h-9 px-4 text-[10px] font-black uppercase tracking-widest border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl transition-all",
+                            !user && "opacity-50 grayscale pointer-events-none"
+                        )}
                         onClick={() => {
                             if (activeView !== undefined && activeView !== null) {
                                 navigateTo('recommended-intake');
@@ -451,8 +455,68 @@ function ProfileContentInner({ className }: { className?: string }) {
             <div className="flex flex-col gap-6 items-start justify-center overflow-x-hidden">
                 <div className="max-w-2xl w-full mx-auto space-y-8 pb-10">
                     <div className="grid grid-cols-1 gap-8">
-                        {/* Identification Card */}
+                        {/* Measures Card (Always Active) */}
                         <section className="space-y-1">
+                            <button 
+                                onClick={() => toggleAccordion('measures')}
+                                className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
+                            >
+                                <div className="flex items-center gap-4 flex-1">
+                                    <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
+                                        <Globe size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div className="text-left">
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
+                                    </div>
+                                </div>
+                                <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'measures' ? "rotate-180" : "")}>
+                                    <ChevronDown size={20} />
+                                </div>
+                            </button>
+                            
+                            {expandedAccordion === 'measures' && (
+                            <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {Object.keys(COUNTRY_PRESETS).map(country => (
+                                            <button
+                                                key={country}
+                                                onClick={() => handleCountryChange(country)}
+                                                className={cn(
+                                                    "px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
+                                                    formData.country === country ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400"
+                                                )}
+                                            >
+                                                {country}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Energy Unit</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button onClick={() => setEnergyUnit("kJ")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>kJ</button>
+                                            <button onClick={() => setEnergyUnit("kcal")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>kcal</button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Measurement</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button onClick={() => setMeasurementUnit("metric")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Metric</button>
+                                            <button onClick={() => setMeasurementUnit("imperial")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Imperial</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            )}
+                        </section>
+
+                        {/* Identification Card */}
+                        <section className={cn("space-y-1", !user && "opacity-50 grayscale pointer-events-none")}>
                             <button 
                                 onClick={() => toggleAccordion('identification')}
                                 className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
@@ -463,7 +527,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                                     </div>
                                     <div className="text-left">
                                         <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Basic Information</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Basic Information { !user && "(Sign in to edit)" }</p>
                                     </div>
                                 </div>
                                 <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'identification' ? "rotate-180" : "")}>
@@ -561,68 +625,8 @@ function ProfileContentInner({ className }: { className?: string }) {
                             )}
                         </section>
 
-                        {/* Measures Card */}
-                        <section className="space-y-1">
-                            <button 
-                                onClick={() => toggleAccordion('measures')}
-                                className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
-                            >
-                                <div className="flex items-center gap-4 flex-1">
-                                    <div className="flex-shrink-0 bg-emerald-500/5 p-3 rounded-xl text-emerald-500 shadow-sm border border-current/10 group-hover:opacity-80 transition-opacity">
-                                        <Globe size={24} className="stroke-[2.5]" />
-                                    </div>
-                                    <div className="text-left">
-                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
-                                    </div>
-                                </div>
-                                <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'measures' ? "rotate-180" : "")}>
-                                    <ChevronDown size={20} />
-                                </div>
-                            </button>
-                            
-                            {expandedAccordion === 'measures' && (
-                            <div className="bg-white dark:bg-slate-900/50 rounded-b-2xl p-8 space-y-8 shadow-md relative overflow-hidden border border-t-0 border-emerald-500/20">
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {Object.keys(COUNTRY_PRESETS).map(country => (
-                                            <button
-                                                key={country}
-                                                onClick={() => handleCountryChange(country)}
-                                                className={cn(
-                                                    "px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
-                                                    formData.country === country ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400"
-                                                )}
-                                            >
-                                                {country}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-                                    <div className="space-y-3">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Energy Unit</Label>
-                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
-                                            <button onClick={() => setEnergyUnit("kJ")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>kJ</button>
-                                            <button onClick={() => setEnergyUnit("kcal")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>kcal</button>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Measurement</Label>
-                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
-                                            <button onClick={() => setMeasurementUnit("metric")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Metric</button>
-                                            <button onClick={() => setMeasurementUnit("imperial")} className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-500")}>Imperial</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            )}
-                        </section>
-
                         {/* Goals Card */}
-                        <section className="space-y-1">
+                        <section className={cn("space-y-1", !user && "opacity-50 grayscale pointer-events-none")}>
                             <button 
                                 onClick={() => toggleAccordion('goals')}
                                 className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
@@ -633,7 +637,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                                     </div>
                                     <div className="text-left">
                                         <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Fitness Direction</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Fitness Direction { !user && "(Sign in to edit)" }</p>
                                     </div>
                                 </div>
                                 <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'goals' ? "rotate-180" : "")}>
@@ -665,7 +669,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                         </section>
 
                         {/* Dietary Profile Card */}
-                        <section className="space-y-1">
+                        <section className={cn("space-y-1", !user && "opacity-50 grayscale pointer-events-none")}>
                             <button 
                                 onClick={() => toggleAccordion('dietary')}
                                 className="w-full flex items-center justify-between gap-4 px-6 py-5 bg-gradient-to-br from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-500/20 rounded-t-2xl hover:opacity-95 transition-all group"
@@ -676,7 +680,7 @@ function ProfileContentInner({ className }: { className?: string }) {
                                     </div>
                                     <div className="text-left">
                                         <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutritional Approach</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutritional Approach { !user && "(Sign in to edit)" }</p>
                                     </div>
                                 </div>
                                 <div className={cn("text-emerald-500 transition-transform duration-300", expandedAccordion === 'dietary' ? "rotate-180" : "")}>
@@ -749,7 +753,11 @@ function ProfileContentInner({ className }: { className?: string }) {
                     <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
                         <Button
                             onClick={handleSave}
-                            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black h-12 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all"
+                            disabled={!user}
+                            className={cn(
+                                "w-full bg-purple-600 hover:bg-purple-700 text-white font-black h-12 rounded-xl flex items-center justify-center gap-2 text-xs uppercase tracking-widest transition-all",
+                                !user && "opacity-50 grayscale pointer-events-none"
+                            )}
                         >
                             <Save size={16} />
                             Save Profile
