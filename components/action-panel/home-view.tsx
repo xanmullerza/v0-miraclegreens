@@ -20,7 +20,8 @@ import {
     Scale,
     Flame,
     Dna,
-    Target
+    Target,
+    Cookie
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -140,7 +141,7 @@ export function HomeView({
                             { 
                                 icon: Flame, 
                                 title: "Let me cook :--)", 
-                                desc: "No pesky popups. No annoying emails. We stay out of the way so you can just focus on your food.",
+                                desc: "We stay out of the way so you can just focus on your food. No bells and whistles, no mess, no fuss.",
                                 color: "orange"
                             },
                             { 
@@ -195,6 +196,29 @@ export function HomeView({
                         ))}
                     </div>
                     
+                    {/* App Etiquette Section */}
+                    <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <div className="relative group">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                            <div className="relative p-8 rounded-3xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 shadow-xl overflow-hidden">
+                                <div className="absolute top-0 right-0 -translate-x-4 translate-y-4 opacity-[0.03] dark:opacity-[0.05]">
+                                    <Cookie size={120} className="rotate-12" />
+                                </div>
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-6 flex items-center gap-2">
+                                    <Zap size={14} />
+                                    App Etiquette
+                                </h3>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed italic">
+                                    "No pesky popups, annoying ads, or even emails. The only cookies around here are found in our recipes."
+                                </p>
+                                <div className="mt-6 flex items-center gap-2">
+                                    <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                                    <span className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">Miracle Greens Team</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="mt-8 text-center">
                         <p className="text-[10px] text-slate-400 font-medium italic">
                             Quick toggle: <kbd className="px-1.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[9px] text-slate-500">⌘/</kbd>
