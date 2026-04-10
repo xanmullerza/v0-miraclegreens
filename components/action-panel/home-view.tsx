@@ -45,6 +45,23 @@ export function HomeView({
     const { profile } = useUserPreferences();
     const isLoggedIn = !!profile.nickname || !!profile.name;
     const [activeTab, setActiveTab] = React.useState<'browse' | 'chat' | 'settings' | 'login'>('browse');
+    const [isHeaderVisible, setIsHeaderVisible] = React.useState(true);
+    const brandRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsHeaderVisible(entry.isIntersecting);
+            },
+            { threshold: 0.1 }
+        );
+
+        if (brandRef.current) {
+            observer.observe(brandRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
 
     const handleTabChange = (tab: 'browse' | 'chat' | 'settings' | 'login') => {
         setActiveTab(tab);
@@ -55,17 +72,25 @@ export function HomeView({
     };
     
     return (
-        <div className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-900/50">
-            <HomeTabShell 
-                isAdmin={isAdmin}
-                isLoggedIn={isLoggedIn}
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-            />
+        <div className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden">
+            <div className={cn(
+                "absolute top-0 left-0 right-0 z-30 transition-all duration-500 ease-in-out",
+                isHeaderVisible ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
+            )}>
+                <HomeTabShell 
+                    isAdmin={isAdmin}
+                    isLoggedIn={isLoggedIn}
+                    activeTab={activeTab}
+                    onTabChange={handleTabChange}
+                />
+            </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {/* Brand Section */}
-                <div className="flex flex-col items-center justify-center py-10 text-center space-y-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                <div 
+                    ref={brandRef}
+                    className="flex flex-col items-center justify-center py-10 text-center space-y-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800"
+                >
                     <div className="flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
                         <Leaf size={32} className="text-white" />
                     </div>
