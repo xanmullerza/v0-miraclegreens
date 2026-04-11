@@ -51,9 +51,10 @@ export function ActionPanelBottomNav({
     // Secondary menu options for each button
     const secondaryMenus = {
         cookbook: [
-            { id: 'view', label: 'Recipes', icon: BookOpen, color: 'text-emerald-500', onClick: () => { navigateTo('cookbook'); } },
-            { id: 'create', label: 'Maker', icon: Plus, color: 'text-emerald-600', onClick: () => { navigateTo('recipe-builder'); } },
-            { id: 'import', label: 'Importer', icon: Upload, color: 'text-blue-500', onClick: () => { navigateTo('import'); } },
+            { id: 'view', label: 'Recipes', icon: BookOpen, color: 'emerald', onClick: () => { navigateTo('cookbook'); } },
+            { id: 'create', label: 'Maker', icon: Plus, color: 'cyan', onClick: () => { navigateTo('recipe-builder'); } },
+            { id: 'import', label: 'Importer', icon: Upload, color: 'violet', onClick: () => { navigateTo('import'); } },
+            { id: 'export', label: 'Export', icon: Download, color: 'amber', onClick: () => { navigateTo('cookbook'); } },
         ],
         library: [
             { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
@@ -78,7 +79,7 @@ export function ActionPanelBottomNav({
         )}>
             {showExpandedMenu ? (
                 // Expanded secondary menu
-                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-4 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
+                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-5 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
                     {/* Permanent Home Button */}
                     <button
                         onClick={() => {
@@ -111,6 +112,38 @@ export function ActionPanelBottomNav({
                             isActive = isActionPanelOpen && activeView === targetView;
                         }
 
+                        // Color classes for muted and neon states
+                        const colorStyles = {
+                            emerald: {
+                                muted: 'text-emerald-400/50 border-emerald-500/30',
+                                active: 'text-emerald-400 border-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6),0_0_24px_rgba(52,211,153,0.3)]'
+                            },
+                            cyan: {
+                                muted: 'text-cyan-400/50 border-cyan-500/30',
+                                active: 'text-cyan-400 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6),0_0_24px_rgba(34,211,238,0.3)]'
+                            },
+                            violet: {
+                                muted: 'text-violet-400/50 border-violet-500/30',
+                                active: 'text-violet-400 border-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.6),0_0_24px_rgba(167,139,250,0.3)]'
+                            },
+                            amber: {
+                                muted: 'text-amber-400/50 border-amber-500/30',
+                                active: 'text-amber-400 border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.6),0_0_24px_rgba(251,191,36,0.3)]'
+                            },
+                            // Fallback colors for library/tracker submenus
+                            fuchsia: {
+                                muted: 'text-fuchsia-400/50 border-fuchsia-500/30',
+                                active: 'text-fuchsia-400 border-fuchsia-400 shadow-[0_0_12px_rgba(232,121,249,0.6),0_0_24px_rgba(232,121,249,0.3)]'
+                            },
+                            blue: {
+                                muted: 'text-blue-400/50 border-blue-500/30',
+                                active: 'text-blue-400 border-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.6),0_0_24px_rgba(96,165,250,0.3)]'
+                            }
+                        };
+
+                        const itemColor = item.color as keyof typeof colorStyles;
+                        const colorStyle = colorStyles[itemColor] || colorStyles.emerald;
+
                         return (
                             <button
                                 key={item.id}
@@ -118,15 +151,20 @@ export function ActionPanelBottomNav({
                                     item.onClick();
                                 }}
                                 className={cn(
-                                    "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]",
-                                    isActive ? item.color : "text-slate-400 hover:text-slate-200"
+                                    "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]"
                                 )}
                                 title={item.label}
                             >
-                                <Icon size={20} className="transition-transform group-hover:scale-110" />
+                                <div className={cn(
+                                    "p-2 rounded-xl border-2 transition-all duration-300",
+                                    isActive ? colorStyle.active : colorStyle.muted,
+                                    !isActive && "hover:border-opacity-60 hover:text-opacity-80"
+                                )}>
+                                    <Icon size={18} className="transition-transform group-hover:scale-110" />
+                                </div>
                                 <span className={cn(
-                                    "text-[8px] font-black uppercase tracking-widest mt-1 opacity-60",
-                                    isActive && "opacity-100"
+                                    "text-[8px] font-black uppercase tracking-widest mt-1.5 transition-opacity",
+                                    isActive ? "opacity-100" : "opacity-50"
                                 )}>{item.label}</span>
                             </button>
                         );
