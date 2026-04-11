@@ -122,10 +122,10 @@ export function FeatureCarousel() {
 
     return (
         <div className="w-full">
-            <div className="flex items-center gap-2 mb-4 px-1">
+            <div className="flex items-center justify-center gap-2 mb-4 px-1">
                 <BookOpen size={14} className="text-emerald-500" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-                    It&apos;s All About Recipes
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-center">
+                    It&apos;s All About Your Recipes
                 </h3>
             </div>
             
