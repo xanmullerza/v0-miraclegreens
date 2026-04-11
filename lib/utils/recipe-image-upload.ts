@@ -24,7 +24,7 @@ export async function downloadAndUploadRecipeImage(
         // Fetch the image
         const response = await fetch(imageUrl, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; BookoFood/1.0)'
+                'User-Agent': 'Mozilla/5.0 (compatible; VitalaGreens/1.0)'
             }
         });
 
@@ -95,7 +95,7 @@ export async function fetchImageBlob(imageUrl: string): Promise<Blob> {
     try {
         const response = await fetch(imageUrl, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; BookoFood/1.0)'
+                'User-Agent': 'Mozilla/5.0 (compatible; VitalaGreens/1.0)'
             }
         });
 

@@ -25,7 +25,7 @@ export default function HomePage() {
         <Suspense fallback={
             <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
                 <Loader2 className="animate-spin text-emerald-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Initializing BookoFood...</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Initializing Vitala...</p>
             </div>
         }>
             <HomePageContent />

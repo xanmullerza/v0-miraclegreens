@@ -9,6 +9,7 @@ import {
     Users, 
     TrendingUp, 
     Settings, 
+    Leaf, 
     MessageSquarePlus, 
     Sparkles, 
     Zap, 
@@ -31,7 +32,6 @@ import { ActionPanelView, useActionPanel } from '@/lib/context/action-panel-cont
 import { HomeTabShell } from './home-tab-shell';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { FeatureCarousel } from '@/components/ux/feature-carousel';
-import { BookoFoodLogo } from '@/components/ui/bookofood-logo';
 
 interface HomeViewProps {
     setActiveView: (view: ActionPanelView) => void;
@@ -95,15 +95,15 @@ export function HomeView({
                     ref={brandRef}
                     className="flex flex-col items-center justify-center py-10 text-center space-y-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800"
                 >
-                    <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-slate-700 shadow-lg">
-                        <BookoFoodLogo size="md" />
+                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                        <Leaf size={32} className="text-white" />
                     </div>
                     <div>
                         <h2 className="text-lg font-black uppercase tracking-[0.25em] text-slate-900 dark:text-white leading-tight">
-                            BookoFood
+                            Miracle Greens
                         </h2>
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500/80 mt-1.5 px-4 py-0.5 border border-emerald-500/20 rounded-full inline-block">
-                            Your Recipe Book
+                            Nutritional Intelligence
                         </p>
                     </div>
                     <div className="flex items-center justify-center gap-3 pt-1">
@@ -128,7 +128,7 @@ export function HomeView({
                 </div>
 
                 <div className="p-4 space-y-6 max-w-sm mx-auto">
-                    {/* Feature Carousel - What BookoFood is about */}
+                    {/* Feature Carousel - What Miracle Greens is about */}
                     <FeatureCarousel />
 
                 {/* 3. Mission / Info Section (From Home Page) */}
@@ -215,7 +215,7 @@ export function HomeView({
                                 </p>
                                 <div className="mt-6 flex items-center gap-2">
                                     <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
-                                    <span className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">BookoFood Team</span>
+                                    <span className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">Miracle Greens Team</span>
                                 </div>
                             </div>
                         </div>

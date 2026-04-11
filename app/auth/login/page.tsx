@@ -231,7 +231,7 @@ function LoginContent() {
                 {/* Footer Credits */}
                 <div className="flex flex-col items-center gap-3">
                     <p className="text-[11px] text-slate-400 font-medium uppercase tracking-[0.3em] opacity-60">
-                        BookoFood &copy; {new Date().getFullYear()}
+                        Vitala Research Systems &copy; {new Date().getFullYear()}
                     </p>
                     <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
                 </div>

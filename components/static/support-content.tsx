@@ -33,8 +33,8 @@ export function SupportContent({ className }: SupportContentProps) {
           <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
             Send us an email and we'll get back to you within 24 hours.
           </p>
-          <a href="mailto:support@bookofood.app" className="text-indigo-500 font-bold text-sm hover:underline">
-            support@bookofood.app
+          <a href="mailto:support@vitala.app" className="text-indigo-500 font-bold text-sm hover:underline">
+            support@vitala.app
           </a>
         </div>
 
@@ -65,7 +65,7 @@ export function SupportContent({ className }: SupportContentProps) {
           <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
             Call us for urgent issues. Available Monday-Friday, 9am-6pm EST.
           </p>
-          <a href="tel:+1-555-266-5366" className="text-amber-500 font-bold text-sm hover:underline">
+          <a href="tel:+1-555-VITALA-1" className="text-amber-500 font-bold text-sm hover:underline">
             +1 (555) 848-2521
           </a>
         </div>
@@ -78,7 +78,7 @@ export function SupportContent({ className }: SupportContentProps) {
           <div className="space-y-4">
             {[
               {
-                q: "How do I create a BookoFood account?",
+                q: "How do I create a Vitala account?",
                 a: "You can create a new account by visiting our sign-up page and providing your email address and password. If you have any issues during registration, please contact our support team."
               },
               {
@@ -116,7 +116,7 @@ export function SupportContent({ className }: SupportContentProps) {
           <p className="text-slate-700 dark:text-slate-300 mb-6">
             Our support team is ready to help. Reach out via email, chat, or phone and we'll assist you as quickly as possible.
           </p>
-          <a href="mailto:support@bookofood.app" className="inline-block px-6 py-3 bg-indigo-500 text-white font-bold rounded-lg hover:bg-indigo-600 transition-colors">
+          <a href="mailto:support@vitala.app" className="inline-block px-6 py-3 bg-indigo-500 text-white font-bold rounded-lg hover:bg-indigo-600 transition-colors">
             Contact Support
           </a>
         </section>

@@ -9,9 +9,9 @@ const _dmSans = DM_Sans({ subsets: ['latin'] });
 const _playfair = Playfair_Display({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'BookoFood | Your Personal Recipe Book',
+  title: 'Vitala | Biological Nutrition Protocol',
   description:
-    'BookoFood is your personal recipe book. Create, import, save, share and export recipes all in one place.',
+    'A professional nutrition platform focused on helping you make better biological choices through optimized protocols and healthy eating.',
   generator: 'v0.app',
   icons: {
     icon: [
