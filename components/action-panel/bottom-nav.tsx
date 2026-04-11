@@ -57,14 +57,14 @@ export function ActionPanelBottomNav({
             { id: 'export', label: 'Export', icon: Download, color: 'amber', onClick: () => { navigateTo('cookbook'); } },
         ],
         library: [
-            { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
-            { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'text-fuchsia-500', onClick: () => { navigateTo('nutridex'); } },
-            { id: 'comparator', label: 'Comparator', icon: Scale, color: 'text-amber-500', onClick: () => { navigateTo('comparator'); } },
+            { id: 'foods', label: 'Foods', icon: Leaf, color: 'cyan', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
+            { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'fuchsia', onClick: () => { navigateTo('nutridex'); } },
+            { id: 'comparator', label: 'Comparator', icon: Scale, color: 'amber', onClick: () => { navigateTo('comparator'); } },
         ],
         tracker: [
-            { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { setActiveMainTab('planner'); setIsActionPanelOpen(false); router.push('/'); } },
-            { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'text-amber-500', onClick: () => { navigateTo('shopping'); } },
-            { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'text-emerald-500', onClick: () => { navigateTo('pantry'); } },
+            { id: 'planner', label: 'Planner', icon: Calendar, color: 'blue', onClick: () => { setActiveMainTab('planner'); setIsActionPanelOpen(false); router.push('/'); } },
+            { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'amber', onClick: () => { navigateTo('shopping'); } },
+            { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'emerald', onClick: () => { navigateTo('pantry'); } },
         ]
     };
 
