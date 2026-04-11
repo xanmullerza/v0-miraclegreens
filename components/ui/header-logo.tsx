@@ -82,7 +82,7 @@ export function HeaderLogo({
                     { [
                         { id: 'recipes', label: 'Home', icon: Info, color: 'text-purple-500' },
                         { id: 'recipes', label: 'Cookbook', icon: ChefHat, color: 'text-emerald-500' },
-                        { id: 'foods', label: 'Library', icon: Leaf, color: 'text-emerald-500' },
+                        { id: 'foods', label: 'Library', icon: BookOpen, color: 'text-emerald-500' },
                         { id: 'planner', label: 'Tracker', icon: Calendar, color: 'text-emerald-500' },
                     ].map((item: any) => {
                         const Icon = item.icon;
