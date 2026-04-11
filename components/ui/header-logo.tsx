@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Leaf, Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Globe, LayoutGrid, Sun, Moon, ChefHat, Calendar, Info, Shield, HelpCircle, BookOpen } from 'lucide-react';
+import { Home, User, Smartphone, TabletSmartphone, Monitor as Computer, Sun, Moon, ChefHat, Calendar, Info, Shield, HelpCircle, BookOpen } from 'lucide-react';
+import { BookoFoodLogo } from '@/components/ui/bookofood-logo';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
@@ -61,16 +62,16 @@ export function HeaderLogo({
             {/* Left - Logo Area */}
             <div className="flex h-full items-center px-4 overflow-hidden">
                 <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-all active:scale-[0.98] shrink-0">
-                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-emerald-400/30 flex-shrink-0 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)]">
-                        <Leaf size={16} className="text-white" />
+                    <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 flex-shrink-0 shadow-sm">
+                        <BookoFoodLogo size="sm" />
                     </div>
-                    <div className="flex flex-col hidden sm:flex">
+                    <div className="hidden sm:flex flex-col">
                         <div className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white leading-tight">
-                            Miracle Greens
+                            BookoFood
                         </div>
                         {showSubtext && (
                             <div className="text-[7.5px] font-bold uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-500/80">
-                                Nutritional Intelligence
+                                Your Recipe Book
                             </div>
                         )}
                     </div>

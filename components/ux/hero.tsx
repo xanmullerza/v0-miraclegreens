@@ -1,4 +1,4 @@
-﻿import Image from 'next/image';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Heart } from 'lucide-react';
 
@@ -13,7 +13,7 @@ export function Hero() {
               Nutrition optimized for life
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Vitala is your expert companion for biological nutrition. We provide the tools and data you need to make better food choices, build optimized meal protocols, and achieve your health goals through the power of high-density nutrition.
+              BookoFood is your personal recipe book. Import from anywhere, save what you love, share with friends, and export your entire collection — all in one beautiful app.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Button size="lg" className="h-12 px-8 text-base gap-2" asChild>
