@@ -106,14 +106,7 @@ export function HomeView({
                             Nutritional Intelligence
                         </p>
                     </div>
-                </div>
-
-                <div className="p-4 space-y-6 max-w-sm mx-auto">
-                    {/* Feature Carousel - What Miracle Greens is about */}
-                    <FeatureCarousel />
-
-                    {/* Quick Info Links moved here */}
-                    <div className="flex items-center justify-center gap-3 pt-6">
+                    <div className="flex items-center justify-center gap-3 pt-1">
                         {([
                             { label: 'Privacy', view: 'privacy' as const, icon: Shield },
                             { label: 'Support', view: 'support' as const, icon: HelpCircle },
@@ -132,6 +125,11 @@ export function HomeView({
                             );
                         })}
                     </div>
+                </div>
+
+                <div className="p-4 space-y-6 max-w-sm mx-auto">
+                    {/* Feature Carousel - What Miracle Greens is about */}
+                    <FeatureCarousel />
 
                 {/* 3. Mission / Info Section (From Home Page) */}
                 <div className="pt-8 pb-32 space-y-4">
@@ -144,7 +142,7 @@ export function HomeView({
                         {([
                             { 
                                 icon: Flame, 
-                                title: "Let me cook :--)", 
+                                title: "Let Me Cook", 
                                 desc: "We stay out of the way so you can just focus on your food. No bells and whistles, no mess, no fuss.",
                                 color: "orange"
                             },
@@ -192,8 +190,8 @@ export function HomeView({
                                         <item.icon size={16} />
                                     </div>
                                     <div>
-                                        <h5 className="font-black text-[10px] uppercase tracking-tighter text-slate-900 dark:text-white">{item.title}</h5>
-                                        <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">{item.desc}</p>
+                                        <h5 className="font-black text-sm uppercase tracking-tight text-slate-900 dark:text-white">{item.title}</h5>
+                                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
                                     </div>
                                 </div>
                             </div>
