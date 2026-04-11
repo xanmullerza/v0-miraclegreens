@@ -31,6 +31,7 @@ import { ActionPanelView, useActionPanel } from '@/lib/context/action-panel-cont
 
 import { HomeTabShell } from './home-tab-shell';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { FeatureCarousel } from '@/components/ux/feature-carousel';
 
 interface HomeViewProps {
     setActiveView: (view: ActionPanelView) => void;
@@ -108,8 +109,11 @@ export function HomeView({
                 </div>
 
                 <div className="p-4 space-y-6 max-w-sm mx-auto">
+                    {/* Feature Carousel - What Miracle Greens is about */}
+                    <FeatureCarousel />
+
                     {/* Quick Info Links moved here */}
-                    <div className="flex items-center justify-center gap-3 pt-2">
+                    <div className="flex items-center justify-center gap-3 pt-6">
                         {([
                             { label: 'Privacy', view: 'privacy' as const, icon: Shield },
                             { label: 'Support', view: 'support' as const, icon: HelpCircle },
