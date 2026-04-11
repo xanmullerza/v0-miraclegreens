@@ -115,29 +115,29 @@ export function ActionPanelBottomNav({
                         // Color classes for muted and neon states
                         const colorStyles = {
                             emerald: {
-                                muted: 'text-emerald-400/50 border-emerald-500/30',
-                                active: 'text-emerald-400 border-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6),0_0_24px_rgba(52,211,153,0.3)]'
+                                muted: 'text-emerald-500/40 border-emerald-600/25 bg-emerald-950/20',
+                                active: 'text-emerald-300 border-emerald-400 bg-emerald-500/20 shadow-[0_0_8px_rgba(52,211,153,0.5),0_0_16px_rgba(52,211,153,0.3),0_0_32px_rgba(52,211,153,0.2),inset_0_0_8px_rgba(52,211,153,0.1)]'
                             },
                             cyan: {
-                                muted: 'text-cyan-400/50 border-cyan-500/30',
-                                active: 'text-cyan-400 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6),0_0_24px_rgba(34,211,238,0.3)]'
+                                muted: 'text-cyan-500/40 border-cyan-600/25 bg-cyan-950/20',
+                                active: 'text-cyan-300 border-cyan-400 bg-cyan-500/20 shadow-[0_0_8px_rgba(34,211,238,0.5),0_0_16px_rgba(34,211,238,0.3),0_0_32px_rgba(34,211,238,0.2),inset_0_0_8px_rgba(34,211,238,0.1)]'
                             },
                             violet: {
-                                muted: 'text-violet-400/50 border-violet-500/30',
-                                active: 'text-violet-400 border-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.6),0_0_24px_rgba(167,139,250,0.3)]'
+                                muted: 'text-violet-500/40 border-violet-600/25 bg-violet-950/20',
+                                active: 'text-violet-300 border-violet-400 bg-violet-500/20 shadow-[0_0_8px_rgba(167,139,250,0.5),0_0_16px_rgba(167,139,250,0.3),0_0_32px_rgba(167,139,250,0.2),inset_0_0_8px_rgba(167,139,250,0.1)]'
                             },
                             amber: {
-                                muted: 'text-amber-400/50 border-amber-500/30',
-                                active: 'text-amber-400 border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.6),0_0_24px_rgba(251,191,36,0.3)]'
+                                muted: 'text-amber-500/40 border-amber-600/25 bg-amber-950/20',
+                                active: 'text-amber-300 border-amber-400 bg-amber-500/20 shadow-[0_0_8px_rgba(251,191,36,0.5),0_0_16px_rgba(251,191,36,0.3),0_0_32px_rgba(251,191,36,0.2),inset_0_0_8px_rgba(251,191,36,0.1)]'
                             },
                             // Fallback colors for library/tracker submenus
                             fuchsia: {
-                                muted: 'text-fuchsia-400/50 border-fuchsia-500/30',
-                                active: 'text-fuchsia-400 border-fuchsia-400 shadow-[0_0_12px_rgba(232,121,249,0.6),0_0_24px_rgba(232,121,249,0.3)]'
+                                muted: 'text-fuchsia-500/40 border-fuchsia-600/25 bg-fuchsia-950/20',
+                                active: 'text-fuchsia-300 border-fuchsia-400 bg-fuchsia-500/20 shadow-[0_0_8px_rgba(232,121,249,0.5),0_0_16px_rgba(232,121,249,0.3),0_0_32px_rgba(232,121,249,0.2),inset_0_0_8px_rgba(232,121,249,0.1)]'
                             },
                             blue: {
-                                muted: 'text-blue-400/50 border-blue-500/30',
-                                active: 'text-blue-400 border-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.6),0_0_24px_rgba(96,165,250,0.3)]'
+                                muted: 'text-blue-500/40 border-blue-600/25 bg-blue-950/20',
+                                active: 'text-blue-300 border-blue-400 bg-blue-500/20 shadow-[0_0_8px_rgba(96,165,250,0.5),0_0_16px_rgba(96,165,250,0.3),0_0_32px_rgba(96,165,250,0.2),inset_0_0_8px_rgba(96,165,250,0.1)]'
                             }
                         };
 
@@ -156,9 +156,9 @@ export function ActionPanelBottomNav({
                                 title={item.label}
                             >
                                 <div className={cn(
-                                    "p-2 rounded-xl border-2 transition-all duration-300",
+                                    "p-2.5 rounded-2xl border-2 transition-all duration-300",
                                     isActive ? colorStyle.active : colorStyle.muted,
-                                    !isActive && "hover:border-opacity-60 hover:text-opacity-80"
+                                    !isActive && "hover:brightness-125 hover:border-opacity-50"
                                 )}>
                                     <Icon size={18} className="transition-transform group-hover:scale-110" />
                                 </div>
