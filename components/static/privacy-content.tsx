@@ -25,7 +25,7 @@ export function PrivacyContent({ className }: PrivacyContentProps) {
         <section>
           <h2 className="text-2xl font-black uppercase italic text-slate-900 dark:text-white mb-4">Introduction</h2>
           <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-            Vitala ("we", "us", "our" or "Company") operates the Vitala website and application. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
+            BookoFood ("we", "us", "our" or "Company") operates the BookoFood website and application. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
           </p>
         </section>
 
@@ -44,7 +44,7 @@ export function PrivacyContent({ className }: PrivacyContentProps) {
         <section>
           <h2 className="text-2xl font-black uppercase italic text-slate-900 dark:text-white mb-4">Use of Data</h2>
           <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-            Vitala uses the collected data for various purposes:
+            BookoFood uses the collected data for various purposes:
           </p>
           <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mt-3">
             <li>To provide and maintain our Service</li>
@@ -70,7 +70,7 @@ export function PrivacyContent({ className }: PrivacyContentProps) {
           </p>
           <div className="flex items-center gap-2 mt-4 text-slate-700 dark:text-slate-300">
             <Mail size={18} className="text-emerald-500" />
-            <span>privacy@vitala.app</span>
+            <span>privacy@bookofood.app</span>
           </div>
         </section>
       </div>

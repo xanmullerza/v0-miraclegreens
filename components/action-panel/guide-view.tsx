@@ -43,7 +43,7 @@ export function GuideView() {
                 <div className="flex items-center justify-center gap-2">
                     <Sparkles size={20} className="text-emerald-500" />
                     <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                        Welcome to MiracleGreens
+                        Welcome to BookoFood
                     </h2>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400">

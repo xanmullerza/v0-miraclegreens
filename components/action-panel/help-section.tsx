@@ -37,7 +37,7 @@ function CookbookHelp() {
                     <span>✍️</span> Add Recipes
                 </h2>
                 <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
-                    Bring your own recipes into Miracle Greens in multiple ways.
+                    Bring your own recipes into BookoFood in multiple ways.
                 </p>
                 <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 space-y-1">
                     <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">Import options:</p>

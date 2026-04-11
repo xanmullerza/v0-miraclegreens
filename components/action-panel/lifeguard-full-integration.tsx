@@ -299,8 +299,8 @@ export function LifeguardFullIntegration() {
 
     useEffect(() => {
         const loadPersistence = async () => {
-            const savedInventory = localStorage.getItem('miraclegreens_survival_inventory');
-            const savedState = localStorage.getItem('miraclegreens_survival_state');
+            const savedInventory = localStorage.getItem('bookofood_survival_inventory');
+            const savedState = localStorage.getItem('bookofood_survival_state');
 
             if (savedInventory) {
                 try {
@@ -328,8 +328,8 @@ export function LifeguardFullIntegration() {
 
         const savePersistence = async () => {
             const state = { step, security: securityStatus, water: waterStatus, profile: profileType };
-            localStorage.setItem('miraclegreens_survival_inventory', JSON.stringify(inventory));
-            localStorage.setItem('miraclegreens_survival_state', JSON.stringify(state));
+            localStorage.setItem('bookofood_survival_inventory', JSON.stringify(inventory));
+            localStorage.setItem('bookofood_survival_state', JSON.stringify(state));
         };
 
         const timer = setTimeout(savePersistence, 1000);
@@ -407,8 +407,8 @@ export function LifeguardFullIntegration() {
         setSimulationDay(0);
         setSuggestions([]);
         setHasSearched(false);
-        localStorage.removeItem('miraclegreens_survival_inventory');
-        localStorage.removeItem('miraclegreens_survival_state');
+            localStorage.removeItem('bookofood_survival_inventory');
+            localStorage.removeItem('bookofood_survival_state');
         toast.success("Simulation Reset.");
     };
 

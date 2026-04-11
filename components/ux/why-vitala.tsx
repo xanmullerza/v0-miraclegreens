@@ -53,7 +53,7 @@ const benefits = [
 
 export function WhyVitala() {
 	return (
-		<section id="why-vitala" className="py-16 md:py-24 bg-muted/30">
+		<section id="why-bookofood" className="py-16 md:py-24 bg-muted/30">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
 					<div>
@@ -61,10 +61,10 @@ export function WhyVitala() {
 							Biological Intelligence
 						</p>
 						<h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
-							Why Vitala?
+							Why BookoFood?
 						</h2>
 						<p className="text-muted-foreground leading-relaxed mb-4">
-							Optimal health isn't built on generic advice. It's built on <strong>biological precision</strong>. Vitala connects the dots between clinical data and your daily plate, ensuring every bite serves a purpose.
+							Great cooking starts with great recipes. BookoFood connects the dots between finding, saving, and sharing the food you love — ensuring your recipe collection is always at your fingertips.
 						</p>
 						<p className="text-muted-foreground leading-relaxed">
 							By focusing on high-density nutrition and bio-efficiency, we help you navigate the complex world of food choices. Whether you're optimizing performance or fighting deficiency, our protocols provide a data-driven path to wellness.

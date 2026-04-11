@@ -36,7 +36,7 @@ export const enrichmentCache = new Map<string, {
 
 // ── LocalStorage Key ────────────────────────────────────────────
 
-export const SHOPPING_STORAGE_KEY = 'vitala_shopping_manual_items';
+export const SHOPPING_STORAGE_KEY = 'bookofood_shopping_manual_items';
 
 // ── Category helpers ────────────────────────────────────────────
 

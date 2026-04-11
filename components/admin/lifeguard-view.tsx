@@ -287,8 +287,8 @@ export default function SurvivalModePage() {
     useEffect(() => {
         const loadPersistence = async () => {
             // Priority 1: LocalStorage (Fastest)
-            const savedInventory = localStorage.getItem('miraclegreens_survival_inventory');
-            const savedState = localStorage.getItem('miraclegreens_survival_state');
+            const savedInventory = localStorage.getItem('bookofood_survival_inventory');
+            const savedState = localStorage.getItem('bookofood_survival_state');
 
             if (savedInventory) {
                 try {
@@ -340,8 +340,8 @@ export default function SurvivalModePage() {
             const state = { step, security: securityStatus, water: waterStatus, profile: profileType };
 
             // Save to LocalStorage
-            localStorage.setItem('miraclegreens_survival_inventory', JSON.stringify(inventory));
-            localStorage.setItem('miraclegreens_survival_state', JSON.stringify(state));
+            localStorage.setItem('bookofood_survival_inventory', JSON.stringify(inventory));
+            localStorage.setItem('bookofood_survival_state', JSON.stringify(state));
 
             // Sync to Cloud (throttled/background)
             const { data: { session } } = await supabase.auth.getSession();
@@ -434,8 +434,8 @@ export default function SurvivalModePage() {
         setHasSearched(false);
 
         // Clear Persistence
-        localStorage.removeItem('miraclegreens_survival_inventory');
-        localStorage.removeItem('miraclegreens_survival_state');
+        localStorage.removeItem('bookofood_survival_inventory');
+        localStorage.removeItem('bookofood_survival_state');
 
         toast.success("Simulation Reset.");
     };
