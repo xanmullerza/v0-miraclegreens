@@ -1,6 +1,5 @@
 import React from 'react';
-import { MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings, Shield, HelpCircle, BookOpen, Upload } from 'lucide-react';
-import { BookoFoodLogo } from '@/components/ui/bookofood-logo';
+import { Leaf, MessageSquarePlus, Sparkles, ChevronRight, Zap, Settings, Shield, HelpCircle, BookOpen, Upload } from 'lucide-react';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
 
 interface DesktopGuideProps {
@@ -13,15 +12,15 @@ export function DesktopGuide({ setActiveView, isAdmin }: DesktopGuideProps) {
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50 dark:bg-slate-900/50">
             {/* Header Section */}
             <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
-                <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-slate-700 shadow-lg">
-                    <BookoFoodLogo size="md" />
+                <div className="flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                    <Leaf size={28} className="text-white" />
                 </div>
                 <div>
                     <h2 className="text-base font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white leading-tight">
-                        BookoFood
+                        Miracle Greens
                     </h2>
                     <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-500/80 mt-1">
-                        Your Recipe Book
+                        Nutritional Intelligence
                     </p>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import Image from 'next/image';
+﻿import Image from 'next/image';
 import { Quote } from 'lucide-react';
 
 const testimonials = [
@@ -7,21 +7,21 @@ const testimonials = [
     role: 'Community Health Director',
     image: '/african-woman-doctor-professional-headshot.jpg',
     content:
-      "The quality of BookoFood's recipe collection tools is exceptional. They've built a platform that truly understands home cooks — I've seen a massive shift in how our community approaches cooking and meal planning.",
+      "The quality of Vitala's nutritional protocols is exceptional. They've built a platform that truly understands biological needs — I've seen a massive shift in how our patients approach their daily eating habits.",
   },
   {
     name: 'Samuel Ndlovu',
     role: 'Nutrition Research Partner',
     image: '/african-man-farmer-headshot.jpg',
     content:
-      "BookoFood insists on the highest standards when it comes to recipe management. Their vision to make personal recipe books accessible to everyone is exactly what home cooks need.",
+      "Vitala insists on the highest standards of data integrity and food quality. Their vision to provide personalized, science-backed nutrition for everyone is exactly what the industry needs.",
   },
   {
     name: 'Maria Santos',
     role: 'Wellness Coordinator',
     image: '/latina-woman-nonprofit-worker-headshot.jpg',
     content:
-      "BookoFood is brilliant. It's not just a recipe app — it's a complete kitchen companion that empowers people to discover, organize, and share their love of food effortlessly.",
+      "The Vitala Biological Protocol is brilliant. It's not just a meal planner — it's an education system that empowers people to take control of their health through density-focused nutrition.",
   },
 ];
 

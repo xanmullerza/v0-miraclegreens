@@ -24,7 +24,7 @@ const features: FeatureSlide[] = [
     {
         icon: ChefHat,
         title: "Your Personal Cookbook",
-        description: "At its heart, BookoFood is a cookbook. Create, organize, and perfect your recipes with detailed nutritional insights.",
+        description: "At its heart, Miracle Greens is a cookbook. Create, organize, and perfect your recipes with detailed nutritional insights.",
         highlight: "Create Recipes",
         color: 'emerald'
     },

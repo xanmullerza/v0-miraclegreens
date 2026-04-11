@@ -61,19 +61,9 @@ export function HeaderLogo({
         )}>
             {/* Left - Logo Area */}
             <div className="flex h-full items-center px-4 overflow-hidden">
-                <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-all active:scale-[0.98] shrink-0">
+                <Link href="/dashboard" className="flex items-center hover:opacity-80 transition-all active:scale-[0.98] shrink-0">
                     <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 flex-shrink-0 shadow-sm">
                         <BookoFoodLogo size="sm" />
-                    </div>
-                    <div className="hidden sm:flex flex-col">
-                        <div className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white leading-tight">
-                            BookoFood
-                        </div>
-                        {showSubtext && (
-                            <div className="text-[7.5px] font-bold uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-500/80">
-                                Your Recipe Book
-                            </div>
-                        )}
                     </div>
                 </Link>
 

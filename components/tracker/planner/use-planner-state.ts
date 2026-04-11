@@ -26,7 +26,7 @@ export function usePlannerState() {
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
     const planKey = plan ? `${plan.breakfast.id}_${plan.lunch.id}_${plan.dinner.id}` : null;
-    const EATEN_STORAGE_KEY = 'bookofood_eaten_meals';
+    const EATEN_STORAGE_KEY = 'vitala_eaten_meals';
     const eatenHydrated = useRef(false);
 
     useEffect(() => {

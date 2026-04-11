@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+﻿import { supabase } from '@/lib/supabase';
 
 export interface ScannedProduct {
     barcode: string;
@@ -138,7 +138,7 @@ export async function lookupProduct(barcode: string): Promise<ScannedProduct | n
         const response = await fetch(
             `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`,
             {
-                headers: { 'User-Agent': 'BookoFood/1.0 - Recipe App' },
+                headers: { 'User-Agent': 'Vitala/1.0 - Health App' },
                 // Add cache control for better offline experience
                 cache: 'force-cache'
             }

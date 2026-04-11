@@ -23,8 +23,8 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
 
     const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/?recipeId=${recipe?.id || ''}` : '';
     const shareText = recipe 
-        ? `Check out this delicious recipe for ${recipe.title} on BookoFood!`
-        : `Check out BookoFood - Your Personal Recipe Book!`;
+        ? `Check out this delicious recipe for ${recipe.title} on Miracle Greens! 🥗`
+        : `Check out Miracle Greens - Modern Nutrition & Recipe Management! 🥗`;
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(shareUrl);
