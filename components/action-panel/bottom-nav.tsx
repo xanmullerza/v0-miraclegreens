@@ -54,7 +54,7 @@ export function ActionPanelBottomNav({
             { id: 'view', label: 'Recipes', icon: BookOpen, color: 'emerald', onClick: () => { navigateTo('cookbook'); } },
             { id: 'create', label: 'Maker', icon: Plus, color: 'cyan', onClick: () => { navigateTo('recipe-builder'); } },
             { id: 'import', label: 'Importer', icon: Upload, color: 'violet', onClick: () => { navigateTo('import'); } },
-            { id: 'export', label: 'Export', icon: Download, color: 'amber', onClick: () => { navigateTo('cookbook'); } },
+            { id: 'back', label: 'Back', icon: ChevronLeft, color: 'slate', onClick: () => { router.back(); } },
         ],
         library: [
             { id: 'foods', label: 'Foods', icon: Leaf, color: 'cyan', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
