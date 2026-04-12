@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ArrowLeft } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -80,17 +80,17 @@ export function ActionPanelBottomNav({
             {showExpandedMenu ? (
                 // Expanded secondary menu
                 <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-5 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
-                    {/* Permanent Home Button */}
+                    {/* Permanent Back Button */}
                     <button
                         onClick={() => {
                             setExpandedButton(null);
                             navigateTo('home');
                         }}
                         className="flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px] text-slate-400 hover:text-emerald-500"
-                        title="Home"
+                        title="Back"
                     >
-                        <Home size={20} className="transition-transform group-hover:scale-110" />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Home</span>
+                        <ArrowLeft size={20} className="transition-transform group-hover:scale-110" />
+                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Back</span>
                     </button>
 
                     {secondaryMenus[activeCategory as keyof typeof secondaryMenus]?.map((item) => {
