@@ -145,7 +145,8 @@ export function FeatureCarousel() {
                             key={feature.title}
                             className={cn(
                                 "relative p-6 rounded-2xl border min-h-[200px] flex flex-col",
-                                "bg-white dark:bg-slate-800/60",
+                                colors.bg,
+                                "dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-900/60",
                                 colors.border
                             )}
                         >
