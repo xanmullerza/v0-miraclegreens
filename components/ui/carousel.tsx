@@ -23,7 +23,7 @@ export function Carousel({
     activeIndicatorClassNames
 }: CarouselProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
-        align: 'start',
+        align: 'center',
         containScroll: 'trimSnaps',
         loop: false,
     });
@@ -59,7 +59,7 @@ export function Carousel({
                     {children.map((child, index) => (
                         <div
                             key={index}
-                            className="flex-[0_0_100%] min-w-0 pr-4 transition-all duration-500 ease-in-out"
+                            className="flex-[0_0_100%] min-w-0 transition-all duration-500 ease-in-out"
                             style={{
                                 opacity: selectedIndex === index ? 1 : 0.4,
                                 transform: selectedIndex === index ? 'scale(1)' : 'scale(0.95)',
