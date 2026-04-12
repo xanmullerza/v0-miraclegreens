@@ -49,22 +49,62 @@ export function ActionPanelBottomNav({
 
 
     // Secondary menu options for each button
+    // Colors: Blue (home), Emerald (cookbook), Cyan (library), Amber/Violet (tracker)
     const secondaryMenus = {
         cookbook: [
-            { id: 'view', label: 'Recipes', icon: BookOpen, color: 'text-emerald-500', onClick: () => { navigateTo('cookbook'); } },
-            { id: 'create', label: 'Maker', icon: Plus, color: 'text-emerald-600', onClick: () => { navigateTo('recipe-builder'); } },
-            { id: 'import', label: 'Importer', icon: Upload, color: 'text-blue-500', onClick: () => { navigateTo('import'); } },
+            { id: 'view', label: 'Recipes', icon: BookOpen, color: 'emerald', onClick: () => { navigateTo('cookbook'); } },
+            { id: 'create', label: 'Maker', icon: Plus, color: 'emerald', onClick: () => { navigateTo('recipe-builder'); } },
+            { id: 'import', label: 'Importer', icon: Upload, color: 'emerald', onClick: () => { navigateTo('import'); } },
         ],
         library: [
-            { id: 'foods', label: 'Foods', icon: Leaf, color: 'text-cyan-500', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
-            { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'text-fuchsia-500', onClick: () => { navigateTo('nutridex'); } },
-            { id: 'comparator', label: 'Comparator', icon: Scale, color: 'text-amber-500', onClick: () => { navigateTo('comparator'); } },
+            { id: 'foods', label: 'Foods', icon: Leaf, color: 'cyan', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
+            { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'violet', onClick: () => { navigateTo('nutridex'); } },
+            { id: 'comparator', label: 'Comparator', icon: Scale, color: 'cyan', onClick: () => { navigateTo('comparator'); } },
         ],
         tracker: [
-            { id: 'planner', label: 'Planner', icon: Calendar, color: 'text-blue-500', onClick: () => { setActiveMainTab('planner'); setIsActionPanelOpen(false); router.push('/'); } },
-            { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'text-amber-500', onClick: () => { navigateTo('shopping'); } },
-            { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'text-emerald-500', onClick: () => { navigateTo('pantry'); } },
+            { id: 'planner', label: 'Planner', icon: Calendar, color: 'amber', onClick: () => { setActiveMainTab('planner'); setIsActionPanelOpen(false); router.push('/'); } },
+            { id: 'shopping', label: 'Shopping', icon: ShoppingBasket, color: 'violet', onClick: () => { navigateTo('shopping'); } },
+            { id: 'pantry', label: 'Pantry', icon: Shapes, color: 'amber', onClick: () => { navigateTo('pantry'); } },
         ]
+    };
+
+    // Color config for neon glow effects
+    const colorConfig: Record<string, { text: string; border: string; bg: string; glow: string; hoverBorder: string }> = {
+        blue: {
+            text: 'text-blue-500',
+            border: 'border-blue-500/30',
+            bg: 'bg-blue-500/10',
+            glow: 'shadow-[0_0_12px_rgba(59,130,246,0.6)]',
+            hoverBorder: 'hover:border-blue-500/50',
+        },
+        emerald: {
+            text: 'text-emerald-500',
+            border: 'border-emerald-500/30',
+            bg: 'bg-emerald-500/10',
+            glow: 'shadow-[0_0_12px_rgba(16,185,129,0.6)]',
+            hoverBorder: 'hover:border-emerald-500/50',
+        },
+        cyan: {
+            text: 'text-cyan-500',
+            border: 'border-cyan-500/30',
+            bg: 'bg-cyan-500/10',
+            glow: 'shadow-[0_0_12px_rgba(6,182,212,0.6)]',
+            hoverBorder: 'hover:border-cyan-500/50',
+        },
+        amber: {
+            text: 'text-amber-500',
+            border: 'border-amber-500/30',
+            bg: 'bg-amber-500/10',
+            glow: 'shadow-[0_0_12px_rgba(245,158,11,0.6)]',
+            hoverBorder: 'hover:border-amber-500/50',
+        },
+        violet: {
+            text: 'text-violet-500',
+            border: 'border-violet-500/30',
+            bg: 'bg-violet-500/10',
+            glow: 'shadow-[0_0_12px_rgba(139,92,246,0.6)]',
+            hoverBorder: 'hover:border-violet-500/50',
+        },
     };
 
     // Check if we should show expanded menu
@@ -79,21 +119,25 @@ export function ActionPanelBottomNav({
             {showExpandedMenu ? (
                 // Expanded secondary menu
                 <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-4 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
-                    {/* Permanent Home Button */}
+                    {/* Permanent Home Button - Blue */}
                     <button
                         onClick={() => {
                             setExpandedButton(null);
                             navigateTo('home');
                         }}
-                        className="flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px] text-slate-400 hover:text-emerald-500"
+                        className={cn(
+                            "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 active:scale-90 group shrink-0 min-w-[60px] border-2",
+                            "text-slate-400 border-slate-300/30 dark:border-slate-700/50 hover:border-blue-500/50 hover:text-blue-500"
+                        )}
                         title="Home"
                     >
-                        <Home size={20} className="transition-transform group-hover:scale-110" />
+                        <Home size={20} className="transition-all group-hover:scale-110" />
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Home</span>
                     </button>
 
                     {secondaryMenus[activeCategory as keyof typeof secondaryMenus]?.map((item) => {
                         const Icon = item.icon;
+                        const colors = colorConfig[item.color] || colorConfig.emerald;
                         
                         // Check if this item matches activeView - handle specific mappings
                         const viewMap: Record<string, string> = {
@@ -118,15 +162,20 @@ export function ActionPanelBottomNav({
                                     item.onClick();
                                 }}
                                 className={cn(
-                                    "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px]",
-                                    isActive ? item.color : "text-slate-400 hover:text-slate-200"
+                                    "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 active:scale-90 group shrink-0 min-w-[60px] border-2",
+                                    isActive 
+                                        ? cn(colors.text, colors.border, colors.bg, colors.glow)
+                                        : cn("text-slate-400 border-slate-300/30 dark:border-slate-700/50", colors.hoverBorder, `hover:${colors.text}`)
                                 )}
                                 title={item.label}
                             >
-                                <Icon size={20} className="transition-transform group-hover:scale-110" />
+                                <Icon size={20} className={cn(
+                                    "transition-all group-hover:scale-110",
+                                    isActive && colors.text
+                                )} />
                                 <span className={cn(
-                                    "text-[8px] font-black uppercase tracking-widest mt-1 opacity-60",
-                                    isActive && "opacity-100"
+                                    "text-[8px] font-black uppercase tracking-widest mt-1",
+                                    isActive ? "opacity-100" : "opacity-60"
                                 )}>{item.label}</span>
                             </button>
                         );
@@ -135,7 +184,7 @@ export function ActionPanelBottomNav({
             ) : (
                 // Main menu
                 <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-4 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
-                    {/* Home Button - Left (Toggle behavior) */}
+                    {/* Home Button - Left (Toggle behavior) - Blue */}
                     <button
                         onClick={() => {
                             if (activeView === 'home') {
@@ -145,73 +194,96 @@ export function ActionPanelBottomNav({
                             }
                         }}
                         className={cn(
-                            "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            activeView === 'home' ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
+                            "flex-1 flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 active:scale-90 group border-2",
+                            activeView === 'home' 
+                                ? cn(colorConfig.blue.text, colorConfig.blue.border, colorConfig.blue.bg, colorConfig.blue.glow)
+                                : "text-slate-400 border-slate-300/30 dark:border-slate-700/50 hover:border-blue-500/50 hover:text-blue-500"
                         )}
                         title="Home"
                     >
-                        <Home size={20} className="transition-transform group-hover:scale-110" />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">
+                        <Home size={20} className={cn("transition-all group-hover:scale-110", activeView === 'home' && colorConfig.blue.text)} />
+                        <span className={cn("text-[8px] font-black uppercase tracking-widest mt-1", activeView === 'home' ? "opacity-100" : "opacity-60")}>
                             Home
                         </span>
                     </button>
 
-                    {/* Cookbook Button - with dropdown */}
-                    <button
-                        onClick={() => {
-                            if (activeCategory === 'cookbook') {
-                                setExpandedButton('none');
-                            } else {
-                                setExpandedButton('cookbook');
-                            }
-                        }}
-                        className={cn(
-                            "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            (expandedButton === 'cookbook' || activeView === 'cookbook' || activeView === 'recipe-builder' || activeView === 'import' || activeView === 'recipe-detail') || (!isActionPanelOpen && pathname === '/' && activeMainTab === 'recipes') ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
-                        )}
-                        title="Cookbook"
-                    >
-                        <BookOpen size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Cookbook</span>
-                    </button>
+                    {/* Cookbook Button - with dropdown - Emerald */}
+                    {(() => {
+                        const isCookbookActive = (expandedButton === 'cookbook' || activeView === 'cookbook' || activeView === 'recipe-builder' || activeView === 'import' || activeView === 'recipe-detail') || (!isActionPanelOpen && pathname === '/' && activeMainTab === 'recipes');
+                        return (
+                            <button
+                                onClick={() => {
+                                    if (activeCategory === 'cookbook') {
+                                        setExpandedButton('none');
+                                    } else {
+                                        setExpandedButton('cookbook');
+                                    }
+                                }}
+                                className={cn(
+                                    "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 active:scale-90 group flex-1 border-2",
+                                    isCookbookActive 
+                                        ? cn(colorConfig.emerald.text, colorConfig.emerald.border, colorConfig.emerald.bg, colorConfig.emerald.glow)
+                                        : "text-slate-400 border-slate-300/30 dark:border-slate-700/50 hover:border-emerald-500/50 hover:text-emerald-500"
+                                )}
+                                title="Cookbook"
+                            >
+                                <BookOpen size={20} className={cn("transition-all group-hover:scale-110", isCookbookActive && colorConfig.emerald.text)} />
+                                <span className={cn("text-[8px] font-black uppercase tracking-widest mt-1", isCookbookActive ? "opacity-100" : "opacity-60")}>Cookbook</span>
+                            </button>
+                        );
+                    })()}
 
-                    {/* Library Button */}
-                    <button
-                        onClick={() => {
-                            if (activeCategory === 'library') {
-                                setExpandedButton('none');
-                            } else {
-                                setExpandedButton('library');
-                            }
-                        }}
-                        className={cn(
-                            "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            (expandedButton === 'library' || activeView === 'nutridex' || activeView === 'comparator') || (!isActionPanelOpen && pathname === '/' && activeMainTab === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
-                        )}
-                        title="Library"
-                    >
-                        <LibraryIcon size={20} className={cn("transition-transform group-hover:scale-110", pathname.startsWith('/library') && "animate-pulse")} />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
-                    </button>
+                    {/* Library Button - Cyan */}
+                    {(() => {
+                        const isLibraryActive = (expandedButton === 'library' || activeView === 'nutridex' || activeView === 'comparator') || (!isActionPanelOpen && pathname === '/' && activeMainTab === 'foods');
+                        return (
+                            <button
+                                onClick={() => {
+                                    if (activeCategory === 'library') {
+                                        setExpandedButton('none');
+                                    } else {
+                                        setExpandedButton('library');
+                                    }
+                                }}
+                                className={cn(
+                                    "flex-1 flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 active:scale-90 group border-2",
+                                    isLibraryActive 
+                                        ? cn(colorConfig.cyan.text, colorConfig.cyan.border, colorConfig.cyan.bg, colorConfig.cyan.glow)
+                                        : "text-slate-400 border-slate-300/30 dark:border-slate-700/50 hover:border-cyan-500/50 hover:text-cyan-500"
+                                )}
+                                title="Library"
+                            >
+                                <LibraryIcon size={20} className={cn("transition-all group-hover:scale-110", isLibraryActive && colorConfig.cyan.text)} />
+                                <span className={cn("text-[8px] font-black uppercase tracking-widest mt-1", isLibraryActive ? "opacity-100" : "opacity-60")}>Library</span>
+                            </button>
+                        );
+                    })()}
 
-                    {/* Tracker Button */}
-                    <button
-                        onClick={() => {
-                            if (activeCategory === 'tracker') {
-                                setExpandedButton('none');
-                            } else {
-                                setExpandedButton('tracker');
-                            }
-                        }}
-                        className={cn(
-                            "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && (pathname === '/tracker' || (pathname === '/' && activeMainTab === 'planner'))) ? "text-blue-500 bg-blue-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-blue-500"
-                        )}
-                        title="Tracker"
-                    >
-                        <BarChart3 size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/tracker' && "animate-pulse")} />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Tracker</span>
-                    </button>
+                    {/* Tracker Button - Amber */}
+                    {(() => {
+                        const isTrackerActive = (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && (pathname === '/tracker' || (pathname === '/' && activeMainTab === 'planner')));
+                        return (
+                            <button
+                                onClick={() => {
+                                    if (activeCategory === 'tracker') {
+                                        setExpandedButton('none');
+                                    } else {
+                                        setExpandedButton('tracker');
+                                    }
+                                }}
+                                className={cn(
+                                    "flex-1 flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 active:scale-90 group border-2",
+                                    isTrackerActive 
+                                        ? cn(colorConfig.amber.text, colorConfig.amber.border, colorConfig.amber.bg, colorConfig.amber.glow)
+                                        : "text-slate-400 border-slate-300/30 dark:border-slate-700/50 hover:border-amber-500/50 hover:text-amber-500"
+                                )}
+                                title="Tracker"
+                            >
+                                <BarChart3 size={20} className={cn("transition-all group-hover:scale-110", isTrackerActive && colorConfig.amber.text)} />
+                                <span className={cn("text-[8px] font-black uppercase tracking-widest mt-1", isTrackerActive ? "opacity-100" : "opacity-60")}>Tracker</span>
+                            </button>
+                        );
+                    })()}
                 </div>
             )}
         </div>
