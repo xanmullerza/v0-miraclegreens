@@ -141,6 +141,24 @@ export function ActionPanelBottomNav({
                             }
                         };
 
+                        if (item.id === 'back') {
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        item.onClick();
+                                    }}
+                                    className="flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px] text-slate-400 hover:text-emerald-500"
+                                    title={item.label}
+                                >
+                                    <Icon size={20} className="transition-transform group-hover:scale-110" />
+                                    <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">
+                                        {item.label}
+                                    </span>
+                                </button>
+                            );
+                        }
+
                         const itemColor = item.color as keyof typeof colorStyles;
                         const colorStyle = colorStyles[itemColor] || colorStyles.emerald;
 
