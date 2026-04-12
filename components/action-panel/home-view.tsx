@@ -230,7 +230,7 @@ export function HomeView({
                                 </div>
                             </div>
                         );
-                    </div>
+                    })}
                     
                     {/* App Etiquette Section */}
                     <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
@@ -263,6 +263,7 @@ export function HomeView({
                 </div>
             </div>
         </div>
+    </div>
     </div>
     );
 }
