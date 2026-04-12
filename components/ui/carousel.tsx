@@ -23,7 +23,7 @@ export function Carousel({
     activeIndicatorClassNames
 }: CarouselProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
-        align: 'start',
+        align: 'center',
         containScroll: 'trimSnaps',
         loop: false,
     });
