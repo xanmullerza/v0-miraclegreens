@@ -180,12 +180,6 @@ export function HomeView({
                                 color: "emerald"
                             },
                             { 
-                                icon: Dna, 
-                                title: "Built for Humans", 
-                                desc: "Forget fad diets. We match modern science with what our bodies were actually built to eat.",
-                                color: "purple"
-                            },
-                            { 
                                 icon: Target, 
                                 title: "No Guesswork", 
                                 desc: "We do the messy math for you behind the scenes. What you track is exactly what you get.",
@@ -196,12 +190,6 @@ export function HomeView({
                                 title: "Your Data, Your Rules", 
                                 desc: "Your health info stays on your device. We think your data belongs to you, not a big corp.",
                                 color: "blue"
-                            },
-                            { 
-                                icon: Scale, 
-                                title: "Real Science", 
-                                desc: "No marketing hype or trend-chasing. Just verified data and calculations experts trust.",
-                                color: "amber"
                             }
                         ]).map((item, i) => {
                             const colors = commitmentColorClasses[item.color as keyof typeof commitmentColorClasses];
@@ -235,8 +223,8 @@ export function HomeView({
                     {/* App Etiquette Section */}
                     <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
                         <div className="relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                            <div className="relative p-8 rounded-3xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 shadow-xl overflow-hidden">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                            <div className="relative p-8 rounded-3xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 shadow-xl overflow-hidden">
                                 <div className="absolute top-0 right-0 -translate-x-4 translate-y-4 opacity-[0.03] dark:opacity-[0.05]">
                                     <Cookie size={120} className="rotate-12" />
                                 </div>
@@ -249,17 +237,12 @@ export function HomeView({
                                 </p>
                                 <div className="mt-6 flex items-center gap-2">
                                     <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
-                                    <span className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">Miracle Greens Team</span>
+                                    <span className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">theo</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-8 text-center">
-                        <p className="text-[10px] text-slate-400 font-medium italic">
-                            Quick toggle: <kbd className="px-1.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[9px] text-slate-500">⌘/</kbd>
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>
