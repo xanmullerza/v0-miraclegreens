@@ -33,6 +33,33 @@ import { HomeTabShell } from './home-tab-shell';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { FeatureCarousel } from '@/components/ux/feature-carousel';
 
+const commitmentColorClasses = {
+    orange: {
+        bg: 'bg-orange-500/10',
+        border: 'border-orange-500/20',
+    },
+    emerald: {
+        bg: 'bg-emerald-500/10',
+        border: 'border-emerald-500/20',
+    },
+    purple: {
+        bg: 'bg-purple-500/10',
+        border: 'border-purple-500/20',
+    },
+    rose: {
+        bg: 'bg-rose-500/10',
+        border: 'border-rose-500/20',
+    },
+    blue: {
+        bg: 'bg-blue-500/10',
+        border: 'border-blue-500/20',
+    },
+    amber: {
+        bg: 'bg-amber-500/10',
+        border: 'border-amber-500/20',
+    }
+};
+
 interface HomeViewProps {
     setActiveView: (view: ActionPanelView) => void;
     setShowOnlyMyRecipes: (show: boolean) => void;
@@ -176,8 +203,15 @@ export function HomeView({
                                 desc: "No marketing hype or trend-chasing. Just verified data and calculations experts trust.",
                                 color: "amber"
                             }
-                        ]).map((item, i) => (
-                            <div key={i} className="p-4 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50">
+                        ]).map((item, i) => {
+                            const colors = commitmentColorClasses[item.color as keyof typeof commitmentColorClasses];
+                            return (
+                            <div key={i} className={cn(
+                                "p-4 rounded-2xl border",
+                                colors.bg,
+                                "dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-900/60",
+                                colors.border
+                            )}>
                                 <div className="flex items-start gap-3">
                                     <div className={cn("mt-1 flex-shrink-0", {
                                         "text-orange-500": item.color === 'orange',
@@ -195,7 +229,7 @@ export function HomeView({
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                        );
                     </div>
                     
                     {/* App Etiquette Section */}
