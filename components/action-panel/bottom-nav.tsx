@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ArrowLeft } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ChevronLeft } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -54,7 +54,7 @@ export function ActionPanelBottomNav({
             { id: 'view', label: 'Recipes', icon: BookOpen, color: 'emerald', onClick: () => { navigateTo('cookbook'); } },
             { id: 'create', label: 'Maker', icon: Plus, color: 'cyan', onClick: () => { navigateTo('recipe-builder'); } },
             { id: 'import', label: 'Importer', icon: Upload, color: 'violet', onClick: () => { navigateTo('import'); } },
-            { id: 'export', label: 'Export', icon: Download, color: 'amber', onClick: () => { navigateTo('cookbook'); } },
+            { id: 'back', label: 'Back', icon: ChevronLeft, color: 'slate', onClick: () => { router.back(); } },
         ],
         library: [
             { id: 'foods', label: 'Foods', icon: Leaf, color: 'cyan', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
@@ -141,6 +141,24 @@ export function ActionPanelBottomNav({
                             }
                         };
 
+                        if (item.id === 'back') {
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        item.onClick();
+                                    }}
+                                    className="flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group shrink-0 min-w-[60px] text-slate-400 hover:text-emerald-500"
+                                    title={item.label}
+                                >
+                                    <Icon size={20} className="transition-transform group-hover:scale-110" />
+                                    <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">
+                                        {item.label}
+                                    </span>
+                                </button>
+                            );
+                        }
+
                         const itemColor = item.color as keyof typeof colorStyles;
                         const colorStyle = colorStyles[itemColor] || colorStyles.emerald;
 
@@ -172,7 +190,7 @@ export function ActionPanelBottomNav({
                 </div>
             ) : (
                 // Main menu
-                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-2 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
+                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-3 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
                     {/* Home Button - Left (Toggle behavior) */}
                     <button
                         onClick={() => {
@@ -211,6 +229,21 @@ export function ActionPanelBottomNav({
                     >
                         <BookOpen size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Cookbook</span>
+                    </button>
+
+                    {/* Back Button - behaves like mobile back button */}
+                    <button
+                        onClick={() => {
+                            router.back();
+                        }}
+                        className={cn(
+                            "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
+                            "text-slate-400 hover:text-slate-500"
+                        )}
+                        title="Back"
+                    >
+                        <ChevronLeft size={20} className="transition-transform group-hover:scale-110" />
+                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Back</span>
                     </button>
                 </div>
             )}
