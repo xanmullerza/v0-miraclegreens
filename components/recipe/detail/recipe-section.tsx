@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus } from 'lucide-react';
+import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -141,6 +141,51 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     </ol>
                 </div>
             )}
+
+            {/* Recipe Metadata */}
+            <div className="flex flex-wrap items-center justify-center gap-1 p-2 rounded-3xl bg-transparent">
+                {([{
+                        label: <Clock size={17} />,
+                        value: ((recipe.prep_time || 0) + (recipe.cook_time || 0)) || '-',
+                        color: 'text-sky-400'
+                    },
+                    {
+                        label: <Users size={17} />,
+                        value: selectedServings || recipe.servings || 1,
+                        color: 'text-violet-400',
+                    },
+                    {
+                        label: (() => {
+                            const d = recipe.difficulty || 'Medium';
+                            if (d === 'Easy') return <SignalLow size={20} />;
+                            if (d === 'Hard') return <Signal size={20} />;
+                            return <SignalMedium size={20} />;
+                        })(),
+                        value: '',
+                        color: (() => {
+                            const d = recipe.difficulty || 'Medium';
+                            if (d === 'Easy') return 'text-emerald-400';
+                            if (d === 'Hard') return 'text-rose-400';
+                            return 'text-amber-400';
+                        })()
+                    },
+                ] as { label: React.ReactNode; value: string | number; color: string; isInteractive?: boolean }[]).map((tab, idx) => (
+                    <div
+                        key={idx}
+                        className={cn(
+                            'py-3 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-0 flex flex-col items-center justify-center gap-1.5 bg-transparent relative',
+                            tab.color,
+                        )}
+                    >
+                        <span className="opacity-85 leading-none shrink-0">
+                            {tab.label}
+                        </span>
+                        {tab.value !== '' && (
+                            <span className="leading-none font-black text-white/70 text-[10px] tracking-widest">{tab.value}</span>
+                        )}
+                    </div>
+                ))}
+            </div>
 
             {/* Tags & Categories */}
             <button
