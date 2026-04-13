@@ -104,10 +104,10 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                 >
                                     {/* Front Side - Slim Card */}
                                     <div className={cn(
-                                        "absolute inset-0 px-3 flex items-center gap-3 rounded-2xl border transition-all duration-300",
-                                        "bg-emerald-50/50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800",
+                                        "absolute inset-0 px-3 flex items-center gap-3 rounded-2xl border-2 transition-all duration-300",
+                                        "border-emerald-500/30",
                                         isFlipped ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100",
-                                        "group-hover:border-emerald-500 dark:group-hover:border-emerald-500"
+                                        "hover:border-emerald-400 hover:shadow-[0_0_22px_rgba(16,185,129,0.35)] hover:ring-1 hover:ring-emerald-500/20"
                                     )}>
                                         <div className="shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest min-w-[60px] text-center">
                                             {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
