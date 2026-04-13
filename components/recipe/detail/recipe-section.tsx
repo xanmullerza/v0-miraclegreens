@@ -124,9 +124,10 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
                                     {/* Back Side - Macro Breakdown */}
                                     <div className={cn(
-                                        "absolute inset-0 px-4 flex items-center justify-between rounded-2xl border transition-all duration-300",
-                                        "bg-emerald-600 dark:bg-emerald-600 border-emerald-500 text-white",
-                                        isFlipped ? "opacity-100 scale-100 shadow-lg shadow-emerald-600/20" : "opacity-0 scale-95 pointer-events-none"
+                                        "absolute inset-0 px-4 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
+                                        "bg-emerald-600 dark:bg-emerald-600 border-emerald-400 text-white",
+                                        "shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20",
+                                        isFlipped ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                                     )}>
                                         {food ? (
                                             <>
