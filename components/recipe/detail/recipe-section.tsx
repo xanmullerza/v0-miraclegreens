@@ -17,50 +17,27 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
     if (!recipe) return null;
 
+    const totalCookTime = ((recipe.prep_time || 0) + (recipe.cook_time || 0)) || null;
+    const displayServings = selectedServings || recipe.servings || 1;
+    const difficultyLabel = recipe.difficulty || 'Medium';
+
     return (
         <>
-            {/* Tags & Categories Panel */}
-            <button 
-                onClick={() => ctx.navigateTo('recipe-tags')}
-                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors group"
-            >
-                    <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tags & Categories</p>
-                        <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2">
-                        {/* Difficulty Tag */}
-                        <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest">
-                            #{recipe.difficulty || 'Medium'}
-                        </span>
-
-                        {/* Meal Type Tag */}
-                        {recipe.type && (
-                            <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">
-                                #{recipe.type}
-                            </span>
-                        )}
-
-                        {/* Diet Type Tags */}
-                        {recipe.diet && recipe.diet.map(d => (
-                            <span key={d} className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                                #{d}
-                            </span>
-                        ))}
-
-                        {/* Custom Tags */}
-                        {recipe.tags && recipe.tags.map(t => (
-                            <span key={t} className="px-3 py-1.5 rounded-xl bg-slate-500/10 border border-slate-500/20 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                                {t.startsWith('#') ? t : `#${t}`}
-                            </span>
-                        ))}
-
-                        {(!recipe.tags || recipe.tags.length === 0) && !recipe.type && (!recipe.diet || recipe.diet.length === 0) && (
-                            <span className="text-sm font-bold text-slate-400 italic">Add Tags</span>
-                        )}
-                    </div>
-                </button>
+            {/* Recipe Summary */}
+            <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Cook Time</p>
+                    <p className="mt-3 text-sm font-black text-slate-900 dark:text-white">{totalCookTime ? `${totalCookTime} min` : '—'}</p>
+                </div>
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Servings</p>
+                    <p className="mt-3 text-sm font-black text-slate-900 dark:text-white">{displayServings}</p>
+                </div>
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Difficulty</p>
+                    <p className="mt-3 text-sm font-black text-slate-900 dark:text-white">{difficultyLabel}</p>
+                </div>
+            </div>
 
             {/* Ingredients */}
             {ingredients.length > 0 && (
@@ -184,6 +161,40 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     </ol>
                 </div>
             )}
+
+            {/* Tags & Categories */}
+            <button
+                onClick={() => ctx.navigateTo('recipe-tags')}
+                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors group"
+            >
+                <div className="flex items-center justify-between mb-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tags & Categories</p>
+                    <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest">
+                        #{difficultyLabel}
+                    </span>
+                    {recipe.type && (
+                        <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">
+                            #{recipe.type}
+                        </span>
+                    )}
+                    {recipe.diet && recipe.diet.map(d => (
+                        <span key={d} className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                            #{d}
+                        </span>
+                    ))}
+                    {recipe.tags && recipe.tags.map(t => (
+                        <span key={t} className="px-3 py-1.5 rounded-xl bg-slate-500/10 border border-slate-500/20 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                            {t.startsWith('#') ? t : `#${t}`}
+                        </span>
+                    ))}
+                    {(!recipe.tags || recipe.tags.length === 0) && !recipe.type && (!recipe.diet || recipe.diet.length === 0) && (
+                        <span className="text-sm font-bold text-slate-400 italic">Add Tags</span>
+                    )}
+                </div>
+            </button>
 
             {/* Source */}
             {recipe.source && recipe.source !== 'pasted-content' && (
