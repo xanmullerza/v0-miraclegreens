@@ -8,10 +8,10 @@ import type { useRecipeDetail } from './use-recipe-detail';
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
 
 const TABS = [
-    { key: 'recipe' as const, label: 'Recipe', icon: Layers, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
-    { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
-    { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, color: 'text-amber-500', activeBg: 'bg-amber-500/10 border-amber-500/30' },
-    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30' },
+    { key: 'recipe' as const, label: 'Recipe', icon: Layers, color: 'text-emerald-500', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
+    { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
+    { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, color: 'text-amber-500', activeGlow: 'text-amber-400 border-amber-500/40 shadow-[0_0_22px_rgba(251,191,36,0.35)] ring-1 ring-amber-500/20' },
+    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeGlow: 'text-blue-400 border-blue-500/40 shadow-[0_0_22px_rgba(96,165,250,0.35)] ring-1 ring-blue-500/20' },
 ] as const;
 
 interface RecipeHeaderProps {
@@ -69,15 +69,15 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
 
                     {/* Right: Section Pills — matching foods page style */}
                     <div className="flex items-center gap-1.5 bg-slate-950/40 dark:bg-slate-800/60 p-1 rounded-[1.5rem] border border-white/5 overflow-x-auto no-scrollbar">
-                        {TABS.map(({ key, label }) => (
+                        {TABS.map(({ key, label, activeGlow }) => (
                             <button
                                 key={key}
                                 onClick={() => setActiveSection(prev => prev === key ? null : key)}
                                 className={cn(
-                                    'py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1rem] transition-all duration-300 whitespace-nowrap px-3',
+                                    'py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1rem] transition-all duration-300 whitespace-nowrap px-3 border',
                                     activeSection === key
-                                        ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
-                                        : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                                        ? `border-current ${activeGlow}`
+                                        : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-400/40'
                                 )}
                             >
                                 {label}
@@ -113,14 +113,14 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                     </div>
                 )}
                 <div className="flex-1 grid grid-cols-2 gap-2">
-                    {TABS.map(({ key, label, icon: Icon, color, activeBg }) => (
+                    {TABS.map(({ key, label, icon: Icon, activeGlow }) => (
                         <button
                             key={key}
                             onClick={() => setActiveSection(prev => prev === key ? null : key)}
                             className={cn(
                                 'flex flex-col items-center gap-1 px-2 py-2 rounded-lg border text-[9px] font-black uppercase tracking-widest transition-all',
                                 activeSection === key
-                                    ? `${activeBg} ${color}`
+                                    ? `border-current ${activeGlow}`
                                     : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
                             )}
                         >
