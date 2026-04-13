@@ -135,7 +135,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                 </div>
 
                 {recipe && (
-                    <div className="flex items-center gap-3 p-3 mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]">
+                    <div className="flex items-center gap-3 p-3 mb-6 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-2xl border-2 border-emerald-200 dark:border-emerald-700/50 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-emerald-400 dark:hover:border-emerald-500">
                         {recipe.image ? (
                             <img src={recipe.image} alt={recipe.title} className="w-12 h-12 rounded-lg object-cover" />
                         ) : (
@@ -208,7 +208,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
 
                 <button
                     onClick={handleCopyLink}
-                    className="w-full h-12 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border border-slate-200 dark:border-slate-700 group active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
+                    className="w-full h-12 bg-emerald-500/10 dark:bg-emerald-900/20 hover:bg-emerald-500/20 dark:hover:bg-emerald-900/30 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border-2 border-emerald-300 dark:border-emerald-700/50 group active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-emerald-400 dark:hover:border-emerald-500"
                 >
                     {copied ? (
                         <>
@@ -217,8 +217,8 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                         </>
                     ) : (
                         <>
-                            <Copy size={18} className="text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white" />
-                            <span className="text-xs font-bold text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white uppercase tracking-widest">Copy Recipe Link</span>
+                            <Copy size={18} className="text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300" />
+                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 uppercase tracking-widest">Copy Recipe Link</span>
                         </>
                     )}
                 </button>
