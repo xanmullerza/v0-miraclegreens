@@ -105,9 +105,9 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                     {/* Front Side - Slim Card */}
                                     <div className={cn(
                                         "absolute inset-0 px-3 flex items-center gap-3 rounded-2xl border transition-all duration-300",
-                                        "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800",
+                                        "bg-emerald-50/50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800",
                                         isFlipped ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100",
-                                        "group-hover:border-emerald-400 dark:group-hover:border-emerald-600"
+                                        "group-hover:border-emerald-500 dark:group-hover:border-emerald-500"
                                     )}>
                                         <div className="shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest min-w-[60px] text-center">
                                             {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
@@ -116,7 +116,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                             {(ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                         </p>
                                         <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <div className="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-500 text-[9px] font-black uppercase tracking-widest">
+                                            <div className="px-2.5 py-1 rounded-lg bg-emerald-200 dark:bg-emerald-800 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest">
                                                 Macros
                                             </div>
                                         </div>
