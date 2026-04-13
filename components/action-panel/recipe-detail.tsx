@@ -7,7 +7,6 @@ import {
     RecipeHeader,
     RecipeSection,
     RecipeNutrition,
-    RecipeSmartMatch, // RE-ENABLED: Shows only workflow UI
     RecipeRelated,
     RecipeManagement,
 } from '@/components/recipe/detail';
@@ -69,7 +68,6 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
                 {activeSection === 'nutrition' && (
                     <div className="space-y-4">
                         <RecipeNutrition ctx={ctx} />
-                        <RecipeSmartMatch ctx={ctx} /> {/* RE-ENABLED: Shows only workflow UI */}
                     </div>
                 )}
 
