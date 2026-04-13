@@ -127,8 +127,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                                     className={cn(
                                         "relative rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden font-semibold",
                                         isExpanded
-                                            ? "col-span-full w-full px-4 py-3 h-auto bg-gradient-to-r from-green-500/15 to-emerald-500/15 border-green-400/50 dark:border-green-500/50"
-                                            : "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-300/30 dark:border-blue-600/40 text-blue-700 dark:text-blue-400 hover:shadow-md hover:border-blue-400/50 dark:hover:border-blue-500/50"
+                                            ? "col-span-full w-full px-4 py-3 h-auto bg-gradient-to-r from-green-500/15 to-emerald-500/15 border-green-400/50 dark:border-green-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
+                                            : "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-300/30 dark:border-blue-600/40 text-blue-700 dark:text-blue-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] hover:border-blue-400/50 dark:hover:border-blue-500/50"
                                     )}
                                 >
                                     {isExpanded ? (

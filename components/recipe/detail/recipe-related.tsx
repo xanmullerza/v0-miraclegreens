@@ -44,7 +44,7 @@ export function RecipeRelated({ ctx }: RecipeRelatedProps) {
                             <button
                                 key={meal.id}
                                 onClick={() => handleRelatedClick(meal.id)}
-                                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden hover:border-emerald-400/50 dark:hover:border-emerald-500/50"
+                                className="p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden hover:border-emerald-400/50 dark:hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
                             >
                                 {/* Background image */}
                                 {meal.image && (

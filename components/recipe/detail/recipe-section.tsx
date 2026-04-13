@@ -190,7 +190,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
             {/* Tags & Categories */}
             <button
                 onClick={() => ctx.navigateTo('recipe-tags')}
-                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 transition-colors group"
+                className="w-full p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 hover:border-emerald-400/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] group"
             >
                 <div className="flex items-center justify-between mb-3">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tags & Categories</p>

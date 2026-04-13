@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
+const interactiveGlow = 'transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]';
 
 // ── DeleteButton (private) ────────────────────────────────────
 function DeleteButton({ recipeId, onDeleted }: { recipeId: string; onDeleted: () => void }) {
@@ -66,7 +67,12 @@ function DeleteButton({ recipeId, onDeleted }: { recipeId: string; onDeleted: ()
 
     return (
         <button onClick={handleDelete}
-            className="w-full flex flex-col items-start justify-between p-4 rounded-2xl border bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-600 transition-all active:scale-95 text-left h-full group relative overflow-hidden">
+            className={cn(
+                "w-full flex flex-col items-start justify-between p-4 rounded-2xl border bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 text-left h-full group relative overflow-hidden",
+                "hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-600",
+                interactiveGlow,
+            )}
+        >
             <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Trash2 size={32} />
             </div>
@@ -96,7 +102,8 @@ export function RecipeManagement({ ctx }: RecipeManagementProps) {
                 <button
                     onClick={toggleFavorite}
                     className={cn(
-                        "p-4 rounded-2xl border text-left transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden",
+                        "p-4 rounded-2xl border text-left flex flex-col justify-between h-24 group relative overflow-hidden",
+                        interactiveGlow,
                         recipe.is_favorite
                             ? "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400"
                             : "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500"
@@ -128,7 +135,11 @@ export function RecipeManagement({ ctx }: RecipeManagementProps) {
                             else { setRecipeToShare(recipe); navigateTo('recipe-share'); }
                         }
                     }}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/60 transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden"
+                    className={cn(
+                        "p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-left flex flex-col justify-between h-24 group relative overflow-hidden",
+                        "hover:bg-slate-100/60 dark:hover:bg-slate-800/60",
+                        interactiveGlow,
+                    )}
                 >
                     <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Share2 size={32} />
@@ -144,7 +155,8 @@ export function RecipeManagement({ ctx }: RecipeManagementProps) {
                 <button
                     onClick={handleEditClick}
                     className={cn(
-                        "p-4 rounded-2xl border text-left transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden",
+                        "p-4 rounded-2xl border text-left flex flex-col justify-between h-24 group relative overflow-hidden",
+                        interactiveGlow,
                         isOwner
                             ? "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
                             : "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 shadow-sm"
