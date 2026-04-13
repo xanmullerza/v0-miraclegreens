@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check, X, Plus } from 'lucide-react';
+import { Copy, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import * as Icons from 'simple-icons';
@@ -34,7 +34,6 @@ function SimpleIcon({ icon, size = 20 }: { icon: any; size?: number }) {
 
 export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProps) {
     const [copied, setCopied] = useState(false);
-    const [showMore, setShowMore] = useState(false);
 
     const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/?recipeId=${recipe?.id || ''}` : '';
     const shareText = recipe 
@@ -156,41 +155,27 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
                             </div>
                         ))}
-                        
-                        {!showMore && (
-                            <div className="flex flex-col items-center gap-2">
-                                <button
-                                    onClick={() => setShowMore(true)}
-                                    className="w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all transform active:scale-95 shadow-md border border-slate-200 dark:border-slate-700"
-                                >
-                                    <Plus size={20} />
-                                </button>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">More</span>
-                            </div>
-                        )}
                     </div>
 
-                    {showMore && (
-                        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 animate-in slide-in-from-top-4 duration-300">
-                            {extraPlatforms.map((platform) => (
-                                <div key={platform.name} className="flex flex-col items-center gap-2">
-                                    <a
-                                        href={platform.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={cn(
-                                            "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
-                                            platform.color,
-                                            platform.hoverColor
-                                        )}
-                                    >
-                                        <SimpleIcon icon={platform.icon} size={20} />
-                                    </a>
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 animate-in slide-in-from-top-4 duration-300">
+                        {extraPlatforms.map((platform) => (
+                            <div key={platform.name} className="flex flex-col items-center gap-2">
+                                <a
+                                    href={platform.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={cn(
+                                        "w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all transform active:scale-95 shadow-lg",
+                                        platform.color,
+                                        platform.hoverColor
+                                    )}
+                                >
+                                    <SimpleIcon icon={platform.icon} size={20} />
+                                </a>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <button
