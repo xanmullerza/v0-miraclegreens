@@ -813,8 +813,8 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
 
     // If it's embedded, provide a close button. If standalone, we don't need one.
     const containerClasses = isStandalone
-        ? "space-y-8 pb-20 animate-in fade-in duration-700" 
-        : "h-full w-full overflow-y-auto custom-scrollbar p-6 space-y-8 pb-24 relative bg-slate-50/50 dark:bg-slate-900/50";
+        ? "space-y-8 pb-40 animate-in fade-in duration-700" 
+        : "h-full w-full overflow-y-auto custom-scrollbar p-6 space-y-8 pb-48 relative bg-slate-50/50 dark:bg-slate-900/50";
 
     return (
         <div className={containerClasses}>
