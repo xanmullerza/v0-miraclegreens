@@ -133,20 +133,20 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                             <>
                                                 <div className="flex-1 flex justify-around items-center">
                                                     <div className="text-center">
-                                                        <p className="text-[10px] font-black">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
-                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">{energyUnit}</p>
+                                                        <p className="text-[10px] font-black text-emerald-400 dark:text-emerald-300">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
+                                                        <p className="text-[7px] font-bold uppercase tracking-widest text-emerald-300 dark:text-emerald-200">{energyUnit}</p>
                                                     </div>
                                                     <div className="text-center border-l border-white/20 pl-4">
-                                                        <p className="text-[10px] font-black">{ingCarbs}g</p>
-                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Carbs</p>
+                                                        <p className="text-[10px] font-black text-emerald-400 dark:text-emerald-300">{ingCarbs}g</p>
+                                                        <p className="text-[7px] font-bold uppercase tracking-widest text-emerald-300 dark:text-emerald-200">Carbs</p>
                                                     </div>
                                                     <div className="text-center border-l border-white/20 pl-4">
-                                                        <p className="text-[10px] font-black">{ingProtein}g</p>
-                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Protein</p>
+                                                        <p className="text-[10px] font-black text-emerald-400 dark:text-emerald-300">{ingProtein}g</p>
+                                                        <p className="text-[7px] font-bold uppercase tracking-widest text-emerald-300 dark:text-emerald-200">Protein</p>
                                                     </div>
                                                     <div className="text-center border-l border-white/20 pl-4">
-                                                        <p className="text-[10px] font-black">{ingFat}g</p>
-                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Fat</p>
+                                                        <p className="text-[10px] font-black text-emerald-400 dark:text-emerald-300">{ingFat}g</p>
+                                                        <p className="text-[7px] font-bold uppercase tracking-widest text-emerald-300 dark:text-emerald-200">Fat</p>
                                                     </div>
                                                 </div>
                                                 <div className="shrink-0 ml-4 px-2.5 py-1 rounded-lg bg-white/90 dark:bg-slate-900/90 text-emerald-600 text-[9px] font-black uppercase tracking-widest">
