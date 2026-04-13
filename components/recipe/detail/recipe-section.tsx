@@ -113,7 +113,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                             {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
                                         </div>
                                         <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[13px] truncate">
-                                            {(ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                            {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                         </p>
                                         <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <div className="px-2.5 py-1 rounded-lg bg-emerald-200 dark:bg-emerald-800 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest">
