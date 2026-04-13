@@ -197,7 +197,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                                             platform.hoverColor
                                         )}
                                     >
-                                        <platform.icon size={20} />
+                                        <SimpleIcon icon={platform.icon} size={20} />
                                     </a>
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
                                 </div>
