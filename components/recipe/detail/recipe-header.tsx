@@ -62,7 +62,7 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                         </div>
 
                         {/* Title */}
-                        <h2 className="text-sm font-black uppercase tracking-tighter text-emerald-400 italic truncate max-w-[240px]">
+                        <h2 className="text-sm font-black uppercase tracking-tighter text-emerald-400 italic line-clamp-2 whitespace-normal break-words max-w-[240px] leading-tight">
                             {recipe.title}
                         </h2>
                     </div>
@@ -97,7 +97,7 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                         <ArrowLeft size={18} />
                     </button>
                 ) : <div className="w-9" />}
-                <h2 className="text-base font-semibold text-slate-900 dark:text-white flex-1 text-center px-2 truncate">
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white flex-1 text-center px-2 line-clamp-2 whitespace-normal break-words leading-tight">
                     {recipe.title}
                 </h2>
                 <div className="w-9" />
