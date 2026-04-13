@@ -8,10 +8,10 @@ import type { useRecipeDetail } from './use-recipe-detail';
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
 
 const TABS = [
-    { key: 'recipe' as const, label: 'Recipe', icon: Layers, color: 'text-emerald-500', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
-    { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
-    { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, color: 'text-amber-500', activeGlow: 'text-amber-400 border-amber-500/40 shadow-[0_0_22px_rgba(251,191,36,0.35)] ring-1 ring-amber-500/20' },
-    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeGlow: 'text-blue-400 border-blue-500/40 shadow-[0_0_22px_rgba(96,165,250,0.35)] ring-1 ring-blue-500/20' },
+    { key: 'recipe' as const, label: 'Recipe', icon: Layers, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
+    { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
+    { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, muted: 'text-amber-400/50 border-amber-500/30', activeGlow: 'text-amber-400 border-amber-500/40 shadow-[0_0_22px_rgba(251,191,36,0.35)] ring-1 ring-amber-500/20' },
+    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, muted: 'text-blue-400/50 border-blue-500/30', activeGlow: 'text-blue-400 border-blue-500/40 shadow-[0_0_22px_rgba(96,165,250,0.35)] ring-1 ring-blue-500/20' },
 ] as const;
 
 interface RecipeHeaderProps {
@@ -69,15 +69,13 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
 
                     {/* Right: Section Pills — matching foods page style */}
                     <div className="flex items-center gap-1.5 bg-slate-950/40 dark:bg-slate-800/60 p-1 rounded-[1.5rem] border border-white/5 overflow-x-auto no-scrollbar">
-                        {TABS.map(({ key, label, activeGlow, color }) => (
+                        {TABS.map(({ key, label, muted, activeGlow }) => (
                             <button
                                 key={key}
                                 onClick={() => setActiveSection(prev => prev === key ? null : key)}
                                 className={cn(
-                                    'py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1rem] transition-all duration-300 whitespace-nowrap px-3 border',
-                                    activeSection === key
-                                        ? `border-current ${activeGlow}`
-                                        : `${color} border-transparent hover:border-current/40`
+                                    'py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1rem] transition-all duration-300 whitespace-nowrap px-3 border-2',
+                                    activeSection === key ? activeGlow : muted
                                 )}
                             >
                                 {label}
@@ -113,15 +111,13 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                     </div>
                 )}
                 <div className="flex-1 grid grid-cols-2 gap-2">
-                    {TABS.map(({ key, label, icon: Icon, activeGlow, color }) => (
+                    {TABS.map(({ key, label, icon: Icon, muted, activeGlow }) => (
                         <button
                             key={key}
                             onClick={() => setActiveSection(prev => prev === key ? null : key)}
                             className={cn(
-                                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg border text-[9px] font-black uppercase tracking-widest transition-all',
-                                activeSection === key
-                                    ? `border-current ${activeGlow}`
-                                    : `${color} border-slate-200 dark:border-slate-800 hover:border-current/40`
+                                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg border-2 text-[9px] font-black uppercase tracking-widest transition-all',
+                                activeSection === key ? activeGlow : muted
                             )}
                         >
                             <Icon size={14} />
