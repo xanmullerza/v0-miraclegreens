@@ -58,7 +58,7 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
             <RecipeHeader ctx={ctx} standalone={false} />
 
             {/* Content area */}
-            <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 pb-28 space-y-4">
                 {activeSection === 'recipe' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <RecipeSection ctx={ctx} />
