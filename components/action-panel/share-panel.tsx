@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Facebook, Send, MessageCircle, Copy, Check, X, Twitter, Mail, Instagram, Share2, Plus, MessageSquare, Flame } from 'lucide-react';
+import { Copy, Check, X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import * as Icons from 'simple-icons';
 
 interface Recipe {
     id: string;
@@ -15,6 +16,20 @@ interface SharePanelProps {
     recipe?: Recipe;
     onClose: () => void;
     isInline?: boolean;
+}
+
+// Helper component to render simple-icons SVG
+function SimpleIcon({ icon, size = 20 }: { icon: any; size?: number }) {
+    if (!icon) return null;
+    return (
+        <svg 
+            width={size} 
+            height={size} 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+            dangerouslySetInnerHTML={{ __html: icon.svg }}
+        />
+    );
 }
 
 export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProps) {
@@ -36,28 +51,28 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
     const mainPlatforms = [
         {
             name: 'WhatsApp',
-            icon: MessageCircle,
+            icon: Icons.siWhatsapp,
             color: 'bg-[#25D366]',
             hoverColor: 'hover:bg-[#128C7E]',
             url: `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`
         },
         {
             name: 'Telegram',
-            icon: Send,
+            icon: Icons.siTelegram,
             color: 'bg-[#0088cc]',
             hoverColor: 'hover:bg-[#0077b5]',
             url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`
         },
         {
             name: 'Facebook',
-            icon: Facebook,
+            icon: Icons.siFacebook,
             color: 'bg-[#1877F2]',
             hoverColor: 'hover:bg-[#0e5a8a]',
             url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
         },
         {
             name: 'X',
-            icon: Twitter,
+            icon: Icons.siX,
             color: 'bg-black',
             hoverColor: 'hover:bg-slate-900',
             url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`
@@ -67,28 +82,28 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
     const extraPlatforms = [
         {
             name: 'Reddit',
-            icon: Flame,
+            icon: Icons.siReddit,
             color: 'bg-[#FF4500]',
             hoverColor: 'hover:bg-[#FF5700]',
             url: `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`
         },
         {
             name: 'Discord',
-            icon: MessageSquare,
+            icon: Icons.siDiscord,
             color: 'bg-[#5865F2]',
             hoverColor: 'hover:bg-[#4752c4]',
             url: `https://discord.com/channels/@me` // Note: Discord doesn't have a direct share URL scheme like others, usually copy-paste
         },
         {
             name: 'Instagram',
-            icon: Instagram,
+            icon: Icons.siInstagram,
             color: 'bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888]',
             hoverColor: 'opacity-90',
             url: `https://www.instagram.com/` // Custom sharing on IG is also restricted
         },
         {
             name: 'Email',
-            icon: Mail,
+            icon: Icons.siMinutemailer,
             color: 'bg-slate-600',
             hoverColor: 'hover:bg-slate-700',
             url: `mailto:?subject=${encodeURIComponent(recipe?.title || 'Shared Recipe')}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`
@@ -149,7 +164,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                                         platform.hoverColor
                                     )}
                                 >
-                                    <platform.icon size={20} />
+                                    <SimpleIcon icon={platform.icon} size={20} />
                                 </a>
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{platform.name}</span>
                             </div>
