@@ -971,13 +971,13 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                             {instructions.length > 0 && (
                                 <Card className="p-5 lg:p-8 space-y-6">
                                     <div className="flex items-center gap-3">
-                                        <BookOpen className="text-sky-500" size={20} />
-                                        <h2 className="text-lg font-black tracking-wider text-sky-600">Instructions</h2>
+                                        <BookOpen className="text-blue-500" size={20} />
+                                        <h2 className="text-lg font-black tracking-wider text-blue-600">Instructions</h2>
                                     </div>
                                     <div className="space-y-4">
                                         {instructions.map((inst, i) => (
                                             <div key={i} className="flex gap-4">
-                                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-sky-500/10 text-sky-500 font-black flex items-center justify-center text-sm">
+                                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/10 text-blue-500 font-black flex items-center justify-center text-sm">
                                                     {i + 1}
                                                 </div>
                                                 <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed flex-1">
