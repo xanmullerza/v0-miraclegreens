@@ -125,7 +125,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                     {/* Back Side - Macro Breakdown */}
                                     <div className={cn(
                                         "absolute inset-0 px-4 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
-                                        "bg-emerald-600 dark:bg-emerald-600 border-emerald-400 text-white",
+                                        "bg-slate-50/70 dark:bg-slate-950/60 border-emerald-400 text-emerald-900 dark:text-emerald-100",
                                         "shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20",
                                         isFlipped ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                                     )}>
@@ -137,19 +137,19 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                                         <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">{energyUnit}</p>
                                                     </div>
                                                     <div className="text-center border-l border-white/20 pl-4">
+                                                        <p className="text-[10px] font-black">{ingCarbs}g</p>
+                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Carbs</p>
+                                                    </div>
+                                                    <div className="text-center border-l border-white/20 pl-4">
                                                         <p className="text-[10px] font-black">{ingProtein}g</p>
-                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Prot</p>
+                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Protein</p>
                                                     </div>
                                                     <div className="text-center border-l border-white/20 pl-4">
                                                         <p className="text-[10px] font-black">{ingFat}g</p>
                                                         <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Fat</p>
                                                     </div>
-                                                    <div className="text-center border-l border-white/20 pl-4">
-                                                        <p className="text-[10px] font-black">{ingCarbs}g</p>
-                                                        <p className="text-[7px] font-bold opacity-70 uppercase tracking-widest">Carbs</p>
-                                                    </div>
                                                 </div>
-                                                <div className="shrink-0 ml-4 px-2.5 py-1 rounded-lg bg-white text-emerald-600 text-[9px] font-black uppercase tracking-widest">
+                                                <div className="shrink-0 ml-4 px-2.5 py-1 rounded-lg bg-white/90 dark:bg-slate-900/90 text-emerald-600 text-[9px] font-black uppercase tracking-widest">
                                                     Close
                                                 </div>
                                             </>
