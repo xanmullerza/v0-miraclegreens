@@ -11,14 +11,17 @@ interface ActionPanelBottomNavProps {
     activeView: ActionPanelView;
     onClose: () => void;
     isInline?: boolean;
+    orientation?: 'bottom' | 'left' | 'right';
 }
 
 export function ActionPanelBottomNav({
     activeView,
     onClose,
-    isInline = false
+    isInline = false,
+    orientation = 'bottom'
 }: ActionPanelBottomNavProps) {
     const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton, isActionPanelOpen, activeMainTab, setActiveMainTab } = useActionPanel();
+    const isVertical = orientation === 'left' || orientation === 'right';
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -73,13 +76,18 @@ export function ActionPanelBottomNav({
 
     return (
         <div className={cn(
-            isInline ? "sticky bottom-0 w-full" : "fixed bottom-0 left-0 right-0",
+            isInline ? "sticky bottom-0 w-full" : isVertical ? `fixed top-0 bottom-0 ${orientation === 'left' ? 'left-0' : 'right-0'} w-20` : "fixed bottom-0 left-0 right-0",
             "z-[100] flex justify-center pointer-events-none transition-all duration-500",
-            !isActionPanelOpen && "animate-in slide-in-from-bottom-8"
+            !isActionPanelOpen && !isVertical && "animate-in slide-in-from-bottom-8"
         )}>
             {showExpandedMenu ? (
                 // Expanded secondary menu
-                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-5 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3">
+                <div className={cn(
+                    "pointer-events-auto bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-none",
+                    isVertical
+                        ? "h-full w-20 grid grid-rows-5 gap-2 px-2 py-3 border-slate-200/50 dark:border-slate-800/50 shadow-[-4px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_30px_rgba(0,0,0,0.5)]"
+                        : "w-full px-2 py-3 grid grid-cols-5 border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-3"
+                )}>
                     {/* Permanent Home Button */}
                     <button
                         onClick={() => {
@@ -190,7 +198,12 @@ export function ActionPanelBottomNav({
                 </div>
             ) : (
                 // Main menu
-                <div className="pointer-events-auto w-full bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl px-2 py-3 grid grid-cols-3 rounded-none border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
+                <div className={cn(
+                    "pointer-events-auto bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-none",
+                    isVertical
+                        ? "h-full w-20 grid grid-rows-3 gap-2 px-2 py-3 border-slate-200/50 dark:border-slate-800/50 shadow-[-4px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_30px_rgba(0,0,0,0.5)]"
+                        : "w-full px-2 py-3 grid grid-cols-3 border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]"
+                )}>
                     {/* Home Button - Left (Toggle behavior) */}
                     <button
                         onClick={() => {

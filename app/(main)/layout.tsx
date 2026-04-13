@@ -40,14 +40,21 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const { resizeMode, toggleResize } = useSplitView();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [isMobileLandscape, setIsMobileLandscape] = useState(false);
     const [recipeEditorOpen, setRecipeEditorOpen] = useState(false);
     const [detectedRecipe, setDetectedRecipe] = useState<ParsedRecipe | null>(null);
 
     useEffect(() => {
         const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
+        const checkLandscape = () => setIsMobileLandscape(window.innerWidth < 1024 && window.innerWidth > window.innerHeight);
         checkDesktop();
+        checkLandscape();
         window.addEventListener('resize', checkDesktop);
-        return () => window.removeEventListener('resize', checkDesktop);
+        window.addEventListener('resize', checkLandscape);
+        return () => {
+            window.removeEventListener('resize', checkDesktop);
+            window.removeEventListener('resize', checkLandscape);
+        };
     }, []);
 
     // Hide split view on mobile, show chat FAB overlay
@@ -117,7 +124,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     pathname === '/dashboard' ? 'w-full' : ''
                 )}>
                     {/* Main Content */}
-                    <main className="flex-1 overflow-y-auto bg-background custom-scrollbar">
+                    <main className={cn(
+                        "flex-1 overflow-y-auto bg-background custom-scrollbar",
+                        isMobileLandscape && 'pl-20 pr-20'
+                    )}>
                         <div className={cn(
                             "px-0 sm:px-4 flex justify-center pb-32 sm:pb-0",
                             pathname !== '/dashboard' && "py-0 sm:py-4"
@@ -165,6 +175,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     <ActionPanelBottomNav 
                         activeView={activeView}
                         onClose={() => setIsActionPanelOpen(false)}
+                        orientation={isMobileLandscape ? 'right' : 'bottom'}
                     />
                 </React.Suspense>
             )}

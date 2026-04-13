@@ -16,12 +16,14 @@ interface HeaderLogoProps {
     showSubtext?: boolean;
     userStatus?: 'cloud' | 'local' | 'anonymous';
     userAvatarUrl?: string;
+    isMobileLandscape?: boolean;
 }
 
 export function HeaderLogo({ 
     showSubtext = true,
     userStatus = 'anonymous',
     userAvatarUrl,
+    isMobileLandscape: mobileLandscapeProp,
 }: HeaderLogoProps) {
     const pathname = usePathname();
     const router = useRouter();
@@ -31,14 +33,20 @@ export function HeaderLogo({
     const { isActionPanelOpen, setIsActionPanelOpen, setActiveView, activeView, activeMainTab, setActiveMainTab } = useActionPanel();
     const { profile } = useUserPreferences();
     const [isMobile, setIsMobile] = useState(false);
+    const [isLandscape, setIsLandscape] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        const updateViewport = () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            setIsMobile(width < 1024);
+            setIsLandscape(width < 1024 && width > height);
+        };
+        updateViewport();
+        window.addEventListener('resize', updateViewport);
+        return () => window.removeEventListener('resize', updateViewport);
     }, []);
 
     const getResizeIcon = () => {
@@ -54,6 +62,104 @@ export function HeaderLogo({
         if (resizeMode === 'dashboard-only') return 'Focus Content (70/30)';
         return 'Toggle View';
     };
+
+    const mobileLandscape = typeof mobileLandscapeProp === 'boolean'
+        ? mobileLandscapeProp
+        : isMobile && isLandscape;
+
+    if (mobileLandscape) {
+        const mobileNavItems = [
+            { id: 'recipes', label: 'Home', icon: Info },
+            { id: 'foods', label: 'Library', icon: BookOpen },
+            { id: 'planner', label: 'Tracker', icon: Calendar },
+        ];
+
+        const sideActions = [
+            { id: 'privacy', label: 'Privacy', icon: Shield },
+            { id: 'support', label: 'Support', icon: HelpCircle },
+            { id: 'terms', label: 'Terms', icon: BookOpen },
+        ];
+
+        return (
+            <div className="fixed inset-y-0 left-0 z-50 w-20 border-r border-border bg-background/90 backdrop-blur-xl md:hidden flex flex-col justify-between py-3">
+                <div className="flex flex-col items-center gap-3 px-1">
+                    <Link href="/dashboard" className="flex items-center justify-center h-12 w-12 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-slate-700 shadow-sm text-white transition-all hover:opacity-90">
+                        <BookoFoodLogo size="sm" />
+                    </Link>
+
+                    <div className="flex flex-col items-center gap-2 mt-4">
+                        {mobileNavItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = activeMainTab === item.id;
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        setActiveMainTab(item.id as any);
+                                        if (item.id === 'recipes') {
+                                            setResizeMode('content-focus');
+                                        }
+                                        router.push('/');
+                                    }}
+                                    title={item.label}
+                                    className={cn(
+                                        'flex h-12 w-12 items-center justify-center rounded-2xl transition-all',
+                                        isActive ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                                    )}
+                                >
+                                    <Icon size={18} />
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-center gap-2 px-1">
+                    {sideActions.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = activeView === item.id;
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => {
+                                    setActiveView(item.id as any);
+                                    setIsActionPanelOpen(true);
+                                }}
+                                title={item.label}
+                                className={cn(
+                                    'flex h-12 w-12 items-center justify-center rounded-2xl transition-all',
+                                    isActive ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                                )}
+                            >
+                                <Icon size={18} />
+                            </button>
+                        );
+                    })}
+
+                    <button
+                        onClick={() => {
+                            if (pathname === '/profile') {
+                                router.push('/dashboard');
+                                return;
+                            }
+                            setActiveView('profile');
+                            setIsActionPanelOpen(true);
+                        }}
+                        title="Profile"
+                        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white transition-all hover:opacity-90"
+                    >
+                        <div className="h-6 w-6 rounded-full flex items-center justify-center overflow-hidden">
+                            {userAvatarUrl ? (
+                                <img src={userAvatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                <User size={16} />
+                            )}
+                        </div>
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div suppressHydrationWarning className={cn(
