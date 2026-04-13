@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus, ChefHat, UtensilsCrossed, Gauge } from 'lucide-react';
+import { ChevronRight, Plus, Minus } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -17,39 +17,8 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
     if (!recipe) return null;
 
-    const totalCookTime = ((recipe.prep_time || 0) + (recipe.cook_time || 0)) || null;
-    const displayServings = selectedServings || recipe.servings || 1;
-    const difficultyLabel = recipe.difficulty || 'Medium';
-
     return (
         <>
-            {/* Recipe Summary */}
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-6">
-                <div className="flex items-center justify-center gap-8">
-                    <div className="flex items-center gap-2">
-                        <ChefHat className="w-4 h-4 text-emerald-500" />
-                        <div className="text-center">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Cook Time</p>
-                            <p className="text-sm font-black text-slate-900 dark:text-white">{totalCookTime ? `${totalCookTime} min` : '—'}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <UtensilsCrossed className="w-4 h-4 text-emerald-500" />
-                        <div className="text-center">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Servings</p>
-                            <p className="text-sm font-black text-slate-900 dark:text-white">{displayServings}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Gauge className="w-4 h-4 text-emerald-500" />
-                        <div className="text-center">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Difficulty</p>
-                            <p className="text-sm font-black text-slate-900 dark:text-white">{difficultyLabel}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* Ingredients */}
             {ingredients.length > 0 && (
                 <div>
@@ -184,7 +153,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest">
-                        #{difficultyLabel}
+                        #{recipe.difficulty || 'Medium'}
                     </span>
                     {recipe.type && (
                         <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">

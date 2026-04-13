@@ -13,6 +13,8 @@ import {
     CheckSquare,
     Square,
     Search,
+    Clock,
+    Users,
     Coffee,
     Sun,
     Moon,
@@ -20,6 +22,9 @@ import {
     Pill,
     Gauge,
     UtensilsCrossed,
+    SignalLow,
+    SignalMedium,
+    Signal,
     Plus,
     Minus
 } from 'lucide-react';
@@ -551,6 +556,53 @@ export function RecipesView({
                                                 </>
                                             );
                                         })()}
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-row lg:flex-col items-stretch gap-2 pt-2 lg:pt-0 lg:pl-4 lg:w-52 justify-center">
+
+                                    <div className="flex flex-wrap items-center justify-center gap-1 p-2 rounded-3xl bg-transparent grow">
+                                        {([{
+                                                label: <Clock size={17} />,
+                                                value: (recipe.prep_time || 0) + (recipe.cook_time || 0) || '-',
+                                                color: 'text-sky-400'
+                                            },
+                                            {
+                                                label: <Users size={17} />,
+                                                value: servingsOverrides[recipe.id] !== undefined ? servingsOverrides[recipe.id] : (filters.globalServings !== null ? filters.globalServings : (recipe.servings || 1)),
+                                                color: 'text-violet-400',
+                                            },
+                                            {
+                                                label: (() => {
+                                                    const d = recipe.difficulty || 'Medium';
+                                                    if (d === 'Easy') return <SignalLow size={20} />;
+                                                    if (d === 'Hard') return <Signal size={20} />;
+                                                    return <SignalMedium size={20} />;
+                                                })(),
+                                                value: '',
+                                                color: (() => {
+                                                    const d = recipe.difficulty || 'Medium';
+                                                    if (d === 'Easy') return 'text-emerald-400';
+                                                    if (d === 'Hard') return 'text-rose-400';
+                                                    return 'text-amber-400';
+                                                })()
+                                            },
+                                        ] as { label: React.ReactNode; value: string | number; color: string; isInteractive?: boolean }[]).map((tab, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={cn(
+                                                    'py-3 px-1 rounded-2xl transition-all duration-300 whitespace-nowrap flex-1 min-w-0 flex flex-col items-center justify-center gap-1.5 bg-transparent relative',
+                                                    tab.color,
+                                                )}
+                                            >
+                                                <span className="opacity-85 leading-none shrink-0">
+                                                    {tab.label}
+                                                </span>
+                                                {tab.value !== '' && (
+                                                    <span className="leading-none font-black text-white/70 text-[10px] tracking-widest">{tab.value}</span>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
