@@ -135,7 +135,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                 </div>
 
                 {recipe && (
-                    <div className="flex items-center gap-3 p-3 mb-6 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-2xl border-2 border-emerald-200 dark:border-emerald-700/50 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-emerald-400 dark:hover:border-emerald-500">
+                    <div className="flex items-center gap-3 p-3 mb-6 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/10 border-2 border-emerald-500/40 dark:border-emerald-400/30 shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(16,185,129,0.35)] hover:border-emerald-500/50">
                         {recipe.image ? (
                             <img src={recipe.image} alt={recipe.title} className="w-12 h-12 rounded-lg object-cover" />
                         ) : (
