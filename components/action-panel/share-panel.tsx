@@ -135,7 +135,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                 </div>
 
                 {recipe && (
-                    <div className="flex items-center gap-3 p-3 mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                    <div className="flex items-center gap-3 p-3 mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]">
                         {recipe.image ? (
                             <img src={recipe.image} alt={recipe.title} className="w-12 h-12 rounded-lg object-cover" />
                         ) : (
@@ -208,7 +208,7 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
 
                 <button
                     onClick={handleCopyLink}
-                    className="w-full h-12 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl flex items-center justify-center gap-3 transition-colors border border-slate-200 dark:border-slate-700 group"
+                    className="w-full h-12 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border border-slate-200 dark:border-slate-700 group active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
                 >
                     {copied ? (
                         <>
