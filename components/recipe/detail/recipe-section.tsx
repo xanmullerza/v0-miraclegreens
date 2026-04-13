@@ -169,14 +169,14 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
             {/* Instructions */}
             {instructions.length > 0 && (
                 <div>
-                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-emerald-500 mb-3 flex items-center gap-2">
-                        <span className="w-1 h-4 bg-emerald-500 rounded-full" />
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600 mb-3 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-blue-600 rounded-full" />
                         Instructions
                     </h3>
                     <ol className="space-y-3">
                         {instructions.map((inst, idx) => (
                             <li key={idx} className="flex gap-3 text-sm">
-                                <span className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                <span className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
                                     {inst.step_order || idx + 1}
                                 </span>
                                 <span className="text-slate-700 dark:text-slate-300 pt-0.5">
