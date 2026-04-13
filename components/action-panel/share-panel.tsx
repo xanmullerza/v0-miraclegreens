@@ -121,19 +121,6 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                     ? "w-full h-full flex flex-col p-4" 
                     : "w-full rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-in slide-in-from-bottom duration-300"
             )}>
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Share Recipe</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Share with friends and family</p>
-                    </div>
-                    <button 
-                        onClick={onClose}
-                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400"
-                    >
-                        <X size={20} />
-                    </button>
-                </div>
-
                 {recipe && (
                     <div className="flex items-center gap-3 p-3 mb-6 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/10 shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(16,185,129,0.35)]">
                         {recipe.image ? (
