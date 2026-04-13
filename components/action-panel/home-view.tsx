@@ -33,33 +33,6 @@ import { HomeTabShell } from './home-tab-shell';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { FeatureCarousel } from '@/components/ux/feature-carousel';
 
-const commitmentColorClasses = {
-    orange: {
-        bg: 'bg-orange-500/10',
-        border: 'border-orange-500/20',
-    },
-    emerald: {
-        bg: 'bg-emerald-500/10',
-        border: 'border-emerald-500/20',
-    },
-    purple: {
-        bg: 'bg-purple-500/10',
-        border: 'border-purple-500/20',
-    },
-    rose: {
-        bg: 'bg-rose-500/10',
-        border: 'border-rose-500/20',
-    },
-    blue: {
-        bg: 'bg-blue-500/10',
-        border: 'border-blue-500/20',
-    },
-    amber: {
-        bg: 'bg-amber-500/10',
-        border: 'border-amber-500/20',
-    }
-};
-
 interface HomeViewProps {
     setActiveView: (view: ActionPanelView) => void;
     setShowOnlyMyRecipes: (show: boolean) => void;
@@ -165,7 +138,8 @@ export function HomeView({
                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Our Commitment</h3>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="relative space-y-4 pl-12">
+                        <div className="absolute left-5 top-0 bottom-0 w-1.5 rounded-full bg-slate-300/40"></div>
                         {([
                             { 
                                 icon: Flame, 
@@ -191,54 +165,45 @@ export function HomeView({
                                 desc: "Your health info stays on your device. We think your data belongs to you, not a big corp.",
                                 color: "blue"
                             }
-                        ]).map((item, i) => {
-                            const colors = commitmentColorClasses[item.color as keyof typeof commitmentColorClasses];
-                            return (
-                            <div key={i} className={cn(
-                                "p-4 rounded-2xl border",
-                                colors.bg,
-                                "dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-900/60",
-                                colors.border
-                            )}>
-                                <div className="flex items-start gap-3">
-                                    <div className={cn("mt-1 flex-shrink-0", {
+                        ]).map((item, i) => (
+                            <div key={i} className="relative flex items-center gap-4 py-5">
+                                <div className={cn(
+                                    "relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-white dark:bg-slate-900 shadow-sm",
+                                    {
                                         "text-orange-500": item.color === 'orange',
                                         "text-emerald-500": item.color === 'emerald',
                                         "text-purple-500": item.color === 'purple',
                                         "text-rose-500": item.color === 'rose',
                                         "text-blue-500": item.color === 'blue',
                                         "text-amber-500": item.color === 'amber'
-                                    })}>
-                                        <item.icon size={16} />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-black text-sm uppercase tracking-tight text-slate-900 dark:text-white">{item.title}</h5>
-                                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
-                                    </div>
+                                    }
+                                )}>
+                                    <item.icon size={24} />
+                                </div>
+                                <div className="flex-1">
+                                    <h5 className="font-black text-sm uppercase tracking-tight text-slate-900 dark:text-white">{item.title}</h5>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">{item.desc}</p>
                                 </div>
                             </div>
-                        );
-                    })}
-                    
+                        ))}
+                    </div>
+
                     {/* App Etiquette Section */}
                     <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-                        <div className="relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                            <div className="relative p-8 rounded-3xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 shadow-xl overflow-hidden">
-                                <div className="absolute top-0 right-0 -translate-x-4 translate-y-4 opacity-[0.03] dark:opacity-[0.05]">
-                                    <Cookie size={120} className="rotate-12" />
-                                </div>
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-6 flex items-center gap-2">
-                                    <Zap size={14} />
-                                    App Etiquette
-                                </h3>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed italic">
-                                    "No pesky popups, annoying ads, or even emails. The only cookies around here are found in our recipes."
-                                </p>
-                                <div className="mt-6 flex items-center gap-2">
-                                    <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
-                                    <span className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">theo</span>
-                                </div>
+                        <div className="relative p-8 overflow-hidden">
+                            <div className="absolute top-0 right-0 opacity-[0.08] dark:opacity-[0.12] pointer-events-none">
+                                <Cookie size={120} className="rotate-12" />
+                            </div>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-6 flex items-center gap-2">
+                                <Zap size={14} />
+                                App Etiquette
+                            </h3>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed italic">
+                                "No pesky popups, annoying ads, or even emails. The only cookies around here are found in our recipes."
+                            </p>
+                            <div className="mt-6 flex items-center gap-2">
+                                <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                                <span className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-300">theo</span>
                             </div>
                         </div>
                     </div>
@@ -246,7 +211,6 @@ export function HomeView({
                 </div>
             </div>
         </div>
-    </div>
     </div>
     );
 }
