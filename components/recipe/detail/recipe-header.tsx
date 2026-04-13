@@ -69,7 +69,7 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
 
                     {/* Right: Section Pills — matching foods page style */}
                     <div className="flex items-center gap-1.5 bg-slate-950/40 dark:bg-slate-800/60 p-1 rounded-[1.5rem] border border-white/5 overflow-x-auto no-scrollbar">
-                        {TABS.map(({ key, label, activeGlow }) => (
+                        {TABS.map(({ key, label, activeGlow, color }) => (
                             <button
                                 key={key}
                                 onClick={() => setActiveSection(prev => prev === key ? null : key)}
@@ -77,7 +77,7 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                                     'py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1rem] transition-all duration-300 whitespace-nowrap px-3 border',
                                     activeSection === key
                                         ? `border-current ${activeGlow}`
-                                        : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-400/40'
+                                        : `${color} border-transparent hover:border-current/40`
                                 )}
                             >
                                 {label}
@@ -113,7 +113,7 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                     </div>
                 )}
                 <div className="flex-1 grid grid-cols-2 gap-2">
-                    {TABS.map(({ key, label, icon: Icon, activeGlow }) => (
+                    {TABS.map(({ key, label, icon: Icon, activeGlow, color }) => (
                         <button
                             key={key}
                             onClick={() => setActiveSection(prev => prev === key ? null : key)}
@@ -121,7 +121,7 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                                 'flex flex-col items-center gap-1 px-2 py-2 rounded-lg border text-[9px] font-black uppercase tracking-widest transition-all',
                                 activeSection === key
                                     ? `border-current ${activeGlow}`
-                                    : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                                    : `${color} border-slate-200 dark:border-slate-800 hover:border-current/40`
                             )}
                         >
                             <Icon size={14} />
