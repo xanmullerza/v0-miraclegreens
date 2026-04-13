@@ -8,10 +8,10 @@ import type { useRecipeDetail } from './use-recipe-detail';
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
 
 const TABS = [
-    { key: 'recipe' as const, label: 'Recipe', icon: Layers, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
-    { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-500/40 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
-    { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, muted: 'text-amber-400/50 border-amber-500/30', activeGlow: 'text-amber-400 border-amber-500/40 shadow-[0_0_22px_rgba(251,191,36,0.35)] ring-1 ring-amber-500/20' },
-    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, muted: 'text-blue-400/50 border-blue-500/30', activeGlow: 'text-blue-400 border-blue-500/40 shadow-[0_0_22px_rgba(96,165,250,0.35)] ring-1 ring-blue-500/20' },
+    { key: 'recipe' as const, label: 'Recipe', icon: Layers, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-400 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
+    { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-400 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
+    { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, muted: 'text-amber-400/50 border-amber-500/30', activeGlow: 'text-amber-400 border-amber-400 shadow-[0_0_22px_rgba(251,191,36,0.35)] ring-1 ring-amber-500/20' },
+    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, muted: 'text-blue-400/50 border-blue-500/30', activeGlow: 'text-blue-400 border-blue-400 shadow-[0_0_22px_rgba(96,165,250,0.35)] ring-1 ring-blue-500/20' },
 ] as const;
 
 interface RecipeHeaderProps {
