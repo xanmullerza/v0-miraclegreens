@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus } from 'lucide-react';
+import { ChevronRight, Plus, Minus, ChefHat, UtensilsCrossed, Gauge } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -24,18 +24,29 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
     return (
         <>
             {/* Recipe Summary */}
-            <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Cook Time</p>
-                    <p className="mt-3 text-sm font-black text-slate-900 dark:text-white">{totalCookTime ? `${totalCookTime} min` : '—'}</p>
-                </div>
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Servings</p>
-                    <p className="mt-3 text-sm font-black text-slate-900 dark:text-white">{displayServings}</p>
-                </div>
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Difficulty</p>
-                    <p className="mt-3 text-sm font-black text-slate-900 dark:text-white">{difficultyLabel}</p>
+            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-6">
+                <div className="flex items-center justify-center gap-8">
+                    <div className="flex items-center gap-2">
+                        <ChefHat className="w-4 h-4 text-emerald-500" />
+                        <div className="text-center">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Cook Time</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{totalCookTime ? `${totalCookTime} min` : '—'}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <UtensilsCrossed className="w-4 h-4 text-emerald-500" />
+                        <div className="text-center">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Servings</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{displayServings}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Gauge className="w-4 h-4 text-emerald-500" />
+                        <div className="text-center">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Difficulty</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{difficultyLabel}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
