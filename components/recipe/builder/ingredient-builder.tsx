@@ -44,10 +44,12 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                         </div>
                     </div>
 
-                    <InlineFoodSearch 
-                        onSelect={(food: any) => handleAddIngredient(food)} 
-                        isAdmin={isAdmin}
-                    />
+                    {!showPicker && (
+                        <InlineFoodSearch 
+                            onSelect={(food: any) => handleAddIngredient(food)} 
+                            isAdmin={isAdmin}
+                        />
+                    )}
 
                     {showMagicPaste && (
                         <MagicPasteSection
@@ -93,6 +95,18 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                     ) : (
                         <div className="py-12 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/10 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace is empty</p>
+                        </div>
+                    )}
+
+                    {showPicker && (
+                        <div className="pt-4">
+                            <div className="mb-3 px-3 py-2 rounded-2xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[10px] uppercase tracking-[0.25em] font-black text-slate-500 dark:text-slate-400">
+                                Add another ingredient
+                            </div>
+                            <InlineFoodSearch
+                                onSelect={(food: any) => handleAddIngredient(food)}
+                                isAdmin={isAdmin}
+                            />
                         </div>
                     )}
 
