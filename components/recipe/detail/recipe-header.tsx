@@ -114,10 +114,10 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                                 if (ctx.onShare) { ctx.onShare(recipe); }
                                 else { ctx.setRecipeToShare(recipe); ctx.navigateTo('recipe-share'); }
                             }}
-                            className="inline-flex items-center justify-center h-10 px-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                            className="inline-flex items-center justify-center h-10 px-3 rounded-2xl border border-sky-200 dark:border-sky-700 bg-sky-100/80 dark:bg-slate-800 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-slate-700 transition-all"
                             title="Share recipe"
                         >
-                            <Share2 size={16} />
+                            <Share2 size={16} className="text-sky-600 dark:text-sky-300" />
                         </button>
                     </div>
                 </div>
