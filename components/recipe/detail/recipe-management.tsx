@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Heart, Share2, Wand2, Pencil, Trash2, ShoppingBasket, Loader2 } from 'lucide-react';
+import { Heart, Wand2, Pencil, Trash2, ShoppingBasket, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import type { useRecipeDetail } from './use-recipe-detail';
@@ -125,30 +125,6 @@ export function RecipeManagement({ ctx }: RecipeManagementProps) {
                         </p>
                     </div>
                     <Heart size={16} className={cn("transition-transform group-hover:scale-110", recipe.is_favorite ? "fill-current" : "")} />
-                </button>
-
-                {/* Share */}
-                <button
-                    onClick={() => {
-                        if (recipe) {
-                            if (onShare) { onShare(recipe); }
-                            else { setRecipeToShare(recipe); navigateTo('recipe-share'); }
-                        }
-                    }}
-                    className={cn(
-                        "p-4 rounded-2xl border border-sky-200 dark:border-sky-700 bg-sky-100/80 dark:bg-slate-900/30 text-left flex flex-col justify-between h-24 group relative overflow-hidden",
-                        "hover:bg-sky-200/60 dark:hover:bg-slate-800/60",
-                        interactiveGlow,
-                    )}
-                >
-                    <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Share2 size={32} className="text-sky-400" />
-                    </div>
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500 mb-1">Distribution</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">Share Recipe</p>
-                    </div>
-                    <Share2 size={16} className="text-sky-500 group-hover:text-sky-600 transition-colors" />
                 </button>
 
                 {/* Edit / Remix */}
