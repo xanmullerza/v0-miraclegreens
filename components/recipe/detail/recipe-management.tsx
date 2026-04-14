@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Heart, Wand2, Pencil, Trash2, ShoppingBasket, Loader2 } from 'lucide-react';
+import { Wand2, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import type { useRecipeDetail } from './use-recipe-detail';
@@ -91,42 +91,13 @@ interface RecipeManagementProps {
 }
 
 export function RecipeManagement({ ctx }: RecipeManagementProps) {
-    const { recipe, isOwner, toggleFavorite, handleEditClick, onBack, onShare, setRecipeToShare, navigateTo } = ctx;
+    const { recipe, isOwner, handleEditClick, onBack } = ctx;
 
     if (!recipe) return null;
 
     return (
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="grid grid-cols-2 gap-3">
-                {/* Favourite */}
-                <button
-                    onClick={toggleFavorite}
-                    className={cn(
-                        "p-4 rounded-2xl border text-left flex flex-col justify-between h-24 group relative overflow-hidden",
-                        interactiveGlow,
-                        recipe.is_favorite
-                            ? "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400"
-                            : "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500"
-                    )}
-                >
-                    <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Heart size={32} className={recipe.is_favorite ? "fill-current" : ""} />
-                    </div>
-                    <div>
-                        <p className={cn(
-                            "text-[10px] font-black uppercase tracking-[0.2em] mb-1",
-                            recipe.is_favorite ? "text-rose-500" : "text-slate-500"
-                        )}>Collection</p>
-                        <p className={cn(
-                            "text-sm font-bold truncate",
-                            recipe.is_favorite ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white"
-                        )}>
-                            {recipe.is_favorite ? 'Favourited' : 'Add to Favourites'}
-                        </p>
-                    </div>
-                    <Heart size={16} className={cn("transition-transform group-hover:scale-110", recipe.is_favorite ? "fill-current" : "")} />
-                </button>
-
                 {/* Edit / Remix */}
                 <button
                     onClick={handleEditClick}
