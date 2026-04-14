@@ -292,7 +292,7 @@ export function NutritionDisplay({
                                     className="flex items-center justify-between bg-transparent dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                                 >
                                     <span className={cn('text-sm font-semibold group-hover/nut:text-violet-400', meetsThreshold ? 'text-violet-500' : 'text-slate-500 dark:text-slate-400')}>
-                                        {v.label}
+                                        {v.fullName === 'Ascorbic Acid' ? 'Vitamin C' : v.label}
                                     </span>
                                     <span
                                         className={cn(
