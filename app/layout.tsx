@@ -49,16 +49,16 @@ export default function RootLayout({
                 (function() {
                   try {
                     var stored = localStorage.getItem('theme');
-                    var themes = ['light', 'dark', 'material', 'neon', 'free'];
+                    var themes = ['material', 'neon', 'free'];
                     themes.forEach(function(theme) {
                       document.documentElement.classList.remove(theme);
                     });
 
-                    if (stored === 'system' || stored === null) {
-                      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                      document.documentElement.classList.toggle('dark', prefersDark);
-                    } else if (themes.includes(stored)) {
+                    if (themes.includes(stored)) {
                       document.documentElement.classList.add(stored);
+                    } else {
+                      document.documentElement.classList.add('material');
+                      localStorage.setItem('theme', 'material');
                     }
                   } catch (e) { }
                 })();
@@ -71,7 +71,7 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="material"
-          enableSystem
+          themes={['material', 'neon', 'free']}
           disableTransitionOnChange
         >
           <UserPreferencesProvider>{children}</UserPreferencesProvider>
