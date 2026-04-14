@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Activity, Dna, Sparkles, Zap, Loader2 } from 'lucide-react';
 import { useRecipeNutrition } from '@/hooks/use-recipe-nutrition';
 import { NutritionDisplay } from '@/components/nutrients/NutritionDisplay';
+import { RecipeSmartMatch } from './recipe-smart-match';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
@@ -24,23 +25,9 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
     // Check if recipe has nutrition data saved in DB only
     const hasData = recipe.calories > 0 && recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0;
 
-    // No data → Empty state (workflow in side panel)
+    // No data → Show smart match workflow
     if (!hasData) {
-        return (
-            <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100 dark:border-indigo-800/50 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-10"><Sparkles size={64} className="text-indigo-500" /></div>
-                    <div className="relative z-10">
-                        <h3 className="text-lg font-black text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
-                            <Sparkles size={18} className="text-indigo-500 animate-pulse" /> Smart Match
-                        </h3>
-                        <p className="text-sm text-indigo-700/80 dark:text-indigo-400/80 mb-4 leading-relaxed">
-                            Use the workflow on the right side to match and measure ingredients from our nutrition database.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
+        return <RecipeSmartMatch ctx={ctx} />;
     }
 
     // Calculate nutrition using DB recipe fields only; no fallback to calculated ingredient nutrition
