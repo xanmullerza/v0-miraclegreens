@@ -58,6 +58,21 @@ export function NutritionDisplay({
     const { energy, protein, carbs, fat, aminoAcids, carbBreakdown, fatBreakdown, micronutrients } = nutrition;
     const ndm = nutrientDisplayMode;
 
+    const vitaminSortOrder = ['B9', 'B9 (Folate)', 'B12', 'B12 (Cobalamin)', 'C', 'Vitamin C'];
+    const sortedVitamins = micronutrients.waterSoluble.concat(micronutrients.fatSoluble).slice().sort((a, b) => {
+        const getOrder = (nutrient: { label: string; fullName?: string }) => {
+            const key = `${nutrient.label}`;
+            const fullName = nutrient.fullName || '';
+            const orderIndex = vitaminSortOrder.findIndex(order =>
+                key === order || fullName === order || key.includes(order) || fullName.includes(order)
+            );
+            return orderIndex !== -1 ? orderIndex : vitaminSortOrder.length;
+        };
+        const orderA = getOrder(a);
+        const orderB = getOrder(b);
+        return orderA !== orderB ? orderA - orderB : a.label.localeCompare(b.label);
+    });
+
     return (
         <div className="space-y-4">
             {/* Header */}
@@ -268,7 +283,7 @@ export function NutritionDisplay({
                         <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2">
-                        {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).map(v => {
+                        {sortedVitamins.map(v => {
                             const meetsThreshold = v.pct >= universalThreshold;
                             return (
                                 <Link 
