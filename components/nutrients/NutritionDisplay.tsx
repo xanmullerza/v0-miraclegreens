@@ -85,14 +85,34 @@ export function NutritionDisplay({
             {/* Macros Summary Bar */}
             <div className="grid grid-cols-4 gap-2 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
                 {/* Energy */}
-                <div className="text-center">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4 text-center">
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 mb-1">Energy</div>
                     <div className="text-lg font-black text-slate-900 dark:text-white">
                         {Math.round(energy.value).toLocaleString()}
                     </div>
                     <div className="text-[8px] text-slate-400 font-bold">{energyUnit}</div>
+                    <button
+                        onClick={() => setExpandedMacro(expandedMacro === 'energy' ? null : 'energy')}
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        aria-label="Toggle energy details"
+                    >
+                        {expandedMacro === 'energy' ? 'Hide details' : 'Details'}
+                    </button>
+                    {expandedMacro === 'energy' && (
+                        <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-2">
+                            <div className="text-[11px] font-black uppercase tracking-widest text-orange-500">Energy Details</div>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Unit</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{energyUnit}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>RDA %</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{Math.round(energy.percent)}%</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                
+
                 {/* Carbs */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4 text-center">
                     <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
