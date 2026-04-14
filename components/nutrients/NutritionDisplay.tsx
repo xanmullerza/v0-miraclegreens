@@ -179,7 +179,7 @@ export function NutritionDisplay({
 
             {/* Macro Details */}
             {expandedMacro === 'energy' && (
-                <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-3">
+                <div className="mt-3 p-3 rounded-2xl bg-transparent border border-slate-200 dark:border-slate-700 text-left space-y-3">
                     <div className="text-[11px] font-black uppercase tracking-widest text-orange-500">Energy Details</div>
                     <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
                         <span>Amount</span>
@@ -192,7 +192,7 @@ export function NutritionDisplay({
                 </div>
             )}
             {expandedMacro === 'carbs' && (
-                <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-3">
+                <div className="mt-3 p-3 rounded-2xl bg-transparent border border-slate-200 dark:border-slate-700 text-left space-y-3">
                     <div className="text-[11px] font-black uppercase tracking-widest text-blue-500">Carbs Breakdown</div>
                     <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
                         <span>Starch</span>
@@ -209,7 +209,7 @@ export function NutritionDisplay({
                 </div>
             )}
             {expandedMacro === 'protein' && (
-                <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-3">
+                <div className="mt-3 p-3 rounded-2xl bg-transparent border border-slate-200 dark:border-slate-700 text-left space-y-3">
                     <div className="text-[11px] font-black uppercase tracking-widest text-rose-500">Amino Acids Breakdown</div>
                     {aminoAcids.map(aa => (
                         <div key={aa.name} className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
@@ -220,7 +220,7 @@ export function NutritionDisplay({
                 </div>
             )}
             {expandedMacro === 'fat' && (
-                <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-3">
+                <div className="mt-3 p-3 rounded-2xl bg-transparent border border-slate-200 dark:border-slate-700 text-left space-y-3">
                     <div className="text-[11px] font-black uppercase tracking-widest text-amber-500">Fat Breakdown</div>
                     <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
                         <span>Saturated</span>
