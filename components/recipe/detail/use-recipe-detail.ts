@@ -370,7 +370,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 toast.info(`✅ Instructions loaded: ${instructionsData?.length || 0}`);
                 setInstructions(instructionsData || []);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('[fetchRecipeDetails] Error fetching recipe:', error);
             console.error('[fetchRecipeDetails] Error stack:', error?.stack);
             toast.error(`❌ Failed to load recipe: ${error.message || 'Unknown error'}`);
