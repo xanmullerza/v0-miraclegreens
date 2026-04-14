@@ -119,7 +119,7 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
             </div>
 
             {results.length > 0 && (
-                <div className="max-h-60 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                <div className="max-h-[15rem] overflow-y-auto space-y-1 pr-1 custom-scrollbar">
                     {results.map((item, idx) => (
                         <button
                             key={`${item.source}-${item.id || item.fdcId || idx}`}
