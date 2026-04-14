@@ -94,130 +94,115 @@ export function NutritionDisplay({
                 </div>
                 
                 {/* Carbs */}
-                <Link 
-                    href="/?nutrientId=Carbs"
-                    className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
-                >
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
-                    <div className="text-lg font-black text-slate-900 dark:text-white">
-                        {Math.round(carbs.value)}
+                <div className="relative space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4">
+                    <div className="text-center">
+                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
+                        <div className="text-lg font-black text-slate-900 dark:text-white">
+                            {Math.round(carbs.value)}
+                        </div>
+                        <div className="text-[8px] text-slate-400 font-bold">g</div>
                     </div>
-                    <div className="text-[8px] text-slate-400 font-bold">g</div>
-                    <button 
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs'); }}
-                        className="absolute top-0 right-0 text-slate-400 group-hover:text-blue-500 transition-colors"
+                    <button
+                        onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
+                        className="absolute top-3 right-3 h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-500 transition-colors"
+                        aria-label="Toggle carbs breakdown"
                     >
-                        {expandedMacro === 'carbs' ? '▼' : '▶'}
+                        {expandedMacro === 'carbs' ? '−' : '+'}
                     </button>
-                </Link>
-                
-                {/* Protein */}
-                <Link 
-                    href="/?nutrientId=Protein"
-                    className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
-                >
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
-                    <div className="text-lg font-black text-slate-900 dark:text-white">
-                        {Math.round(protein.value)}
-                    </div>
-                    <div className="text-[8px] text-slate-400 font-bold">g</div>
-                    <button 
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedMacro(expandedMacro === 'protein' ? null : 'protein'); }}
-                        className="absolute top-0 right-0 text-slate-400 group-hover:text-rose-500 transition-colors"
-                    >
-                        {expandedMacro === 'protein' ? '▼' : '▶'}
-                    </button>
-                </Link>
-                
-                {/* Fat */}
-                <Link 
-                    href="/?nutrientId=Fat"
-                    className="text-center hover:opacity-80 transition-opacity group relative cursor-pointer"
-                >
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
-                    <div className="text-lg font-black text-slate-900 dark:text-white">
-                        {Math.round(fat.value)}
-                    </div>
-                    <div className="text-[8px] text-slate-400 font-bold">g</div>
-                    <button 
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedMacro(expandedMacro === 'fat' ? null : 'fat'); }}
-                        className="absolute top-0 right-0 text-slate-400 group-hover:text-amber-500 transition-colors"
-                    >
-                        {expandedMacro === 'fat' ? '▼' : '▶'}
-                    </button>
-                </Link>
-            </div>
-
-            {/* Expanded Macro Details */}
-            <div className="space-y-3">
-                {/* Carbs Details */}
-                {expandedMacro === 'carbs' && (
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 space-y-3">
-                        <h4 className="text-[11px] font-black uppercase tracking-widest text-blue-500 mb-3">Carbs Breakdown</h4>
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Starch</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{carbBreakdown.starch.toFixed(1)}g</span>
+                    {expandedMacro === 'carbs' && (
+                        <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-2">
+                            <div className="text-[11px] font-black uppercase tracking-widest text-blue-500">Carbs Breakdown</div>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Starch</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{carbBreakdown.starch.toFixed(1)}g</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Fiber</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{carbBreakdown.fiber.toFixed(1)}g</span>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Fiber</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{carbBreakdown.fiber.toFixed(1)}g</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Sugar</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{carbBreakdown.sugar.toFixed(1)}g</span>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Sugar</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{carbBreakdown.sugar.toFixed(1)}g</span>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
-                {/* Protein Details */}
-                {expandedMacro === 'protein' && (
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 space-y-3">
-                        <h4 className="text-[11px] font-black uppercase tracking-widest text-rose-500 mb-3">Amino Acids Breakdown</h4>
-                        <div className="space-y-2">
+                {/* Protein */}
+                <div className="relative space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4">
+                    <div className="text-center">
+                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
+                        <div className="text-lg font-black text-slate-900 dark:text-white">
+                            {Math.round(protein.value)}
+                        </div>
+                        <div className="text-[8px] text-slate-400 font-bold">g</div>
+                    </div>
+                    <button
+                        onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
+                        className="absolute top-3 right-3 h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-500 transition-colors"
+                        aria-label="Toggle protein breakdown"
+                    >
+                        {expandedMacro === 'protein' ? '−' : '+'}
+                    </button>
+                    {expandedMacro === 'protein' && (
+                        <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-2">
+                            <div className="text-[11px] font-black uppercase tracking-widest text-rose-500">Amino Acids Breakdown</div>
                             {aminoAcids.map(aa => (
-                                <div key={aa.name} className="flex items-center justify-between">
-                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{aa.name}</span>
-                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{aa.value.toFixed(2)}g</span>
+                                <div key={aa.name} className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                    <span>{aa.name}</span>
+                                    <span className="font-bold text-slate-900 dark:text-white">{aa.value.toFixed(2)}g</span>
                                 </div>
                             ))}
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
-                {/* Fat Details */}
-                {expandedMacro === 'fat' && (
-                    <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 space-y-3">
-                        <h4 className="text-[11px] font-black uppercase tracking-widest text-amber-500 mb-3">Fat Breakdown</h4>
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Saturated</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.saturated.toFixed(1)}g</span>
+                {/* Fat */}
+                <div className="relative space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4">
+                    <div className="text-center">
+                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
+                        <div className="text-lg font-black text-slate-900 dark:text-white">
+                            {Math.round(fat.value)}
+                        </div>
+                        <div className="text-[8px] text-slate-400 font-bold">g</div>
+                    </div>
+                    <button
+                        onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
+                        className="absolute top-3 right-3 h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-amber-500 transition-colors"
+                        aria-label="Toggle fat breakdown"
+                    >
+                        {expandedMacro === 'fat' ? '−' : '+'}
+                    </button>
+                    {expandedMacro === 'fat' && (
+                        <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-2">
+                            <div className="text-[11px] font-black uppercase tracking-widest text-amber-500">Fat Breakdown</div>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Saturated</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.saturated.toFixed(1)}g</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Monounsaturated</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.monounsaturated.toFixed(1)}g</span>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Monounsaturated</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.monounsaturated.toFixed(1)}g</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Polyunsaturated</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.polyunsaturated.toFixed(1)}g</span>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Polyunsaturated</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.polyunsaturated.toFixed(1)}g</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Omega-3</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.omega3.toFixed(2)}g</span>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Omega-3</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.omega3.toFixed(2)}g</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Omega-6</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.omega6.toFixed(2)}g</span>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Omega-6</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.omega6.toFixed(2)}g</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Cholesterol</span>
-                                <span className="text-sm font-bold text-slate-900 dark:text-white">{fatBreakdown.cholesterol.toFixed(0)}mg</span>
+                            <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
+                                <span>Cholesterol</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.cholesterol.toFixed(0)}mg</span>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
 
             {/* Micronutrients */}
