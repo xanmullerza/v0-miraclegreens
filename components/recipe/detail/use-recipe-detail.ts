@@ -23,6 +23,7 @@ interface UseRecipeDetailOptions {
 
 export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecipeDetailOptions) {
     console.log('[useRecipeDetail] Hook initialized with recipeId:', recipeId);
+    toast.info(`🔧 Initializing recipe detail for: ${recipeId}`);
 
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -204,6 +205,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             console.log('[auto-run-smart-match] Checking nutrition data:', { hasData, calories: recipe.calories, micronutrients: !!recipe.micronutrients });
             if (!hasData && Object.keys(matchedIngredients).length === 0 && !smartMatchRunning) {
                 console.log('[auto-run-smart-match] Conditions met, running auto match');
+                toast.info('🤖 Auto-matching ingredients for nutrition...');
                 // Auto-run smart match for recipes without nutrition data
                 runAutoMatch();
             } else {
@@ -227,12 +229,14 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     const fetchRecipeDetails = async () => {
         console.log('[fetchRecipeDetails] Starting to fetch recipe with ID:', recipeId);
+        toast.info(`🔍 Fetching recipe data...`);
         try {
             setLoading(true);
             console.log('[fetchRecipeDetails] Set loading to true');
 
             if (String(recipeId).startsWith('local-')) {
                 console.log('[fetchRecipeDetails] Loading local recipe');
+                toast.info('📱 Loading local recipe...');
                 const localData = localStorage.getItem('local_recipes');
                 if (localData) {
                     const localRecipes: any[] = JSON.parse(localData);
@@ -240,6 +244,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     
                     if (localRecipe) {
                         console.log('[fetchRecipeDetails] Found local recipe:', localRecipe.title);
+                        toast.success(`✅ Local recipe loaded: "${localRecipe.title}"`);
                         setRecipe({
                             ...localRecipe,
                             difficulty: localRecipe.difficulty || 'Medium',
@@ -275,6 +280,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 }
             } else {
                 console.log('[fetchRecipeDetails] Loading database recipe');
+                toast.info('🗄️ Loading from database...');
                 const { data: recipeData, error: recipeError } = await supabase
                     .from('recipes')
                     .select('*')
@@ -283,9 +289,11 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
                 if (recipeError) {
                     console.error('[fetchRecipeDetails] Recipe query error:', recipeError);
+                    toast.error(`❌ Recipe query failed: ${recipeError.message}`);
                     throw recipeError;
                 }
                 console.log('[fetchRecipeDetails] Recipe data loaded:', recipeData?.title);
+                toast.success(`✅ Recipe data loaded: "${recipeData.title}"`);
 
                 const { data: ingredientsData, error: ingredientsError } = await supabase
                     .from('ingredients')
@@ -295,9 +303,11 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
                 if (ingredientsError) {
                     console.error('[fetchRecipeDetails] Ingredients query error:', ingredientsError);
+                    toast.error(`❌ Ingredients query failed: ${ingredientsError.message}`);
                     throw ingredientsError;
                 }
                 console.log('[fetchRecipeDetails] Ingredients loaded:', ingredientsData?.length || 0);
+                toast.info(`✅ Ingredients loaded: ${ingredientsData?.length || 0}`);
                 setIngredients(ingredientsData || []);
 
                 if (ingredientsData && ingredientsData.length > 0) {
@@ -353,15 +363,17 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
                 if (instructionsError) {
                     console.error('[fetchRecipeDetails] Instructions query error:', instructionsError);
+                    toast.error(`❌ Instructions query failed: ${instructionsError.message}`);
                     throw instructionsError;
                 }
                 console.log('[fetchRecipeDetails] Instructions loaded:', instructionsData?.length || 0);
+                toast.info(`✅ Instructions loaded: ${instructionsData?.length || 0}`);
                 setInstructions(instructionsData || []);
             }
         } catch (error) {
             console.error('[fetchRecipeDetails] Error fetching recipe:', error);
             console.error('[fetchRecipeDetails] Error stack:', error?.stack);
-            toast.error('Failed to load recipe details');
+            toast.error(`❌ Failed to load recipe: ${error.message || 'Unknown error'}`);
         } finally {
             console.log('[fetchRecipeDetails] Setting loading to false');
             setLoading(false);
@@ -510,6 +522,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     const runAutoMatch = async () => {
         console.log('[runAutoMatch] Starting auto match for ingredients:', ingredients.length);
+        toast.info(`🔍 Auto-matching ${ingredients.length} ingredients...`);
         setSmartMatchRunning(true);
         const loadingToastId = toast.loading("Auto-matching ingredients...");
         
@@ -526,6 +539,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 // Auto-skip flavorings
                 if (isFlavoringIngredient({ name: ingName } as any)) {
                     console.log('[runAutoMatch] Skipping flavoring:', ingName);
+                    toast.info(`⏭️ Skipping flavoring: ${ingName}`);
                     autoSkipped.push(ing.id);
                     continue;
                 }
@@ -539,17 +553,20 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 }
 
                 console.log('[runAutoMatch] Searching for:', searchTerm);
+                toast.info(`🔎 Searching: "${searchTerm}"`);
                 const results = await searchFoodItem(searchTerm);
                 console.log('[runAutoMatch] Search results:', results?.length || 0);
                 
                 if (results && results.length > 0) {
                     // Auto-accept first result (highest confidence)
                     console.log('[runAutoMatch] Auto-matched:', results[0].name);
+                    toast.success(`✅ Matched: "${results[0].name}"`);
                     autoMatched[ing.id] = results[0];
                     setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
                 } else {
                     // No match found - needs manual selection
                     console.log('[runAutoMatch] No match found for:', ingName);
+                    toast.warning(`❓ No match for: "${ingName}"`);
                     unmatchable.push(ing);
                 }
             }
@@ -578,7 +595,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         } catch (err: any) {
             console.error('[runAutoMatch] Auto-match error:', err);
             console.error('[runAutoMatch] Error stack:', err?.stack);
-            toast.error('Auto-match failed');
+            toast.error(`❌ Auto-match failed: ${err.message || 'Unknown error'}`);
         } finally {
             console.log('[runAutoMatch] Setting smartMatchRunning to false');
             setSmartMatchRunning(false);

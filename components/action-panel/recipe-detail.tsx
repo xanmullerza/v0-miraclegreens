@@ -22,10 +22,14 @@ interface RecipeDetailProps {
 
 export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetailProps) {
     console.log('[RecipeDetail] Component rendering with recipeId:', recipeId);
+    toast.info(`📖 Loading recipe: ${recipeId}`);
     const ctx = useRecipeDetail({ recipeId, onBack, onShare, onRemix });
     const { recipe, loading, activeSection } = ctx;
 
     console.log('[RecipeDetail] Context state:', { recipe: !!recipe, loading, activeSection });
+    if (recipe) {
+        toast.success(`✅ Recipe loaded: "${recipe.title}"`);
+    }
 
     // ── Loading ──────────────────────────────────────────────
     if (loading) {
@@ -41,6 +45,7 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
     // ── Not found ────────────────────────────────────────────
     if (!recipe) {
         console.log('[RecipeDetail] Recipe not found');
+        toast.error(`❌ Recipe not found: ${recipeId}`);
         return (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 p-4">
                 <p className="text-slate-500 text-center">Recipe not found</p>
@@ -58,6 +63,7 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
 
     // ── Main render ──────────────────────────────────────────
     console.log('[RecipeDetail] Rendering main content, activeSection:', activeSection);
+    toast.info(`📋 Showing section: ${activeSection}`);
     return (
         <div className="flex-1 overflow-y-auto flex flex-col bg-white dark:bg-slate-900">
             {/* Chatbot-style header (sticky title bar + image grid) */}

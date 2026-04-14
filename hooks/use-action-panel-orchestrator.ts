@@ -155,23 +155,30 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
     // Complex Handlers
     const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
         console.log('[handleSaveAndViewRecipe] Starting save process for recipe:', recipe.title);
+        toast.info(`🔄 Starting save for "${recipe.title}"`);
         importer.setIsLoading(true);
         try {
             console.log('[handleSaveAndViewRecipe] Structuring recipe for saving...');
+            toast.info('📝 Preparing recipe data...');
             const structured = structureRecipeForSaving(recipe);
             if (!structured) {
                 console.error('[handleSaveAndViewRecipe] Failed to structure recipe data');
+                toast.error('❌ Failed to prepare recipe data');
                 throw new Error('Failed to structure recipe data for saving');
             }
             const { recipeDataToSave, ingredientsList, instructionsList } = structured;
             console.log('[handleSaveAndViewRecipe] Structured data:', { recipeDataToSave, ingredientsCount: ingredientsList.length, instructionsCount: instructionsList.length });
+            toast.info(`✅ Prepared ${ingredientsList.length} ingredients, ${instructionsList.length} instructions`);
 
             console.log('[handleSaveAndViewRecipe] Calling saveRecipe...');
+            toast.info('💾 Saving to database...');
             const result = await saveRecipe(recipeDataToSave as any, ingredientsList, instructionsList);
             const recipeId = result?.id || `recipe-${Date.now()}`;
             console.log('[handleSaveAndViewRecipe] Save successful, recipeId:', recipeId);
+            toast.success(`✅ Saved with ID: ${recipeId}`);
 
             console.log('[handleSaveAndViewRecipe] Updating navigation state...');
+            toast.info('🔄 Updating navigation...');
             toast.success('Successfully saved to your library!');
             setSelectedRecipeId(recipeId);
             setPreviousView(null);
@@ -181,10 +188,11 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
             importer.setPastedRecipeContent('');
             importer.setPastedRecipeURL('');
             console.log('[handleSaveAndViewRecipe] Navigation updated, process complete');
+            toast.info('🎯 Navigation complete');
         } catch (error: any) {
             console.error('[handleSaveAndViewRecipe] Error during save process:', error);
             console.error('[handleSaveAndViewRecipe] Error stack:', error.stack);
-            toast.error('Failed to save recipe. Please try again.');
+            toast.error(`❌ Save failed: ${error.message || 'Unknown error'}`);
         } finally {
             console.log('[handleSaveAndViewRecipe] Setting loading to false');
             importer.setIsLoading(false);
