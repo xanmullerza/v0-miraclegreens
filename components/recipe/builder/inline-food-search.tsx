@@ -58,7 +58,8 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
                     fat_g: item.fat_g,
                     carbs_g: item.carbs_g,
                     micronutrients: item.micronutrients || {},
-                    portions: item.portions || []
+                    portions: item.portions || [],
+                    source: item.source
                 });
                 setSearchQuery('');
                 return;
@@ -93,7 +94,8 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
                     fat_g: detailedItem.fat_g,
                     carbs_g: detailedItem.carbs_g,
                     micronutrients: detailedItem.micronutrients,
-                    portions: uniquePortions
+                    portions: uniquePortions,
+                    source: detailedItem.source || 'usda'
                 });
                 setSearchQuery('');
             }

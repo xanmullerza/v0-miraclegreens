@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal } from 'lucide-react';
+import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import type { useRecipeDetail } from './use-recipe-detail';
 
@@ -112,8 +112,15 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                         <div className="shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest min-w-[60px] text-center">
                                             {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
                                         </div>
-                                        <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[13px] truncate">
-                                            {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                        <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[13px] truncate flex items-center gap-2">
+                                            <span>
+                                                {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                            </span>
+                                            {ing.food_items?.source === 'usda' ? (
+                                                <Globe size={10} className="shrink-0 text-blue-500" title="From USDA API" />
+                                            ) : ing.food_items?.source === 'local' ? (
+                                                <Database size={10} className="shrink-0 text-green-500" title="From Local Database" />
+                                            ) : null}
                                         </p>
                                         <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <div className="px-2.5 py-1 rounded-lg bg-emerald-200 dark:bg-emerald-800 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest">

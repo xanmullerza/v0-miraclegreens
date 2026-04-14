@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, isSpice } from 'lucide-react';
+import { Trash2, Database, Globe } from 'lucide-react';
 import { RecipeIngredient } from './types';
 import { getSpiceMeasures } from '@/lib/utils/spice-conversion';
 
@@ -39,7 +39,7 @@ export function IngredientRow({
             </button>
 
             {/* Ingredient Name */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 flex items-center gap-2">
                 {editingNameIndex === index ? (
                     <input
                         type="text"
@@ -51,12 +51,19 @@ export function IngredientRow({
                         className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-sm w-full outline-none"
                     />
                 ) : (
-                    <div 
-                        onClick={() => setEditingNameIndex(index)}
-                        className="font-bold text-slate-900 dark:text-white truncate text-sm cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-                    >
-                        {ing.food_item_name}
-                    </div>
+                    <>
+                        <div 
+                            onClick={() => setEditingNameIndex(index)}
+                            className="font-bold text-slate-900 dark:text-white truncate text-sm cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex-1"
+                        >
+                            {ing.food_item_name}
+                        </div>
+                        {ing.source === 'usda' ? (
+                            <Globe size={12} className="shrink-0 text-blue-500" title="From USDA API" />
+                        ) : (
+                            <Database size={12} className="shrink-0 text-green-500" title="From Local Database" />
+                        )}
+                    </>
                 )}
             </div>
 

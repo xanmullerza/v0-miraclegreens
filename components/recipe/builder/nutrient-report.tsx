@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, Zap, Gem, Droplet, Sun, Pill, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Layers, Zap, Gem, Droplet, Sun, Pill, Info, ChevronDown, ChevronUp, Database, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RecipeIngredient } from './types';
 
@@ -168,7 +168,14 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
                                         <div key={idx} className="flex items-center justify-between group">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                                                <span className="text-[10px] font-bold text-slate-300 group-hover:text-white transition-colors">{ing.food_item_name}</span>
+                                                <span className="text-[10px] font-bold text-slate-300 group-hover:text-white transition-colors flex items-center gap-1">
+                                                    {ing.food_item_name}
+                                                    {ing.source === 'usda' ? (
+                                                        <Globe size={8} className="text-blue-400" />
+                                                    ) : ing.source === 'local' ? (
+                                                        <Database size={8} className="text-green-400" />
+                                                    ) : null}
+                                                </span>
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <span className="text-[10px] font-mono text-slate-500">{val.toFixed(1)}g</span>

@@ -16,6 +16,7 @@ interface FoodItem {
     micronutrients?: Record<string, number>;
     portions?: any[];
     image?: string;
+    source?: string;
 }
 
 interface FoodItemPickerProps {
@@ -122,7 +123,8 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                     fat_g: item.fat_g,
                     carbs_g: item.carbs_g,
                     micronutrients: item.micronutrients || {},
-                    portions: item.portions || []
+                    portions: item.portions || [],
+                    source: item.source
                 });
                 // Only close if NOT in Smart Match mode
                 if (!hasInitialResults) {
@@ -165,7 +167,8 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                     fat_g: detailedItem.fat_g,
                     carbs_g: detailedItem.carbs_g,
                     micronutrients: detailedItem.micronutrients,
-                    portions: uniquePortions
+                    portions: uniquePortions,
+                    source: detailedItem.source || 'usda'
                 });
                 // Only close if NOT in Smart Match mode
                 if (!hasInitialResults) {
@@ -228,7 +231,8 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                 fat_g: manualItem.fat_g,
                 carbs_g: manualItem.carbs_g,
                 micronutrients: manualItem.micronutrients,
-                portions: manualItem.portions
+                portions: manualItem.portions,
+                source: 'local'
             });
 
             setShowManualEntry(false);
