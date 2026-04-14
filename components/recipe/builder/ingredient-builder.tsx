@@ -1,25 +1,17 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { useIngredientBuilder } from './use-ingredient-builder';
-import { MagicPasteSection } from './magic-paste-section';
 import { IngredientRow } from './ingredient-row';
 import { InlineFoodSearch } from './inline-food-search';
 import { IngredientBuilderProps, IngredientBuilderHandle } from './types';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Wand2, ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ArrowRight } from 'lucide-react';
 
 export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>((props, ref) => {
     const { ingredients, onNext } = props;
     const {
         showPicker, setShowPicker,
-        showMagicPaste, setShowMagicPaste,
-        magicText, setMagicText,
-        isParsing, pendingIngredients, setPendingIngredients,
         editingNameIndex, setEditingNameIndex,
-        isAdmin, handleAddIngredient, handleMagicParse,
-        confirmPendingIngredient, confirmAllIngredients,
-        handleUSDASearchForPending, rejectPendingIngredient,
+        isAdmin, handleAddIngredient,
         handleUpdateQuantity, handleRemoveIngredient,
         handleUpdateName, handleUpdateMeasure, totals, userRDAs, energyUnit
     } = useIngredientBuilder(props);
@@ -38,37 +30,39 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-3">
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Add Ingredients</h4>
-                            <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-1">Click Add Ingredient to search for a new item.</p>
+                            <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-1">
+                                {ingredients.length === 0 ? 'Add your first ingredient to get started.' : 'Click Add Ingredient to search for a new item.'}
+                            </p>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        {!showPicker ? (
                             <Button
                                 onClick={() => setShowPicker(true)}
                                 className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest"
                             >
-                                Add Ingredient
+                                {ingredients.length === 0 ? 'Add your first ingredient' : 'Add ingredient'}
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => setShowMagicPaste(!showMagicPaste)} className="h-8 text-[9px] uppercase font-black tracking-widest gap-2">
-                                <Wand2 size={12} /> {showMagicPaste ? 'Hide Paste' : 'Add via Paste'}
+                        ) : (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowPicker(false)}
+                                className="h-8 text-[10px] uppercase font-black tracking-widest"
+                            >
+                                Cancel search
                             </Button>
-                        </div>
+                        )}
                     </div>
 
-                    {showMagicPaste && (
-                        <MagicPasteSection
-                            magicText={magicText}
-                            setMagicText={setMagicText}
-                            isParsing={isParsing}
-                            handleMagicParse={handleMagicParse}
-                            pendingIngredients={pendingIngredients}
-                            setPendingIngredients={setPendingIngredients}
-                            setShowMagicPaste={setShowMagicPaste}
-                            confirmPendingIngredient={confirmPendingIngredient}
-                            confirmAllIngredients={confirmAllIngredients}
-                            handleUSDASearchForPending={handleUSDASearchForPending}
-                            rejectPendingIngredient={rejectPendingIngredient}
-                            setShowPicker={setShowPicker}
-                            isAdmin={isAdmin}
-                        />
+                    {showPicker && (
+                        <div className="pt-4">
+                            <InlineFoodSearch
+                                onSelect={(food: any) => {
+                                    handleAddIngredient(food);
+                                    setShowPicker(false);
+                                }}
+                                isAdmin={isAdmin}
+                            />
+                        </div>
                     )}
                 </div>
 
@@ -99,17 +93,6 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                         </div>
                     )}
 
-                    {showPicker && (
-                        <div className="pt-4">
-                            <div className="mb-3 px-3 py-2 rounded-2xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[10px] uppercase tracking-[0.25em] font-black text-slate-500 dark:text-slate-400">
-                                Add another ingredient
-                            </div>
-                            <InlineFoodSearch
-                                onSelect={(food: any) => handleAddIngredient(food)}
-                                isAdmin={isAdmin}
-                            />
-                        </div>
-                    )}
 
                     {hasIngredients && (
                         <>
