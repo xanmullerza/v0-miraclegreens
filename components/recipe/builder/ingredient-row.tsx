@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Plus, isSpice } from 'lucide-react';
+import { Trash2, isSpice } from 'lucide-react';
 import { RecipeIngredient } from './types';
 import { getSpiceMeasures } from '@/lib/utils/spice-conversion';
 
@@ -12,13 +12,12 @@ interface IngredientRowProps {
     handleUpdateQuantity: (i: number, q: number) => void;
     handleUpdateMeasure: (i: number, m: string) => void;
     handleRemoveIngredient: (i: number) => void;
-    setShowPicker: (s: boolean) => void;
 }
 
 export function IngredientRow({
     ingredient, index, editingNameIndex, setEditingNameIndex,
     handleUpdateName, handleUpdateQuantity, handleUpdateMeasure, 
-    handleRemoveIngredient, setShowPicker
+    handleRemoveIngredient
 }: IngredientRowProps) {
     const ing = ingredient;
     const measures = ing.available_measures || [];
@@ -95,15 +94,6 @@ export function IngredientRow({
                 )}
             </div>
 
-            {/* Add Button */}
-            <button
-                type="button"
-                onClick={() => setShowPicker(true)}
-                className="shrink-0 w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-all"
-                title="Add Ingredient"
-            >
-                <Plus size={14} />
-            </button>
         </div>
     );
 }

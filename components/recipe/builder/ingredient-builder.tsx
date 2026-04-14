@@ -6,7 +6,7 @@ import { InlineFoodSearch } from './inline-food-search';
 import { IngredientBuilderProps, IngredientBuilderHandle } from './types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Wand2, Plus, ArrowRight } from 'lucide-react';
+import { Wand2, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>((props, ref) => {
@@ -35,21 +35,23 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
             {/* Main Workspace */}
             <div className="space-y-6">
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between px-2">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Add Ingredients</h4>
-                        <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={() => setShowMagicPaste(!showMagicPaste)} className="h-7 text-[9px] uppercase font-black tracking-widest gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-3">
+                        <div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Add Ingredients</h4>
+                            <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-1">Click Add Ingredient to search for a new item.</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                onClick={() => setShowPicker(true)}
+                                className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest"
+                            >
+                                Add Ingredient
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setShowMagicPaste(!showMagicPaste)} className="h-8 text-[9px] uppercase font-black tracking-widest gap-2">
                                 <Wand2 size={12} /> {showMagicPaste ? 'Hide Paste' : 'Add via Paste'}
                             </Button>
                         </div>
                     </div>
-
-                    {!showPicker && (
-                        <InlineFoodSearch 
-                            onSelect={(food: any) => handleAddIngredient(food)} 
-                            isAdmin={isAdmin}
-                        />
-                    )}
 
                     {showMagicPaste && (
                         <MagicPasteSection
@@ -88,7 +90,6 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                                     handleUpdateQuantity={handleUpdateQuantity}
                                     handleUpdateMeasure={handleUpdateMeasure}
                                     handleRemoveIngredient={handleRemoveIngredient}
-                                    setShowPicker={setShowPicker}
                                 />
                             ))}
                         </div>
