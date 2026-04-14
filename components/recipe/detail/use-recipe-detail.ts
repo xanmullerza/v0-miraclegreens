@@ -205,6 +205,9 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         }
     }, [activeSection, recipe, ingredients, matchedIngredients, smartMatchRunning]);
 
+    // Check if step 1 is complete
+    const isStep1Complete = ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id]);
+
     // Manual transition to step 2 (when user clicks button)
     const proceedToStep2 = () => {
         if (isStep1Complete) {
