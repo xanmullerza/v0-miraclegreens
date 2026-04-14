@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Activity, Eye, EyeOff } from 'lucide-react';
+import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 
 interface NutritionData {
     energy: { value: number; percent: number };
@@ -49,6 +50,8 @@ export function NutritionDisplay({
     onThresholdChange,
 }: NutritionDisplayProps) {
     const [expandedMacro, setExpandedMacro] = useState<string | null>(null);
+    const { user, loading: userLoading } = useDataPersistence();
+    const energyDisabled = !userLoading && !user;
 
     if (!nutrition) return null;
 
@@ -100,12 +103,17 @@ export function NutritionDisplay({
                     </div>
                     <div className="text-[8px] text-slate-400 font-bold">{energyUnit}</div>
                     <button
-                        onClick={() => setExpandedMacro(expandedMacro === 'energy' ? null : 'energy')}
+                        onClick={() => {
+                            if (!energyDisabled) setExpandedMacro(expandedMacro === 'energy' ? null : 'energy');
+                        }}
+                        disabled={energyDisabled}
                         className={cn(
-                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 transition hover:bg-slate-100 dark:hover:bg-slate-800',
-                            expandedMacro === 'energy'
-                                ? 'text-orange-400 dark:text-orange-200 border border-orange-500/90 shadow-[0_0_0_1px_rgba(251,191,36,0.7)] dark:shadow-[0_0_0_1px_rgba(251,191,36,0.35)]'
-                                : 'text-orange-500 dark:text-orange-300 border border-orange-200 dark:border-orange-400/60'
+                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 transition dark:hover:bg-slate-800',
+                            energyDisabled
+                                ? 'cursor-not-allowed opacity-50 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500'
+                                : expandedMacro === 'energy'
+                                    ? 'text-orange-400 dark:text-orange-200 border border-orange-500/90 shadow-[0_0_0_1px_rgba(251,191,36,0.7)] dark:shadow-[0_0_0_1px_rgba(251,191,36,0.35)] hover:bg-slate-100'
+                                    : 'text-orange-500 dark:text-orange-300 border border-orange-200 dark:border-orange-400/60 hover:bg-slate-100 dark:hover:bg-slate-800'
                         )}
                         aria-label="Toggle energy details"
                     >
