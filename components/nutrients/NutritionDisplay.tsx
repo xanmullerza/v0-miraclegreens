@@ -72,15 +72,15 @@ export function NutritionDisplay({
                                     'flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
                                     universalThreshold === t
                                         ? t === 50
-                                            ? 'bg-yellow-100 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-100 shadow-sm'
+                                            ? 'bg-yellow-100 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-100 border border-yellow-200 dark:border-yellow-500/40 shadow-sm'
                                             : t === 75
-                                                ? 'bg-sky-100 text-sky-900 dark:bg-sky-500/20 dark:text-sky-100 shadow-sm'
-                                                : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-100 shadow-sm'
+                                                ? 'bg-sky-100 text-sky-900 dark:bg-sky-500/20 dark:text-sky-100 border border-sky-200 dark:border-sky-500/40 shadow-sm'
+                                                : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-100 border border-emerald-200 dark:border-emerald-500/40 shadow-sm'
                                         : t === 50
-                                            ? 'text-yellow-500 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100'
+                                            ? 'text-yellow-500 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100 border border-transparent hover:border-yellow-200 dark:hover:border-yellow-500/40'
                                             : t === 75
-                                                ? 'text-sky-500 hover:text-sky-700 dark:text-sky-300 dark:hover:text-sky-100'
-                                                : 'text-emerald-500 hover:text-emerald-700 dark:text-emerald-300 dark:hover:text-emerald-100'
+                                                ? 'text-sky-500 hover:text-sky-700 dark:text-sky-300 dark:hover:text-sky-100 border border-transparent hover:border-sky-200 dark:hover:border-sky-500/40'
+                                                : 'text-emerald-500 hover:text-emerald-700 dark:text-emerald-300 dark:hover:text-emerald-100 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-500/40'
                                 )}
                             >
                                 {t}%
@@ -101,7 +101,7 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">{energyUnit}</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'energy' ? null : 'energy')}
-                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-orange-500 dark:text-orange-300 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                         aria-label="Toggle energy details"
                     >
                         {expandedMacro === 'energy' ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -117,7 +117,7 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
-                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-blue-500 dark:text-blue-300 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                         aria-label="Toggle carbs details"
                     >
                         {expandedMacro === 'carbs' ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -133,7 +133,7 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
-                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-rose-500 dark:text-rose-300 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                         aria-label="Toggle protein details"
                     >
                         {expandedMacro === 'protein' ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -149,7 +149,7 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
-                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                        className="mt-3 mx-auto inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-transparent p-2 text-amber-500 dark:text-amber-300 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                         aria-label="Toggle fat details"
                     >
                         {expandedMacro === 'fat' ? <EyeOff size={16} /> : <Eye size={16} />}
