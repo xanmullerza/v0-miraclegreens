@@ -49,14 +49,16 @@ export default function RecipeViewer({ recipeId }: RecipeViewerProps) {
         );
     }
 
-    // Calculate nutrition per serving
-    const nutrition: CalculatedNutrition = recipe.calculated_nutrition || {
-        calories: recipe.calories,
-        protein: recipe.protein,
-        fat: recipe.fat,
-        carbs: recipe.carbs,
-    };
+    // Require DB-derived recipe nutrition only
+    if (!recipe.calculated_nutrition) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <div className="text-gray-500">Nutrition data unavailable. Recipe nutrition must be calculated from DB food item data.</div>
+            </div>
+        );
+    }
 
+    const nutrition: CalculatedNutrition = recipe.calculated_nutrition;
     const perServing = scaleNutrition(nutrition, recipe.servings, 1);
     const forSelectedServings = scaleNutrition(nutrition, recipe.servings, servings);
 

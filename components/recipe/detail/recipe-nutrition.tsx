@@ -21,8 +21,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
 
     if (!recipe) return null;
 
-    // Check if recipe has nutrition data saved in DB OR calculated from ingredients
-    const hasData = recipe.calories > 0 || calculatedNutrition.calories > 0;
+    // Check if recipe has nutrition data saved in DB only
+    const hasData = recipe.calories > 0 && recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0;
 
     // No data → Empty state (workflow in side panel)
     if (!hasData) {
@@ -43,16 +43,16 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         );
     }
 
-    // Calculate nutrition using the hook - always per-serving, scale by selectedServings
+    // Calculate nutrition using DB recipe fields only; no fallback to calculated ingredient nutrition
     const nutrition = useRecipeNutrition({
         recipe: {
             ...recipe,
-            calories: recipe.calories > 0 ? recipe.calories : calculatedNutrition.calories,
-            protein: recipe.protein > 0 ? recipe.protein : calculatedNutrition.protein,
-            carbs: recipe.carbs > 0 ? recipe.carbs : calculatedNutrition.carbs,
-            fat: recipe.fat > 0 ? recipe.fat : calculatedNutrition.fat,
-            energy_kj: recipe.energy_kj > 0 ? recipe.energy_kj : calculatedNutrition.energy_kj,
-            micronutrients: recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0 ? recipe.micronutrients : calculatedNutrition.micronutrients || {},
+            calories: recipe.calories,
+            protein: recipe.protein,
+            carbs: recipe.carbs,
+            fat: recipe.fat,
+            energy_kj: recipe.energy_kj,
+            micronutrients: recipe.micronutrients || {},
         },
         viewMode: 'per-serving' as const,
         energyUnit,
@@ -90,8 +90,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
         },
     } : null;
 
-    // Get phytonutrients (not part of NutritionDisplay yet)
-    const phytonutrients = calculatedNutrition.phytonutrients && Object.keys(calculatedNutrition.phytonutrients).length > 0 ? calculatedNutrition.phytonutrients : (recipe.phytonutrients || {});
+    // Get phytonutrients from DB recipe only
+    const phytonutrients = recipe.phytonutrients || {};
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
