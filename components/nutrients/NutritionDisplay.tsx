@@ -274,7 +274,7 @@ export function NutritionDisplay({
                                 <Link 
                                     key={v.label} 
                                     href={`/?nutrientId=${encodeURIComponent(v.fullName || v.label)}`}
-                                    className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
+                                    className="flex items-center justify-between bg-transparent dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                                 >
                                     <span className={cn('text-sm font-semibold group-hover/nut:text-violet-400', meetsThreshold ? 'text-violet-500' : 'text-slate-500 dark:text-slate-400')}>
                                         {v.label}
@@ -293,7 +293,7 @@ export function NutritionDisplay({
                         <div className="border-t border-slate-200 dark:border-slate-800 pt-2 mt-2">
                             <Link 
                                 href="/?nutrientId=Choline"
-                                className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
+                                className="flex items-center justify-between bg-transparent dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                             >
                                 <span
                                     className={cn(
@@ -335,7 +335,7 @@ export function NutritionDisplay({
                                 <Link 
                                     key={m.label} 
                                     href={`/?nutrientId=${encodeURIComponent(m.label)}`}
-                                    className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
+                                    className="flex items-center justify-between bg-transparent dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                                 >
                                     <span className={cn('text-sm font-semibold group-hover/nut:text-cyan-400', meetsThreshold ? 'text-cyan-500' : 'text-slate-500 dark:text-slate-400')}>
                                         {m.label}
