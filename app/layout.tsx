@@ -2,8 +2,8 @@ import type React from 'react';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
-import { ThemeProvider } from "@/components/ux/theme-provider"
-import { UserPreferencesProvider } from "@/lib/context/user-preferences-context";
+import { ThemeProvider } from '@/components/ux/theme-provider';
+import { UserPreferencesProvider } from '@/lib/context/user-preferences-context';
 
 const _dmSans = DM_Sans({ subsets: ['latin'] });
 const _playfair = Playfair_Display({ subsets: ['latin'] });
@@ -32,7 +32,7 @@ export const metadata = {
   },
 };
 
-import { Toaster } from "sonner";
+import { Toaster } from 'sonner';
 
 export default function RootLayout({
   children,
@@ -49,12 +49,19 @@ export default function RootLayout({
                 (function() {
                   try {
                     var stored = localStorage.getItem('theme');
-                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    var shouldBeDark = stored ? stored === 'dark' : prefersDark;
-                    if (shouldBeDark) {
-                      document.documentElement.classList.add('dark');
-                    } else {
-                      document.documentElement.classList.remove('dark');
+                    var themes = ['light', 'dark', 'material', 'neon', 'free'];
+                    themes.forEach(function(theme) {
+                      document.documentElement.classList.remove(theme);
+                    });
+
+                    if (stored === 'system' || stored === null) {
+                      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                      document.documentElement.classList.toggle('dark', prefersDark);
+                    } else if (themes.includes(stored)) {
+                      document.documentElement.classList.add(stored);
+                      if (stored === 'neon') {
+                        document.documentElement.classList.add('dark');
+                      }
                     }
                   } catch (e) { }
                 })();
@@ -66,13 +73,11 @@ export default function RootLayout({
       <body className={`${_dmSans.className} ${_playfair.className} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="material"
           enableSystem
           disableTransitionOnChange
         >
-          <UserPreferencesProvider>
-            {children}
-          </UserPreferencesProvider>
+          <UserPreferencesProvider>{children}</UserPreferencesProvider>
           <Toaster richColors position="top-center" />
         </ThemeProvider>
         <Analytics />
