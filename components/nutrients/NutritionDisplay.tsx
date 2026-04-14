@@ -71,8 +71,16 @@ export function NutritionDisplay({
                                 className={cn(
                                     'flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
                                     universalThreshold === t
-                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                        ? t === 50
+                                            ? 'bg-yellow-100 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-100 shadow-sm'
+                                            : t === 75
+                                                ? 'bg-sky-100 text-sky-900 dark:bg-sky-500/20 dark:text-sky-100 shadow-sm'
+                                                : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-100 shadow-sm'
+                                        : t === 50
+                                            ? 'text-yellow-500 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100'
+                                            : t === 75
+                                                ? 'text-sky-500 hover:text-sky-700 dark:text-sky-300 dark:hover:text-sky-100'
+                                                : 'text-emerald-500 hover:text-emerald-700 dark:text-emerald-300 dark:hover:text-emerald-100'
                                 )}
                             >
                                 {t}%
