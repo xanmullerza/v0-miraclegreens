@@ -41,7 +41,7 @@ export function useIngredientBuilder(props: IngredientBuilderProps) {
             quantity,
             measure_label: unit,
             modifier: initialValues?.modifier || '',
-            image: item.image,
+            image: item.image || undefined,
             source: (item as FoodItemMatch).source || item.source || 'local',
             calories: item.energy_kcal || 0,
             energy_kj: item.energy_kj || 0,
