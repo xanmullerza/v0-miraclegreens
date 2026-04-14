@@ -60,7 +60,7 @@ export function NutritionDisplay({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-500 flex items-center gap-2">
-                    <Activity size={16} /> Nutritional Breakdown
+                    <Activity size={16} /> Minimum Threshold
                 </h3>
                 {onThresholdChange && (
                     <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
