@@ -72,15 +72,15 @@ export function NutritionDisplay({
                                     'flex-1 text-[10px] font-black py-1.5 px-2 rounded-md transition-all uppercase tracking-widest',
                                     universalThreshold === t
                                         ? t === 50
-                                            ? 'bg-yellow-100 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-100 border border-yellow-200 dark:border-yellow-500/40 shadow-sm'
+                                            ? 'bg-yellow-100 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-400/60 shadow-sm'
                                             : t === 75
-                                                ? 'bg-sky-100 text-sky-900 dark:bg-sky-500/20 dark:text-sky-100 border border-sky-200 dark:border-sky-500/40 shadow-sm'
-                                                : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-100 border border-emerald-200 dark:border-emerald-500/40 shadow-sm'
+                                                ? 'bg-sky-100 text-sky-900 dark:bg-sky-500/20 dark:text-sky-100 border border-sky-300 dark:border-sky-400/60 shadow-sm'
+                                                : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-100 border border-emerald-300 dark:border-emerald-400/60 shadow-sm'
                                         : t === 50
-                                            ? 'text-yellow-500 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100 border border-transparent hover:border-yellow-200 dark:hover:border-yellow-500/40'
+                                            ? 'text-yellow-500 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100 border border-yellow-200 dark:border-yellow-500/40'
                                             : t === 75
-                                                ? 'text-sky-500 hover:text-sky-700 dark:text-sky-300 dark:hover:text-sky-100 border border-transparent hover:border-sky-200 dark:hover:border-sky-500/40'
-                                                : 'text-emerald-500 hover:text-emerald-700 dark:text-emerald-300 dark:hover:text-emerald-100 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-500/40'
+                                                ? 'text-sky-500 hover:text-sky-700 dark:text-sky-300 dark:hover:text-sky-100 border border-sky-200 dark:border-sky-500/40'
+                                                : 'text-emerald-500 hover:text-emerald-700 dark:text-emerald-300 dark:hover:text-emerald-100 border border-emerald-200 dark:border-emerald-500/40'
                                 )}
                             >
                                 {t}%
