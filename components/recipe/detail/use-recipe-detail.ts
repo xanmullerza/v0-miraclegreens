@@ -22,6 +22,8 @@ interface UseRecipeDetailOptions {
 }
 
 export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecipeDetailOptions) {
+    console.log('[useRecipeDetail] Hook initialized with recipeId:', recipeId);
+
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
@@ -196,11 +198,16 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     // Auto-run smart match when entering nutrition tab for recipes without data
     useEffect(() => {
+        console.log('[auto-run-smart-match] Effect triggered:', { activeSection, recipe: !!recipe, loading, ingredientsCount: ingredients.length });
         if (activeSection === 'nutrition' && recipe && !loading && ingredients.length > 0) {
             const hasData = recipe.calories > 0 && recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0;
+            console.log('[auto-run-smart-match] Checking nutrition data:', { hasData, calories: recipe.calories, micronutrients: !!recipe.micronutrients });
             if (!hasData && Object.keys(matchedIngredients).length === 0 && !smartMatchRunning) {
+                console.log('[auto-run-smart-match] Conditions met, running auto match');
                 // Auto-run smart match for recipes without nutrition data
                 runAutoMatch();
+            } else {
+                console.log('[auto-run-smart-match] Conditions not met:', { hasData, matchedCount: Object.keys(matchedIngredients).length, smartMatchRunning });
             }
         }
     }, [activeSection, recipe, loading, ingredients, matchedIngredients, smartMatchRunning]);
@@ -219,16 +226,20 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     };
 
     const fetchRecipeDetails = async () => {
+        console.log('[fetchRecipeDetails] Starting to fetch recipe with ID:', recipeId);
         try {
             setLoading(true);
+            console.log('[fetchRecipeDetails] Set loading to true');
 
             if (String(recipeId).startsWith('local-')) {
+                console.log('[fetchRecipeDetails] Loading local recipe');
                 const localData = localStorage.getItem('local_recipes');
                 if (localData) {
                     const localRecipes: any[] = JSON.parse(localData);
                     const localRecipe = localRecipes.find(r => r.id === recipeId);
                     
                     if (localRecipe) {
+                        console.log('[fetchRecipeDetails] Found local recipe:', localRecipe.title);
                         setRecipe({
                             ...localRecipe,
                             difficulty: localRecipe.difficulty || 'Medium',
@@ -263,13 +274,18 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     throw new Error('No local recipes found');
                 }
             } else {
+                console.log('[fetchRecipeDetails] Loading database recipe');
                 const { data: recipeData, error: recipeError } = await supabase
                     .from('recipes')
                     .select('*')
                     .eq('id', recipeId)
                     .single();
 
-                if (recipeError) throw recipeError;
+                if (recipeError) {
+                    console.error('[fetchRecipeDetails] Recipe query error:', recipeError);
+                    throw recipeError;
+                }
+                console.log('[fetchRecipeDetails] Recipe data loaded:', recipeData?.title);
 
                 const { data: ingredientsData, error: ingredientsError } = await supabase
                     .from('ingredients')
@@ -277,7 +293,11 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     .eq('recipe_id', recipeId)
                     .order('id', { ascending: true });
 
-                if (ingredientsError) throw ingredientsError;
+                if (ingredientsError) {
+                    console.error('[fetchRecipeDetails] Ingredients query error:', ingredientsError);
+                    throw ingredientsError;
+                }
+                console.log('[fetchRecipeDetails] Ingredients loaded:', ingredientsData?.length || 0);
                 setIngredients(ingredientsData || []);
 
                 if (ingredientsData && ingredientsData.length > 0) {
@@ -316,6 +336,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 }
 
                 if (recipeData) {
+                    console.log('[fetchRecipeDetails] Setting recipe state');
                     setRecipe({
                         ...recipeData,
                         difficulty: recipeData.difficulty || 'Medium',
@@ -330,13 +351,19 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     .eq('recipe_id', recipeId)
                     .order('step_order', { ascending: true });
 
-                if (instructionsError) throw instructionsError;
+                if (instructionsError) {
+                    console.error('[fetchRecipeDetails] Instructions query error:', instructionsError);
+                    throw instructionsError;
+                }
+                console.log('[fetchRecipeDetails] Instructions loaded:', instructionsData?.length || 0);
                 setInstructions(instructionsData || []);
             }
         } catch (error) {
-            console.error('Error fetching recipe:', error);
+            console.error('[fetchRecipeDetails] Error fetching recipe:', error);
+            console.error('[fetchRecipeDetails] Error stack:', error?.stack);
             toast.error('Failed to load recipe details');
         } finally {
+            console.log('[fetchRecipeDetails] Setting loading to false');
             setLoading(false);
         }
     };
@@ -482,19 +509,23 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     };
 
     const runAutoMatch = async () => {
+        console.log('[runAutoMatch] Starting auto match for ingredients:', ingredients.length);
         setSmartMatchRunning(true);
         const loadingToastId = toast.loading("Auto-matching ingredients...");
         
         try {
+            console.log('[runAutoMatch] Processing ingredients...');
             const autoMatched: Record<string, any> = {};
             const unmatchable: typeof ingredients = [];
             const autoSkipped: string[] = [];
 
             for (const ing of ingredients) {
                 const ingName = ing.base_ingredient || ing.item;
+                console.log('[runAutoMatch] Processing ingredient:', ingName);
                 
                 // Auto-skip flavorings
                 if (isFlavoringIngredient({ name: ingName } as any)) {
+                    console.log('[runAutoMatch] Skipping flavoring:', ingName);
                     autoSkipped.push(ing.id);
                     continue;
                 }
@@ -502,22 +533,28 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 // Search for first match
                 const searchTerm = extractCoreName(ingName);
                 if (!searchTerm || searchTerm.length < 2) {
+                    console.log('[runAutoMatch] Search term too short:', searchTerm);
                     unmatchable.push(ing);
                     continue;
                 }
 
+                console.log('[runAutoMatch] Searching for:', searchTerm);
                 const results = await searchFoodItem(searchTerm);
+                console.log('[runAutoMatch] Search results:', results?.length || 0);
                 
                 if (results && results.length > 0) {
                     // Auto-accept first result (highest confidence)
+                    console.log('[runAutoMatch] Auto-matched:', results[0].name);
                     autoMatched[ing.id] = results[0];
                     setAcceptedMatches(prev => ({ ...prev, [ing.id]: true }));
                 } else {
                     // No match found - needs manual selection
+                    console.log('[runAutoMatch] No match found for:', ingName);
                     unmatchable.push(ing);
                 }
             }
 
+            console.log('[runAutoMatch] Auto match complete:', { matched: Object.keys(autoMatched).length, skipped: autoSkipped.length, unmatchable: unmatchable.length });
             // Update matched ingredients
             setMatchedIngredients(prev => ({ ...prev, ...autoMatched }));
 
@@ -531,15 +568,19 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             // Stay in FOOD_MATCH step to show matched ingredient cards in side panel
             // User must accept matches before proceeding to INGREDIENT_REVIEW
             if (unmatchable.length > 0) {
+                console.log('[runAutoMatch] Showing manual selection needed toast');
                 toast.success(`Auto-matched ${Object.keys(autoMatched).length} ingredients. ${unmatchable.length} need manual selection in the side panel.`, { duration: 3000 });
             } else {
+                console.log('[runAutoMatch] All ingredients auto-matched successfully');
                 toast.success(`✓ Successfully auto-matched all ${Object.keys(autoMatched).length} ingredients! Review below and click "Proceed to Portion Matching".`, { id: loadingToastId });
             }
             // Keep at FOOD_MATCH - don't auto-transition yet
         } catch (err: any) {
-            console.error('Auto-match error:', err);
+            console.error('[runAutoMatch] Auto-match error:', err);
+            console.error('[runAutoMatch] Error stack:', err?.stack);
             toast.error('Auto-match failed');
         } finally {
+            console.log('[runAutoMatch] Setting smartMatchRunning to false');
             setSmartMatchRunning(false);
         }
     };

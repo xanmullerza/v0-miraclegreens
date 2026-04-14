@@ -154,15 +154,24 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
 
     // Complex Handlers
     const handleSaveAndViewRecipe = async (recipe: ParsedRecipe) => {
+        console.log('[handleSaveAndViewRecipe] Starting save process for recipe:', recipe.title);
         importer.setIsLoading(true);
         try {
+            console.log('[handleSaveAndViewRecipe] Structuring recipe for saving...');
             const structured = structureRecipeForSaving(recipe);
-            if (!structured) throw new Error('Failed to structure recipe data for saving');
+            if (!structured) {
+                console.error('[handleSaveAndViewRecipe] Failed to structure recipe data');
+                throw new Error('Failed to structure recipe data for saving');
+            }
             const { recipeDataToSave, ingredientsList, instructionsList } = structured;
+            console.log('[handleSaveAndViewRecipe] Structured data:', { recipeDataToSave, ingredientsCount: ingredientsList.length, instructionsCount: instructionsList.length });
 
+            console.log('[handleSaveAndViewRecipe] Calling saveRecipe...');
             const result = await saveRecipe(recipeDataToSave as any, ingredientsList, instructionsList);
             const recipeId = result?.id || `recipe-${Date.now()}`;
-            
+            console.log('[handleSaveAndViewRecipe] Save successful, recipeId:', recipeId);
+
+            console.log('[handleSaveAndViewRecipe] Updating navigation state...');
             toast.success('Successfully saved to your library!');
             setSelectedRecipeId(recipeId);
             setPreviousView(null);
@@ -171,10 +180,13 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
             importer.setIsCreatingRecipe(false);
             importer.setPastedRecipeContent('');
             importer.setPastedRecipeURL('');
+            console.log('[handleSaveAndViewRecipe] Navigation updated, process complete');
         } catch (error: any) {
-            console.error('Error saving recipe:', error);
+            console.error('[handleSaveAndViewRecipe] Error during save process:', error);
+            console.error('[handleSaveAndViewRecipe] Error stack:', error.stack);
             toast.error('Failed to save recipe. Please try again.');
         } finally {
+            console.log('[handleSaveAndViewRecipe] Setting loading to false');
             importer.setIsLoading(false);
         }
     };
