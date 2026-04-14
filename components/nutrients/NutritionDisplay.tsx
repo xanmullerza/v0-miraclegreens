@@ -273,13 +273,11 @@ export function NutritionDisplay({
                                     </span>
                                     <span
                                         className={cn(
-                                            'text-sm font-bold' ,
+                                            'text-sm font-bold',
                                             v.pct >= 100 ? 'text-emerald-400' : v.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                         )}
                                     >
-                                        {ndm === 'value' && `${v.val.toFixed(1)}`}
-                                        {ndm === 'percentage' && `${v.pct}%`}
-                                        {ndm === 'both' && `${v.val.toFixed(1)} (${v.pct}%)`}
+                                        {v.val.toFixed(1)}
                                     </span>
                                 </Link>
                             );
@@ -303,9 +301,7 @@ export function NutritionDisplay({
                                         micronutrients.choline.pct >= 100 ? 'text-emerald-400' : micronutrients.choline.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                     )}
                                 >
-                                    {ndm === 'value' && `${micronutrients.choline.val.toFixed(1)} mg`}
-                                    {ndm === 'percentage' && `${micronutrients.choline.pct}%`}
-                                    {ndm === 'both' && `${micronutrients.choline.val.toFixed(1)} mg (${micronutrients.choline.pct}%)`}
+                                    {micronutrients.choline.val.toFixed(1)} mg
                                 </span>
                             </Link>
                         </div>
@@ -338,13 +334,11 @@ export function NutritionDisplay({
                                     </span>
                                     <span
                                         className={cn(
-                                            'text-sm font-bold' ,
+                                            'text-sm font-bold',
                                             m.pct >= 100 ? 'text-emerald-400' : m.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                         )}
                                     >
-                                        {ndm === 'value' && `${m.val.toFixed(1)} mg`}
-                                        {ndm === 'percentage' && `${m.pct}%`}
-                                        {ndm === 'both' && `${m.val.toFixed(1)} mg (${m.pct}%)`}
+                                        {m.val.toFixed(1)} mg
                                     </span>
                                 </Link>
                             );
