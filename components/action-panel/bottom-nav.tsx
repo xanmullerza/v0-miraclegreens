@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface ActionPanelBottomNavProps {
     activeView: ActionPanelView;
@@ -21,6 +22,7 @@ export function ActionPanelBottomNav({
     orientation = 'bottom'
 }: ActionPanelBottomNavProps) {
     const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton, isActionPanelOpen, activeMainTab, setActiveMainTab } = useActionPanel();
+    const { profile } = useUserPreferences();
     const isVertical = orientation === 'left' || orientation === 'right';
     const router = useRouter();
     const pathname = usePathname();
@@ -201,8 +203,8 @@ export function ActionPanelBottomNav({
                 <div className={cn(
                     "pointer-events-auto bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-none",
                     isVertical
-                        ? "h-full w-20 grid grid-rows-3 gap-2 px-2 py-3 border-slate-200/50 dark:border-slate-800/50 shadow-[-4px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_30px_rgba(0,0,0,0.5)]"
-                        : "w-full px-2 py-3 grid grid-cols-3 border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]"
+                        ? `h-full w-20 grid gap-2 px-2 py-3 border-slate-200/50 dark:border-slate-800/50 shadow-[-4px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_30px_rgba(0,0,0,0.5)] ${profile?.isAdmin ? 'grid-rows-5' : 'grid-rows-3'}`
+                        : `w-full px-2 py-3 border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)] ${profile?.isAdmin ? 'grid grid-cols-5' : 'grid grid-cols-3'}`
                 )}>
                     {/* Home Button - Left (Toggle behavior) */}
                     <button
@@ -243,6 +245,48 @@ export function ActionPanelBottomNav({
                         <BookOpen size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Cookbook</span>
                     </button>
+
+                    {/* Library Button - Admin only */}
+                    {profile?.isAdmin && (
+                        <button
+                            onClick={() => {
+                                if (activeCategory === 'library') {
+                                    setExpandedButton('none');
+                                } else {
+                                    setExpandedButton('library');
+                                }
+                            }}
+                            className={cn(
+                                "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
+                                (expandedButton === 'library' || activeView === 'nutridex' || activeView === 'comparator') || (!isActionPanelOpen && activeMainTab === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
+                            )}
+                            title="Library"
+                        >
+                            <LibraryIcon size={20} className="transition-transform group-hover:scale-110" />
+                            <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
+                        </button>
+                    )}
+
+                    {/* Tracker Button - Admin only */}
+                    {profile?.isAdmin && (
+                        <button
+                            onClick={() => {
+                                if (activeCategory === 'tracker') {
+                                    setExpandedButton('none');
+                                } else {
+                                    setExpandedButton('tracker');
+                                }
+                            }}
+                            className={cn(
+                                "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
+                                (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && activeMainTab === 'planner') ? "text-violet-500 bg-violet-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-violet-500"
+                            )}
+                            title="Tracker"
+                        >
+                            <BarChart3 size={20} className="transition-transform group-hover:scale-110" />
+                            <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Tracker</span>
+                        </button>
+                    )}
 
                     {/* Back Button - behaves like mobile back button */}
                     <button
