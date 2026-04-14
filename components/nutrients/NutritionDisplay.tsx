@@ -94,20 +94,18 @@ export function NutritionDisplay({
                 </div>
                 
                 {/* Carbs */}
-                <div className="relative space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4">
-                    <div className="text-center">
-                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
-                        <div className="text-lg font-black text-slate-900 dark:text-white">
-                            {Math.round(carbs.value)}
-                        </div>
-                        <div className="text-[8px] text-slate-400 font-bold">g</div>
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4 text-center">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-1">Carbs</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                        {Math.round(carbs.value)}
                     </div>
+                    <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
-                        className="absolute top-3 right-3 h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-500 transition-colors"
-                        aria-label="Toggle carbs breakdown"
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        aria-label="Toggle carbs details"
                     >
-                        {expandedMacro === 'carbs' ? '−' : '+'}
+                        {expandedMacro === 'carbs' ? 'Hide details' : 'Details'}
                     </button>
                     {expandedMacro === 'carbs' && (
                         <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-2">
@@ -129,20 +127,18 @@ export function NutritionDisplay({
                 </div>
 
                 {/* Protein */}
-                <div className="relative space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4">
-                    <div className="text-center">
-                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
-                        <div className="text-lg font-black text-slate-900 dark:text-white">
-                            {Math.round(protein.value)}
-                        </div>
-                        <div className="text-[8px] text-slate-400 font-bold">g</div>
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4 text-center">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-1">Protein</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                        {Math.round(protein.value)}
                     </div>
+                    <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
-                        className="absolute top-3 right-3 h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-500 transition-colors"
-                        aria-label="Toggle protein breakdown"
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        aria-label="Toggle protein details"
                     >
-                        {expandedMacro === 'protein' ? '−' : '+'}
+                        {expandedMacro === 'protein' ? 'Hide details' : 'Details'}
                     </button>
                     {expandedMacro === 'protein' && (
                         <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-2">
@@ -158,20 +154,18 @@ export function NutritionDisplay({
                 </div>
 
                 {/* Fat */}
-                <div className="relative space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4">
-                    <div className="text-center">
-                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
-                        <div className="text-lg font-black text-slate-900 dark:text-white">
-                            {Math.round(fat.value)}
-                        </div>
-                        <div className="text-[8px] text-slate-400 font-bold">g</div>
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/20 p-4 text-center">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-1">Fat</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-white">
+                        {Math.round(fat.value)}
                     </div>
+                    <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
-                        className="absolute top-3 right-3 h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-amber-500 transition-colors"
-                        aria-label="Toggle fat breakdown"
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        aria-label="Toggle fat details"
                     >
-                        {expandedMacro === 'fat' ? '−' : '+'}
+                        {expandedMacro === 'fat' ? 'Hide details' : 'Details'}
                     </button>
                     {expandedMacro === 'fat' && (
                         <div className="mt-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-left space-y-2">
