@@ -2,12 +2,11 @@ import React, { forwardRef, useImperativeHandle } from 'react';
 import { useIngredientBuilder } from './use-ingredient-builder';
 import { MagicPasteSection } from './magic-paste-section';
 import { IngredientRow } from './ingredient-row';
-import { NutrientReport } from './nutrient-report';
 import { InlineFoodSearch } from './inline-food-search';
 import { IngredientBuilderProps, IngredientBuilderHandle } from './types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Scale, Wand2, Plus, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wand2, Plus, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>((props, ref) => {
@@ -18,7 +17,6 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
         magicText, setMagicText,
         isParsing, pendingIngredients, setPendingIngredients,
         editingNameIndex, setEditingNameIndex,
-        showDetailedNutrients, setShowDetailedNutrients,
         isAdmin, handleAddIngredient, handleMagicParse,
         confirmPendingIngredient, confirmAllIngredients,
         handleUSDASearchForPending, rejectPendingIngredient,
@@ -100,37 +98,6 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
 
                     {hasIngredients && (
                         <>
-                            {/* Analysis Toggle */}
-                            <div className="pt-4">
-                                <button
-                                    onClick={() => setShowDetailedNutrients(!showDetailedNutrients)}
-                                    className="w-full py-4 flex items-center justify-between px-6 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 transition-all group"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
-                                            <Scale size={18} />
-                                        </div>
-                                        <div className="text-left">
-                                            <p className="text-xs font-black uppercase tracking-widest">Protocol Analysis</p>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Molecular Nutrient Breakdown</p>
-                                        </div>
-                                    </div>
-                                    {showDetailedNutrients ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                                </button>
-
-                                {showDetailedNutrients && (
-                                    <div className="mt-6 animate-in slide-in-from-top-4 duration-500">
-                                        <NutrientReport 
-                                            totals={totals}
-                                            userRDAs={userRDAs || {}}
-                                            ingredients={ingredients}
-                                            energyUnit={energyUnit}
-                                            profile={{}} 
-                                        />
-                                    </div>
-                                )}
-                            </div>
-
                             {onNext && (
                                 <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
                                     <Button 
