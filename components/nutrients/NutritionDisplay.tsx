@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Activity } from 'lucide-react';
+import { Activity, Eye, EyeOff } from 'lucide-react';
 
 interface NutritionData {
     energy: { value: number; percent: number };
@@ -93,10 +93,10 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">{energyUnit}</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'energy' ? null : 'energy')}
-                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
                         aria-label="Toggle energy details"
                     >
-                        {expandedMacro === 'energy' ? 'Hide' : 'Show'}
+                        {expandedMacro === 'energy' ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                 </div>
 
@@ -109,10 +109,10 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
-                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
                         aria-label="Toggle carbs details"
                     >
-                        {expandedMacro === 'carbs' ? 'Hide' : 'Show'}
+                        {expandedMacro === 'carbs' ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                 </div>
 
@@ -125,10 +125,10 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
-                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
                         aria-label="Toggle protein details"
                     >
-                        {expandedMacro === 'protein' ? 'Hide' : 'Show'}
+                        {expandedMacro === 'protein' ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                 </div>
 
@@ -141,10 +141,10 @@ export function NutritionDisplay({
                     <div className="text-[8px] text-slate-400 font-bold">g</div>
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
-                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+                        className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 p-2 text-slate-700 dark:text-slate-200 transition hover:bg-slate-200 dark:hover:bg-slate-800"
                         aria-label="Toggle fat details"
                     >
-                        {expandedMacro === 'fat' ? 'Hide' : 'Show'}
+                        {expandedMacro === 'fat' ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                 </div>
             </div>
