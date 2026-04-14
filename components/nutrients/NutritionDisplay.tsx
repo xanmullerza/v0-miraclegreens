@@ -242,10 +242,6 @@ export function NutritionDisplay({
                         <span>Omega-6</span>
                         <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.omega6.toFixed(2)}g</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm text-slate-700 dark:text-slate-300">
-                        <span>Cholesterol</span>
-                        <span className="font-bold text-slate-900 dark:text-white">{fatBreakdown.cholesterol.toFixed(0)}mg</span>
-                    </div>
                 </div>
             )}
 
