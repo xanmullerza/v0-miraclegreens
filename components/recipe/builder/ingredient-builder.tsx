@@ -34,26 +34,6 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
 
     return (
         <div className="space-y-6">
-            {/* Header / Summary Card */}
-            {hasIngredients && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    {[
-                        { label: 'Calories', val: Math.round(totals.calories), unit: energyUnit === 'kJ' ? 'kJ' : 'kcal', color: 'text-orange-500' },
-                        { label: 'Protein', val: totals.protein.toFixed(1), unit: 'g', color: 'text-emerald-500' },
-                        { label: 'Carbs', val: totals.carbs.toFixed(1), unit: 'g', color: 'text-blue-500' },
-                        { label: 'Fat', val: totals.fat.toFixed(1), unit: 'g', color: 'text-amber-500' },
-                    ].map((macro, idx) => (
-                        <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-center">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{macro.label}</p>
-                            <div className="flex items-baseline justify-center gap-1">
-                                <span className={cn("text-xl font-black", macro.color)}>{macro.val}</span>
-                                <span className="text-[10px] font-bold text-slate-500">{macro.unit}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
             {/* Main Workspace */}
             <div className="space-y-6">
                 <div className="space-y-4">

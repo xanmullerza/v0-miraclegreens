@@ -473,13 +473,10 @@ export function RecipesView({
                         <div
                             key={recipe.id}
                             className={cn(
-                                'group relative rounded-[2.5rem] transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm',
-                                'shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] hover:-translate-y-1',
-                                isMix 
-                                    ? 'bg-gradient-to-br from-indigo-950 via-indigo-950 to-slate-900' 
-                                    : 'bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800/90'
+                                'group relative rounded-[2.5rem] transition-all duration-500 cursor-pointer overflow-hidden backdrop-blur-sm border border-slate-200/70 dark:border-slate-800/80',
+                                'shadow-[0_8px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] dark:hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.55)] hover:-translate-y-1',
+                                'bg-white/15 dark:bg-slate-900/70'
                             )}
-
 
                             onClick={() => onRecipeClick ? onRecipeClick(recipe.id) : router.push(`/?recipeId=${recipe.id}`)}
                         >

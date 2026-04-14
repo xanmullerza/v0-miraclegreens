@@ -145,7 +145,7 @@ export function AllMealsView() {
                         <div
                             key={recipe.id}
                             onClick={() => router.push(`/?recipeId=${recipe.id}`)}
-                            className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-orange-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
+                            className="group bg-transparent dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-orange-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
                         >
                             {/* Image */}
                             <div className="aspect-video bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 relative overflow-hidden">
