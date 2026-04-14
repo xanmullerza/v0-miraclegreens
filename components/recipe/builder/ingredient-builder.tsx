@@ -30,9 +30,6 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-3">
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Add Ingredients</h4>
-                            <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-1">
-                                {ingredients.length === 0 ? 'Add your first ingredient to get started.' : 'Click Add Ingredient to search for a new item.'}
-                            </p>
                         </div>
                         {!showPicker ? (
                             <Button
