@@ -259,7 +259,7 @@ export function NutritionDisplay({
                 <div className="rounded-[2.5rem] border border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] dark:hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.55)] hover:-translate-y-1 transition-all duration-500 p-4 flex flex-col gap-4">
                     <div>
                         <div className="flex items-center justify-between">
-                            <div className="text-sm font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
+                            <div className="text-sm font-black uppercase tracking-widest text-violet-500">Vitamins</div>
                             <div className="text-xs font-bold text-violet-700 bg-violet-100 dark:bg-violet-500/10 dark:text-violet-200 px-2.5 py-1 rounded-full">
                                 {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).filter(v => v.pct >= universalThreshold).length} /{' '}
                                 {micronutrients.waterSoluble.length + micronutrients.fatSoluble.length}
