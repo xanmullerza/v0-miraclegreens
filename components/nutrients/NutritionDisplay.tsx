@@ -102,10 +102,10 @@ export function NutritionDisplay({
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'energy' ? null : 'energy')}
                         className={cn(
-                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 text-orange-500 dark:text-orange-300 transition hover:bg-slate-100 dark:hover:bg-slate-800',
+                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 transition hover:bg-slate-100 dark:hover:bg-slate-800',
                             expandedMacro === 'energy'
-                                ? 'border border-orange-500/90 shadow-[0_0_0_1px_rgba(251,191,36,0.7)] dark:shadow-[0_0_0_1px_rgba(251,191,36,0.35)]'
-                                : 'border border-orange-200 dark:border-orange-400/60'
+                                ? 'text-orange-400 dark:text-orange-200 border border-orange-500/90 shadow-[0_0_0_1px_rgba(251,191,36,0.7)] dark:shadow-[0_0_0_1px_rgba(251,191,36,0.35)]'
+                                : 'text-orange-500 dark:text-orange-300 border border-orange-200 dark:border-orange-400/60'
                         )}
                         aria-label="Toggle energy details"
                     >
@@ -123,10 +123,10 @@ export function NutritionDisplay({
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'carbs' ? null : 'carbs')}
                         className={cn(
-                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 text-blue-500 dark:text-blue-300 transition hover:bg-slate-100 dark:hover:bg-slate-800',
+                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 transition hover:bg-slate-100 dark:hover:bg-slate-800',
                             expandedMacro === 'carbs'
-                                ? 'border border-blue-500/90 shadow-[0_0_0_1px_rgba(59,130,246,0.7)] dark:shadow-[0_0_0_1px_rgba(96,165,250,0.35)]'
-                                : 'border border-blue-200 dark:border-blue-400/60'
+                                ? 'text-blue-400 dark:text-blue-200 border border-blue-500/90 shadow-[0_0_0_1px_rgba(59,130,246,0.7)] dark:shadow-[0_0_0_1px_rgba(96,165,250,0.35)]'
+                                : 'text-blue-500 dark:text-blue-300 border border-blue-200 dark:border-blue-400/60'
                         )}
                         aria-label="Toggle carbs details"
                     >
@@ -144,10 +144,10 @@ export function NutritionDisplay({
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'protein' ? null : 'protein')}
                         className={cn(
-                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 text-rose-500 dark:text-rose-300 transition hover:bg-slate-100 dark:hover:bg-slate-800',
+                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 transition hover:bg-slate-100 dark:hover:bg-slate-800',
                             expandedMacro === 'protein'
-                                ? 'border border-rose-500/90 shadow-[0_0_0_1px_rgba(244,63,94,0.7)] dark:shadow-[0_0_0_1px_rgba(244,114,182,0.35)]'
-                                : 'border border-rose-200 dark:border-rose-400/60'
+                                ? 'text-rose-400 dark:text-rose-200 border border-rose-500/90 shadow-[0_0_0_1px_rgba(244,63,94,0.7)] dark:shadow-[0_0_0_1px_rgba(244,114,182,0.35)]'
+                                : 'text-rose-500 dark:text-rose-300 border border-rose-200 dark:border-rose-400/60'
                         )}
                         aria-label="Toggle protein details"
                     >
@@ -165,10 +165,10 @@ export function NutritionDisplay({
                     <button
                         onClick={() => setExpandedMacro(expandedMacro === 'fat' ? null : 'fat')}
                         className={cn(
-                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 text-amber-500 dark:text-amber-300 transition hover:bg-slate-100 dark:hover:bg-slate-800',
+                            'mt-3 mx-auto inline-flex items-center justify-center rounded-full bg-transparent p-2 transition hover:bg-slate-100 dark:hover:bg-slate-800',
                             expandedMacro === 'fat'
-                                ? 'border border-amber-500/90 shadow-[0_0_0_1px_rgba(245,158,11,0.7)] dark:shadow-[0_0_0_1px_rgba(251,191,36,0.35)]'
-                                : 'border border-amber-200 dark:border-amber-400/60'
+                                ? 'text-amber-400 dark:text-amber-200 border border-amber-500/90 shadow-[0_0_0_1px_rgba(245,158,11,0.7)] dark:shadow-[0_0_0_1px_rgba(251,191,36,0.35)]'
+                                : 'text-amber-500 dark:text-amber-300 border border-amber-200 dark:border-amber-400/60'
                         )}
                         aria-label="Toggle fat details"
                     >
