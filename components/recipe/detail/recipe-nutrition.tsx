@@ -108,7 +108,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
 
             {/* Phytonutrients Section */}
             {/* Phytonutrients Section */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl transition-all duration-300 p-4">
+            <div className="rounded-[2.5rem] border border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] dark:hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.55)] hover:-translate-y-1 transition-all duration-500 p-4">
                 <div className="mb-4">
                     <div className="text-[11px] font-black uppercase tracking-widest text-green-400">Phytonutrients</div>
                     <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5">Plant compounds with powerful health benefits • Click a tag to learn more</div>

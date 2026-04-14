@@ -232,7 +232,7 @@ export function NutritionDisplay({
             {/* Micronutrients */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Vitamins */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col gap-4">
+                <div className="rounded-[2.5rem] border border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] dark:hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.55)] hover:-translate-y-1 transition-all duration-500 p-4 flex flex-col gap-4">
                     <div>
                         <div className="flex items-center justify-between">
                             <div className="text-sm font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
@@ -297,7 +297,7 @@ export function NutritionDisplay({
                 </div>
 
                 {/* Minerals */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col gap-4">
+                <div className="rounded-[2.5rem] border border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] dark:hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.55)] hover:-translate-y-1 transition-all duration-500 p-4 flex flex-col gap-4">
                     <div>
                         <div className="flex items-center justify-between">
                             <div className="text-sm font-black uppercase tracking-widest text-cyan-500">Minerals</div>
