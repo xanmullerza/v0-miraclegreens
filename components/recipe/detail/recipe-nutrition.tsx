@@ -108,13 +108,13 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
 
             {/* Phytonutrients Section */}
             {/* Phytonutrients Section */}
-            <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-4">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl transition-all duration-300 p-4">
                 <div className="mb-4">
                     <div className="text-[11px] font-black uppercase tracking-widest text-green-400">Phytonutrients</div>
-                    <div className="text-[9px] text-slate-400 mt-0.5">Plant compounds with powerful health benefits • Click a tag to learn more</div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5">Plant compounds with powerful health benefits • Click a tag to learn more</div>
                 </div>
                 {phytonutrients && Object.keys(phytonutrients).length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                         {Object.entries(phytonutrients).map(([name, data]) => {
                             const isExpanded = expandedPhyto === name;
                             const description = typeof data === 'object' ? data.description : String(data);
@@ -125,10 +125,10 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                                     key={name}
                                     onClick={() => setExpandedPhyto(isExpanded ? null : name)}
                                     className={cn(
-                                        "relative rounded-lg border transition-all duration-300 cursor-pointer overflow-hidden font-semibold",
+                                        "relative rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden font-semibold w-full",
                                         isExpanded
-                                            ? "col-span-full w-full px-4 py-3 h-auto bg-gradient-to-r from-green-500/15 to-emerald-500/15 border-green-400/50 dark:border-green-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
-                                            : "inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-300/30 dark:border-blue-600/40 text-blue-700 dark:text-blue-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] hover:border-blue-400/50 dark:hover:border-blue-500/50"
+                                            ? "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl px-4 py-4"
+                                            : "inline-flex items-center gap-1.5 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 hover:shadow-sm"
                                     )}
                                 >
                                     {isExpanded ? (
@@ -136,7 +136,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                                         <div className="flex flex-col gap-3 w-full">
                                             <div>
                                                 <div className="text-[11px] font-black text-green-700 dark:text-green-400">{name}</div>
-                                                <p className="text-[9px] text-slate-600 dark:text-slate-300 leading-relaxed mt-1.5">
+                                                <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed mt-1.5">
                                                     {description || "No description available"}
                                                 </p>
                                             </div>
@@ -145,7 +145,7 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                                                     <div className="text-[8px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">Sources</div>
                                                     <div className="flex flex-wrap gap-1.5">
                                                         {sources.map((source) => (
-                                                            <span key={source} className="inline-block text-[8px] bg-green-500/20 text-green-700 dark:text-green-400 px-2 py-1 rounded-full border border-green-300/30 dark:border-green-600/40">
+                                                            <span key={source} className="inline-block text-[8px] bg-green-500/20 text-green-700 dark:text-green-300 px-2 py-1 rounded-full border border-green-300/30 dark:border-green-600/40">
                                                                 {source}
                                                             </span>
                                                         ))}
@@ -156,8 +156,8 @@ export function RecipeNutrition({ ctx }: { ctx: RecipeDetailCtx }) {
                                     ) : (
                                         // Collapsed view - Show tag
                                         <>
-                                            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-500/20 text-[7px] font-black">•</span>
-                                            <span className="text-[10px]">{name}</span>
+                                            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500/20 text-[7px] font-black">•</span>
+                                            <span className="text-[10px] text-slate-900 dark:text-slate-200">{name}</span>
                                         </>
                                     )}
                                 </button>

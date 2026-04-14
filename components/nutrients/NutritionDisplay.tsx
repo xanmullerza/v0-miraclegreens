@@ -232,16 +232,16 @@ export function NutritionDisplay({
             {/* Micronutrients */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Vitamins */}
-                <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-3 flex flex-col gap-3">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col gap-4">
                     <div>
                         <div className="flex items-center justify-between">
                             <div className="text-sm font-black uppercase tracking-widest text-violet-500">Vitamins + Choline</div>
-                            <div className="text-xs font-bold text-violet-400 bg-violet-500/10 px-2.5 py-1 rounded-full">
+                            <div className="text-xs font-bold text-violet-700 bg-violet-100 dark:bg-violet-500/10 dark:text-violet-200 px-2.5 py-1 rounded-full">
                                 {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).filter(v => v.pct >= universalThreshold).length} /{' '}
                                 {micronutrients.waterSoluble.length + micronutrients.fatSoluble.length}
                             </div>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2">
                         {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).map(v => {
@@ -250,9 +250,9 @@ export function NutritionDisplay({
                                 <Link 
                                     key={v.label} 
                                     href={`/?nutrientId=${encodeURIComponent(v.fullName || v.label)}`}
-                                    className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
+                                    className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                                 >
-                                    <span className={cn('text-sm font-semibold group-hover/nut:text-violet-400', meetsThreshold ? 'text-violet-300' : 'text-slate-400')}>
+                                    <span className={cn('text-sm font-semibold group-hover/nut:text-violet-400', meetsThreshold ? 'text-violet-500' : 'text-slate-500 dark:text-slate-400')}>
                                         {v.label}
                                     </span>
                                     <span
@@ -268,15 +268,15 @@ export function NutritionDisplay({
                                 </Link>
                             );
                         })}
-                        <div className="border-t border-slate-700 pt-2 mt-2">
+                        <div className="border-t border-slate-200 dark:border-slate-800 pt-2 mt-2">
                             <Link 
                                 href="/?nutrientId=Choline"
-                                className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
+                                className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                             >
                                 <span
                                     className={cn(
                                         'text-sm font-semibold group-hover/nut:text-violet-400',
-                                        micronutrients.choline.pct >= universalThreshold ? 'text-violet-300' : 'text-slate-400'
+                                        micronutrients.choline.pct >= universalThreshold ? 'text-violet-500' : 'text-slate-500 dark:text-slate-400'
                                     )}
                                 >
                                     Choline
@@ -297,16 +297,16 @@ export function NutritionDisplay({
                 </div>
 
                 {/* Minerals */}
-                <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-3 flex flex-col gap-3">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col gap-4">
                     <div>
                         <div className="flex items-center justify-between">
                             <div className="text-sm font-black uppercase tracking-widest text-cyan-500">Minerals</div>
-                            <div className="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-full">
+                            <div className="text-xs font-bold text-cyan-700 bg-cyan-100 dark:bg-cyan-500/10 dark:text-cyan-200 px-2.5 py-1 rounded-full">
                                 {micronutrients.electrolytes.concat(micronutrients.trace).filter(v => v.pct >= universalThreshold).length} /{' '}
                                 {micronutrients.electrolytes.length + micronutrients.trace.length}
                             </div>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
                     </div>
                     <div className="space-y-2">
                         {micronutrients.electrolytes.concat(micronutrients.trace).map(m => {
@@ -315,9 +315,9 @@ export function NutritionDisplay({
                                 <Link 
                                     key={m.label} 
                                     href={`/?nutrientId=${encodeURIComponent(m.label)}`}
-                                    className="flex items-center justify-between hover:bg-slate-700/30 p-1 -mx-1 rounded-md transition-colors cursor-pointer group/nut"
+                                    className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                                 >
-                                    <span className={cn('text-sm font-semibold group-hover/nut:text-cyan-400', meetsThreshold ? 'text-cyan-300' : 'text-slate-400')}>
+                                    <span className={cn('text-sm font-semibold group-hover/nut:text-cyan-400', meetsThreshold ? 'text-cyan-500' : 'text-slate-500 dark:text-slate-400')}>
                                         {m.label}
                                     </span>
                                     <span
