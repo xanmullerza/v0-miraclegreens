@@ -76,7 +76,7 @@ export function HomeView({
     };
     
     return (
-        <div className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-white dark:bg-slate-900/50 relative overflow-hidden">
             <div className={cn(
                 "absolute top-0 left-0 right-0 z-30 transition-all duration-500 ease-in-out",
                 isHeaderVisible ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
