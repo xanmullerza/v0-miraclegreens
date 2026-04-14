@@ -76,6 +76,16 @@ export function NutritionDisplay({
     const fullVitamins = sortedVitamins;
     const fullMinerals = micronutrients.electrolytes.concat(micronutrients.trace);
 
+    const nutrientUnit = (label: string, fullName?: string) => {
+        const norm = `${label}${fullName ? ` ${fullName}` : ''}`;
+        if (/B12|Cobalamin/i.test(norm)) return 'mg';
+        if (/Vitamin|Thiamine|Riboflavin|Niacin|Pantothenic Acid|Pyridoxine|Biotin|Folate|Ascorbic Acid/i.test(norm)) return 'mg';
+        if (/Sodium|Potassium|Calcium|Magnesium|Phosphorus|Iron|Zinc|Copper|Manganese|Iodine|Selenium/i.test(norm)) return 'mg';
+        return 'mg';
+    };
+
+    const displayValue = (value: number, label: string, fullName?: string) => `${value.toFixed(1)} ${nutrientUnit(label, fullName)}`;
+
     return (
         <div className="space-y-4">
             {/* Header */}
@@ -302,7 +312,7 @@ export function NutritionDisplay({
                                             v.pct >= 100 ? 'text-emerald-400' : v.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                         )}
                                     >
-                                        {v.val.toFixed(1)}
+                                        {displayValue(v.val, v.label, v.fullName)}
                                     </span>
                                 </Link>
                             );
@@ -362,7 +372,7 @@ export function NutritionDisplay({
                                             m.pct >= 100 ? 'text-emerald-400' : m.pct >= universalThreshold ? 'text-amber-400' : 'text-slate-400'
                                         )}
                                     >
-                                        {m.val.toFixed(1)} mg
+                                        {displayValue(m.val, m.label)}
                                     </span>
                                 </Link>
                             );
