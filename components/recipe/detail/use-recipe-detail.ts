@@ -196,14 +196,14 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     // Auto-run smart match when entering nutrition tab for recipes without data
     useEffect(() => {
-        if (activeSection === 'nutrition' && recipe && ingredients.length > 0) {
+        if (activeSection === 'nutrition' && recipe && !loading && ingredients.length > 0) {
             const hasData = recipe.calories > 0 && recipe.micronutrients && Object.keys(recipe.micronutrients).length > 0;
             if (!hasData && Object.keys(matchedIngredients).length === 0 && !smartMatchRunning) {
                 // Auto-run smart match for recipes without nutrition data
                 runAutoMatch();
             }
         }
-    }, [activeSection, recipe, ingredients, matchedIngredients, smartMatchRunning]);
+    }, [activeSection, recipe, loading, ingredients, matchedIngredients, smartMatchRunning]);
 
     // Check if step 1 is complete
     const isStep1Complete = ingredients.length > 0 && ingredients.every(i => acceptedMatches[i.id] || skippedIngredients[i.id]);
