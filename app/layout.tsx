@@ -59,9 +59,6 @@ export default function RootLayout({
                       document.documentElement.classList.toggle('dark', prefersDark);
                     } else if (themes.includes(stored)) {
                       document.documentElement.classList.add(stored);
-                      if (stored === 'neon') {
-                        document.documentElement.classList.add('dark');
-                      }
                     }
                   } catch (e) { }
                 })();

@@ -8,6 +8,9 @@ declare module 'next/link';
 declare module 'next/font/google';
 declare module '@vercel/analytics/next';
 declare module 'lucide-react';
+declare module '*.css';
+declare module '*.scss';
+declare module '*.sass';
 
 declare namespace JSX {
   interface IntrinsicElements {
