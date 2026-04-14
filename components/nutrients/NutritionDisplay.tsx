@@ -73,6 +73,9 @@ export function NutritionDisplay({
         return orderA !== orderB ? orderA - orderB : a.label.localeCompare(b.label);
     });
 
+    const fullVitamins = sortedVitamins;
+    const fullMinerals = micronutrients.electrolytes.concat(micronutrients.trace);
+
     return (
         <div className="space-y-4">
             {/* Header */}
@@ -276,14 +279,13 @@ export function NutritionDisplay({
                         <div className="flex items-center justify-between">
                             <div className="text-sm font-black uppercase tracking-widest text-violet-500">Vitamins</div>
                             <div className="text-xs font-bold text-violet-700 bg-violet-100 dark:bg-violet-500/10 dark:text-violet-200 px-2.5 py-1 rounded-full">
-                                {micronutrients.waterSoluble.concat(micronutrients.fatSoluble).filter(v => v.pct >= universalThreshold).length} /{' '}
-                                {micronutrients.waterSoluble.length + micronutrients.fatSoluble.length}
+                                {fullVitamins.filter(v => v.pct >= universalThreshold).length} / {fullVitamins.length}
                             </div>
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Showing the full vitamins list; threshold only changes highlight color.</div>
                     </div>
                     <div className="space-y-2">
-                        {sortedVitamins.map(v => {
+                        {fullVitamins.map(v => {
                             const meetsThreshold = v.pct >= universalThreshold;
                             return (
                                 <Link 
@@ -337,14 +339,13 @@ export function NutritionDisplay({
                         <div className="flex items-center justify-between">
                             <div className="text-sm font-black uppercase tracking-widest text-cyan-500">Minerals</div>
                             <div className="text-xs font-bold text-cyan-700 bg-cyan-100 dark:bg-cyan-500/10 dark:text-cyan-200 px-2.5 py-1 rounded-full">
-                                {micronutrients.electrolytes.concat(micronutrients.trace).filter(v => v.pct >= universalThreshold).length} /{' '}
-                                {micronutrients.electrolytes.length + micronutrients.trace.length}
+                                {fullMinerals.filter(m => m.pct >= universalThreshold).length} / {fullMinerals.length}
                             </div>
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Threshold: ≥ {universalThreshold}% RDA</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Showing the full minerals list; threshold only changes highlight color.</div>
                     </div>
                     <div className="space-y-2">
-                        {micronutrients.electrolytes.concat(micronutrients.trace).map(m => {
+                        {fullMinerals.map(m => {
                             const meetsThreshold = m.pct >= universalThreshold;
                             return (
                                 <Link 
