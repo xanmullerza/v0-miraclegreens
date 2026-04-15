@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Trash2, Save, Loader2, Camera, Wand2, Beaker } from 'lucide-react';
+import { Plus, Minus, Trash2, Save, Loader2, Camera, Wand2, Beaker } from 'lucide-react';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
 
 interface RecipeBuilderPanelProps {
@@ -173,13 +173,27 @@ export function RecipeBuilderPanel({
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Servings
                             </label>
-                            <input
-                                type="number"
-                                value={recipeServings}
-                                onChange={(e) => setRecipeServings(Number(e.target.value))}
-                                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                min="1"
-                            />
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setRecipeServings(Math.max(1, recipeServings - 1))}
+                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                >
+                                    <Minus size={16} />
+                                </button>
+                                <input
+                                    type="number"
+                                    value={recipeServings}
+                                    onChange={(e) => setRecipeServings(Math.max(1, Number(e.target.value)))}
+                                    className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
+                                    min="1"
+                                />
+                                <button
+                                    onClick={() => setRecipeServings(recipeServings + 1)}
+                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                >
+                                    <Plus size={16} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -188,25 +202,53 @@ export function RecipeBuilderPanel({
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Prep Time (min)
                             </label>
-                            <input
-                                type="number"
-                                value={recipePrepTime}
-                                onChange={(e) => setRecipePrepTime(Number(e.target.value))}
-                                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                min="0"
-                            />
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setRecipePrepTime(Math.max(0, recipePrepTime - 5))}
+                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                >
+                                    <Minus size={16} />
+                                </button>
+                                <input
+                                    type="number"
+                                    value={recipePrepTime}
+                                    onChange={(e) => setRecipePrepTime(Math.max(0, Number(e.target.value)))}
+                                    className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
+                                    min="0"
+                                />
+                                <button
+                                    onClick={() => setRecipePrepTime(recipePrepTime + 5)}
+                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                >
+                                    <Plus size={16} />
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Cook Time (min)
                             </label>
-                            <input
-                                type="number"
-                                value={recipeCookTime}
-                                onChange={(e) => setRecipeCookTime(Number(e.target.value))}
-                                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                min="0"
-                            />
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setRecipeCookTime(Math.max(0, recipeCookTime - 5))}
+                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                >
+                                    <Minus size={16} />
+                                </button>
+                                <input
+                                    type="number"
+                                    value={recipeCookTime}
+                                    onChange={(e) => setRecipeCookTime(Math.max(0, Number(e.target.value)))}
+                                    className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
+                                    min="0"
+                                />
+                                <button
+                                    onClick={() => setRecipeCookTime(recipeCookTime + 5)}
+                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                >
+                                    <Plus size={16} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
