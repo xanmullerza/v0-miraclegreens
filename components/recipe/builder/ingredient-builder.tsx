@@ -69,7 +69,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                     </div>
 
                     {ingredients.length > 0 ? (
-                        <div className="space-y-2 pb-32">
+                        <div className="space-y-2">
                             {ingredients.map((ing, idx) => (
                                 <IngredientRow
                                     key={`${ing.food_item_id}-${idx}`}
@@ -83,18 +83,8 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                                     handleRemoveIngredient={handleRemoveIngredient}
                                 />
                             ))}
-                        </div>
-                    ) : (
-                        <div className="py-12 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/10 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace is empty</p>
-                        </div>
-                    )}
-
-
-                    {hasIngredients && (
-                        <>
-                            {onNext && (
-                                <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
+                            {hasIngredients && onNext && (
+                                <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800 pb-32">
                                     <Button 
                                         onClick={onNext}
                                         className="bg-violet-600 hover:bg-violet-700 text-white gap-2 min-w-[200px] font-black text-[10px] uppercase tracking-widest h-12 rounded-xl shadow-lg shadow-violet-500/20"
@@ -103,7 +93,11 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                                     </Button>
                                 </div>
                             )}
-                        </>
+                        </div>
+                    ) : (
+                        <div className="py-12 flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/10 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace is empty</p>
+                        </div>
                     )}
                 </div>
             </div>
