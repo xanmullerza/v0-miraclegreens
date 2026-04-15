@@ -66,7 +66,7 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
                     <div className="flex items-center justify-center mb-4">
                         <h3 className="text-lg font-bold flex items-center gap-3">
                             <Plus className="w-5 h-5 text-violet-500" />
-                            Ingredients
+                            Step 1: Add Ingredient
                         </h3>
                         <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest opacity-60">
                             {ingredients.length} items added
