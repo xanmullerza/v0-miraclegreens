@@ -321,7 +321,8 @@ export function RecipeBuilderPanel({
                     <div className="flex flex-col gap-3 mt-8">
                         {/* Save Options Dialog */}
                         <Dialog open={showSaveOptions} onOpenChange={setShowSaveOptions}>
-                            <DialogContent className="sm:max-w-md">
+                            <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm animate-in fade-in-0 duration-200" />
+                            <DialogContent className="sm:max-w-md border-0 rounded-3xl px-8 py-6 relative z-[110]">
                                 <DialogHeader>
                                     <DialogTitle className="text-center text-lg font-bold">Save Recipe</DialogTitle>
                                 </DialogHeader>
