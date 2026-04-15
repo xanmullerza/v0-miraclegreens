@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, Minus, Trash2, Save, Loader2, Camera, Wand2, Beaker } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
 
 interface RecipeBuilderPanelProps {
@@ -58,6 +59,8 @@ export function RecipeBuilderPanel({
     handleRecipeImageUpload,
     handleSaveRecipe
 }: RecipeBuilderPanelProps) {
+    const [showSaveOptions, setShowSaveOptions] = useState(false);
+
     return (
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 p-4">
             {/* Step Title */}
@@ -259,9 +262,17 @@ export function RecipeBuilderPanel({
                     <div className="flex gap-2 mt-4">
                         <button
                             onClick={() => setRecipeStep(2)}
-                            className="flex-1 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-sm transition-colors"
+                            className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold uppercase tracking-widest text-[10px] transition-all"
                         >
                             ← Back
+                        </button>
+                        <button
+                            onClick={() => setShowSaveOptions(true)}
+                            disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
+                            className="flex-[2] px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                            <span>Save</span>
                         </button>
                     </div>
 
@@ -308,38 +319,63 @@ export function RecipeBuilderPanel({
                     </div>
 
                     <div className="flex flex-col gap-3 mt-8">
-                        {/* Primary Save Button */}
-                        <button
-                            onClick={() => handleSaveRecipe(false, false)}
-                            disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
-                            className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                            {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                            <span className="text-[10px]">Save as Recipe</span>
-                        </button>
+                        {/* Save Options Dialog */}
+                        <Dialog open={showSaveOptions} onOpenChange={setShowSaveOptions}>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle className="text-center text-lg font-bold">Save Recipe</DialogTitle>
+                                </DialogHeader>
+                                <div className="flex flex-col gap-3 mt-4">
+                                    {/* Save as Recipe */}
+                                    <button
+                                        onClick={() => {
+                                            handleSaveRecipe(false, false);
+                                            setShowSaveOptions(false);
+                                        }}
+                                        disabled={recipeSaving}
+                                        className="w-full h-16 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                                    >
+                                        {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                        <div className="text-left">
+                                            <div className="text-sm font-bold">Recipe</div>
+                                            <div className="text-xs opacity-80">Save as a new recipe</div>
+                                        </div>
+                                    </button>
 
-                        {/* Secondary Action Buttons */}
-                        <div className="flex gap-3">
-                            {/* Remix Button */}
-                            <button
-                                onClick={() => handleSaveRecipe(false, true)}
-                                disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0}
-                                className="flex-1 h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex flex-col items-center justify-center gap-1 disabled:opacity-50 border border-indigo-400/30"
-                            >
-                                <Wand2 size={14} className="mb-0.5" />
-                                <span className="text-[9px]">Save as Remix</span>
-                            </button>
+                                    {/* Save as Remix */}
+                                    <button
+                                        onClick={() => {
+                                            handleSaveRecipe(false, true);
+                                            setShowSaveOptions(false);
+                                        }}
+                                        disabled={recipeSaving}
+                                        className="w-full h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-3 disabled:opacity-50 border border-indigo-400/30"
+                                    >
+                                        <Wand2 size={16} />
+                                        <div className="text-left">
+                                            <div className="text-sm font-bold">Remix</div>
+                                            <div className="text-xs opacity-80">Save as a remix variation</div>
+                                        </div>
+                                    </button>
 
-                            {/* Mix Button */}
-                            <button
-                                onClick={() => handleSaveRecipe(true, false)}
-                                disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0}
-                                className="flex-1 h-16 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-amber-600/20 flex flex-col items-center justify-center gap-1 disabled:opacity-50 border border-amber-400/30"
-                            >
-                                <Beaker size={14} className="mb-0.5" />
-                                <span className="text-[9px]">Save as Mix</span>
-                            </button>
-                        </div>
+                                    {/* Save as Mix */}
+                                    <button
+                                        onClick={() => {
+                                            handleSaveRecipe(true, false);
+                                            setShowSaveOptions(false);
+                                        }}
+                                        disabled={recipeSaving}
+                                        className="w-full h-16 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-amber-600/20 flex items-center justify-center gap-3 disabled:opacity-50 border border-amber-400/30"
+                                    >
+                                        <Beaker size={16} />
+                                        <div className="text-left">
+                                            <div className="text-sm font-bold">Mix</div>
+                                            <div className="text-xs opacity-80">Save as a mix combination</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </>
             )}
