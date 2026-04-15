@@ -152,7 +152,8 @@ export function RecipeBuilderPanel({
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Meal Type */}
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Meal Type
@@ -169,84 +170,87 @@ export function RecipeBuilderPanel({
                                 <option value="supplement">Supplement</option>
                             </select>
                         </div>
+
+                        {/* Servings */}
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Servings
                             </label>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                                 <button
                                     onClick={() => setRecipeServings(Math.max(1, recipeServings - 1))}
-                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    <Minus size={16} />
+                                    <Minus size={14} />
                                 </button>
                                 <input
                                     type="number"
                                     value={recipeServings}
                                     onChange={(e) => setRecipeServings(Math.max(1, Number(e.target.value)))}
-                                    className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
+                                    className="h-full flex-1 px-2 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
                                     min="1"
                                 />
                                 <button
                                     onClick={() => setRecipeServings(recipeServings + 1)}
-                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    <Plus size={16} />
+                                    <Plus size={14} />
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                        {/* Prep Time */}
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Prep Time (min)
                             </label>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                                 <button
                                     onClick={() => setRecipePrepTime(Math.max(0, recipePrepTime - 5))}
-                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    <Minus size={16} />
+                                    <Minus size={14} />
                                 </button>
                                 <input
                                     type="number"
                                     value={recipePrepTime}
                                     onChange={(e) => setRecipePrepTime(Math.max(0, Number(e.target.value)))}
-                                    className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
+                                    className="h-full flex-1 px-2 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
                                     min="0"
                                 />
                                 <button
                                     onClick={() => setRecipePrepTime(recipePrepTime + 5)}
-                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    <Plus size={16} />
+                                    <Plus size={14} />
                                 </button>
                             </div>
                         </div>
+
+                        {/* Cook Time */}
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Cook Time (min)
                             </label>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                                 <button
                                     onClick={() => setRecipeCookTime(Math.max(0, recipeCookTime - 5))}
-                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    <Minus size={16} />
+                                    <Minus size={14} />
                                 </button>
                                 <input
                                     type="number"
                                     value={recipeCookTime}
                                     onChange={(e) => setRecipeCookTime(Math.max(0, Number(e.target.value)))}
-                                    className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center"
+                                    className="h-full flex-1 px-2 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
                                     min="0"
                                 />
                                 <button
                                     onClick={() => setRecipeCookTime(recipeCookTime + 5)}
-                                    className="h-10 w-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-colors"
+                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    <Plus size={16} />
+                                    <Plus size={14} />
                                 </button>
                             </div>
                         </div>
