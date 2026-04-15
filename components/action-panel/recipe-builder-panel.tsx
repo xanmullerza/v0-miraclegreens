@@ -59,7 +59,7 @@ export function RecipeBuilderPanel({
             {/* Step Title */}
             <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">
-                    {recipeStep === 1 ? 'Step 1: Add Ingredients' : recipeStep === 2 ? 'Step 2: Instructions' : recipeStep === 3 ? 'Step 3: Recipe Details' : 'Step 4: Finalize'}
+                    {recipeStep === 1 ? 'Step 1: Add Ingredients' : recipeStep === 2 ? 'Step 2: Instructions' : 'Step 3: Finalize Recipe'}
                 </h3>
             </div>
 
@@ -124,7 +124,7 @@ export function RecipeBuilderPanel({
                             disabled={recipeInstructions.filter(i => i.trim()).length === 0}
                             className="flex-[2] px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
                         >
-                            Next: Details →
+                            Next: Finalize →
                         </button>
                     </div>
                 </>
@@ -192,20 +192,9 @@ export function RecipeBuilderPanel({
                         >
                             ← Back
                         </button>
-                        <button
-                            onClick={() => setRecipeStep(4)}
-                            disabled={!recipeTitle.trim()}
-                            className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Next: Finalize →
-                        </button>
                     </div>
-                </>
-            )}
 
-            {recipeStep === 4 && (
-                <>
-                    <div>
+                    <div className="mt-6">
                         <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                             Recipe Photo (Optional)
                         </label>
@@ -280,16 +269,11 @@ export function RecipeBuilderPanel({
                                 <span className="text-[9px]">Save as Mix</span>
                             </button>
                         </div>
-
-                        <button
-                            onClick={() => setRecipeStep(3)}
-                            className="w-full py-2.5 rounded-xl text-slate-400 hover:text-slate-600 font-bold text-[10px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2 mt-4"
-                        >
-                            ← Back to Steps
-                        </button>
                     </div>
                 </>
             )}
+
+
         </div>
     );
 }
