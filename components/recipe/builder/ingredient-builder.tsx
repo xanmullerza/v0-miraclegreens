@@ -69,7 +69,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                     </div>
 
                     {ingredients.length > 0 ? (
-                        <div className="space-y-2">
+                        <div className="space-y-2 pb-32">
                             {ingredients.map((ing, idx) => (
                                 <IngredientRow
                                     key={`${ing.food_item_id}-${idx}`}
