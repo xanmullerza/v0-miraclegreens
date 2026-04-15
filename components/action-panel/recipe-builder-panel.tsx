@@ -77,16 +77,10 @@ export function RecipeBuilderPanel({
 
             {recipeStep === 2 && (
                 <>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-3">
+                    <div className="flex flex-col px-2 gap-3">
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Add Directions</h4>
                         </div>
-                        <button
-                            onClick={handleAddInstruction}
-                            className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest rounded-lg px-4"
-                        >
-                            {recipeInstructions.length === 0 ? 'Add your first direction' : 'Add direction'}
-                        </button>
                     </div>
                     <div className="space-y-2 pt-4">
                         {recipeInstructions.map((step, idx) => (
@@ -110,6 +104,15 @@ export function RecipeBuilderPanel({
                                 )}
                             </div>
                         ))}
+                    </div>
+
+                    <div className="mt-4">
+                        <button
+                            onClick={handleAddInstruction}
+                            className="w-full h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest rounded-lg px-4"
+                        >
+                            {recipeInstructions.length === 0 ? 'Add your first direction' : 'Add direction'}
+                        </button>
                     </div>
 
                     <div className="flex gap-2 mt-4 pb-32">
