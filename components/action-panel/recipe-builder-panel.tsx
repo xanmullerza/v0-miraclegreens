@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Plus, Minus, Trash2, Save, Loader2, Camera, Wand2, Beaker } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Plus, Minus, Trash2, Save, Loader2, Camera, Wand2, Beaker, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
 
 interface RecipeBuilderPanelProps {
@@ -322,10 +322,13 @@ export function RecipeBuilderPanel({
                         {/* Save Options Dialog */}
                         <Dialog open={showSaveOptions} onOpenChange={setShowSaveOptions}>
                             <DialogContent className="sm:max-w-md border-0 rounded-3xl px-8 py-6">
-                                <DialogHeader>
-                                    <DialogTitle className="text-center text-lg font-bold">Save Recipe</DialogTitle>
-                                </DialogHeader>
-                                <div className="flex flex-col gap-3 mt-4">
+                                <DialogClose asChild>
+                                    <button className="absolute right-4 top-4 h-10 w-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-sm hover:bg-rose-700 transition-colors">
+                                        <X className="h-4 w-4" />
+                                        <span className="sr-only">Close</span>
+                                    </button>
+                                </DialogClose>
+                                <div className="flex flex-col gap-3 mt-2">
                                     {/* Save as Recipe */}
                                     <button
                                         onClick={() => {
@@ -333,7 +336,7 @@ export function RecipeBuilderPanel({
                                             setShowSaveOptions(false);
                                         }}
                                         disabled={recipeSaving}
-                                        className="w-full h-16 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                                        className="w-full h-20 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50"
                                     >
                                         {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                         <div className="text-left">
@@ -349,7 +352,7 @@ export function RecipeBuilderPanel({
                                             setShowSaveOptions(false);
                                         }}
                                         disabled={recipeSaving}
-                                        className="w-full h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-3 disabled:opacity-50 border border-indigo-400/30"
+                                        className="w-full h-20 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50 border border-indigo-400/30"
                                     >
                                         <Wand2 size={16} />
                                         <div className="text-left">
@@ -365,7 +368,7 @@ export function RecipeBuilderPanel({
                                             setShowSaveOptions(false);
                                         }}
                                         disabled={recipeSaving}
-                                        className="w-full h-16 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-amber-600/20 flex items-center justify-center gap-3 disabled:opacity-50 border border-amber-400/30"
+                                        className="w-full h-20 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-amber-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50 border border-amber-400/30"
                                     >
                                         <Beaker size={16} />
                                         <div className="text-left">
