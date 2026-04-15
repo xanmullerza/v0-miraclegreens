@@ -27,19 +27,9 @@ export function IngredientRow({
     const allOptions = hasGrams ? measures : [{ label: 'g', weight_g: 1 }, ...measures];
 
     return (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group">
-            {/* Delete Button */}
-            <button
-                type="button"
-                onClick={() => handleRemoveIngredient(index)}
-                className="shrink-0 w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all"
-                title="Delete Ingredient"
-            >
-                <Trash2 size={14} />
-            </button>
-
+        <div className="flex flex-col gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group">
             {/* Ingredient Name */}
-            <div className="flex-1 min-w-0 flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
                 {editingNameIndex === index ? (
                     <input
                         type="text"
@@ -51,38 +41,30 @@ export function IngredientRow({
                         className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-sm w-full outline-none"
                     />
                 ) : (
-                    <>
-                        <div 
-                            onClick={() => setEditingNameIndex(index)}
-                            className="font-bold text-slate-900 dark:text-white truncate text-sm cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex-1"
-                        >
-                            {ing.food_item_name}
-                        </div>
-                        {ing.source === 'usda' ? (
-                            <Globe size={12} className="shrink-0 text-blue-500" title="From USDA API" />
-                        ) : (
-                            <Database size={12} className="shrink-0 text-green-500" title="From Local Database" />
-                        )}
-                    </>
+                    <div
+                        onClick={() => setEditingNameIndex(index)}
+                        className="font-bold text-slate-900 dark:text-white truncate text-sm cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                    >
+                        {ing.food_item_name}
+                    </div>
                 )}
             </div>
 
             {/* Quantity and Measure */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 flex-wrap">
                 <input
                     type="number"
                     value={ing.quantity}
                     onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                    className="w-14 h-8 px-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                    className="w-20 h-9 px-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                     min="0"
                     step="0.125"
                 />
-                
                 {allOptions.length > 1 ? (
                     <select
                         value={ing.measure_label}
                         onChange={(e) => handleUpdateMeasure(index, e.target.value)}
-                        className="h-8 pl-2 pr-8 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 border-none outline-none appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        className="min-w-[120px] h-9 pl-2 pr-8 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 border-none outline-none appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         style={{
                             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='C19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                             backgroundRepeat: 'no-repeat',
@@ -95,12 +77,36 @@ export function IngredientRow({
                         ))}
                     </select>
                 ) : (
-                    <div className="px-2 h-8 flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
+                    <div className="px-3 h-9 flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
                         {ing.measure_label}
                     </div>
                 )}
             </div>
 
+            {/* Source and Delete */}
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                    {ing.source === 'usda' ? (
+                        <>
+                            <Globe size={14} className="text-blue-500" />
+                            USDA API
+                        </>
+                    ) : (
+                        <>
+                            <Database size={14} className="text-green-500" />
+                            Local DB
+                        </>
+                    )}
+                </div>
+                <button
+                    type="button"
+                    onClick={() => handleRemoveIngredient(index)}
+                    className="shrink-0 w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all"
+                    title="Delete Ingredient"
+                >
+                    <Trash2 size={14} />
+                </button>
+            </div>
         </div>
     );
 }
