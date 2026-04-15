@@ -403,12 +403,8 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                                             };
 
                                             const getSourceLabel = () => {
-                                                if (!isUSDA) return 'Local';
-                                                if (dataType.includes('SR Legacy')) return 'USDA Raw';
-                                                if (dataType.includes('Foundation')) return 'USDA Found';
-                                                if (dataType.includes('Survey')) return 'USDA Survey';
-                                                if (dataType.includes('Branded')) return 'Branded';
-                                                return 'USDA';
+                                                if (!isUSDA) return 'Local DB';
+                                                return 'USDA API';
                                             };
 
                                             return (

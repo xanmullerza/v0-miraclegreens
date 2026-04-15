@@ -59,11 +59,23 @@ export function RecipeBuilderPanel({
             {/* Step Title */}
             <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">
-                    {recipeStep === 1 ? 'Step 1: Recipe Details' : recipeStep === 2 ? 'Step 2: Ingredients' : recipeStep === 3 ? 'Step 3: Instructions' : 'Step 4: Finalize'}
+                    {recipeStep === 1 ? 'Step 1: Add Ingredients' : recipeStep === 2 ? 'Step 2: Recipe Details' : recipeStep === 3 ? 'Step 3: Instructions' : 'Step 4: Finalize'}
                 </h3>
             </div>
 
             {recipeStep === 1 && (
+                <>
+                    <IngredientBuilder
+                        ref={builderRef}
+                        ingredients={recipeIngredients}
+                        onChange={setRecipeIngredients}
+                        initialShowPicker={recipeIngredients.length === 0}
+                        onNext={() => setRecipeStep(2)}
+                    />
+                </>
+            )}
+
+            {recipeStep === 2 && (
                 <>
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
@@ -118,25 +130,6 @@ export function RecipeBuilderPanel({
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => setRecipeStep(2)}
-                        disabled={!recipeTitle.trim()}
-                        className="w-full px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-                    >
-                        Next: Add Ingredients →
-                    </button>
-                </>
-            )}
-
-            {recipeStep === 2 && (
-                <>
-                    <IngredientBuilder
-                        ref={builderRef}
-                        ingredients={recipeIngredients}
-                        onChange={setRecipeIngredients}
-                        initialShowPicker={recipeIngredients.length === 0}
-                    />
-
                     <div className="flex gap-2 mt-4">
                         <button
                             onClick={() => setRecipeStep(1)}
@@ -146,7 +139,7 @@ export function RecipeBuilderPanel({
                         </button>
                         <button
                             onClick={() => setRecipeStep(3)}
-                            disabled={recipeIngredients.length === 0}
+                            disabled={!recipeTitle.trim()}
                             className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Next: Instructions →
