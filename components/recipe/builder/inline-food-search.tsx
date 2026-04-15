@@ -122,30 +122,33 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
 
             {results.length > 0 && (
                 <div className="max-h-[12rem] overflow-y-auto space-y-1 pr-1 custom-scrollbar">
-                    {results.map((item, idx) => (
-                        <button
-                            key={`${item.source}-${item.id || item.fdcId || idx}`}
-                            onClick={() => handleSelectItem(item)}
-                            className="w-full text-left p-2 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-900/20 border border-transparent hover:border-violet-200 dark:hover:border-violet-800 transition-all flex flex-col gap-2 group"
-                        >
-                            <div className="flex items-center justify-between gap-3">
-                                <div className="min-w-0 flex-1">
-                                    <div className="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-violet-600 dark:group-hover:text-violet-400">
-                                        {item.name}
+                    {results.map((item, idx) => {
+                        const displayName = item.source === 'local' && item.common_name ? item.common_name : item.name;
+                        return (
+                            <button
+                                key={`${item.source}-${item.id || item.fdcId || idx}`}
+                                onClick={() => handleSelectItem(item)}
+                                className="w-full text-left p-2 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-900/20 border border-transparent hover:border-violet-200 dark:hover:border-violet-800 transition-all flex flex-col gap-2 group"
+                            >
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                                            {displayName}
+                                        </div>
+                                        <div className="text-[9px] text-slate-500 font-medium">
+                                            {Math.round(item.energy_kcal)} kcal • P: {item.protein_g?.toFixed(1)}g
+                                        </div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500 font-medium">
-                                        {Math.round(item.energy_kcal)} kcal • P: {item.protein_g?.toFixed(1)}g
-                                    </div>
+                                    <span className={`text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full ${item.source === 'local' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-sky-50 text-sky-700 border border-sky-100'}`}>
+                                        {item.source === 'local' ? 'Local DB' : 'USDA API'}
+                                    </span>
                                 </div>
-                                <span className={`text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full ${item.source === 'local' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-sky-50 text-sky-700 border border-sky-100'}`}>
-                                    {item.source === 'local' ? 'Local DB' : 'USDA API'}
-                                </span>
-                            </div>
-                            <div className="self-end shrink-0 w-6 h-6 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Plus size={12} className="text-violet-500" />
-                            </div>
-                        </button>
-                    ))}
+                                <div className="self-end shrink-0 w-6 h-6 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Plus size={12} className="text-violet-500" />
+                                </div>
+                            </button>
+                        );
+                    })}
                 </div>
             )}
         </div>

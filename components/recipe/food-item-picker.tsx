@@ -424,17 +424,21 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                                                         <div className="flex flex-col flex-1 min-w-0">
                                                             <div className="flex items-center gap-2">
                                                                 <div className="font-bold text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-400 flex-1 truncate">
-                                                                    {item.name}
+                                                                    {item.source === 'local' && item.common_name ? item.common_name : item.name}
                                                                 </div>
                                                                 <span className={`text-[8px] py-1 px-2 rounded-full font-black uppercase shrink-0 border ${getSourceStyle()}`}>
                                                                     {getSourceLabel()}
                                                                 </span>
                                                             </div>
-                                                            {item.common_name && (
+                                                            {item.source === 'local' && item.common_name ? (
+                                                                <div className="text-[10px] text-muted-foreground opacity-60 truncate">
+                                                                    {item.name}
+                                                                </div>
+                                                            ) : item.common_name ? (
                                                                 <div className="text-[10px] text-muted-foreground opacity-60 truncate">
                                                                     {item.common_name}
                                                                 </div>
-                                                            )}
+                                                            ) : null}
                                                         </div>
                                                     </div>
                                                     <div className="text-xs text-muted-foreground mt-2 flex gap-2">
