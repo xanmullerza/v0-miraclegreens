@@ -117,6 +117,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                 onSelect({
                     id: item.id,
                     name: item.name,
+                    common_name: item.common_name,
                     energy_kcal: item.energy_kcal,
                     energy_kj: item.energy_kj,
                     protein_g: item.protein_g,
@@ -161,6 +162,7 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                 onSelect({
                     id: localId,
                     name: detailedItem.name,
+                    common_name: detailedItem.common_name,
                     energy_kcal: detailedItem.energy_kcal,
                     energy_kj: detailedItem.energy_kj,
                     protein_g: detailedItem.protein_g,
