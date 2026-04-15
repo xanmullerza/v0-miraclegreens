@@ -59,7 +59,7 @@ export function RecipeBuilderPanel({
             {/* Step Title */}
             <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">
-                    {recipeStep === 1 ? 'Step 1: Add Ingredients' : recipeStep === 2 ? 'Step 2: Recipe Details' : recipeStep === 3 ? 'Step 3: Instructions' : 'Step 4: Finalize'}
+                    {recipeStep === 1 ? 'Step 1: Add Ingredients' : recipeStep === 2 ? 'Step 2: Instructions' : recipeStep === 3 ? 'Step 3: Recipe Details' : 'Step 4: Finalize'}
                 </h3>
             </div>
 
@@ -76,6 +76,61 @@ export function RecipeBuilderPanel({
             )}
 
             {recipeStep === 2 && (
+                <>
+                    <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
+                            Cooking Steps *
+                        </label>
+                        <button
+                            onClick={handleAddInstruction}
+                            className="text-xs font-bold uppercase tracking-widest text-emerald-500 hover:text-emerald-600 flex items-center gap-1"
+                        >
+                            <Plus size={12} /> Add
+                        </button>
+                    </div>
+                    <div className="space-y-2">
+                        {recipeInstructions.map((step, idx) => (
+                            <div key={idx} className="flex gap-2 group">
+                                <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center font-black text-[10px] text-muted-foreground shrink-0 border border-border">
+                                    {idx + 1}
+                                </div>
+                                <textarea
+                                    value={step}
+                                    onChange={(e) => handleUpdateInstruction(idx, e.target.value)}
+                                    placeholder={`Step ${idx + 1}...`}
+                                    className="flex-1 px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[50px] resize-none"
+                                />
+                                {recipeInstructions.length > 1 && (
+                                    <button
+                                        onClick={() => handleRemoveInstruction(idx)}
+                                        className="p-1 text-slate-400 hover:text-rose-500 transition-colors shrink-0 mt-1"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex gap-2 mt-4">
+                        <button
+                            onClick={() => setRecipeStep(1)}
+                            className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-widest text-[10px] transition-all hover:bg-slate-300 dark:hover:bg-slate-700"
+                        >
+                            ← Back
+                        </button>
+                        <button
+                            onClick={() => setRecipeStep(3)}
+                            disabled={recipeInstructions.filter(i => i.trim()).length === 0}
+                            className="flex-[2] px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                        >
+                            Next: Details →
+                        </button>
+                    </div>
+                </>
+            )}
+
+            {recipeStep === 3 && (
                 <>
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
@@ -132,70 +187,15 @@ export function RecipeBuilderPanel({
 
                     <div className="flex gap-2 mt-4">
                         <button
-                            onClick={() => setRecipeStep(1)}
+                            onClick={() => setRecipeStep(2)}
                             className="flex-1 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium text-sm transition-colors"
                         >
                             ← Back
                         </button>
                         <button
-                            onClick={() => setRecipeStep(3)}
+                            onClick={() => setRecipeStep(4)}
                             disabled={!recipeTitle.trim()}
                             className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Next: Instructions →
-                        </button>
-                    </div>
-                </>
-            )}
-
-            {recipeStep === 3 && (
-                <>
-                    <div className="flex items-center justify-between">
-                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
-                            Cooking Steps *
-                        </label>
-                        <button
-                            onClick={handleAddInstruction}
-                            className="text-xs font-bold uppercase tracking-widest text-emerald-500 hover:text-emerald-600 flex items-center gap-1"
-                        >
-                            <Plus size={12} /> Add
-                        </button>
-                    </div>
-                    <div className="space-y-2">
-                        {recipeInstructions.map((step, idx) => (
-                            <div key={idx} className="flex gap-2 group">
-                                <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center font-black text-[10px] text-muted-foreground shrink-0 border border-border">
-                                    {idx + 1}
-                                </div>
-                                <textarea
-                                    value={step}
-                                    onChange={(e) => handleUpdateInstruction(idx, e.target.value)}
-                                    placeholder={`Step ${idx + 1}...`}
-                                    className="flex-1 px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[50px] resize-none"
-                                />
-                                {recipeInstructions.length > 1 && (
-                                    <button
-                                        onClick={() => handleRemoveInstruction(idx)}
-                                        className="p-1 text-slate-400 hover:text-rose-500 transition-colors shrink-0 mt-1"
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex gap-2 mt-4">
-                        <button
-                            onClick={() => setRecipeStep(2)}
-                            className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-widest text-[10px] transition-all hover:bg-slate-300 dark:hover:bg-slate-700"
-                        >
-                            ← Back
-                        </button>
-                        <button
-                            onClick={() => setRecipeStep(4)}
-                            disabled={recipeInstructions.filter(i => i.trim()).length === 0}
-                            className="flex-[2] px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
                         >
                             Next: Finalize →
                         </button>
