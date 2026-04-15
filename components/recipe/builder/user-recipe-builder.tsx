@@ -73,16 +73,14 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
                             {ingredients.length} items added
                         </Badge>
                     </div>
-                    <Card className="p-4 shadow-sm border border-slate-100 dark:border-slate-800/50 bg-white dark:bg-slate-900/40 mb-4">
-                        <div className="flex justify-center">
-                            <Button
-                                onClick={() => setShowPicker(true)}
-                                className="h-12 bg-emerald-500 hover:bg-emerald-600 text-white px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3"
-                            >
-                                <Plus className="w-5 h-5" /> 🥕 Step 1: Add Ingredients
-                            </Button>
-                        </div>
-                    </Card>
+                    <div className="flex justify-center py-4">
+                        <Button
+                            onClick={() => setShowPicker(true)}
+                            className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all shadow-lg shadow-emerald-500/20"
+                        >
+                            <Plus className="w-5 h-5" /> 🥕 Step 1: Add Ingredients
+                        </Button>
+                    </div>
                     <IngredientBuilder
                         ingredients={ingredients}
                         onChange={setIngredients}
