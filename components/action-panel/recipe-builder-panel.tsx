@@ -77,18 +77,18 @@ export function RecipeBuilderPanel({
 
             {recipeStep === 2 && (
                 <>
-                    <div className="flex items-center justify-between">
-                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
-                            Cooking Steps *
-                        </label>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-3">
+                        <div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Add Directions</h4>
+                        </div>
                         <button
                             onClick={handleAddInstruction}
-                            className="text-xs font-bold uppercase tracking-widest text-emerald-500 hover:text-emerald-600 flex items-center gap-1"
+                            className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest rounded-lg px-4"
                         >
-                            <Plus size={12} /> Add
+                            {recipeInstructions.length === 0 ? 'Add your first direction' : 'Add direction'}
                         </button>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 pt-4">
                         {recipeInstructions.map((step, idx) => (
                             <div key={idx} className="flex gap-2 group">
                                 <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center font-black text-[10px] text-muted-foreground shrink-0 border border-border">
@@ -97,7 +97,7 @@ export function RecipeBuilderPanel({
                                 <textarea
                                     value={step}
                                     onChange={(e) => handleUpdateInstruction(idx, e.target.value)}
-                                    placeholder={`Step ${idx + 1}...`}
+                                    placeholder={`Direction ${idx + 1}...`}
                                     className="flex-1 px-3 py-2 rounded-lg bg-card border border-border text-foreground placeholder-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[50px] resize-none"
                                 />
                                 {recipeInstructions.length > 1 && (
