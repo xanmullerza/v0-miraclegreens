@@ -63,7 +63,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                 </div>
 
                 <div className="space-y-3">
-                    <div className="flex items-center justify-between px-2">
+                    <div className="flex items-center justify-center px-2">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Workspace / {ingredients.length} Items</h4>
                     </div>
 
