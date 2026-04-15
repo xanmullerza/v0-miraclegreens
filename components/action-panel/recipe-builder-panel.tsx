@@ -321,7 +321,7 @@ export function RecipeBuilderPanel({
                     <div className="flex flex-col gap-3 mt-8">
                         {/* Save Options Dialog */}
                         <Dialog open={showSaveOptions} onOpenChange={setShowSaveOptions}>
-                            <DialogContent className="sm:max-w-md border-0 rounded-3xl px-8 py-6">
+                            <DialogContent showCloseButton={false} className="sm:max-w-md border-0 rounded-3xl px-8 py-6 bg-transparent shadow-none">
                                 <DialogClose asChild>
                                     <button className="absolute right-4 top-4 h-10 w-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-sm hover:bg-rose-700 transition-colors">
                                         <X className="h-4 w-4" />
