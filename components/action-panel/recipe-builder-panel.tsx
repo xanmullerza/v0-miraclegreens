@@ -112,7 +112,7 @@ export function RecipeBuilderPanel({
                         ))}
                     </div>
 
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex gap-2 mt-4 pb-32">
                         <button
                             onClick={() => setRecipeStep(1)}
                             className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-widest text-[10px] transition-all hover:bg-slate-300 dark:hover:bg-slate-700"
