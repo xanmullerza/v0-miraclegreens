@@ -27,7 +27,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
             {/* Main Workspace */}
             <div className="space-y-6">
                 <div className="space-y-4">
-                    <div className="flex justify-end px-2">
+                    <div className="flex justify-center px-2">
                         {!hasIngredients && !showPicker ? (
                             <Button
                                 onClick={() => setShowPicker(true)}
