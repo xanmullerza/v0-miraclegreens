@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useRecipeWizard } from './use-recipe-wizard';
 import { InstructionsSection } from './instructions-section';
 import { MetadataSection } from './metadata-section';
@@ -28,7 +28,6 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
 
     const instructionsRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);
-    const [showPicker, setShowPicker] = useState(false);
 
     const onNextStep = () => {
         handleNextStep();
@@ -67,19 +66,11 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
                     <div className="flex items-center justify-center mb-4">
                         <h3 className="text-lg font-bold flex items-center gap-3">
                             <Plus className="w-5 h-5 text-violet-500" />
-                            Step 1: Add Ingredient
+                            Search for Ingredients to Add
                         </h3>
                         <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest opacity-60">
                             {ingredients.length} items added
                         </Badge>
-                    </div>
-                    <div className="flex justify-center py-4">
-                        <Button
-                            onClick={() => setShowPicker(true)}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all shadow-lg shadow-emerald-500/20"
-                        >
-                            <Plus className="w-5 h-5" /> 🥕 Step 1: Add Ingredients
-                        </Button>
                     </div>
                     <IngredientBuilder
                         ingredients={ingredients}
@@ -87,8 +78,6 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
                         initialShowPicker={startMode === 'manual'}
                         initialShowMagicPaste={startMode === 'magic'}
                         onNext={onNextStep}
-                        showPicker={showPicker}
-                        onShowPickerChange={setShowPicker}
                     />
                 </Card>
 
