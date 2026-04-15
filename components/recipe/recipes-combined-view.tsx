@@ -24,6 +24,15 @@ export function RecipesCombinedView({ onRecipeClick, isPremium, fullHeight }: Re
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const { navigateTo } = useActionPanel();
 
+    const dropdownOptions = [
+        {
+            id: 'create-recipe',
+            label: 'Create Recipe',
+            icon: <Plus size={16} />,
+            onClick: () => navigateTo('import')
+        }
+    ];
+
     return (
         <RecipeTabShell
             title="Cookbook"
@@ -34,6 +43,7 @@ export function RecipesCombinedView({ onRecipeClick, isPremium, fullHeight }: Re
             setSortField={setSortField}
             sortDirection={sortDirection}
             setSortDirection={setSortDirection}
+            dropdownOptions={dropdownOptions}
         >
             <RecipesView 
                 onRecipeClick={onRecipeClick}
