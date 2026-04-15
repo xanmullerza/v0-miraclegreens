@@ -70,4 +70,6 @@ export interface IngredientBuilderProps {
     initialShowPicker?: boolean;
     initialShowMagicPaste?: boolean;
     onNext?: () => void;
+    showPicker?: boolean;
+    onShowPickerChange?: (show: boolean) => void;
 }

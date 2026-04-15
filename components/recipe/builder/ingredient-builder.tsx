@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
 export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>((props, ref) => {
-    const { ingredients, onNext } = props;
+    const { ingredients, onNext, showPicker: externalShowPicker, onShowPickerChange } = props;
     const {
         showPicker, setShowPicker,
         editingNameIndex, setEditingNameIndex,
         isAdmin, handleAddIngredient,
         handleUpdateQuantity, handleRemoveIngredient,
         handleUpdateName, handleUpdateMeasure, totals, userRDAs, energyUnit
-    } = useIngredientBuilder(props);
+    } = useIngredientBuilder(props, externalShowPicker, onShowPickerChange);
 
     useImperativeHandle(ref, () => ({
         handleAddIngredient: (foodItem, initialValues) => handleAddIngredient(foodItem, initialValues)

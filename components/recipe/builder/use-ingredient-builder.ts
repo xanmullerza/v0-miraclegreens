@@ -3,11 +3,13 @@ import { RecipeIngredient, FoodItemData, IngredientBuilderProps, PendingIngredie
 import { FoodItemMatch } from '@/lib/services/nutrition';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
-export function useIngredientBuilder(props: IngredientBuilderProps) {
-    const { ingredients, onChange, initialShowMagicPaste = false } = props;
+export function useIngredientBuilder(props: IngredientBuilderProps, externalShowPicker?: boolean, externalSetShowPicker?: (show: boolean) => void) {
+    const { ingredients, onChange, initialShowMagicPaste = false, initialShowPicker = false } = props;
     const { profile, energyUnit, dailyTargets: userRDAs } = useUserPreferences();
 
-    const [showPicker, setShowPicker] = useState(false);
+    const [internalShowPicker, setInternalShowPicker] = useState(initialShowPicker);
+    const showPicker = externalShowPicker !== undefined ? externalShowPicker : internalShowPicker;
+    const setShowPicker = externalSetShowPicker || setInternalShowPicker;
     const [showMagicPaste, setShowMagicPaste] = useState(initialShowMagicPaste);
     const [magicText, setMagicText] = useState('');
     const [isParsing, setIsParsing] = useState(false);

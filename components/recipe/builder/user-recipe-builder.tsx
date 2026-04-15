@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useRecipeWizard } from './use-recipe-wizard';
 import { InstructionsSection } from './instructions-section';
 import { MetadataSection } from './metadata-section';
@@ -28,6 +28,7 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
 
     const instructionsRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);
+    const [showPicker, setShowPicker] = useState(false);
 
     const onNextStep = () => {
         handleNextStep();
@@ -72,12 +73,24 @@ export function UserRecipeBuilder({ defaultType = 'dinner', onSaveSuccess }: Use
                             {ingredients.length} items added
                         </Badge>
                     </div>
+                    <Card className="p-4 shadow-sm border border-slate-100 dark:border-slate-800/50 bg-white dark:bg-slate-900/40 mb-4">
+                        <div className="flex justify-center">
+                            <Button
+                                onClick={() => setShowPicker(true)}
+                                className="h-12 bg-emerald-500 hover:bg-emerald-600 text-white px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3"
+                            >
+                                <Plus className="w-5 h-5" /> 🥕 Step 1: Add Ingredients
+                            </Button>
+                        </div>
+                    </Card>
                     <IngredientBuilder
                         ingredients={ingredients}
                         onChange={setIngredients}
                         initialShowPicker={startMode === 'manual'}
                         initialShowMagicPaste={startMode === 'magic'}
                         onNext={onNextStep}
+                        showPicker={showPicker}
+                        onShowPickerChange={setShowPicker}
                     />
                 </Card>
 
