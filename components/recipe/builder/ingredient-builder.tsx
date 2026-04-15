@@ -36,7 +36,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                                 onClick={() => setShowPicker(true)}
                                 className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest"
                             >
-                                {ingredients.length === 0 ? 'Add your first ingredient' : 'Add ingredient'}
+                                Add ingredient
                             </Button>
                         ) : (
                             <Button
