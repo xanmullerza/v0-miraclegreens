@@ -40,6 +40,46 @@ function singularize(word: string): string {
     return lower;
 }
 
+function getSearchRelevance(query: string, name: string, commonName?: string): number {
+    const cleanQuery = query.trim().toLowerCase();
+    const lowerName = name.toLowerCase();
+    const lowerCommon = (commonName || '').toLowerCase();
+    const queryWords = cleanQuery.split(/\s+/).filter(Boolean);
+    let score = 0;
+
+    // Exact direct matches are best
+    if (lowerName === cleanQuery || lowerCommon === cleanQuery) score += 200;
+    if (lowerName.startsWith(cleanQuery) || lowerCommon.startsWith(cleanQuery)) score += 120;
+
+    // Whole-word matches are stronger than substring matches
+    queryWords.forEach((word) => {
+        if (!word) return;
+        const exactWord = ` ${word} `;
+        if (lowerName.includes(exactWord) || lowerCommon.includes(exactWord)) score += 80;
+        if (lowerName.includes(word) || lowerCommon.includes(word)) score += 20;
+    });
+
+    // Short names are often better for single-word queries
+    if (queryWords.length === 1) {
+        if (lowerName === cleanQuery) score += 40;
+        if (lowerCommon === cleanQuery) score += 40;
+        score += Math.max(0, 10 - lowerName.length / 5);
+    }
+
+    const processedKeywords = ['baked', 'cooked', 'fried', 'roasted', 'canned', 'stewed', 'grilled', 'smoked', 'deli', 'sliced'];
+    const rawKeywords = ['raw', 'fresh', 'whole', 'unsalted'];
+    const isProcessed = processedKeywords.some(k => lowerName.includes(k) || lowerCommon.includes(k));
+    const isRaw = rawKeywords.some(k => lowerName.includes(k) || lowerCommon.includes(k));
+    const queryIsProcessed = processedKeywords.some(k => cleanQuery.includes(k));
+
+    if (!queryIsProcessed) {
+        if (isRaw) score += 15;
+        if (isProcessed) score -= 10;
+    }
+
+    return score;
+}
+
 /**
  * Searches for food items in the local Supabase database.
  */
@@ -126,52 +166,20 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         portions: (item.portions || []) as FoodMeasure[],
         source: 'local' as const
     })).sort((a, b) => {
+        const aScore = getSearchRelevance(cleanQuery, a.name, a.common_name);
+        const bScore = getSearchRelevance(cleanQuery, b.name, b.common_name);
+        if (aScore !== bScore) return bScore - aScore;
+
         const aName = a.name.toLowerCase();
         const bName = b.name.toLowerCase();
         const aCommon = (a.common_name || "").toLowerCase();
         const bCommon = (b.common_name || "").toLowerCase();
 
-        // 1. Literal Exact Match (Highest Priority)
-        if (aName === cleanQuery || aCommon === cleanQuery) return -1;
-        if (bName === cleanQuery || bCommon === cleanQuery) return 1;
-
-        // 2. Singularized Exact Match
         const singular = singularize(cleanQuery);
         if (aName === singular || aCommon === singular) return -1;
         if (bName === singular || bCommon === singular) return 1;
 
-        // 3. Raw/Fresh/Base Priority Boost
-        // We want to prefer the base ingredient over processed versions (Baked, Cooked, Fried)
-        const rawKeywords = ['raw', 'fresh', 'whole', 'unsalted'];
-        const processedKeywords = ['baked', 'cooked', 'boiled', 'fried', 'roasted', 'canned', 'stewed'];
-
-        const isAProcessed = processedKeywords.some(k => aName.includes(k));
-        const isBProcessed = processedKeywords.some(k => bName.includes(k));
-        const isARaw = rawKeywords.some(k => aName.includes(k));
-        const isBRaw = rawKeywords.some(k => bName.includes(k));
-
-        // If query doesn't mention a processed state, prefer raw or non-processed
-        const queryIsProcessed = processedKeywords.some(k => cleanQuery.includes(k));
-        if (!queryIsProcessed) {
-            if (isARaw && !isBRaw) return -1;
-            if (!isARaw && isBRaw) return 1;
-            if (!isAProcessed && isBProcessed) return -1;
-            if (isAProcessed && !isBProcessed) return 1;
-        }
-
-        // 4. StartsWith Boost
-        const aStarts = aName.startsWith(cleanQuery) || aCommon.startsWith(cleanQuery);
-        const bStarts = bName.startsWith(cleanQuery) || bCommon.startsWith(cleanQuery);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-
-        // 5. Word Coverage Score
-        const queryWords = cleanQuery.split(/\s+/).filter(w => w.length > 2);
-        const aWordScore = queryWords.filter(w => aName.includes(w) || aCommon.includes(w)).length;
-        const bWordScore = queryWords.filter(w => bName.includes(w) || bCommon.includes(w)).length;
-        if (aWordScore !== bWordScore) return bWordScore - aWordScore;
-
-        return aName.length - bName.length; // Prefer shorter names if scores tied
+        return aName.length - bName.length;
     });
 }
 
@@ -324,10 +332,10 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
             'Branded': 4
         };
 
+        const lowerQuery = query.toLowerCase();
         const results = data.foods.map((food: any) => {
             // Check for strict exclusionary mismatches (e.g. searching for Chicken but getting Turkey)
             const desc = (food.description || "").toLowerCase();
-            const lowerQuery = query.toLowerCase();
             if (lowerQuery.startsWith('chicken') && desc.includes('turkey')) return null;
             if (lowerQuery.startsWith('turkey') && desc.includes('chicken')) return null;
 
@@ -355,6 +363,7 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
             }
 
             const energyKj = Math.round(energyKcal * 4.184);
+            const descScore = getSearchRelevance(lowerQuery, food.description || '');
 
             const micronutrients = extractUSDANutrients(food.foodNutrients);
 
@@ -370,15 +379,19 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
                 fat_g: fat,
                 micronutrients,
                 source: 'usda' as const,
-                _priority: dataTypePriority[food.dataType] || 5 // for sorting
+                _priority: dataTypePriority[food.dataType] || 5, // for sorting
+                _score: descScore
             };
         }).filter((f: any) => f !== null);
 
-        // Sort by priority (SR Legacy first, Branded last)
-        results.sort((a: any, b: any) => a._priority - b._priority);
+        // Sort by relevance score first, then by data type priority.
+        results.sort((a: any, b: any) => {
+            if (b._score !== a._score) return b._score - a._score;
+            return a._priority - b._priority;
+        });
 
-        // Remove _priority before returning
-        return results.map(({ _priority, ...rest }: any) => rest).slice(0, 15);
+        // Remove internal sort helpers before returning
+        return results.map(({ _priority, _score, ...rest }: any) => rest).slice(0, 15);
     } catch (error) {
         console.error("[USDA Search Exception] Catch Block:", error);
         return [];
