@@ -179,7 +179,7 @@ export function RecipeBuilderPanel({
                             <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                                 <button
                                     onClick={() => setRecipeServings(Math.max(1, recipeServings - 1))}
-                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <Minus size={14} />
                                 </button>
@@ -187,12 +187,12 @@ export function RecipeBuilderPanel({
                                     type="number"
                                     value={recipeServings}
                                     onChange={(e) => setRecipeServings(Math.max(1, Number(e.target.value)))}
-                                    className="h-full flex-1 px-2 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
+                                    className="h-full flex-1 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
                                     min="1"
                                 />
                                 <button
                                     onClick={() => setRecipeServings(recipeServings + 1)}
-                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <Plus size={14} />
                                 </button>
@@ -207,7 +207,7 @@ export function RecipeBuilderPanel({
                             <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                                 <button
                                     onClick={() => setRecipePrepTime(Math.max(0, recipePrepTime - 5))}
-                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <Minus size={14} />
                                 </button>
@@ -215,12 +215,12 @@ export function RecipeBuilderPanel({
                                     type="number"
                                     value={recipePrepTime}
                                     onChange={(e) => setRecipePrepTime(Math.max(0, Number(e.target.value)))}
-                                    className="h-full flex-1 px-2 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
+                                    className="h-full flex-1 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
                                     min="0"
                                 />
                                 <button
                                     onClick={() => setRecipePrepTime(recipePrepTime + 5)}
-                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <Plus size={14} />
                                 </button>
@@ -235,7 +235,7 @@ export function RecipeBuilderPanel({
                             <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                                 <button
                                     onClick={() => setRecipeCookTime(Math.max(0, recipeCookTime - 5))}
-                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <Minus size={14} />
                                 </button>
@@ -243,12 +243,12 @@ export function RecipeBuilderPanel({
                                     type="number"
                                     value={recipeCookTime}
                                     onChange={(e) => setRecipeCookTime(Math.max(0, Number(e.target.value)))}
-                                    className="h-full flex-1 px-2 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
+                                    className="h-full flex-1 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700"
                                     min="0"
                                 />
                                 <button
                                     onClick={() => setRecipeCookTime(recipeCookTime + 5)}
-                                    className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <Plus size={14} />
                                 </button>
