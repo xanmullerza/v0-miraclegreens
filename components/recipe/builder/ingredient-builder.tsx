@@ -27,39 +27,14 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
             {/* Main Workspace */}
             <div className="space-y-6">
                 <div className="space-y-4">
-                    <div className="flex justify-center px-2">
-                        {!hasIngredients && !showPicker ? (
-                            <Button
-                                onClick={() => setShowPicker(true)}
-                                className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest"
-                            >
-                                Add ingredient
-                            </Button>
-                        ) : null}
-
-                        {!hasIngredients && showPicker ? (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowPicker(false)}
-                                className="h-8 text-[10px] uppercase font-black tracking-widest"
-                            >
-                                Cancel search
-                            </Button>
-                        ) : null}
+                    <div className="pt-4">
+                        <InlineFoodSearch
+                            onSelect={(food: any) => {
+                                handleAddIngredient(food);
+                            }}
+                            isAdmin={isAdmin}
+                        />
                     </div>
-
-                    {showPicker && (
-                        <div className="pt-4">
-                            <InlineFoodSearch
-                                onSelect={(food: any) => {
-                                    handleAddIngredient(food);
-                                    setShowPicker(false);
-                                }}
-                                isAdmin={isAdmin}
-                            />
-                        </div>
-                    )}
                 </div>
 
                 <div className="space-y-3">
@@ -82,24 +57,13 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                                     handleRemoveIngredient={handleRemoveIngredient}
                                 />
                             ))}
-                            <div className="pt-4 flex justify-center">
-                                {!showPicker ? (
-                                    <Button
-                                        onClick={() => setShowPicker(true)}
-                                        className="h-8 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] uppercase font-black tracking-widest"
-                                    >
-                                        Add ingredient
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setShowPicker(false)}
-                                        className="h-8 text-[10px] uppercase font-black tracking-widest"
-                                    >
-                                        Cancel search
-                                    </Button>
-                                )}
+                            <div className="pt-4">
+                                <InlineFoodSearch
+                                    onSelect={(food: any) => {
+                                        handleAddIngredient(food);
+                                    }}
+                                    isAdmin={isAdmin}
+                                />
                             </div>
                             {hasIngredients && onNext && (
                                 <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800 pb-32">
