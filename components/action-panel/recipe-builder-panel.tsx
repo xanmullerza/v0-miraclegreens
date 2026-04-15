@@ -9,6 +9,8 @@ interface RecipeBuilderPanelProps {
     setRecipeTitle: (title: string) => void;
     recipeServings: number;
     setRecipeServings: (servings: number) => void;
+    recipeType: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement';
+    setRecipeType: (type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement') => void;
     recipePrepTime: number;
     setRecipePrepTime: (time: number) => void;
     recipeCookTime: number;
@@ -36,6 +38,8 @@ export function RecipeBuilderPanel({
     setRecipeTitle,
     recipeServings,
     setRecipeServings,
+    recipeType,
+    setRecipeType,
     recipePrepTime,
     setRecipePrepTime,
     recipeCookTime,
@@ -148,17 +152,35 @@ export function RecipeBuilderPanel({
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                            Servings
-                        </label>
-                        <input
-                            type="number"
-                            value={recipeServings}
-                            onChange={(e) => setRecipeServings(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            min="1"
-                        />
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                Meal Type
+                            </label>
+                            <select
+                                value={recipeType}
+                                onChange={(e) => setRecipeType(e.target.value as 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement')}
+                                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            >
+                                <option value="breakfast">Breakfast</option>
+                                <option value="lunch">Lunch</option>
+                                <option value="dinner">Dinner</option>
+                                <option value="snack">Snack</option>
+                                <option value="supplement">Supplement</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                Servings
+                            </label>
+                            <input
+                                type="number"
+                                value={recipeServings}
+                                onChange={(e) => setRecipeServings(Number(e.target.value))}
+                                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                min="1"
+                            />
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">

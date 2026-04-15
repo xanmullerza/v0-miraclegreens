@@ -3,7 +3,7 @@ import { RecipeBuilderPanel } from '../recipe-builder-panel';
 
 export function RecipeBuilderView({
     recipeStep, setRecipeStep, recipeTitle, setRecipeTitle,
-    recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
+    recipeServings, setRecipeServings, recipeType, setRecipeType, recipePrepTime, setRecipePrepTime,
     recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
     recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
     recipeSaving, handleAddInstruction,
@@ -18,6 +18,8 @@ export function RecipeBuilderView({
             setRecipeTitle={setRecipeTitle}
             recipeServings={recipeServings}
             setRecipeServings={setRecipeServings}
+            recipeType={recipeType}
+            setRecipeType={setRecipeType}
             recipePrepTime={recipePrepTime}
             setRecipePrepTime={setRecipePrepTime}
             recipeCookTime={recipeCookTime}

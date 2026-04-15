@@ -11,7 +11,7 @@ export function useRecipeBuilderLogic({
 }) {
     const [showRecipeBuilder, setShowRecipeBuilder] = useState(false);
     const [recipeTitle, setRecipeTitle] = useState('');
-    const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
+    const [recipeType, setRecipeType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement'>('dinner');
     const [recipePrepTime, setRecipePrepTime] = useState(30);
     const [recipeCookTime, setRecipeCookTime] = useState(0);
     const [recipeServings, setRecipeServings] = useState(4);
