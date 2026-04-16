@@ -145,244 +145,246 @@ export function RecipeBuilderPanel({
 
             {recipeStep === 3 && (
                 <>
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                            Recipe Title *
-                        </label>
-                        <input
-                            type="text"
-                            value={recipeTitle}
-                            onChange={(e) => setRecipeTitle(e.target.value)}
-                            placeholder="e.g., Chicken Stir Fry"
-                            className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        {/* Meal Type */}
+                    <Card className="space-y-4 p-4 pb-32 bg-card rounded-[2.5rem] border border-border shadow-2xl">
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                                Meal Type
+                                Recipe Title *
                             </label>
-                            <select
-                                value={recipeType}
-                                onChange={(e) => setRecipeType(e.target.value as 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement')}
-                                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            <input
+                                type="text"
+                                value={recipeTitle}
+                                onChange={(e) => setRecipeTitle(e.target.value)}
+                                placeholder="e.g., Chicken Stir Fry"
+                                className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Meal Type */}
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                    Meal Type
+                                </label>
+                                <select
+                                    value={recipeType}
+                                    onChange={(e) => setRecipeType(e.target.value as 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement')}
+                                    className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                >
+                                    <option value="breakfast">Breakfast</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="dinner">Dinner</option>
+                                    <option value="snack">Snack</option>
+                                    <option value="supplement">Supplement</option>
+                                </select>
+                            </div>
+
+                            {/* Servings */}
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                    Servings
+                                </label>
+                                <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
+                                    <button
+                                        onClick={() => setRecipeServings(Math.max(1, recipeServings - 1))}
+                                        className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                                    >
+                                        <Minus size={14} />
+                                    </button>
+                                    <input
+                                        type="number"
+                                        value={recipeServings}
+                                        onChange={(e) => setRecipeServings(Math.max(1, Number(e.target.value)))}
+                                        className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
+                                        min="1"
+                                    />
+                                    <button
+                                        onClick={() => setRecipeServings(recipeServings + 1)}
+                                        className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                                    >
+                                        <Plus size={14} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Prep Time */}
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                    Prep Time (min)
+                                </label>
+                                <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
+                                    <button
+                                        onClick={() => setRecipePrepTime(Math.max(0, recipePrepTime - 5))}
+                                        className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                                    >
+                                        <Minus size={14} />
+                                    </button>
+                                    <input
+                                        type="number"
+                                        value={recipePrepTime}
+                                        onChange={(e) => setRecipePrepTime(Math.max(0, Number(e.target.value)))}
+                                        className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
+                                        min="0"
+                                    />
+                                    <button
+                                        onClick={() => setRecipePrepTime(recipePrepTime + 5)}
+                                        className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                                    >
+                                        <Plus size={14} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Cook Time */}
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                                    Cook Time (min)
+                                </label>
+                                <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
+                                    <button
+                                        onClick={() => setRecipeCookTime(Math.max(0, recipeCookTime - 5))}
+                                        className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                                    >
+                                        <Minus size={14} />
+                                    </button>
+                                    <input
+                                        type="number"
+                                        value={recipeCookTime}
+                                        onChange={(e) => setRecipeCookTime(Math.max(0, Number(e.target.value)))}
+                                        className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
+                                        min="0"
+                                    />
+                                    <button
+                                        onClick={() => setRecipeCookTime(recipeCookTime + 5)}
+                                        className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                                    >
+                                        <Plus size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setRecipeStep(2)}
+                                className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold uppercase tracking-widest text-[10px] transition-all"
                             >
-                                <option value="breakfast">Breakfast</option>
-                                <option value="lunch">Lunch</option>
-                                <option value="dinner">Dinner</option>
-                                <option value="snack">Snack</option>
-                                <option value="supplement">Supplement</option>
-                            </select>
+                                ← Back
+                            </button>
+                            <button
+                                onClick={() => setShowSaveOptions(true)}
+                                disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
+                                className="flex-[2] px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                <span>Save</span>
+                            </button>
                         </div>
 
-                        {/* Servings */}
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                                Servings
+                                Recipe Photo (Optional)
                             </label>
-                            <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
-                                <button
-                                    onClick={() => setRecipeServings(Math.max(1, recipeServings - 1))}
-                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
-                                >
-                                    <Minus size={14} />
-                                </button>
-                                <input
-                                    type="number"
-                                    value={recipeServings}
-                                    onChange={(e) => setRecipeServings(Math.max(1, Number(e.target.value)))}
-                                    className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
-                                    min="1"
-                                />
-                                <button
-                                    onClick={() => setRecipeServings(recipeServings + 1)}
-                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
-                                >
-                                    <Plus size={14} />
-                                </button>
+                            <div className="relative aspect-video rounded-lg bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden group hover:border-emerald-500/50 transition-all">
+                                {recipeImage ? (
+                                    <div className="w-full h-full relative">
+                                        <img src={recipeImage} alt="Recipe" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <button
+                                                className="gap-2 px-3 py-1 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-lg text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center"
+                                                onClick={() => setRecipeImage('')}
+                                            >
+                                                <Trash2 size={12} /> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer p-3">
+                                        <div className="text-center">
+                                            {recipeUploading ? (
+                                                <Loader2 className="h-5 w-5 animate-spin text-emerald-500 mx-auto" />
+                                            ) : (
+                                                <>
+                                                    <Camera size={18} className="text-slate-400 mx-auto mb-2" />
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        {!recipeUploading && (
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleRecipeImageUpload}
+                                            />
+                                        )}
+                                    </label>
+                                )}
                             </div>
                         </div>
 
-                        {/* Prep Time */}
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                                Prep Time (min)
-                            </label>
-                            <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
-                                <button
-                                    onClick={() => setRecipePrepTime(Math.max(0, recipePrepTime - 5))}
-                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
-                                >
-                                    <Minus size={14} />
-                                </button>
-                                <input
-                                    type="number"
-                                    value={recipePrepTime}
-                                    onChange={(e) => setRecipePrepTime(Math.max(0, Number(e.target.value)))}
-                                    className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
-                                    min="0"
-                                />
-                                <button
-                                    onClick={() => setRecipePrepTime(recipePrepTime + 5)}
-                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
-                                >
-                                    <Plus size={14} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Cook Time */}
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                                Cook Time (min)
-                            </label>
-                            <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
-                                <button
-                                    onClick={() => setRecipeCookTime(Math.max(0, recipeCookTime - 5))}
-                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
-                                >
-                                    <Minus size={14} />
-                                </button>
-                                <input
-                                    type="number"
-                                    value={recipeCookTime}
-                                    onChange={(e) => setRecipeCookTime(Math.max(0, Number(e.target.value)))}
-                                    className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
-                                    min="0"
-                                />
-                                <button
-                                    onClick={() => setRecipeCookTime(recipeCookTime + 5)}
-                                    className="h-full px-4 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
-                                >
-                                    <Plus size={14} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-2 mt-4">
-                        <button
-                            onClick={() => setRecipeStep(2)}
-                            className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold uppercase tracking-widest text-[10px] transition-all"
-                        >
-                            ← Back
-                        </button>
-                        <button
-                            onClick={() => setShowSaveOptions(true)}
-                            disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
-                            className="flex-[2] px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                            {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                            <span>Save</span>
-                        </button>
-                    </div>
-
-                    <div className="mt-6">
-                        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                            Recipe Photo (Optional)
-                        </label>
-                        <div className="relative aspect-video rounded-lg bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 overflow-hidden group hover:border-emerald-500/50 transition-all">
-                            {recipeImage ? (
-                                <div className="w-full h-full relative">
-                                    <img src={recipeImage} alt="Recipe" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="flex flex-col gap-3">
+                            {/* Save Options Dialog */}
+                            <Dialog open={showSaveOptions} onOpenChange={setShowSaveOptions}>
+                                <DialogContent showCloseButton={false} className="sm:max-w-md border-0 rounded-3xl px-8 py-6 bg-transparent shadow-none">
+                                    <DialogClose asChild>
+                                        <button className="absolute right-4 top-4 h-10 w-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-sm hover:bg-rose-700 transition-colors">
+                                            <X className="h-4 w-4" />
+                                            <span className="sr-only">Close</span>
+                                        </button>
+                                    </DialogClose>
+                                    <div className="flex flex-col gap-3 mt-2">
+                                        {/* Save as Recipe */}
                                         <button
-                                            className="gap-2 px-3 py-1 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-lg text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center"
-                                            onClick={() => setRecipeImage('')}
+                                            onClick={() => {
+                                                handleSaveRecipe(false, false);
+                                                setShowSaveOptions(false);
+                                            }}
+                                            disabled={recipeSaving}
+                                            className="w-full h-20 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50"
                                         >
-                                            <Trash2 size={12} /> Remove
+                                            {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                            <div className="text-left">
+                                                <div className="text-sm font-bold">Recipe</div>
+                                                <div className="text-xs opacity-80">Save as a new recipe</div>
+                                            </div>
+                                        </button>
+
+                                        {/* Save as Remix */}
+                                        <button
+                                            onClick={() => {
+                                                handleSaveRecipe(false, true);
+                                                setShowSaveOptions(false);
+                                            }}
+                                            disabled={recipeSaving}
+                                            className="w-full h-20 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50 border border-indigo-400/30"
+                                        >
+                                            <Wand2 size={16} />
+                                            <div className="text-left">
+                                                <div className="text-sm font-bold">Remix</div>
+                                                <div className="text-xs opacity-80">Save as a remix variation</div>
+                                            </div>
+                                        </button>
+
+                                        {/* Save as Mix */}
+                                        <button
+                                            onClick={() => {
+                                                handleSaveRecipe(true, false);
+                                                setShowSaveOptions(false);
+                                            }}
+                                            disabled={recipeSaving}
+                                            className="w-full h-20 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-amber-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50 border border-amber-400/30"
+                                        >
+                                            <Beaker size={16} />
+                                            <div className="text-left">
+                                                <div className="text-sm font-bold">Mix</div>
+                                                <div className="text-xs opacity-80">Save as a mix combination</div>
+                                            </div>
                                         </button>
                                     </div>
-                                </div>
-                            ) : (
-                                <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer p-3">
-                                    <div className="text-center">
-                                        {recipeUploading ? (
-                                            <Loader2 className="h-5 w-5 animate-spin text-emerald-500 mx-auto" />
-                                        ) : (
-                                            <>
-                                                <Camera size={18} className="text-slate-400 mx-auto mb-2" />
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
-                                            </>
-                                        )}
-                                    </div>
-                                    {!recipeUploading && (
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={handleRecipeImageUpload}
-                                        />
-                                    )}
-                                </label>
-                            )}
+                                </DialogContent>
+                            </Dialog>
                         </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 mt-8">
-                        {/* Save Options Dialog */}
-                        <Dialog open={showSaveOptions} onOpenChange={setShowSaveOptions}>
-                            <DialogContent showCloseButton={false} className="sm:max-w-md border-0 rounded-3xl px-8 py-6 bg-transparent shadow-none">
-                                <DialogClose asChild>
-                                    <button className="absolute right-4 top-4 h-10 w-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-sm hover:bg-rose-700 transition-colors">
-                                        <X className="h-4 w-4" />
-                                        <span className="sr-only">Close</span>
-                                    </button>
-                                </DialogClose>
-                                <div className="flex flex-col gap-3 mt-2">
-                                    {/* Save as Recipe */}
-                                    <button
-                                        onClick={() => {
-                                            handleSaveRecipe(false, false);
-                                            setShowSaveOptions(false);
-                                        }}
-                                        disabled={recipeSaving}
-                                        className="w-full h-20 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-xl shadow-emerald-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50"
-                                    >
-                                        {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                                        <div className="text-left">
-                                            <div className="text-sm font-bold">Recipe</div>
-                                            <div className="text-xs opacity-80">Save as a new recipe</div>
-                                        </div>
-                                    </button>
-
-                                    {/* Save as Remix */}
-                                    <button
-                                        onClick={() => {
-                                            handleSaveRecipe(false, true);
-                                            setShowSaveOptions(false);
-                                        }}
-                                        disabled={recipeSaving}
-                                        className="w-full h-20 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-indigo-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50 border border-indigo-400/30"
-                                    >
-                                        <Wand2 size={16} />
-                                        <div className="text-left">
-                                            <div className="text-sm font-bold">Remix</div>
-                                            <div className="text-xs opacity-80">Save as a remix variation</div>
-                                        </div>
-                                    </button>
-
-                                    {/* Save as Mix */}
-                                    <button
-                                        onClick={() => {
-                                            handleSaveRecipe(true, false);
-                                            setShowSaveOptions(false);
-                                        }}
-                                        disabled={recipeSaving}
-                                        className="w-full h-20 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-lg shadow-amber-600/20 flex items-start justify-start gap-3 px-4 py-4 disabled:opacity-50 border border-amber-400/30"
-                                    >
-                                        <Beaker size={16} />
-                                        <div className="text-left">
-                                            <div className="text-sm font-bold">Mix</div>
-                                            <div className="text-xs opacity-80">Save as a mix combination</div>
-                                        </div>
-                                    </button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
+                    </Card>
                 </>
             )}
 
