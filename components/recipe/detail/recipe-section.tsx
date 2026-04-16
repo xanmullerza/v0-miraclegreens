@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X } from 'lucide-react';
+import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import { searchFoodItem } from '@/lib/services/nutrition';
 import { supabase } from '@/lib/supabase';
@@ -28,6 +28,42 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
     // State for ingredient search and replacement
     const [editingIngredient, setEditingIngredient] = useState<any>(null);
     const [showSearchDialog, setShowSearchDialog] = useState(false);
+
+    // State for delete confirmation
+    const [deleteConfirming, setDeleteConfirming] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+
+    // Delete recipe handler
+    const handleDeleteRecipe = async () => {
+        if (!recipe) return;
+
+        if (!deleteConfirming) {
+            setDeleteConfirming(true);
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            if (String(recipe.id).startsWith('local-')) {
+                const localData = localStorage.getItem('local_recipes');
+                if (localData) {
+                    const recipes = JSON.parse(localData);
+                    const filtered = recipes.filter((r: any) => r.id !== recipe.id);
+                    localStorage.setItem('local_recipes', JSON.stringify(filtered));
+                }
+            } else {
+                const { error } = await supabase.from('recipes').delete().eq('id', recipe.id);
+                if (error) throw error;
+            }
+            toast.success('Recipe deleted successfully');
+            if (ctx.onBack) ctx.onBack();
+        } catch (error: any) {
+            toast.error(`Delete failed: ${error.message}`);
+            setDeleteConfirming(false);
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     if (!recipe) return null;
 
@@ -253,6 +289,73 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     )}
                 </div>
             </button>
+
+            {/* Edit and Delete Buttons */}
+            {ctx.isOwner && (
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        onClick={ctx.handleEditClick}
+                        className="p-4 rounded-2xl border text-left flex flex-col justify-between h-24 group relative overflow-hidden bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
+                    >
+                        <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <Pencil size={32} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-slate-500">Modification</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">Edit Content</p>
+                        </div>
+                        <Pencil size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                    </button>
+
+                    <button
+                        onClick={handleDeleteRecipe}
+                        className={cn(
+                            "p-4 rounded-2xl border text-left flex flex-col justify-between h-24 group relative overflow-hidden transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]",
+                            deleteConfirming
+                                ? "bg-rose-600 border-rose-500 text-white"
+                                : "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-600"
+                        )}
+                    >
+                        {deleteConfirming ? (
+                            <>
+                                <div className="absolute top-2 right-2 opacity-20">
+                                    <Trash2 size={32} />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-rose-200">Permanence</p>
+                                    <p className="text-sm font-bold">Confirm Delete?</p>
+                                </div>
+                                <div className="flex gap-2 w-full">
+                                    <button
+                                        onClick={handleDeleteRecipe}
+                                        disabled={deleting}
+                                        className="flex-1 py-2 bg-white text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center"
+                                    >
+                                        {deleting ? <Loader2 size={12} className="animate-spin" /> : 'Confirm'}
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setDeleteConfirming(false); }}
+                                        className="flex-1 py-2 bg-rose-700/50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Trash2 size={32} />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-slate-500">Permanence</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">Delete Recipe</p>
+                                </div>
+                                <Trash2 size={16} className="text-slate-400 group-hover:text-rose-500 transition-colors" />
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
 
             {/* Ingredient Search Dialog */}
             <Dialog open={showSearchDialog} onOpenChange={setShowSearchDialog}>

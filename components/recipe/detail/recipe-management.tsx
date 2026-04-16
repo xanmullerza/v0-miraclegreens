@@ -1,89 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
-import { Wand2, Pencil, Trash2, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { toast } from 'sonner';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
 const interactiveGlow = 'transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]';
-
-// ── DeleteButton (private) ────────────────────────────────────
-function DeleteButton({ recipeId, onDeleted }: { recipeId: string; onDeleted: () => void }) {
-    const [confirming, setConfirming] = useState(false);
-    const [deleting, setDeleting] = useState(false);
-
-    const handleDelete = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!confirming) { setConfirming(true); return; }
-
-        setDeleting(true);
-        try {
-            if (String(recipeId).startsWith('local-')) {
-                const localData = localStorage.getItem('local_recipes');
-                if (localData) {
-                    const recipes = JSON.parse(localData);
-                    const filtered = recipes.filter((r: any) => r.id !== recipeId);
-                    localStorage.setItem('local_recipes', JSON.stringify(filtered));
-                }
-            } else {
-                const { error } = await supabase.from('recipes').delete().eq('id', recipeId);
-                if (error) throw error;
-            }
-            onDeleted();
-        } catch (error: any) {
-            toast.error(`Delete failed: ${error.message}`);
-            setConfirming(false);
-        } finally {
-            setDeleting(false);
-        }
-    };
-
-    if (confirming) {
-        return (
-            <div className="flex flex-col items-start justify-between p-4 rounded-2xl border bg-rose-600 border-rose-500 text-white animate-in zoom-in-95 duration-200 h-full gap-2 shadow-xl shadow-rose-600/20 relative overflow-hidden">
-                <div className="absolute top-2 right-2 opacity-20">
-                    <Trash2 size={32} />
-                </div>
-                <div className="relative z-10">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-rose-200">Permanence</p>
-                    <p className="text-sm font-bold">Confirm Delete?</p>
-                </div>
-                <div className="flex gap-2 w-full relative z-10">
-                    <button onClick={handleDelete} disabled={deleting}
-                        className="flex-1 py-2 bg-white text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 transition-colors flex items-center justify-center">
-                        {deleting ? <Loader2 size={12} className="animate-spin" /> : 'Confirm'}
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setConfirming(false); }}
-                        className="flex-1 py-2 bg-rose-700/50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-colors">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <button onClick={handleDelete}
-            className={cn(
-                "w-full flex flex-col items-start justify-between p-4 rounded-2xl border bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 text-left h-full group relative overflow-hidden",
-                "hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-600",
-                interactiveGlow,
-            )}
-        >
-            <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Trash2 size={32} />
-            </div>
-            <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Permanence</p>
-                <p className="text-sm font-bold text-slate-900 dark:text-white">Delete Recipe</p>
-            </div>
-            <Trash2 size={16} className="text-slate-400 group-hover:text-rose-500 transition-colors" />
-        </button>
-    );
-}
 
 // ── RecipeManagement ──────────────────────────────────────────
 interface RecipeManagementProps {
@@ -97,46 +19,8 @@ export function RecipeManagement({ ctx }: RecipeManagementProps) {
 
     return (
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="grid grid-cols-2 gap-3">
-                {/* Edit / Remix */}
-                <button
-                    onClick={handleEditClick}
-                    className={cn(
-                        "p-4 rounded-2xl border text-left flex flex-col justify-between h-24 group relative overflow-hidden",
-                        interactiveGlow,
-                        isOwner
-                            ? "bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
-                            : "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 shadow-sm"
-                    )}
-                >
-                    <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                        {isOwner ? <Pencil size={32} /> : <Wand2 size={32} />}
-                    </div>
-                    <div>
-                        <p className={cn(
-                            "text-[10px] font-black uppercase tracking-[0.2em] mb-1",
-                            isOwner ? "text-slate-500" : "text-indigo-500"
-                        )}>Modification</p>
-                        <p className={cn(
-                            "text-sm font-bold",
-                            isOwner ? "text-slate-900 dark:text-white" : "text-indigo-600 dark:text-indigo-400"
-                        )}>
-                            {isOwner ? 'Edit Content' : 'Remix & Save'}
-                        </p>
-                    </div>
-                    {isOwner ? <Pencil size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" /> : <Wand2 size={16} className="text-indigo-500" />}
-                </button>
-
-                {/* Delete */}
-                {isOwner && (
-                    <div className="relative h-24">
-                        <DeleteButton
-                            recipeId={recipe.id}
-                            onDeleted={() => { toast.success('Recipe deleted successfully'); if (onBack) onBack(); }}
-                        />
-                    </div>
-                )}
-            </div>
+            {/* Management options moved to recipe section */}
+            <p className="text-center text-slate-400 text-sm">Edit and delete options are now available in the recipe details section.</p>
         </div>
     );
 }
