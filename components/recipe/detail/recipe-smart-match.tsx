@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
 import { cleanIngredientDisplay, extractCoreName, parseRecipeAmount } from '@/lib/utils/parsing-utils';
 import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
-import { IngredientReviewPanel } from './ingredient-review-panel';
+import { IngredientReviewComparison } from './ingredient-review-comparison';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import {
     Dialog,
@@ -79,7 +79,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
 
             {/* STEP 2: INGREDIENT REVIEW */}
             {mappingStep === 'INGREDIENT_REVIEW' && (
-                <IngredientReviewPanel
+                <IngredientReviewComparison
                     ingredients={ingredients}
                     matchedIngredients={matchedIngredients}
                     setMatchedIngredients={setMatchedIngredients}
@@ -220,7 +220,7 @@ function StepOneFoodMatch({
                     }}
                     className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2"
                 >
-                    Proceed to Step 2: Portion Verification <ChevronRight size={16} />
+                    Proceed to Step 2: Ingredient Review <ChevronRight size={16} />
                 </button>
             )}
         </div>

@@ -220,8 +220,8 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     // Manual transition to step 2 (when user clicks button)
     const proceedToStep2 = () => {
         if (isStep1Complete) {
-            console.log('[proceedToStep2] Transitioning to PORTION_MATCH', { isStep1Complete, acceptedMatches, skippedIngredients });
-            setMappingStep('PORTION_MATCH');
+            console.log('[proceedToStep2] Transitioning to INGREDIENT_REVIEW', { isStep1Complete, acceptedMatches, skippedIngredients });
+            setMappingStep('INGREDIENT_REVIEW');
         } else {
             console.warn('[proceedToStep2] Cannot proceed - Step 1 not complete', { isStep1Complete });
         }
