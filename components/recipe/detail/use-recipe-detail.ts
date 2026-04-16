@@ -817,6 +817,12 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         }
     };
 
+    const updateIngredient = (ingredientId: string, updatedIngredient: Ingredient) => {
+        setIngredients(prev => prev.map(ing => 
+            ing.id === ingredientId ? { ...ing, ...updatedIngredient } : ing
+        ));
+    };
+
     return {
         recipe,
         setRecipe,
@@ -880,6 +886,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
         handleEditClick,
         fetchRecipeDetails,
         deleteIngredient,
+        updateIngredient,
         
         findNutrientMatch,
         

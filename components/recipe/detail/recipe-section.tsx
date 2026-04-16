@@ -2,8 +2,18 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe } from 'lucide-react';
+import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
+import { searchFoodItem } from '@/lib/services/nutrition';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
+import FoodItemPicker from '@/components/recipe/food-item-picker';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
@@ -14,6 +24,10 @@ interface RecipeSectionProps {
 
 export function RecipeSection({ ctx }: RecipeSectionProps) {
     const { recipe, ingredients, instructions, calculatedNutrition, selectedServings, setSelectedServings, setShowTagsDialog, flippedCards, setFlippedCards, energyUnit } = ctx;
+
+    // State for ingredient search and replacement
+    const [editingIngredient, setEditingIngredient] = useState<any>(null);
+    const [showSearchDialog, setShowSearchDialog] = useState(false);
 
     if (!recipe) return null;
 
@@ -122,7 +136,18 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                                 <Database size={10} className="shrink-0 text-green-500" title="From Local Database" />
                                             ) : null}
                                         </p>
-                                        <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setEditingIngredient(ing);
+                                                    setShowSearchDialog(true);
+                                                }}
+                                                className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-slate-500 hover:text-blue-600 transition-colors"
+                                                title="Search for different ingredient"
+                                            >
+                                                <Search size={12} />
+                                            </button>
                                             <div className="px-2.5 py-1 rounded-lg bg-emerald-200 dark:bg-emerald-800 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest">
                                                 Macros
                                             </div>
@@ -228,6 +253,49 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     )}
                 </div>
             </button>
+
+            {/* Ingredient Search Dialog */}
+            <Dialog open={showSearchDialog} onOpenChange={setShowSearchDialog}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Replace Ingredient</DialogTitle>
+                    </DialogHeader>
+                        <FoodItemPicker
+                            onSelect={async (foodItem) => {
+                                if (!foodItem) return;
+
+                                try {
+                                    // Update the ingredient in the database
+                                    const { error } = await supabase
+                                        .from('recipe_ingredients')
+                                        .update({ food_item_id: foodItem.id })
+                                        .eq('id', editingIngredient.id);
+
+                                    if (error) throw error;
+
+                                    // Update local state
+                                    ctx.updateIngredient(editingIngredient.id, {
+                                        ...editingIngredient,
+                                        food_item_id: foodItem.id,
+                                        food_items: foodItem
+                                    });
+
+                                    toast.success('Ingredient replaced successfully');
+                                    setShowSearchDialog(false);
+                                    setEditingIngredient(null);
+                                } catch (error) {
+                                    console.error('Error replacing ingredient:', error);
+                                    toast.error('Failed to replace ingredient');
+                                }
+                            }}
+                            onClose={() => {
+                                setShowSearchDialog(false);
+                                setEditingIngredient(null);
+                            }}
+                            initialSearchQuery={editingIngredient?.food_items?.common_name || editingIngredient?.food_items?.name || editingIngredient?.base_ingredient || editingIngredient?.item || ''}
+                        />
+                </DialogContent>
+            </Dialog>
 
             {/* Source */}
             {recipe.source && recipe.source !== 'pasted-content' && (
