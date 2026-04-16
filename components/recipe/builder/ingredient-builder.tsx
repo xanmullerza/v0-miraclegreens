@@ -4,6 +4,7 @@ import { IngredientRow } from './ingredient-row';
 import { InlineFoodSearch } from './inline-food-search';
 import { IngredientBuilderProps, IngredientBuilderHandle } from './types';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 
 export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>((props, ref) => {
@@ -24,26 +25,24 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
 
     return (
         <div className="space-y-6">
-            {/* Main Workspace */}
-            <div className="space-y-6">
-                <div className="space-y-4">
-                    <div className="pt-4">
-                        <InlineFoodSearch
-                            onSelect={(food: any) => {
-                                handleAddIngredient(food);
-                            }}
-                            isAdmin={isAdmin}
-                        />
-                    </div>
+            <div className="space-y-4">
+                <div className="pt-4">
+                    <InlineFoodSearch
+                        onSelect={(food: any) => {
+                            handleAddIngredient(food);
+                        }}
+                        isAdmin={isAdmin}
+                    />
+                </div>
+            </div>
+
+            <Card className="space-y-3 p-4 bg-card rounded-[2.5rem] border border-border shadow-2xl">
+                <div className="flex items-center justify-center px-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Workspace / {ingredients.length} Items</h4>
                 </div>
 
-                <div className="space-y-3">
-                    <div className="flex items-center justify-center px-2">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Workspace / {ingredients.length} Items</h4>
-                    </div>
-
-                    {ingredients.length > 0 ? (
-                        <div className="space-y-2">
+                {ingredients.length > 0 ? (
+                    <div className="space-y-2">
                             {ingredients.map((ing, idx) => (
                                 <IngredientRow
                                     key={`${ing.food_item_id}-${idx}`}
@@ -81,7 +80,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Workspace is empty</p>
                         </div>
                     )}
-                </div>
+                </Card>
             </div>
         </div>
     );
