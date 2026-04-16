@@ -56,7 +56,7 @@ export function IngredientRow({
                     <button
                         type="button"
                         onClick={() => handleUpdateQuantity(index, Math.max(0, Number((ing.quantity - 1).toFixed(0))))}
-                        className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                        className="h-full w-10 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
                     >
                         <Minus size={14} />
                     </button>
@@ -71,7 +71,7 @@ export function IngredientRow({
                     <button
                         type="button"
                         onClick={() => handleUpdateQuantity(index, Number((ing.quantity + 1).toFixed(0)))}
-                        className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                        className="h-full w-10 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
                     >
                         <Plus size={14} />
                     </button>
