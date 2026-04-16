@@ -264,62 +264,8 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                 </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
-                {/* Tags & Categories */}
-                <button
-                    onClick={() => ctx.navigateTo('recipe-tags')}
-                    className="p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 hover:border-emerald-400/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] group h-24 overflow-hidden"
-                >
-                    <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tags & Categories</p>
-                        <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                    </div>
-                    <div className="flex flex-wrap gap-2 overflow-hidden">
-                        <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest">
-                            #{recipe.difficulty || 'Medium'}
-                        </span>
-                        {recipe.type && (
-                            <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">
-                                #{recipe.type}
-                            </span>
-                        )}
-                        {recipe.diet && recipe.diet.map(d => (
-                            <span key={d} className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                                #{d}
-                            </span>
-                        ))}
-                        {recipe.tags && recipe.tags.map(t => (
-                            <span key={t} className="px-3 py-1.5 rounded-xl bg-slate-500/10 border border-slate-500/20 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                                {t.startsWith('#') ? t : `#${t}`}
-                            </span>
-                        ))}
-                        {(!recipe.tags || recipe.tags.length === 0) && !recipe.type && (!recipe.diet || recipe.diet.length === 0) && (
-                            <span className="text-sm font-bold text-slate-400 italic">Add Tags</span>
-                        )}
-                    </div>
-                </button>
-
-                {/* Related Recipes Button */}
-                <button
-                    onClick={() => setShowRelatedRecipes(!showRelatedRecipes)}
-                    className="p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 hover:border-emerald-400/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] group h-24 overflow-hidden"
-                >
-                    <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Related Recipes</p>
-                        <ChevronDown size={14} className={`text-slate-400 group-hover:text-emerald-500 transition-all duration-300 ${showRelatedRecipes ? 'rotate-180' : ''}`} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Layers size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                        <span className="text-sm font-bold text-slate-900 dark:text-white">
-                            {ctx.loadingRelated ? 'Finding recipes...' : `${ctx.relatedRecipes.length} related meals found`}
-                        </span>
-                    </div>
-                </button>
-            </div>
-
-            {/* Edit and Delete Buttons */}
             {ctx.isOwner && (
-                <div className="grid grid-cols-2 gap-3 mt-3">
+                <div className="grid grid-cols-2 gap-3 mb-3">
                     <button
                         onClick={ctx.handleEditClick}
                         className="p-4 rounded-2xl border text-left flex flex-col justify-between h-24 group relative overflow-hidden bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
@@ -383,6 +329,59 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     </button>
                 </div>
             )}
+
+            <div className="grid grid-cols-2 gap-3">
+                {/* Tags & Categories */}
+                <button
+                    onClick={() => ctx.navigateTo('recipe-tags')}
+                    className="p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 hover:border-emerald-400/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] group h-24 overflow-hidden"
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tags & Categories</p>
+                        <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                    </div>
+                    <div className="flex flex-wrap gap-2 overflow-hidden">
+                        <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest">
+                            #{recipe.difficulty || 'Medium'}
+                        </span>
+                        {recipe.type && (
+                            <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">
+                                #{recipe.type}
+                            </span>
+                        )}
+                        {recipe.diet && recipe.diet.map(d => (
+                            <span key={d} className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                                #{d}
+                            </span>
+                        ))}
+                        {recipe.tags && recipe.tags.map(t => (
+                            <span key={t} className="px-3 py-1.5 rounded-xl bg-slate-500/10 border border-slate-500/20 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                                {t.startsWith('#') ? t : `#${t}`}
+                            </span>
+                        ))}
+                        {(!recipe.tags || recipe.tags.length === 0) && !recipe.type && (!recipe.diet || recipe.diet.length === 0) && (
+                            <span className="text-sm font-bold text-slate-400 italic">Add Tags</span>
+                        )}
+                    </div>
+                </button>
+
+                {/* Related Recipes Button */}
+                <button
+                    onClick={() => setShowRelatedRecipes(!showRelatedRecipes)}
+                    className="p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 hover:border-emerald-400/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] group h-24 overflow-hidden"
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Related Recipes</p>
+                        <ChevronDown size={14} className={`text-slate-400 group-hover:text-emerald-500 transition-all duration-300 ${showRelatedRecipes ? 'rotate-180' : ''}`} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Layers size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                        <span className="text-sm font-bold text-slate-900 dark:text-white">
+                            {ctx.loadingRelated ? 'Finding recipes...' : `${ctx.relatedRecipes.length} related meals found`}
+                        </span>
+                    </div>
+                </button>
+            </div>
 
             {/* Expandable Related Recipes */}
             {showRelatedRecipes && (
