@@ -81,7 +81,6 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                         </div>
                     )}
                 </Card>
-            </div>
         </div>
     );
 });
