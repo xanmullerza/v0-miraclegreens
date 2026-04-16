@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood } from '@/lib/services/nutrition';
+import { isFlavoringIngredient, getUSDAFoodDetails, searchUSDAFood, searchFoodItem } from '@/lib/services/nutrition';
 import { cleanIngredientDisplay, extractCoreName, parseRecipeAmount } from '@/lib/utils/parsing-utils';
 import { findBestMeasureMatch } from '@/lib/utils/measure-matcher';
 import { IngredientReviewComparison } from './ingredient-review-comparison';
@@ -97,6 +97,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                     recipe={recipe}
                     ingredients={ingredients}
                     matchedIngredients={matchedIngredients}
+                    setMatchedIngredients={setMatchedIngredients}
                     skippedIngredients={skippedIngredients}
                     stepTwoInputs={stepTwoInputs}
                     setStepTwoInputs={setStepTwoInputs}
@@ -582,13 +583,14 @@ function IngredientMatchCard({
 // Step 2: Portion Match
 // ═══════════════════════════════════════════════════════════════
 function StepTwoPortionMatch({
-    recipe, ingredients, matchedIngredients, skippedIngredients,
+    recipe, ingredients, matchedIngredients, setMatchedIngredients, skippedIngredients,
     stepTwoInputs, setStepTwoInputs, stepTwoSaved, setStepTwoSaved,
     setMappingStep, smartMatchRunning, finalizeRecipeNutrition, setIngredients,
 }: {
     recipe: any;
     ingredients: Ingredient[];
     matchedIngredients: Record<string, any>;
+    setMatchedIngredients: React.Dispatch<React.SetStateAction<Record<string, any>>>;
     skippedIngredients: Record<string, boolean>;
     stepTwoInputs: Record<string, { multiplier: string; measure: string; isSaving?: boolean }>;
     setStepTwoInputs: React.Dispatch<React.SetStateAction<Record<string, { multiplier: string; measure: string; isSaving?: boolean }>>>;
@@ -641,6 +643,7 @@ function StepTwoPortionMatch({
                         ing={ing}
                         recipe={recipe}
                         matchedIngredients={matchedIngredients}
+                        setMatchedIngredients={setMatchedIngredients}
                         stepTwoInputs={stepTwoInputs}
                         setStepTwoInputs={setStepTwoInputs}
                         stepTwoSaved={stepTwoSaved}
@@ -694,12 +697,13 @@ function StepTwoPortionMatch({
 
 // ── Individual Portion Row (Step 2) ───────────────────────────
 function PortionRow({
-    ing, recipe, matchedIngredients,
+    ing, recipe, matchedIngredients, setMatchedIngredients,
     stepTwoInputs, setStepTwoInputs, stepTwoSaved, setStepTwoSaved, setIngredients,
 }: {
     ing: Ingredient;
     recipe: any;
     matchedIngredients: Record<string, any>;
+    setMatchedIngredients: React.Dispatch<React.SetStateAction<Record<string, any>>>;
     stepTwoInputs: Record<string, { multiplier: string; measure: string; isSaving?: boolean }>;
     setStepTwoInputs: React.Dispatch<React.SetStateAction<Record<string, { multiplier: string; measure: string; isSaving?: boolean }>>>;
     stepTwoSaved: Record<string, boolean>;
@@ -712,6 +716,10 @@ function PortionRow({
     const [savingCustomMeasure, setSavingCustomMeasure] = React.useState(false);
     const [autoMatchedConfidence, setAutoMatchedConfidence] = React.useState<number | null>(null);
     const [hasAutoMatched, setHasAutoMatched] = React.useState(false);
+    const [showInlineSearch, setShowInlineSearch] = React.useState(false);
+    const [inlineSearchQuery, setInlineSearchQuery] = React.useState(ing.base_ingredient || ing.item);
+    const [inlineSearchResults, setInlineSearchResults] = React.useState<any[]>([]);
+    const [inlineSearchLoading, setInlineSearchLoading] = React.useState(false);
 
     const originalDetails = parseRecipeAmount(ing.amount, ing.item);
     const dbItem = matchedIngredients[ing.id];
@@ -831,6 +839,37 @@ function PortionRow({
         }
     };
 
+    const executeInlineSearch = async (query: string) => {
+        if (!query || query.length < 2) {
+            setInlineSearchResults([]);
+            return;
+        }
+
+        setInlineSearchLoading(true);
+        try {
+            const results = await searchFoodItem(query);
+            setInlineSearchResults(results.slice(0, 6));
+        } catch (err) {
+            console.error('Inline search error:', err);
+            toast.error('Search failed');
+            setInlineSearchResults([]);
+        } finally {
+            setInlineSearchLoading(false);
+        }
+    };
+
+    const handleInlineSearchSelect = async (selectedItem: any) => {
+        setShowInlineSearch(false);
+        setInlineSearchResults([]);
+        
+        // Update the matched item in parent state
+        setMatchedIngredients(prev => ({ ...prev, [ing.id]: selectedItem }));
+        toast.success(`✓ Updated match to "${selectedItem.name}"`);
+        
+        // Reset the search
+        setInlineSearchQuery(ing.base_ingredient || ing.item);
+    };
+
     return (
         <div className={cn(
             "relative rounded-lg border p-[10px] shadow-sm flex flex-col gap-2 transition-all",
@@ -945,27 +984,124 @@ function PortionRow({
                         {liveTotalWeight}g
                     </div>
                     {isOutlier && !isAccepted && <div className="text-[8px] text-rose-500 font-bold uppercase tracking-tighter">High density!</div>}
-                    <button
-                        onClick={isAccepted ? () => setStepTwoSaved(prev => ({ ...prev, [ing.id]: false })) : handleSaveStepTwo}
-                        disabled={inputs.isSaving}
-                        className={cn(
-                            "h-8 px-5 rounded text-[10px] font-bold transition-colors flex items-center justify-center min-w-[80px] gap-1.5 group",
-                            isAccepted
-                                ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
-                                : "bg-muted hover:bg-muted/80 border border-border text-indigo-600 shadow-sm"
-                        )}
-                    >
-                        {inputs.isSaving ? <Loader2 size={12} className="animate-spin" /> : isAccepted ? (
-                            <>
-                                <Check size={12} className="group-hover:hidden" />
-                                <span className="group-hover:hidden whitespace-nowrap text-[8px]">Verified</span>
-                                <RefreshCw size={12} className="hidden group-hover:block" />
-                                <span className="hidden group-hover:block whitespace-nowrap text-[8px]">Edit</span>
-                            </>
-                        ) : "Accept"}
-                    </button>
+                    
+                    <div className="flex gap-1 w-full">
+                        {/* Edit Button */}
+                        <button
+                            onClick={() => setShowInlineSearch(!showInlineSearch)}
+                            disabled={isAccepted}
+                            className="h-8 px-2 rounded text-[10px] font-bold transition-colors flex items-center justify-center border text-blue-600 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 disabled:opacity-50"
+                            title="Edit ingredient match"
+                        >
+                            <Pencil size={12} />
+                        </button>
+                        
+                        {/* Save/Verify Button */}
+                        <button
+                            onClick={isAccepted ? () => setStepTwoSaved(prev => ({ ...prev, [ing.id]: false })) : handleSaveStepTwo}
+                            disabled={inputs.isSaving}
+                            className={cn(
+                                "flex-1 h-8 px-5 rounded text-[10px] font-bold transition-colors flex items-center justify-center gap-1.5 group",
+                                isAccepted
+                                    ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
+                                    : "bg-muted hover:bg-muted/80 border border-border text-indigo-600 shadow-sm"
+                            )}
+                        >
+                            {inputs.isSaving ? <Loader2 size={12} className="animate-spin" /> : isAccepted ? (
+                                <>
+                                    <Check size={12} className="group-hover:hidden" />
+                                    <span className="group-hover:hidden whitespace-nowrap text-[8px]">Verified</span>
+                                    <RefreshCw size={12} className="hidden group-hover:block" />
+                                    <span className="hidden group-hover:block whitespace-nowrap text-[8px]">Edit</span>
+                                </>
+                            ) : "Accept"}
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {/* Inline Search Bar */}
+            {showInlineSearch && (
+                <div className="mt-3 p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-800 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                            Search for different ingredient
+                        </p>
+                        <button
+                            onClick={() => {
+                                setShowInlineSearch(false);
+                                setInlineSearchResults([]);
+                            }}
+                            className="text-indigo-400 hover:text-indigo-600 transition-colors"
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+
+                    {/* Search Input */}
+                    <div className="relative group">
+                        <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                        <input
+                            type="text"
+                            value={inlineSearchQuery}
+                            onChange={(e) => {
+                                setInlineSearchQuery(e.target.value);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') executeInlineSearch(inlineSearchQuery);
+                            }}
+                            placeholder="Search food items..."
+                            autoFocus
+                            className="w-full pl-8 pr-3 py-2 rounded-lg border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                        />
+                    </div>
+
+                    {/* Search Button */}
+                    <button
+                        onClick={() => executeInlineSearch(inlineSearchQuery)}
+                        disabled={inlineSearchLoading || inlineSearchQuery.length < 2}
+                        className="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                        {inlineSearchLoading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+                        {inlineSearchLoading ? 'Searching...' : 'Search'}
+                    </button>
+
+                    {/* Results */}
+                    <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                        {inlineSearchLoading ? (
+                            <div className="flex items-center justify-center py-3 text-slate-500">
+                                <Loader2 size={14} className="animate-spin" />
+                            </div>
+                        ) : inlineSearchResults.length === 0 && inlineSearchQuery.length >= 2 ? (
+                            <div className="p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                                <p className="text-[9px] text-slate-500">No results found. Try a different search.</p>
+                            </div>
+                        ) : (
+                            inlineSearchResults.map((result, idx) => (
+                                <button
+                                    key={result.id || idx}
+                                    onClick={() => handleInlineSearchSelect(result)}
+                                    className="w-full text-left p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
+                                                {result.common_name || result.name}
+                                            </p>
+                                            {result.energy_kcal && (
+                                                <p className="text-[8px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                                    {result.energy_kcal}kcal · P:{result.protein_g}g · C:{result.carbs_g}g · F:{result.fat_g}g
+                                                </p>
+                                            )}
+                                        </div>
+                                        <Check size={14} className="text-indigo-500 flex-shrink-0 ml-2" />
+                                    </div>
+                                </button>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -315,7 +315,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     const initialAccepted: Record<string, boolean> = {};
                     const initialStepTwoSaved: Record<string, boolean> = {};
                     
-                    ingredientsData.forEach((ing) => {
+                    ingredientsData.forEach((mw) => {
                         if (ing.food_items) {
                             // Use portions column directly from food_items
                             const foodItem = {
