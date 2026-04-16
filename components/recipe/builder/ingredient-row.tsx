@@ -52,11 +52,11 @@ export function IngredientRow({
 
             {/* Quantity and Measure */}
             <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                     <button
                         type="button"
                         onClick={() => handleUpdateQuantity(index, Math.max(0, Number((ing.quantity - 0.125).toFixed(3))))}
-                        className="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center"
+                        className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
                     >
                         <Minus size={14} />
                     </button>
@@ -64,14 +64,14 @@ export function IngredientRow({
                         type="number"
                         value={ing.quantity}
                         onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                        className="flex-1 h-9 px-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-center"
+                        className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
                         min="0"
                         step="0.125"
                     />
                     <button
                         type="button"
                         onClick={() => handleUpdateQuantity(index, Number((ing.quantity + 0.125).toFixed(3)))}
-                        className="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center"
+                        className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
                     >
                         <Plus size={14} />
                     </button>
@@ -82,7 +82,7 @@ export function IngredientRow({
                             <select
                                 value={ing.measure_label}
                                 onChange={(e) => handleUpdateMeasure(index, e.target.value)}
-                                className="w-full h-9 pl-2 pr-10 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 border-none outline-none appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                className="w-full h-10 pl-3 pr-10 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 border-none outline-none appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             >
                                 {allOptions.map((opt, oIdx) => (
                                     <option key={oIdx} value={opt.label}>{opt.label}</option>
@@ -91,7 +91,7 @@ export function IngredientRow({
                             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
                         </>
                     ) : (
-                        <div className="w-full h-9 flex items-center justify-between px-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
+                        <div className="w-full h-10 flex items-center justify-between px-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
                             <span>{ing.measure_label}</span>
                             <ChevronDown className="text-slate-500" size={16} />
                         </div>
