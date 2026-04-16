@@ -154,6 +154,6 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
                     })}
                 </div>
             )}
-        </div>
+        </Card>
     );
 }
