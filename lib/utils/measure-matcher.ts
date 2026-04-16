@@ -10,6 +10,12 @@ interface MeasureMatch {
     confidence: number; // 0-100 score
 }
 
+export type MeasureCandidate = {
+    weight_g: number;
+    label: string;
+    confidence?: number;
+};
+
 type MeasureType = 'weight' | 'volume' | 'count' | 'unknown';
 
 // Common measure conversions
@@ -240,7 +246,7 @@ function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, original
 export function findBestMeasureMatch(
     originalMeasure: string,
     originalQuantity: number,
-    availableMeasures: MeasureMatch[]
+    availableMeasures: MeasureCandidate[]
 ): MeasureMatch & { confidence: number; isAutoMatched: boolean } | null {
     if (!availableMeasures || availableMeasures.length === 0) {
         return null;
@@ -275,7 +281,7 @@ export function findBestMeasureMatch(
 export function getMeasureMatchSuggestions(
     originalMeasure: string,
     originalQuantity: number,
-    availableMeasures: MeasureMatch[],
+    availableMeasures: MeasureCandidate[],
     topN: number = 3
 ): (MeasureMatch & { confidence: number })[] {
     if (!availableMeasures || availableMeasures.length === 0) {
