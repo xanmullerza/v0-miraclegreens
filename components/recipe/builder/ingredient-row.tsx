@@ -51,12 +51,12 @@ export function IngredientRow({
             </div>
 
             {/* Quantity and Measure */}
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="grid grid-cols-2 gap-2">
                 <input
                     type="number"
                     value={ing.quantity}
                     onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                    className="w-20 h-9 px-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                    className="w-full h-9 px-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                     min="0"
                     step="0.125"
                 />
@@ -64,7 +64,7 @@ export function IngredientRow({
                     <select
                         value={ing.measure_label}
                         onChange={(e) => handleUpdateMeasure(index, e.target.value)}
-                        className="w-[120px] h-9 pl-2 pr-8 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 border-none outline-none appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        className="w-full h-9 pl-2 pr-8 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500 border-none outline-none appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                         style={{
                             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='C19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                             backgroundRepeat: 'no-repeat',
@@ -77,7 +77,7 @@ export function IngredientRow({
                         ))}
                     </select>
                 ) : (
-                    <div className="w-[120px] px-3 h-9 flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
+                    <div className="w-full-3 h-9 flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-500">
                         {ing.measure_label}
                     </div>
                 )}
