@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X, Pencil, Trash2, Loader2, Layers, ChevronDown } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import { searchFoodItem } from '@/lib/services/nutrition';
 import { supabase } from '@/lib/supabase';
@@ -25,6 +26,10 @@ interface RecipeSectionProps {
 export function RecipeSection({ ctx }: RecipeSectionProps) {
     const { recipe, ingredients, instructions, calculatedNutrition, selectedServings, setSelectedServings, setShowTagsDialog, flippedCards, setFlippedCards, energyUnit } = ctx;
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+
     // State for ingredient search and replacement
     const [editingIngredient, setEditingIngredient] = useState<any>(null);
     const [showSearchDialog, setShowSearchDialog] = useState(false);
@@ -32,6 +37,9 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
     // State for delete confirmation
     const [deleteConfirming, setDeleteConfirming] = useState(false);
     const [deleting, setDeleting] = useState(false);
+
+    // State for related recipes expansion
+    const [showRelatedRecipes, setShowRelatedRecipes] = useState(false);
 
     // Delete recipe handler
     const handleDeleteRecipe = async () => {
@@ -354,6 +362,85 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             </>
                         )}
                     </button>
+                </div>
+            )}
+
+            {/* Related Recipes Button */}
+            <button
+                onClick={() => setShowRelatedRecipes(!showRelatedRecipes)}
+                className="w-full p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left hover:bg-slate-100/60 dark:hover:bg-slate-800/30 hover:border-emerald-400/60 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)] group"
+            >
+                <div className="flex items-center justify-between mb-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Related Recipes</p>
+                    <ChevronDown size={14} className={`text-slate-400 group-hover:text-emerald-500 transition-all duration-300 ${showRelatedRecipes ? 'rotate-180' : ''}`} />
+                </div>
+                <div className="flex items-center gap-2">
+                    <Layers size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">
+                        {ctx.loadingRelated ? 'Finding recipes...' : `${ctx.relatedRecipes.length} related meals found`}
+                    </span>
+                </div>
+            </button>
+
+            {/* Expandable Related Recipes */}
+            {showRelatedRecipes && (
+                <div className="animate-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-2 gap-3">
+                        {ctx.loadingRelated ? (
+                            // Loading state: 4 skeleton cards
+                            Array.from({ length: 4 }).map((_, i) => (
+                                <div
+                                    key={`skeleton-${i}`}
+                                    className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700 h-24"
+                                />
+                            ))
+                        ) : (
+                            // Render up to 4 related recipes
+                            ctx.relatedRecipes.slice(0, 4).map((meal, idx) => (
+                                <button
+                                    key={meal.id}
+                                    onClick={() => {
+                                        const params = new URLSearchParams(searchParams.toString());
+                                        params.set('recipeId', meal.id);
+                                        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                                    }}
+                                    className="p-4 rounded-2xl border-2 border-slate-200/70 dark:border-slate-800/70 bg-slate-50/50 dark:bg-slate-900/30 text-left transition-all active:scale-95 flex flex-col justify-between h-24 group relative overflow-hidden hover:border-emerald-400/50 dark:hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.14)]"
+                                >
+                                    {/* Background image */}
+                                    {meal.image && (
+                                        <img
+                                            src={meal.image}
+                                            className="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity"
+                                            alt={meal.title}
+                                        />
+                                    )}
+
+                                    {/* Content */}
+                                    <div className="relative z-10">
+                                        {(meal as any).overlapMatch && (
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 mb-1">
+                                                {(meal as any).overlapMatch} Shared
+                                            </p>
+                                        )}
+                                        <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
+                                            {meal.title}
+                                        </h4>
+                                    </div>
+
+                                    {/* Icon indicator */}
+                                    <Layers size={14} className="text-slate-400 group-hover:text-emerald-500 transition-colors relative z-10" />
+                                </button>
+                            ))
+                        )}
+                        {ctx.relatedRecipes.length === 0 && !ctx.loadingRelated && (
+                            <div className="col-span-2 p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 text-center">
+                                <Layers size={16} className="text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                                <p className="text-sm font-semibold text-slate-400 dark:text-slate-500">
+                                    No related recipes found
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 

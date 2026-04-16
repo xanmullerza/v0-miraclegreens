@@ -8,7 +8,6 @@ import {
     RecipeHeader,
     RecipeSection,
     RecipeNutrition,
-    RecipeRelated,
     RecipeManagement,
 } from '@/components/recipe/detail';
 
@@ -82,10 +81,6 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
                     <div className="space-y-4">
                         <RecipeNutrition ctx={ctx} />
                     </div>
-                )}
-
-                {activeSection === 'related' && (
-                    <RecipeRelated ctx={ctx} />
                 )}
 
                 {activeSection === 'management' && (

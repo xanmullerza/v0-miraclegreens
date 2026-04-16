@@ -29,7 +29,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
+    const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'management' | null>('recipe');
     const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
     const [showTagsDialog, setShowTagsDialog] = useState(false);
 
