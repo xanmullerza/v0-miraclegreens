@@ -55,7 +55,7 @@ export function IngredientRow({
                 <div className="flex items-center h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden hover:border-emerald-500/30 transition-colors focus-within:ring-2 focus-within:ring-emerald-500">
                     <button
                         type="button"
-                        onClick={() => handleUpdateQuantity(index, Math.max(0, Number((ing.quantity - 0.125).toFixed(3))))}
+                        onClick={() => handleUpdateQuantity(index, Math.max(0, Number((ing.quantity - 1).toFixed(0))))}
                         className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
                     >
                         <Minus size={14} />
@@ -66,11 +66,11 @@ export function IngredientRow({
                         onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
                         className="h-full w-16 px-0.5 bg-transparent text-slate-900 dark:text-white text-sm focus:outline-none text-center border-l border-r border-slate-200 dark:border-slate-700 flex-shrink-0"
                         min="0"
-                        step="0.125"
+                        step="1"
                     />
                     <button
                         type="button"
-                        onClick={() => handleUpdateQuantity(index, Number((ing.quantity + 0.125).toFixed(3)))}
+                        onClick={() => handleUpdateQuantity(index, Number((ing.quantity + 1).toFixed(0)))}
                         className="h-full px-3 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
                     >
                         <Plus size={14} />
