@@ -110,7 +110,7 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
     };
 
     return (
-        <Card className="space-y-3 p-4 shadow-xl">
+        <Card className="space-y-3 p-4 bg-card rounded-[2.5rem] border border-border shadow-2xl transition-all duration-500">
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
@@ -118,7 +118,7 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
                     placeholder="Search database..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-transparent border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
+                    className="w-full pl-9 pr-4 py-2 bg-transparent border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                 />
                 {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 animate-spin text-violet-500" />}
             </div>
