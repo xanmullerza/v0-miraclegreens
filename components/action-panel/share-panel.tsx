@@ -115,11 +115,19 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
             "animate-in fade-in duration-200"
         )}>
             <div className={cn(
-                "bg-white dark:bg-slate-900 overflow-hidden",
+                "bg-white dark:bg-slate-900 overflow-hidden relative",
                 isInline 
                     ? "w-full h-full flex flex-col p-4" 
                     : "w-full rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-in slide-in-from-bottom duration-300"
             )}>
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-sm transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
+                    aria-label="Close share dialog"
+                >
+                    <X size={16} />
+                </button>
+
                 {recipe && (
                     <div className="flex items-center gap-3 p-3 mb-6 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/10 shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(16,185,129,0.35)]">
                         {recipe.image ? (
