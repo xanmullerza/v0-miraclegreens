@@ -4,7 +4,6 @@ import React from 'react';
 import {
     Plus,
     Table,
-    ChefHat,
     ArrowRight,
     Scale,
     Beaker,
@@ -39,22 +38,6 @@ export function AdminOverview({ onTabSelect }: AdminOverviewProps) {
             icon: Plus,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
-        },
-        {
-            name: 'Recipe Architect',
-            desc: 'Build smart meal data and mixes.',
-            tabId: 'builder',
-            icon: ChefHat,
-            color: 'text-violet-500',
-            bg: 'bg-violet-500/10'
-        },
-        {
-            name: 'Edit Recipe',
-            desc: 'Protocol and step refinement.',
-            tabId: 'recipes',
-            icon: Table,
-            color: 'text-rose-500',
-            bg: 'bg-rose-500/10'
         },
         {
             name: 'Compare Foods',

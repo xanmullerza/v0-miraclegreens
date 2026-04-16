@@ -118,15 +118,6 @@ export default function ManageRecipesPage() {
                     <p className="text-slate-500 mt-1 text-sm">Manage and calibrate therapeutic meal data.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <Button
-                        onClick={() => router.push('/admin/recipebuilder')}
-                        className="rounded-xl bg-violet-600 hover:bg-violet-700 text-white gap-2 font-bold px-6"
-                    >
-                        <ChefHat size={16} />
-                        Architect New Recipe
-                    </Button>
-                </div>
             </div>
 
             {/* Filters Bar */}
@@ -239,9 +230,8 @@ export default function ManageRecipesPage() {
 
             {filteredRecipes.length === 0 && (
                 <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
-                    <ChefHat size={48} className="mx-auto mb-4 text-slate-200" />
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">No protocols found</h3>
-                    <p className="text-slate-500 mt-1">Adjust your parameters or architect a new recipe.</p>
+                    <p className="text-slate-500 mt-1">Adjust your parameters or add a recipe to the registry.</p>
                 </div>
             )}
         </div>
