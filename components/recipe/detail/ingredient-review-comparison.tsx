@@ -89,10 +89,10 @@ export function IngredientReviewComparison({
             {/* Header */}
             <div className="pb-2 border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-950 -mx-4 px-4 py-2">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                    <Layers size={14} /> Step 2: Ingredient & Portion Review
+                    <Layers size={14} /> Step 2: Ingredient Review
                 </h3>
                 <p className="text-xs text-muted-foreground mt-2">
-                    Review smart-matched ingredients and their portion conversions before proceeding to final verification.
+                    Review smart-matched ingredients and confirm each selection before moving to portion verification.
                 </p>
             </div>
 
@@ -246,10 +246,10 @@ export function IngredientReviewComparison({
                             : "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
                     )}
                 >
-                    {allVerified ? "Proceed to Portion Verification →" : "All ingredients must be matched or skipped"}
+                    {allVerified ? "Proceed to Step 3: Portion Verification →" : "All ingredients must be matched or skipped"}
                 </button>
                 <p className="text-[9px] text-indigo-600 dark:text-indigo-400 mt-2 text-center">
-                    Review portion conversions and finalize measurements in the next step.
+                    Completed review. In the next step, verify portion measurements for nutrition accuracy.
                 </p>
             </div>
         </div>

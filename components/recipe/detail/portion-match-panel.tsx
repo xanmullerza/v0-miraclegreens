@@ -146,7 +146,7 @@ export function PortionMatchPanel({
                 {/* Header */}
                 <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-950 -mx-4 px-4 py-2">
                     <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                        ⚖️ Step 2: Portion Verification
+                        ⚖️ Step 3: Portion Verification
                     </h3>
                     <button
                         onClick={onBack}
