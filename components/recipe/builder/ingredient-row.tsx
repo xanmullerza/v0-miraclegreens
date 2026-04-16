@@ -101,17 +101,11 @@ export function IngredientRow({
 
             {/* Source and Delete */}
             <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200 dark:border-slate-800">
-                <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2">
                     {ing.source === 'usda' ? (
-                        <>
-                            <Globe size={14} className="text-blue-500" />
-                            USDA API
-                        </>
+                        <Globe size={14} className="text-blue-500" />
                     ) : (
-                        <>
-                            <Database size={14} className="text-green-500" />
-                            Local DB
-                        </>
+                        <Database size={14} className="text-green-500" />
                     )}
                 </div>
                 <button
