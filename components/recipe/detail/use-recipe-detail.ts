@@ -23,7 +23,7 @@ interface UseRecipeDetailOptions {
 
 export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecipeDetailOptions) {
     console.log('[useRecipeDetail] Hook initialized with recipeId:', recipeId);
-    toast.info(`🔧 Initializing recipe detail for: ${recipeId}`);
+    toast.info(`🔧 Initializing recipe detail for: ${recipeId}`, { duration: 1000 });
 
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -169,7 +169,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             setRecipeToRemix({ recipe, ingredients, instructions, isEdit });
             setActiveView('recipe-builder');
             setIsActionPanelOpen(true);
-            toast.info(isEdit ? 'Opening recipe editor...' : 'Remixing recipe...');
+            toast.info(isEdit ? 'Opening recipe editor...' : 'Remixing recipe...', { duration: 1000 });
         }
     };
 
@@ -205,7 +205,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
             console.log('[auto-run-smart-match] Checking nutrition data:', { hasData, calories: recipe.calories, micronutrients: !!recipe.micronutrients });
             if (!hasData && Object.keys(matchedIngredients).length === 0 && !smartMatchRunning) {
                 console.log('[auto-run-smart-match] Conditions met, running auto match');
-                toast.info('🤖 Auto-matching ingredients for nutrition...');
+                toast.info('🤖 Auto-matching ingredients for nutrition...', { duration: 1000 });
                 // Auto-run smart match for recipes without nutrition data
                 runAutoMatch();
             } else {
@@ -229,14 +229,14 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     const fetchRecipeDetails = async () => {
         console.log('[fetchRecipeDetails] Starting to fetch recipe with ID:', recipeId);
-        toast.info(`🔍 Fetching recipe data...`);
+        toast.info(`🔍 Fetching recipe data...`, { duration: 1000 });
         try {
             setLoading(true);
             console.log('[fetchRecipeDetails] Set loading to true');
 
             if (String(recipeId).startsWith('local-')) {
                 console.log('[fetchRecipeDetails] Loading local recipe');
-                toast.info('📱 Loading local recipe...');
+                toast.info('📱 Loading local recipe...', { duration: 1000 });
                 const localData = localStorage.getItem('local_recipes');
                 if (localData) {
                     const localRecipes: any[] = JSON.parse(localData);
@@ -280,7 +280,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 }
             } else {
                 console.log('[fetchRecipeDetails] Loading database recipe');
-                toast.info('🗄️ Loading from database...');
+                toast.info('🗄️ Loading from database...', { duration: 1000 });
                 const { data: recipeData, error: recipeError } = await supabase
                     .from('recipes')
                     .select('*')
@@ -307,7 +307,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     throw ingredientsError;
                 }
                 console.log('[fetchRecipeDetails] Ingredients loaded:', ingredientsData?.length || 0);
-                toast.info(`✅ Ingredients loaded: ${ingredientsData?.length || 0}`);
+                toast.info(`✅ Ingredients loaded: ${ingredientsData?.length || 0}`, { duration: 1000 });
                 setIngredients(ingredientsData || []);
 
                 if (ingredientsData && ingredientsData.length > 0) {
@@ -367,7 +367,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                     throw instructionsError;
                 }
                 console.log('[fetchRecipeDetails] Instructions loaded:', instructionsData?.length || 0);
-                toast.info(`✅ Instructions loaded: ${instructionsData?.length || 0}`);
+                toast.info(`✅ Instructions loaded: ${instructionsData?.length || 0}`, { duration: 1000 });
                 setInstructions(instructionsData || []);
             }
         } catch (error: any) {
@@ -522,7 +522,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
 
     const runAutoMatch = async () => {
         console.log('[runAutoMatch] Starting auto match for ingredients:', ingredients.length);
-        toast.info(`🔍 Auto-matching ${ingredients.length} ingredients...`);
+        toast.info(`🔍 Auto-matching ${ingredients.length} ingredients...`, { duration: 1000 });
         setSmartMatchRunning(true);
         const loadingToastId = toast.loading("Auto-matching ingredients...");
         
@@ -539,7 +539,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 // Auto-skip flavorings
                 if (isFlavoringIngredient({ name: ingName } as any)) {
                     console.log('[runAutoMatch] Skipping flavoring:', ingName);
-                    toast.info(`⏭️ Skipping flavoring: ${ingName}`);
+                    toast.info(`⏭️ Skipping flavoring: ${ingName}`, { duration: 1000 });
                     autoSkipped.push(ing.id);
                     continue;
                 }
@@ -553,7 +553,7 @@ export function useRecipeDetail({ recipeId, onBack, onShare, onRemix }: UseRecip
                 }
 
                 console.log('[runAutoMatch] Searching for:', searchTerm);
-                toast.info(`🔎 Searching: "${searchTerm}"`);
+                toast.info(`🔎 Searching: "${searchTerm}"`, { duration: 1000 });
                 const results = await searchFoodItem(searchTerm);
                 console.log('[runAutoMatch] Search results:', results?.length || 0);
                 
