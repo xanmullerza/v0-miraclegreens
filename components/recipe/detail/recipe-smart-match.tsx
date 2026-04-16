@@ -43,6 +43,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
         deleteIngredient,
         isStep1Complete,
         proceedToStep2,
+        handleEditClick,
     } = ctx;
 
     if (!recipe) return null;
@@ -86,6 +87,7 @@ export function RecipeSmartMatch({ ctx }: RecipeSmartMatchProps) {
                     skippedIngredients={skippedIngredients}
                     setSkippedIngredients={setSkippedIngredients}
                     setMappingStep={setMappingStep}
+                    handleEditClick={handleEditClick}
                 />
             )}
 

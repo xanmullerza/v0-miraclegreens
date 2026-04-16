@@ -33,6 +33,7 @@ interface IngredientReviewComparisonProps {
     skippedIngredients: Record<string, boolean>;
     setSkippedIngredients: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
     setMappingStep: React.Dispatch<React.SetStateAction<'FOOD_MATCH' | 'INGREDIENT_REVIEW' | 'PORTION_MATCH'>>;
+    handleEditClick: () => void;
 }
 
 export function IngredientReviewComparison({
@@ -41,7 +42,8 @@ export function IngredientReviewComparison({
     setMatchedIngredients,
     skippedIngredients,
     setSkippedIngredients,
-    setMappingStep
+    setMappingStep,
+    handleEditClick,
 }: IngredientReviewComparisonProps) {
     const matchedCount = ingredients.filter(ing => matchedIngredients[ing.id]).length;
     const skippedCount = Object.keys(skippedIngredients).length;
@@ -247,6 +249,12 @@ export function IngredientReviewComparison({
                     )}
                 >
                     {allVerified ? "Proceed to Step 3: Portion Verification →" : "All ingredients must be matched or skipped"}
+                </button>
+                <button
+                    onClick={handleEditClick}
+                    className="w-full py-3 mt-3 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 rounded-lg font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                >
+                    Edit Ingredients
                 </button>
                 <p className="text-[9px] text-indigo-600 dark:text-indigo-400 mt-2 text-center">
                     Completed review. In the next step, verify portion measurements for nutrition accuracy.
