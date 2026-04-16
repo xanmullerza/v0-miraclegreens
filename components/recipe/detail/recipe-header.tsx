@@ -10,7 +10,11 @@ type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
 const TABS = [
     { key: 'recipe' as const, label: 'Recipe', icon: Layers, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-400 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
     { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, muted: 'text-violet-400/50 border-violet-500/30', activeGlow: 'text-violet-400 border-violet-400 shadow-[0_0_22px_rgba(167,139,250,0.35)] ring-1 ring-violet-500/20' },
-    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, muted: 'text-blue-400/50 border-blue-500/30', activeGlow: 'text-blue-400 border-blue-400 shadow-[0_0_22px_rgba(96,165,250,0.35)] ring-1 ring-blue-500/20' },
+] as const;
+
+const ACTION_BUTTONS = [
+    { key: 'favorite' as const, label: 'Favorite', icon: Heart, muted: 'text-rose-400/50 border-rose-500/30', activeGlow: 'text-rose-400 border-rose-400 shadow-[0_0_22px_rgba(251,113,133,0.35)] ring-1 ring-rose-500/20' },
+    { key: 'share' as const, label: 'Share', icon: Share2, muted: 'text-sky-400/50 border-sky-500/30', activeGlow: 'text-sky-400 border-sky-400 shadow-[0_0_22px_rgba(56,189,248,0.35)] ring-1 ring-sky-500/20' },
 ] as const;
 
 interface RecipeHeaderProps {
@@ -95,30 +99,6 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                     <h2 className="text-base font-semibold text-slate-900 dark:text-white text-left px-2 line-clamp-2 whitespace-normal break-words leading-tight">
                         {recipe.title}
                     </h2>
-                    <div className="flex items-center gap-2 pt-1">
-                        <button
-                            onClick={ctx.toggleFavorite}
-                            className={cn(
-                                'inline-flex items-center justify-center h-10 px-3 rounded-2xl border text-sm font-semibold transition-all',
-                                recipe.is_favorite
-                                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-600 hover:bg-rose-500/20 hover:border-rose-500'
-                                    : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                            )}
-                            title={recipe.is_favorite ? 'Remove from favourites' : 'Add to favourites'}
-                        >
-                            <Heart size={16} className={recipe.is_favorite ? 'text-rose-500' : 'text-slate-500 dark:text-slate-300'} />
-                        </button>
-                        <button
-                            onClick={() => {
-                                if (ctx.onShare) { ctx.onShare(recipe); }
-                                else { ctx.setRecipeToShare(recipe); ctx.navigateTo('recipe-share'); }
-                            }}
-                            className="inline-flex items-center justify-center h-10 px-3 rounded-2xl border border-sky-200 dark:border-sky-700 bg-sky-100/80 dark:bg-slate-800 text-sky-700 dark:text-sky-300 hover:bg-sky-200 dark:hover:bg-slate-700 transition-all"
-                            title="Share recipe"
-                        >
-                            <Share2 size={16} className="text-sky-600 dark:text-sky-300" />
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -130,19 +110,39 @@ export function RecipeHeader({ ctx, standalone = false }: RecipeHeaderProps) {
                     </div>
                 )}
                 <div className="flex-1 grid grid-cols-2 gap-2">
-                    {TABS.map(({ key, label, icon: Icon, muted, activeGlow }) => (
-                        <button
-                            key={key}
-                            onClick={() => setActiveSection(prev => prev === key ? null : key)}
-                            className={cn(
-                                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg border-2 text-[9px] font-black uppercase tracking-widest transition-all',
-                                activeSection === key ? activeGlow : muted
-                            )}
-                        >
-                            <Icon size={14} />
-                            <span>{label}</span>
-                        </button>
-                    ))}
+                    {[
+                        ...TABS,
+                        ...ACTION_BUTTONS,
+                    ].map(({ key, label, icon: Icon, muted, activeGlow }) => {
+                        const isFavoriteButton = key === 'favorite';
+                        const isShareButton = key === 'share';
+                        const isActive = isFavoriteButton ? recipe.is_favorite : activeSection === key;
+
+                        return (
+                            <button
+                                key={key}
+                                onClick={() => {
+                                    if (isFavoriteButton) {
+                                        ctx.toggleFavorite();
+                                        return;
+                                    }
+                                    if (isShareButton) {
+                                        if (ctx.onShare) { ctx.onShare(recipe); }
+                                        else { ctx.setRecipeToShare(recipe); ctx.navigateTo('recipe-share'); }
+                                        return;
+                                    }
+                                    setActiveSection(prev => prev === key ? null : key);
+                                }}
+                                className={cn(
+                                    'flex flex-col items-center gap-1 px-2 py-2 rounded-lg border-2 text-[9px] font-black uppercase tracking-widest transition-all',
+                                    isActive ? activeGlow : muted
+                                )}
+                            >
+                                <Icon size={14} />
+                                <span>{label}</span>
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
         </>
