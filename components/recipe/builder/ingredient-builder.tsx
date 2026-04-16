@@ -25,7 +25,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
 
     return (
         <div className="space-y-6">
-            <Card className="space-y-3 p-4 bg-card rounded-[2.5rem] border border-border shadow-2xl">
+            <Card className="space-y-3 p-4 pb-32 bg-card rounded-[2.5rem] border border-border shadow-2xl">
                 <div className="flex items-center justify-center px-2">
                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Workspace / {ingredients.length} Items</h4>
                 </div>
@@ -63,7 +63,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                     </div>
 
                     {hasIngredients && onNext && (
-                        <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800 pb-32">
+                        <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
                             <Button
                                 onClick={onNext}
                                 className="bg-violet-600 hover:bg-violet-700 text-white gap-2 min-w-[200px] font-black text-[10px] uppercase tracking-widest h-12 rounded-xl shadow-lg shadow-violet-500/20"
