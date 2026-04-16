@@ -187,7 +187,7 @@ function measureToGrams(quantity: number, measure: string): number | null {
  * Prioritizes measurement TYPE first (weight, volume, count)
  * For count measures, prefers "medium" size as the safest default
  */
-function scoreMeasure(dbMeasure: MeasureMatch, originalMeasure: string, originalQuantity: number): number {
+function scoreMeasure(dbMeasure: MeasureCandidate, originalMeasure: string, originalQuantity: number): number {
     let score = 0;
     
     const originalType = getMeasureType(originalMeasure);
