@@ -68,7 +68,7 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                                 onClick={onNext}
                                 className="bg-violet-600 hover:bg-violet-700 text-white gap-2 min-w-[200px] font-black text-[10px] uppercase tracking-widest h-12 rounded-xl shadow-lg shadow-violet-500/20"
                             >
-                                Next Phase: Instructions <ArrowRight size={14} />
+                                Next Instructions <ArrowRight size={14} />
                             </Button>
                         </div>
                     )}
