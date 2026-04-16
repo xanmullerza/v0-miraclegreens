@@ -186,27 +186,37 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                     </div>
                 </div>
 
-                <button
-                    onClick={handleCopyLink}
-                    className={cn(
-                        "w-full h-12 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border-2 active:scale-95",
-                        copied
-                            ? "bg-emerald-500 text-white border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.35)]"
-                            : "bg-emerald-500/10 dark:bg-emerald-900/20 hover:bg-emerald-500/20 dark:hover:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700/50 group hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-emerald-400 dark:hover:border-emerald-500"
-                    )}
-                >
-                    {copied ? (
-                        <>
-                            <Check size={18} className="text-white" />
-                            <span className="text-xs font-bold uppercase tracking-widest">Link Copied!</span>
-                        </>
-                    ) : (
-                        <>
-                            <Copy size={18} className="text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300" />
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 uppercase tracking-widest">Copy Recipe Link</span>
-                        </>
-                    )}
-                </button>
+                <div className="space-y-3">
+                    <button
+                        onClick={handleCopyLink}
+                        className={cn(
+                            "w-full h-12 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border-2 active:scale-95",
+                            copied
+                                ? "bg-emerald-500 text-white border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+                                : "bg-emerald-500/10 dark:bg-emerald-900/20 hover:bg-emerald-500/20 dark:hover:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700/50 group hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-emerald-400 dark:hover:border-emerald-500"
+                        )}
+                    >
+                        {copied ? (
+                            <>
+                                <Check size={18} className="text-white" />
+                                <span className="text-xs font-bold uppercase tracking-widest">Link Copied!</span>
+                            </>
+                        ) : (
+                            <>
+                                <Copy size={18} className="text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300" />
+                                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 uppercase tracking-widest">Copy Recipe Link</span>
+                            </>
+                        )}
+                    </button>
+
+                    <button
+                        onClick={onClose}
+                        className="w-full h-12 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border-2 bg-slate-500/10 dark:bg-slate-900/20 hover:bg-slate-500/20 dark:hover:bg-slate-900/30 border-slate-300 dark:border-slate-700/50 group hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(107,114,128,0.3)] hover:border-slate-400 dark:hover:border-slate-500 active:scale-95"
+                    >
+                        <X size={18} className="text-slate-600 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300" />
+                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 uppercase tracking-widest">Close</span>
+                    </button>
+                </div>
             </div>
         </div>
     );
