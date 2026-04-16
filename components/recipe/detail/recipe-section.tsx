@@ -377,7 +377,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                     <div className="flex items-center gap-2">
                         <Layers size={16} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
                         <span className="text-sm font-bold text-slate-900 dark:text-white">
-                            {ctx.loadingRelated ? 'Finding recipes...' : `${ctx.relatedRecipes.length} meals`}
+                            {ctx.loadingRelated ? 'Finding recipes...' : `${ctx.relatedRecipes.length} Meals`}
                         </span>
                     </div>
                 </button>
