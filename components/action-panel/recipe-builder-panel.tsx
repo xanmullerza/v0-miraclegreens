@@ -148,7 +148,7 @@ export function RecipeBuilderPanel({
                     <Card className="space-y-4 p-4 pb-32 bg-card rounded-[2.5rem] border border-border shadow-2xl">
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                                Recipe Title *
+                                Recipe Title * <span className="text-slate-500">(Required)</span>
                             </label>
                             <input
                                 type="text"
@@ -263,23 +263,6 @@ export function RecipeBuilderPanel({
                             </div>
                         </div>
 
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setRecipeStep(2)}
-                                className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold uppercase tracking-widest text-[10px] transition-all"
-                            >
-                                ← Back
-                            </button>
-                            <button
-                                onClick={() => setShowSaveOptions(true)}
-                                disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
-                                className="flex-[2] px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
-                            >
-                                {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                                <span>Save</span>
-                            </button>
-                        </div>
-
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
                                 Recipe Photo (Optional)
@@ -320,6 +303,23 @@ export function RecipeBuilderPanel({
                                     </label>
                                 )}
                             </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setRecipeStep(2)}
+                                className="flex-1 px-4 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold uppercase tracking-widest text-[10px] transition-all"
+                            >
+                                ← Back
+                            </button>
+                            <button
+                                onClick={() => setShowSaveOptions(true)}
+                                disabled={recipeSaving || !recipeTitle || recipeIngredients.length === 0 || !recipeInstructions.some(i => i.trim())}
+                                className="flex-[2] px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                {recipeSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                <span>Save</span>
+                            </button>
                         </div>
 
                         <div className="flex flex-col gap-3">
