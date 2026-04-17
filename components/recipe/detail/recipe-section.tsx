@@ -520,8 +520,8 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
             {/* Food Detail Modal */}
             {showFoodDetail && (
-                <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-slate-950 rounded-[2.5rem] w-full max-w-4xl h-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
+                <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-0">
+                    <div className="bg-white dark:bg-slate-950 w-full h-full overflow-hidden shadow-2xl border-0 rounded-none">
                         <FoodDetail foodId={foodDetailId} onBack={() => setShowFoodDetail(false)} />
                     </div>
                 </div>

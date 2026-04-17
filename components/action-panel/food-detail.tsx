@@ -30,9 +30,9 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
     if (!food) return null;
 
     return (
-        <div className="flex flex-col h-full w-full animate-in fade-in duration-500 overflow-y-auto">
+        <div className="flex flex-col h-full w-full animate-in fade-in duration-500 overflow-y-auto bg-white dark:bg-slate-950">
             {/* Close Button for Modal */}
-            <div className="flex justify-end p-4 sticky top-0 z-10 bg-white dark:bg-slate-950">
+            <div className="flex justify-end p-4 sticky top-0 z-10 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
                 <Button 
                     onClick={onBack} 
                     variant="ghost" 
@@ -43,7 +43,7 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
                 </Button>
             </div>
             
-            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden mb-6 w-full mx-auto">
+            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden mx-4 mb-4">
                 <FoodHeader ctx={ctx} />
                 
                 <div className="px-5 py-4 space-y-6 w-full">
