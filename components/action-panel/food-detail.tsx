@@ -44,4 +44,6 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
             <FoodEditCard ctx={ctx} />
         </div>
     );
-}
+};
+
+export default FoodDetail;
