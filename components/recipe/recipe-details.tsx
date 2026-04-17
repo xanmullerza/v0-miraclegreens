@@ -26,7 +26,8 @@ import {
     Scale,
     Dna,
     ChevronUp,
-    UtensilsCrossed
+    UtensilsCrossed,
+    Sun
 } from 'lucide-react';
 
 import { useHeaderActions } from '@/lib/context/header-actions-context';
@@ -1018,11 +1019,22 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                         'Selenium': ['Selenium', 'selenium_ug']
                                     }} />
 
-                                    <NutrientGrid title="Vitamins" icon={Droplet} theme="blue" items={{
+                                    <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="B-Complex & Vitamin C" items={{
+                                        'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                                        'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                                        'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                                        'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                        'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                        'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                                        'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
                                         'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                    }} />
+
+                                    <NutrientGrid title="Fat-Soluble Vitamins" icon={Sun} theme="amber" subtitle="A, D, E, K Bio-availability" items={{
+                                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
                                         'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
                                         'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                                     }} />
                                 </>
                             )}
