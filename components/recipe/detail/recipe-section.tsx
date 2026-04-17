@@ -175,7 +175,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                         </div>
                                         {/* Right Two-Thirds - Description */}
                                         <div className="col-span-2 px-3 py-2 flex items-start gap-2">
-                                            <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[12px] line-clamp-2 break-words">
+                                            <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[12px] line-clamp-3 break-words">
                                                 {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                             </p>
                                             {ing.food_items?.source === 'usda' ? (
