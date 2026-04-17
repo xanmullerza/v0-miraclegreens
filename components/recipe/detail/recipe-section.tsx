@@ -29,13 +29,10 @@ function formatItemMeasurement(amount: string): string {
 
     const prefixMatch = normalized.match(/^(\d+(?:\.\d+)?|\d+\/\d+|\d+\s+\d+\/\d+)(?:\s*x)?\s*/i);
     if (prefixMatch) {
-        const numberPart = prefixMatch[1];
-        const remainder = normalized.slice(prefixMatch[0].length).replace(itemRegex, '').trim();
-        return remainder ? `${numberPart} of ${remainder}` : `${numberPart} of`;
+        return prefixMatch[1];
     }
 
-    const remainder = normalized.replace(itemRegex, '').trim();
-    return remainder ? `each ${remainder}` : 'each';
+    return '1';
 }
 
 interface RecipeSectionProps {
