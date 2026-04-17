@@ -30,9 +30,9 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
     if (!food) return null;
 
     return (
-        <div className="flex flex-col h-full w-full animate-in fade-in duration-500">
+        <div className="flex flex-col h-full w-full animate-in fade-in duration-500 relative">
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto pb-20">
+            <div className="flex-1 overflow-y-auto pr-4">
                 <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden mb-6 w-full mx-auto">
                     <FoodHeader ctx={ctx} />
                     
@@ -45,10 +45,11 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
                 </div>
                 
                 <FoodEditCard ctx={ctx} />
+                <div className="h-24" />
             </div>
             
-            {/* Fixed Back Button at Viewport Bottom */}
-            <div className="fixed bottom-0 left-0 right-0 flex items-center justify-between p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            {/* Sticky Back Button at Bottom */}
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg">
                 <Button 
                     onClick={onBack} 
                     variant="ghost" 
