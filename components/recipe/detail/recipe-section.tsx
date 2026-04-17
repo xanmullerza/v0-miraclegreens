@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X, Pencil, Trash2, Loader2, Layers, ChevronDown } from 'lucide-react';
+import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X, Pencil, Trash2, Loader2, Layers, ChevronDown, Info } from 'lucide-react';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import { searchFoodItem } from '@/lib/services/nutrition';
 import { supabase } from '@/lib/supabase';
@@ -225,22 +225,22 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                                 >
                                                     <X size={20} />
                                                 </Button>
-                                                <div className="flex-1 flex justify-center items-center space-x-8">
+                                                <div className="flex-1 flex justify-center items-center space-x-4">
                                                     <div className="text-center">
-                                                        <p className="text-lg font-black text-violet-300 dark:text-violet-200">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-violet-300 dark:text-violet-200">{energyUnit}</p>
+                                                        <p className="text-sm font-black text-violet-300 dark:text-violet-200">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-violet-300 dark:text-violet-200">{energyUnit}</p>
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-lg font-black text-amber-300 dark:text-amber-200">{ingCarbs}g</p>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-amber-300 dark:text-amber-200">Carbs</p>
+                                                        <p className="text-sm font-black text-amber-300 dark:text-amber-200">{ingCarbs}g</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-300 dark:text-amber-200">Carbs</p>
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-lg font-black text-rose-300 dark:text-rose-200">{ingProtein}g</p>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-rose-300 dark:text-rose-200">Protein</p>
+                                                        <p className="text-sm font-black text-rose-300 dark:text-rose-200">{ingProtein}g</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-rose-300 dark:text-rose-200">Protein</p>
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-lg font-black text-sky-300 dark:text-sky-200">{ingFat}g</p>
-                                                        <p className="text-xs font-bold uppercase tracking-widest text-sky-300 dark:text-sky-200">Fat</p>
+                                                        <p className="text-sm font-black text-sky-300 dark:text-sky-200">{ingFat}g</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-sky-300 dark:text-sky-200">Fat</p>
                                                     </div>
                                                 </div>
                                                 <Button 
@@ -252,10 +252,11 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                                         }
                                                     }} 
                                                     variant="ghost" 
+                                                    size="icon"
                                                     disabled={!ing.food_items?.id}
                                                     className="text-slate-400 hover:text-emerald-400 disabled:opacity-50 hover:bg-emerald-500/10 shrink-0"
                                                 >
-                                                    Details
+                                                    <Info size={16} />
                                                 </Button>
                                             </>
                                         ) : (
