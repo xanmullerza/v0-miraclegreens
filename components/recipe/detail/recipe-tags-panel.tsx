@@ -166,6 +166,7 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
         <PanelWrapper 
             title="Manage Tags" 
             noPadding
+            headerVariant="none"
         >
             <div className="flex flex-col h-full bg-white dark:bg-slate-900">
                 <div className="flex-1 overflow-y-auto p-4 space-y-8 pb-32">
@@ -267,9 +268,9 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
                                 {(recipe.tags || [])
                                     .filter(t => !PREDEFINED_TAGS.includes(t))
                                     .map(tag => (
-                                        <div key={tag} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                                        <div key={tag} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-500 text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shadow-sm">
                                             {tag}
-                                            <button onClick={() => handleRemoveCustomTag(tag)} className="hover:text-rose-500 transition-colors">
+                                            <button onClick={() => handleRemoveCustomTag(tag)} className="text-emerald-500 hover:text-rose-500 transition-colors">
                                                 <X size={14} />
                                             </button>
                                         </div>
@@ -289,13 +290,21 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
                     </div>
                 </div>
 
-                {/* Footer Fix - Persistent Done button */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800">
+                {/* Footer Fix - Persistent Cancel/Save buttons */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-3">
                     <button
+                        type="button"
                         onClick={onBack}
-                        className="w-full py-4 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl active:scale-[0.98] transition-all"
+                        className="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-2xl font-black uppercase tracking-widest text-[11px] transition-all hover:bg-slate-200 dark:hover:bg-slate-700"
                     >
-                        Done
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-emerald-500/20 active:scale-[0.98] transition-all"
+                    >
+                        Save
                     </button>
                 </div>
             </div>
