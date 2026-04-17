@@ -30,9 +30,25 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
     if (!food) return null;
 
     return (
-        <div className="flex flex-col h-full w-full animate-in fade-in duration-500 overflow-y-auto">
-            {/* Back Button */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col h-full w-full animate-in fade-in duration-500">
+            {/* Content Area */}
+            <div className="flex-1 overflow-y-auto">
+                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden mb-6 w-full mx-auto">
+                    <FoodHeader ctx={ctx} />
+                    
+                    <div className="px-5 py-4 space-y-6 w-full">
+                        {activeSection === 'management' && <FoodManagement ctx={ctx} user={ctx.user} />}
+                        {activeSection === 'facts' && (food.details || FOOD_DETAILS[food.id]) && <FoodFacts ctx={ctx} />}
+                        {activeSection === 'recipes' && <FoodRecipes ctx={ctx} />}
+                        {activeSection === 'nutrition' && <FoodNutrition ctx={ctx} />}
+                    </div>
+                </div>
+                
+                <FoodEditCard ctx={ctx} />
+            </div>
+            
+            {/* Sticky Back Button at Bottom */}
+            <div className="sticky bottom-0 flex items-center justify-between p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <Button 
                     onClick={onBack} 
                     variant="ghost" 
@@ -42,19 +58,6 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
                     Back to Recipe
                 </Button>
             </div>
-            
-            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden mb-6 w-full mx-auto">
-                <FoodHeader ctx={ctx} />
-                
-                <div className="px-5 py-4 space-y-6 w-full">
-                    {activeSection === 'management' && <FoodManagement ctx={ctx} user={ctx.user} />}
-                    {activeSection === 'facts' && (food.details || FOOD_DETAILS[food.id]) && <FoodFacts ctx={ctx} />}
-                    {activeSection === 'recipes' && <FoodRecipes ctx={ctx} />}
-                    {activeSection === 'nutrition' && <FoodNutrition ctx={ctx} />}
-                </div>
-            </div>
-            
-            <FoodEditCard ctx={ctx} />
         </div>
     );
 };
