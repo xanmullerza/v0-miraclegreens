@@ -157,7 +157,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             return (
                                 <div
                                     key={ing.id || idx}
-                                    className="relative h-14 group"
+                                    className="relative min-h-14 group"
                                     onClick={() => setFlippedCards(prev => ({ ...prev, [ing.id]: !isFlipped }))}
                                 >
                                     {/* Front Side - Combo Card */}
@@ -174,20 +174,20 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                             </span>
                                         </div>
                                         {/* Right Two-Thirds - Description */}
-                                        <div className="col-span-2 px-3 py-2 flex items-center gap-2">
-                                            <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[12px] truncate">
+                                        <div className="col-span-2 px-3 py-2 flex items-start gap-2">
+                                            <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[12px] line-clamp-2 break-words">
                                                 {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                             </p>
                                             {ing.food_items?.source === 'usda' ? (
-                                                <Globe size={9} className="shrink-0 text-blue-500" title="From USDA API" />
+                                                <Globe size={9} className="shrink-0 text-blue-500 mt-1" title="From USDA API" />
                                             ) : ing.food_items?.source === 'local' ? (
-                                                <Database size={9} className="shrink-0 text-green-500" title="From Local Database" />
+                                                <Database size={9} className="shrink-0 text-green-500 mt-1" title="From Local Database" />
                                             ) : null}
                                         </div>
                                     </div>
                                     {/* Back Side - Macro Breakdown */}
                                     <div className={cn(
-                                        "w-full h-full px-4 py-2 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
+                                        "w-full h-full min-h-14 px-4 py-2 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
                                         "bg-transparent border-emerald-400 text-emerald-900 dark:text-emerald-100",
                                         "shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20",
                                         isFlipped ? "grid" : "hidden"
