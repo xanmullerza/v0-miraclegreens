@@ -519,11 +519,13 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
             </Dialog>
 
             {/* Food Detail Modal */}
-            <Dialog open={showFoodDetail} onOpenChange={() => setShowFoodDetail(false)}>
-                <DialogContent className="inset-0 max-w-none w-full h-full p-0 translate-x-0 translate-y-0 rounded-none overflow-auto">
-                    <FoodDetail foodId={foodDetailId} onBack={() => setShowFoodDetail(false)} />
-                </DialogContent>
-            </Dialog>
+            {showFoodDetail && (
+                <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-950 rounded-[2.5rem] w-full max-w-4xl h-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
+                        <FoodDetail foodId={foodDetailId} onBack={() => setShowFoodDetail(false)} />
+                    </div>
+                </div>
+            )}
 
             {/* Source */}
             {recipe.source && recipe.source !== 'pasted-content' && (
