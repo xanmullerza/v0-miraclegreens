@@ -513,6 +513,65 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                             </tr>
                         </thead>
                         <tbody>
+                            {/* Search Row - appears when a slot is active */}
+                            {activeSlot !== null && (
+                                <tr className="bg-emerald-50/30 dark:bg-emerald-950/20 border-b-2 border-emerald-500/30">
+                                    <td colSpan={4} className="p-3 md:p-6">
+                                        <div className="flex gap-3 items-center">
+                                            <Input
+                                                type="text"
+                                                value={searchQuery}
+                                                onChange={(e) => handleSearchInput(e.target.value)}
+                                                placeholder="Search food library..."
+                                                className="flex-1 bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"
+                                                autoFocus
+                                            />
+                                            <button
+                                                onClick={() => setActiveSlot(null)}
+                                                className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                        {/* Search Results */}
+                                        {searchResults.length > 0 && (
+                                            <div className="mt-3 space-y-1 max-h-48 overflow-y-auto">
+                                                {searchResults.map((food) => (
+                                                    <button
+                                                        key={food.id}
+                                                        onClick={() => selectFood(food)}
+                                                        className="w-full text-left p-2 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors border border-transparent hover:border-emerald-300 dark:hover:border-emerald-700"
+                                                    >
+                                                        <div className="flex items-center gap-3 min-w-0">
+                                                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                                                                {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 w-4" />}
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <h4 className="font-black text-xs uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                                                <p className="text-[8px] text-slate-400 truncate">
+                                                                    {(() => {
+                                                                        try {
+                                                                            const kcal = food.energy_kcal || 0;
+                                                                            return `${kcal.toFixed(0)} kcal / 100g`;
+                                                                        } catch (e) {
+                                                                            return 'N/A';
+                                                                        }
+                                                                    })()}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {isSearching && (
+                                            <div className="mt-3 text-center text-xs text-slate-400">
+                                                Searching...
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            )}
                             {NUTRIENT_GROUPS.map((group) => (
                                 <React.Fragment key={group.title}>
                                     <tr className="bg-slate-50/80 dark:bg-slate-800/50">
@@ -646,69 +705,6 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                     )}
                 </div>
             )}
-            
-            {/* Search Section - Positioned below the table and meals */}
-            <div className="pt-6 w-full md:max-w-[900px] mx-auto"> {/* extra padding to drop the viewer */}
-                <HeroSearch
-                    searchQuery={searchQuery}
-                    onQueryChange={handleSearchInput}
-                    results={searchResults}
-                    isLoading={isSearching}
-                    isActive={activeSlot !== null}
-                    setIsActive={(active) => {
-                        if (!active) setActiveSlot(null);
-                    }}
-                    onSelect={selectFood}
-                    onFocus={() => {
-                        if (activeSlot === null) {
-                            const firstEmpty = selectedFoods.findIndex(f => f === null);
-                            setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
-                        }
-                    }}
-                    theme="emerald"
-                    placeholder="SEARCH FOOD LIBRARY..."
-                    noResultsMessage="No matching items found"
-                    enterMessage="Enter item name to compare"
-                    searchingMessage="Searching Library..."
-                    idleExtra={
-                        activeSlot === null && selectedFoods.some(f => f !== null) ? (
-                            <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500 mt-4">
-                                <button
-                                    onClick={clearAll}
-                                    className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2 shadow-sm active:scale-95"
-                                >
-                                    <Trash2 size={14} /> Clear All
-                                </button>
-                            </div>
-                        ) : null
-                    }
-                    renderResult={(food: any) => (
-                        <>
-                        <div className="flex items-center gap-4 min-w-0">
-                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
-                                {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
-                            </div>
-                            <div className="min-w-0">
-                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                    {(() => {
-                                        try {
-                                            const kcal = food.energy_kcal || 0;
-                                            const value = energyUnit === 'kJ' ? (kcal * 4.184).toFixed(0) : kcal.toFixed(0);
-                                            return `${value} ${energyUnit}`;
-                                        } catch (e) {
-                                            return 'N/A';
-                                        }
-                                    })()} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
-                                </p>
-                            </div>
-                        </div>
-                        <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
-                    </>
-                )}
-            />
-            </div>
-            </div>
         </div>
     );
 }
