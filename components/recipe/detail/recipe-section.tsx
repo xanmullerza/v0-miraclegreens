@@ -180,22 +180,6 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                                 <Database size={10} className="shrink-0 text-green-500" title="From Local Database" />
                                             ) : null}
                                         </p>
-                                        <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setEditingIngredient(ing);
-                                                    setShowSearchDialog(true);
-                                                }}
-                                                className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-slate-500 hover:text-blue-600 transition-colors"
-                                                title="Search for different ingredient"
-                                            >
-                                                <Search size={12} />
-                                            </button>
-                                            <div className="px-2.5 py-1 rounded-lg bg-emerald-200 dark:bg-emerald-800 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest">
-                                                Macros
-                                            </div>
-                                        </div>
                                     </div>
 
                                     {/* Back Side - Macro Breakdown */}
