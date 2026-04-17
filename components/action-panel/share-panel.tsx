@@ -120,14 +120,6 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
                     ? "w-full h-full flex flex-col p-4" 
                     : "w-full rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 animate-in slide-in-from-bottom duration-300"
             )}>
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-sm transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
-                    aria-label="Close share dialog"
-                >
-                    <X size={16} />
-                </button>
-
                 {recipe && (
                     <div className="flex items-center gap-3 p-3 mb-6 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/10 shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300 active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(16,185,129,0.35)]">
                         {recipe.image ? (
@@ -211,10 +203,10 @@ export function SharePanel({ recipe, onClose, isInline = false }: SharePanelProp
 
                     <button
                         onClick={onClose}
-                        className="w-full h-12 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border-2 bg-slate-500/10 dark:bg-slate-900/20 hover:bg-slate-500/20 dark:hover:bg-slate-900/30 border-slate-300 dark:border-slate-700/50 group hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(107,114,128,0.3)] hover:border-slate-400 dark:hover:border-slate-500 active:scale-95"
+                        className="w-full h-12 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 border-2 bg-rose-500/10 dark:bg-rose-900/20 hover:bg-rose-500/20 dark:hover:bg-rose-900/30 border-rose-300 dark:border-rose-700/50 group hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] hover:border-rose-400 dark:hover:border-rose-500 active:scale-95"
                     >
-                        <X size={18} className="text-slate-600 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300" />
-                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 uppercase tracking-widest">Close</span>
+                        <X size={18} className="text-rose-600 dark:text-rose-400 group-hover:text-rose-700 dark:group-hover:text-rose-300" />
+                        <span className="text-xs font-bold text-rose-600 dark:text-rose-400 group-hover:text-rose-700 dark:group-hover:text-rose-300 uppercase tracking-widest">Close</span>
                     </button>
                 </div>
             </div>
