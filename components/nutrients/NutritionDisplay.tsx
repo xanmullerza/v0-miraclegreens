@@ -58,14 +58,11 @@ export function NutritionDisplay({
     const { energy, protein, carbs, fat, aminoAcids, carbBreakdown, fatBreakdown, micronutrients } = nutrition;
     const ndm = nutrientDisplayMode;
 
-    const vitaminSortOrder = ['B9', 'B9 (Folate)', 'B12', 'B12 (Cobalamin)', 'C', 'Vitamin C'];
+    const vitaminSortOrder = ['B1', 'B2', 'B3', 'B5', 'B6', 'B7', 'B9', 'B12', 'C', 'A', 'D', 'E', 'K'];
     const sortedVitamins = micronutrients.waterSoluble.concat(micronutrients.fatSoluble).slice().sort((a, b) => {
         const getOrder = (nutrient: { label: string; fullName?: string }) => {
             const key = `${nutrient.label}`;
-            const fullName = nutrient.fullName || '';
-            const orderIndex = vitaminSortOrder.findIndex(order =>
-                key === order || fullName === order || key.includes(order) || fullName.includes(order)
-            );
+            const orderIndex = vitaminSortOrder.findIndex(order => key === order || key.includes(order));
             return orderIndex !== -1 ? orderIndex : vitaminSortOrder.length;
         };
         const orderA = getOrder(a);
