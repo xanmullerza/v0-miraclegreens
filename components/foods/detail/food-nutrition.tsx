@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Scale } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { useFoodNutrition } from '@/hooks/use-food-nutrition';
@@ -9,6 +9,7 @@ import { useFoodFilter } from '@/lib/context/food-filter-context';
 export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
+    const [showComparator, setShowComparator] = useState(false);
     const { 
         food, amount, selectedPortion, energyUnit, userRDAs, nutrientDisplayMode,
         breakdownNutrient, setBreakdownNutrient
@@ -103,27 +104,62 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
     return (
         <div className="space-y-6">
-            {/* Gram Selector */}
-            <div className="p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800">
-                <div className="flex items-center justify-between">
-                    <h4 className="font-black uppercase tracking-widest text-[10px] text-orange-400">
-                        Adjust Portion
-                    </h4>
-                    <div className="flex items-center gap-2 bg-slate-700 rounded-lg p-2 border border-slate-600 hover:border-orange-400/50 transition-colors cursor-pointer group" title="Click to adjust portion size">
-                        <input
-                            type="number"
-                            min="1"
-                            max="9999"
-                            value={macroGrams}
-                            onChange={(e) => setMacroGrams(Math.max(1, parseInt(e.target.value) || 100))}
-                            className="w-20 bg-slate-800 text-white text-center text-sm font-bold rounded px-2 py-1 border border-slate-600 focus:outline-none focus:border-orange-400 group-hover:border-orange-400/50 transition-colors cursor-pointer"
-                            title="Edit portion size (1-9999g)"
-                            aria-label="Portion size in grams"
-                        />
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-orange-400/60 transition-colors">g</span>
+            {/* Control Buttons - Two Column Layout */}
+            <div className="grid grid-cols-2 gap-4">
+                {/* Adjust Portion */}
+                <div className="p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800">
+                    <div className="flex flex-col gap-4">
+                        <h4 className="font-black uppercase tracking-widest text-[10px] text-orange-400">
+                            Adjust Portion
+                        </h4>
+                        <div className="flex items-center gap-2 bg-slate-700 rounded-lg p-2 border border-slate-600 hover:border-orange-400/50 transition-colors cursor-pointer group" title="Click to adjust portion size">
+                            <input
+                                type="number"
+                                min="1"
+                                max="9999"
+                                value={macroGrams}
+                                onChange={(e) => setMacroGrams(Math.max(1, parseInt(e.target.value) || 100))}
+                                className="w-full bg-slate-800 text-white text-center text-sm font-bold rounded px-2 py-1 border border-slate-600 focus:outline-none focus:border-orange-400 group-hover:border-orange-400/50 transition-colors cursor-pointer"
+                                title="Edit portion size (1-9999g)"
+                                aria-label="Portion size in grams"
+                            />
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-orange-400/60 transition-colors whitespace-nowrap">g</span>
+                        </div>
                     </div>
                 </div>
+
+                {/* Compare Nutrition */}
+                <button
+                    onClick={() => setShowComparator(!showComparator)}
+                    className="p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 hover:border-cyan-400/50 transition-colors flex flex-col items-center justify-center gap-3 group"
+                >
+                    <div className="flex items-center gap-2">
+                        <Scale size={18} className="text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+                        <h4 className="font-black uppercase tracking-widest text-[10px] text-cyan-400 group-hover:text-cyan-300 transition-colors">
+                            Compare
+                        </h4>
+                    </div>
+                    <span className="text-[8px] text-slate-400 group-hover:text-slate-300 transition-colors">Nutrition</span>
+                </button>
             </div>
+
+            {/* Comparator View */}
+            {showComparator && (
+                <div className="p-6 rounded-3xl border bg-gradient-to-br bg-slate-900/50 border-slate-800 space-y-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <h4 className="font-black uppercase tracking-widest text-[12px] text-cyan-400">
+                            Compare Nutrition
+                        </h4>
+                        <button
+                            onClick={() => setShowComparator(false)}
+                            className="text-slate-400 hover:text-slate-200 transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+                    <p className="text-sm text-slate-400">Comparator coming soon...</p>
+                </div>
+            )}
 
             {/* Nutrition Display Component */}
             {nutrition && (
