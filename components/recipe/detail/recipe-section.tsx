@@ -157,20 +157,20 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             return (
                                 <div
                                     key={ing.id || idx}
-                                    className="relative h-14 group"
+                                    className="relative min-h-14 group"
                                     onClick={() => setFlippedCards(prev => ({ ...prev, [ing.id]: !isFlipped }))}
                                 >
                                     {/* Front Side - Slim Card */}
                                     <div className={cn(
-                                        "absolute inset-0 px-3 flex items-center gap-3 rounded-2xl border-2 transition-all duration-300",
+                                        "w-full px-3 py-2 flex items-center gap-3 rounded-2xl border-2 transition-all duration-300",
                                         "border-emerald-500/30",
-                                        isFlipped ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100",
+                                        isFlipped ? "hidden" : "block",
                                         "hover:border-emerald-400 hover:shadow-[0_0_22px_rgba(16,185,129,0.35)] hover:ring-1 hover:ring-emerald-500/20"
                                     )}>
                                         <div className="shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest min-w-[60px] text-center">
                                             {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
                                         </div>
-                                        <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[13px] truncate flex items-center gap-2">
+                                        <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[13px] line-clamp-2 flex items-center gap-2">
                                             <span>
                                                 {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                             </span>
@@ -184,10 +184,10 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
                                     {/* Back Side - Macro Breakdown */}
                                     <div className={cn(
-                                        "absolute inset-0 px-4 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
+                                        "w-full px-4 py-2 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
                                         "bg-transparent border-emerald-400 text-emerald-900 dark:text-emerald-100",
                                         "shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20",
-                                        isFlipped ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                                        isFlipped ? "block" : "hidden"
                                     )}>
                                         {food ? (
                                             <>
