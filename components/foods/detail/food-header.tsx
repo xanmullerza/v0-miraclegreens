@@ -1,16 +1,16 @@
 import React from 'react';
-import { Beef, BookOpen, Activity, ShoppingCart, Heart } from 'lucide-react';
+import { Beef, BookOpen, Activity, ShoppingCart, Salad } from 'lucide-react';
 import { cn, formatFoodName } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 
 const TABS = [
-    { key: 'facts' as const, label: 'About', icon: BookOpen, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-400 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
+    { key: 'facts' as const, label: 'About', icon: BookOpen, muted: 'text-cyan-400/50 border-cyan-500/30', activeGlow: 'text-cyan-400 border-cyan-400 shadow-[0_0_22px_rgba(34,211,238,0.35)] ring-1 ring-cyan-500/20' },
     { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, muted: 'text-violet-400/50 border-violet-500/30', activeGlow: 'text-violet-400 border-violet-400 shadow-[0_0_22px_rgba(167,139,250,0.35)] ring-1 ring-violet-500/20' },
 ] as const;
 
 const ACTION_BUTTONS = [
-    { key: 'recipes' as const, label: 'Recipes', icon: Heart, muted: 'text-rose-400/50 border-rose-500/30', activeGlow: 'text-rose-400 border-rose-400 shadow-[0_0_22px_rgba(251,113,133,0.35)] ring-1 ring-rose-500/20' },
+    { key: 'recipes' as const, label: 'Recipes', icon: Salad, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-400 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
     { key: 'management' as const, label: 'Management', icon: ShoppingCart, muted: 'text-sky-400/50 border-sky-500/30', activeGlow: 'text-sky-400 border-sky-400 shadow-[0_0_22px_rgba(56,189,248,0.35)] ring-1 ring-sky-500/20' },
 ] as const;
 
