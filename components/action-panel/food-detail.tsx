@@ -4,7 +4,7 @@ import React from 'react';
 import { useFoodDetail, FoodHeader, FoodFacts, FoodNutrition, FoodRecipes, FoodManagement, FoodEditCard } from '@/components/foods/detail';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { useActionPanel } from '@/lib/context/action-panel-context';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface FoodDetailProps {
@@ -30,20 +30,20 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
     if (!food) return null;
 
     return (
-        <div className="flex flex-col h-full w-full animate-in fade-in duration-500 overflow-y-auto bg-white dark:bg-slate-950">
-            {/* Close Button for Modal */}
-            <div className="flex justify-end p-4 sticky top-0 z-10 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col h-full w-full animate-in fade-in duration-500 overflow-y-auto">
+            {/* Back Button */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
                 <Button 
                     onClick={onBack} 
                     variant="ghost" 
-                    size="icon" 
-                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                 >
-                    <X size={20} />
+                    <ChevronLeft size={16} className="mr-2" />
+                    Back to Recipe
                 </Button>
             </div>
             
-            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden mx-4 mb-4">
+            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden mb-6 w-full mx-auto">
                 <FoodHeader ctx={ctx} />
                 
                 <div className="px-5 py-4 space-y-6 w-full">

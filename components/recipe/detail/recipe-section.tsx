@@ -97,6 +97,11 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
     if (!recipe) return null;
 
+    // Show food detail instead of recipe if selected
+    if (showFoodDetail && foodDetailId) {
+        return <FoodDetail foodId={foodDetailId} onBack={() => setShowFoodDetail(false)} />;
+    }
+
     return (
         <>
             {/* Recipe Metadata */}
@@ -517,15 +522,6 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                         />
                 </DialogContent>
             </Dialog>
-
-            {/* Food Detail Modal */}
-            {showFoodDetail && (
-                <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-0">
-                    <div className="bg-white dark:bg-slate-950 w-full h-full overflow-hidden shadow-2xl border-0 rounded-none">
-                        <FoodDetail foodId={foodDetailId} onBack={() => setShowFoodDetail(false)} />
-                    </div>
-                </div>
-            )}
 
             {/* Source */}
             {recipe.source && recipe.source !== 'pasted-content' && (
