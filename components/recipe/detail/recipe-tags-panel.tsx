@@ -168,7 +168,7 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
             noPadding
             headerVariant="none"
         >
-            <div className="flex flex-col h-full bg-white dark:bg-slate-900">
+            <div className="relative flex flex-col h-full bg-white dark:bg-slate-900">
                 <div className="flex-1 overflow-y-auto p-4 space-y-8 pb-32">
                     {/* Meal Type */}
                     <div className="space-y-4">
