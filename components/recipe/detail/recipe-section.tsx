@@ -42,7 +42,7 @@ interface RecipeSectionProps {
 }
 
 export function RecipeSection({ ctx }: RecipeSectionProps) {
-    const { recipe, ingredients, instructions, calculatedNutrition, selectedServings, setSelectedServings, setShowTagsDialog, energyUnit } = ctx;
+    const { recipe, ingredients, instructions, calculatedNutrition, selectedServings, setSelectedServings, setShowTagsDialog, flippedCards, setFlippedCards, energyUnit } = ctx;
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -59,8 +59,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
     // State for related recipes expansion
     const [showRelatedRecipes, setShowRelatedRecipes] = useState(false);
 
-    // State for ingredient modal
-    const [selectedIngredient, setSelectedIngredient] = useState<any>(null);
+    // State for food detail modal
     const [showFoodDetail, setShowFoodDetail] = useState(false);
     const [foodDetailId, setFoodDetailId] = useState<string>('');
 
@@ -171,6 +170,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                 ingFat = Math.round((food.fat_g || 0) * ratio * 10) / 10;
                             }
 
+                            const isFlipped = flippedCards[ing.id];
                             const isGenericItem = ing.amount?.toLowerCase().includes('item') || ing.amount?.toLowerCase().includes('unit');
                             const rawAmount = isGenericItem && displayWeight > 0 
                                 ? `${displayWeight}g` 
@@ -181,12 +181,13 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                 <div
                                     key={ing.id || idx}
                                     className="relative min-h-14 group cursor-pointer"
-                                    onClick={() => setSelectedIngredient({ ...ing, ingCalories, ingProtein, ingCarbs, ingFat })}
+                                    onClick={() => setFlippedCards(prev => ({ ...prev, [ing.id]: !prev[ing.id] }))}
                                 >
                                     {/* Front Side - Combo Card */}
                                     <div className={cn(
                                         "w-full h-full grid grid-cols-3 rounded-2xl border-2 transition-all duration-300 overflow-hidden",
                                         "border-emerald-500/30",
+                                        isFlipped ? "hidden" : "grid",
                                         "hover:border-emerald-400 hover:shadow-[0_0_22px_rgba(16,185,129,0.35)] hover:ring-1 hover:ring-emerald-500/20"
                                     )}>
                                         {/* Left Third - Portion */}
@@ -206,6 +207,62 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                                                 <Database size={9} className="shrink-0 text-green-500 mt-1" title="From Local Database" />
                                             ) : null}
                                         </div>
+                                    </div>
+                                    {/* Back Side - Macro Breakdown */}
+                                    <div className={cn(
+                                        "w-full h-full min-h-14 px-4 py-2 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
+                                        "bg-transparent border-emerald-400 text-emerald-900 dark:text-emerald-100",
+                                        "shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20",
+                                        isFlipped ? "flex" : "hidden"
+                                    )}>
+                                        {food ? (
+                                            <>
+                                                <Button 
+                                                    onClick={() => setFlippedCards(prev => ({ ...prev, [ing.id]: false }))} 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="text-slate-400 hover:text-white hover:bg-white/10 shrink-0"
+                                                >
+                                                    <X size={20} />
+                                                </Button>
+                                                <div className="flex-1 flex justify-center items-center space-x-8">
+                                                    <div className="text-center">
+                                                        <p className="text-lg font-black text-violet-300 dark:text-violet-200">{energyUnit === 'kJ' ? Math.round(ingCalories * 4.184) : ingCalories}</p>
+                                                        <p className="text-xs font-bold uppercase tracking-widest text-violet-300 dark:text-violet-200">{energyUnit}</p>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-lg font-black text-amber-300 dark:text-amber-200">{ingCarbs}g</p>
+                                                        <p className="text-xs font-bold uppercase tracking-widest text-amber-300 dark:text-amber-200">Carbs</p>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-lg font-black text-rose-300 dark:text-rose-200">{ingProtein}g</p>
+                                                        <p className="text-xs font-bold uppercase tracking-widest text-rose-300 dark:text-rose-200">Protein</p>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-lg font-black text-sky-300 dark:text-sky-200">{ingFat}g</p>
+                                                        <p className="text-xs font-bold uppercase tracking-widest text-sky-300 dark:text-sky-200">Fat</p>
+                                                    </div>
+                                                </div>
+                                                <Button 
+                                                    onClick={() => { 
+                                                        setFlippedCards(prev => ({ ...prev, [ing.id]: false })); 
+                                                        if (ing.food_items?.id) {
+                                                            setFoodDetailId(ing.food_items.id); 
+                                                            setShowFoodDetail(true); 
+                                                        }
+                                                    }} 
+                                                    variant="ghost" 
+                                                    disabled={!ing.food_items?.id}
+                                                    className="text-slate-400 hover:text-emerald-400 disabled:opacity-50 hover:bg-emerald-500/10 shrink-0"
+                                                >
+                                                    Details
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <p className="text-sm font-bold flex items-center gap-2">
+                                                <span className="opacity-70">⚠</span> Metadata Missing
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -457,63 +514,6 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             }}
                             initialSearchQuery={editingIngredient?.food_items?.common_name || editingIngredient?.food_items?.name || editingIngredient?.base_ingredient || editingIngredient?.item || ''}
                         />
-                </DialogContent>
-            </Dialog>
-
-            {/* Ingredient Macros Modal */}
-            <Dialog open={!!selectedIngredient} onOpenChange={() => setSelectedIngredient(null)}>
-                <DialogContent className="max-w-full h-full w-full p-0 bg-slate-900/95 backdrop-blur-sm">
-                    {selectedIngredient && (
-                        <div className="flex justify-between items-center h-full p-8">
-                            <Button 
-                                onClick={() => setSelectedIngredient(null)} 
-                                variant="ghost" 
-                                size="icon" 
-                                className="text-slate-400 hover:text-white hover:bg-white/10"
-                            >
-                                <X size={24} />
-                            </Button>
-                            <div className="flex-1 text-center space-y-8">
-                                <h2 className="text-3xl font-black text-white uppercase tracking-widest">
-                                    {selectedIngredient.food_items?.common_name || selectedIngredient.food_items?.name || selectedIngredient.base_ingredient || selectedIngredient.item || 'Ingredient'} Nutrition
-                                </h2>
-                                <div className="grid grid-cols-4 gap-12 max-w-2xl mx-auto">
-                                    <div className="text-center space-y-2">
-                                        <p className="text-5xl font-black text-violet-300">
-                                            {energyUnit === 'kJ' ? Math.round(selectedIngredient.ingCalories * 4.184) : selectedIngredient.ingCalories}
-                                        </p>
-                                        <p className="text-lg font-bold uppercase tracking-widest text-violet-300">{energyUnit}</p>
-                                    </div>
-                                    <div className="text-center space-y-2">
-                                        <p className="text-5xl font-black text-amber-300">{selectedIngredient.ingCarbs}g</p>
-                                        <p className="text-lg font-bold uppercase tracking-widest text-amber-300">Carbs</p>
-                                    </div>
-                                    <div className="text-center space-y-2">
-                                        <p className="text-5xl font-black text-rose-300">{selectedIngredient.ingProtein}g</p>
-                                        <p className="text-lg font-bold uppercase tracking-widest text-rose-300">Protein</p>
-                                    </div>
-                                    <div className="text-center space-y-2">
-                                        <p className="text-5xl font-black text-sky-300">{selectedIngredient.ingFat}g</p>
-                                        <p className="text-lg font-bold uppercase tracking-widest text-sky-300">Fat</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <Button 
-                                onClick={() => { 
-                                    setSelectedIngredient(null); 
-                                    if (selectedIngredient.food_items?.id) {
-                                        setFoodDetailId(selectedIngredient.food_items.id); 
-                                        setShowFoodDetail(true); 
-                                    }
-                                }} 
-                                variant="ghost" 
-                                disabled={!selectedIngredient.food_items?.id}
-                                className="text-slate-400 hover:text-emerald-400 disabled:opacity-50 hover:bg-emerald-500/10"
-                            >
-                                More Info
-                            </Button>
-                        </div>
-                    )}
                 </DialogContent>
             </Dialog>
 
