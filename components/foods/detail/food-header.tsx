@@ -4,12 +4,6 @@ import { cn, formatFoodName } from '@/lib/utils';
 import { FoodDetailContextType } from './types';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 
-const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
-        {children}
-    </div>
-);
-
 interface FoodHeaderProps {
     ctx: FoodDetailContextType;
 }
@@ -20,40 +14,26 @@ export function FoodHeader({ ctx }: FoodHeaderProps) {
     if (!food) return null;
 
     return (
-        <div className="bg-slate-100/95 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 px-4 py-3">
-            {/* Title Section */}
-            <div className="flex items-center gap-4 mb-4">
-                {/* Image */}
-                <div className="w-12 h-12 shrink-0">
-                    <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-xl">
-                        <div className="w-full h-full rounded-lg bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                            {food.image ? (
-                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                    <Beef size={20} className="opacity-10" />
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-                </div>
-                
-                {/* Title */}
-                <div className="flex-1">
-                    <h2 className="text-lg font-black uppercase tracking-tighter text-emerald-400 italic">
+        <>
+            {/* Sticky title bar */}
+            <div className="sticky top-0 z-10 px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <div className="flex items-start justify-between gap-3">
+                    <h2 className="text-base font-semibold text-slate-900 dark:text-white text-left px-2 line-clamp-2 whitespace-normal break-words leading-tight">
                         {formatFoodName(food.common_name || food.name)}
                     </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        {activeSection === 'facts' && 'About & Culinary Facts'}
-                        {activeSection === 'nutrition' && 'Nutritional Information'}
-                        {activeSection === 'recipes' && 'Recipes & Uses'}
-                        {activeSection === 'management' && 'Pantry & Shopping'}
-                    </p>
                 </div>
             </div>
 
-            {/* Navigation Section */}
-            <div className="flex items-center gap-1.5 bg-slate-950/40 dark:bg-slate-800/60 p-1 rounded-[1.5rem] border border-white/5 overflow-x-auto no-scrollbar">
+            {/* Image Section */}
+            <div className="flex gap-3 p-4">
+                {food.image && (
+                    <div className="w-32 h-32 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0">
+                        <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
+                    </div>
+                )}
+                
+                {/* Navigation Pills */}
+                <div className="flex-1 grid grid-cols-2 gap-2">
                     {[
                         { key: 'facts' as const, label: 'About', hidden: !(food.details || FOOD_DETAILS[food.id]) },
                         { key: 'nutrition' as const, label: 'Nutrition' },
@@ -67,16 +47,17 @@ export function FoodHeader({ ctx }: FoodHeaderProps) {
                                 if (key === 'management') { setQuickAddQty('1'); setQuickAddWeight(''); }
                             }}
                             className={cn(
-                                'py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-[1rem] transition-all duration-300 whitespace-nowrap px-3 flex-1',
+                                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg border-2 text-[9px] font-black uppercase tracking-widest transition-all',
                                 activeSection === key
-                                    ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10"
-                                    : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                                    ? "bg-slate-800/80 text-emerald-400 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] ring-1 ring-white/10 border-emerald-400"
+                                    : "text-slate-500 hover:text-slate-300 border-slate-600"
                             )}
                         >
-                            {label}
+                            <span>{label}</span>
                         </button>
                     ))}
+                </div>
             </div>
-        </div>
+        </>
     );
 }

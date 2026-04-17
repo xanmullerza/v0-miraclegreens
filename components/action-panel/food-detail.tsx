@@ -33,7 +33,7 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
         <div className="flex flex-col h-full w-full animate-in fade-in duration-500 relative">
             {/* Content Area */}
             <div className="flex-1 overflow-y-auto">
-                <div className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 mb-6 w-full">
+                <div className="bg-slate-50 dark:bg-slate-900/50 w-full">
                     <FoodHeader ctx={ctx} />
                     
                     <div className="px-5 py-4 space-y-6 w-full">
