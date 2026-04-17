@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ChevronRight, Plus, Minus, Clock, Users, SignalLow, SignalMedium, Signal, Database, Globe, Search, X, Pencil, Trash2, Loader2, Layers, ChevronDown, Info } from 'lucide-react';
@@ -17,6 +17,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useHeaderActions } from '@/lib/context/header-actions-context';
 import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
@@ -59,9 +60,15 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
     // State for related recipes expansion
     const [showRelatedRecipes, setShowRelatedRecipes] = useState(false);
 
-    // State for food detail modal
+    // State for food detail inline view
     const [showFoodDetail, setShowFoodDetail] = useState(false);
     const [foodDetailId, setFoodDetailId] = useState<string>('');
+    const { setHideAppChrome } = useHeaderActions();
+
+    useEffect(() => {
+        setHideAppChrome(showFoodDetail);
+        return () => setHideAppChrome(false);
+    }, [showFoodDetail, setHideAppChrome]);
 
     // Delete recipe handler
     const handleDeleteRecipe = async () => {

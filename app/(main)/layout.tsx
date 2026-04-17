@@ -11,7 +11,7 @@ import { RecipePreview } from '@/components/recipe/recipe-preview';
 import { RDADrawer } from '@/components/ux/rda-drawer';
 import { DraggableFab } from '@/components/ux/draggable-fab';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
+import { HeaderActionsProvider, useHeaderActions } from '@/lib/context/header-actions-context';
 import { SearchProvider } from '@/lib/context/search-context';
 import { ActionPanelProvider, useActionPanel } from '@/lib/context/action-panel-context';
 import { SplitViewProvider, useSplitView } from '@/lib/context/split-view-context';
@@ -38,6 +38,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const { profile, showRDADrawer } = useUserPreferences();
     const { isActionPanelOpen, setIsActionPanelOpen, activeView } = useActionPanel();
     const { resizeMode, toggleResize } = useSplitView();
+    const { hideAppChrome } = useHeaderActions();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
     const [isMobileLandscape, setIsMobileLandscape] = useState(false);
@@ -111,9 +112,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div suppressHydrationWarning className="h-screen w-full flex flex-col bg-background text-foreground font-sans">
-            <React.Suspense fallback={<div className="h-12 border-b bg-background" />}>
-                <HeaderLogo />
-            </React.Suspense>
+            {!hideAppChrome && (
+                <React.Suspense fallback={<div className="h-12 border-b bg-background" />}>
+                    <HeaderLogo />
+                </React.Suspense>
+            )}
             
             {/* Main content flex container */}
             <div className="flex flex-1 overflow-hidden">
@@ -170,7 +173,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Global Bottom Navigation (Mobile Only) */}
-            {isMobile && pathname !== '/dashboard' && (
+            {isMobile && pathname !== '/dashboard' && !hideAppChrome && (
                 <React.Suspense fallback={null}>
                     <ActionPanelBottomNav 
                         activeView={activeView}

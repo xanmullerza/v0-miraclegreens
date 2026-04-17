@@ -13,6 +13,8 @@ interface HeaderActionsContextType {
     setIsFilterExpanded: (expanded: boolean) => void;
     isFilterActive: boolean;
     setIsFilterActive: (active: boolean) => void;
+    hideAppChrome: boolean;
+    setHideAppChrome: (hide: boolean) => void;
 }
 
 const HeaderActionsContext = createContext<HeaderActionsContextType | undefined>(undefined);
@@ -23,6 +25,7 @@ export function HeaderActionsProvider({ children }: { children: ReactNode }) {
     const [filterContent, setFilterContent] = useState<ReactNode | null>(null);
     const [isFilterExpanded, setIsFilterExpanded] = useState(false);
     const [isFilterActive, setIsFilterActive] = useState(false);
+    const [hideAppChrome, setHideAppChrome] = useState(false);
 
     return (
         <HeaderActionsContext.Provider value={{
@@ -30,7 +33,8 @@ export function HeaderActionsProvider({ children }: { children: ReactNode }) {
             customSegmentLabel, setCustomSegmentLabel,
             filterContent, setFilterContent,
             isFilterExpanded, setIsFilterExpanded,
-            isFilterActive, setIsFilterActive
+            isFilterActive, setIsFilterActive,
+            hideAppChrome, setHideAppChrome
         }}>
             {children}
         </HeaderActionsContext.Provider>
