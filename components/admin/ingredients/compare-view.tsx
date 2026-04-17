@@ -428,7 +428,15 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                             <div className="min-w-0">
                                 <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                    {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                    {(() => {
+                                        try {
+                                            const kcal = food.energy_kcal || 0;
+                                            const value = energyUnit === 'kJ' ? (kcal * 4.184).toFixed(0) : kcal.toFixed(0);
+                                            return `${value} ${energyUnit}`;
+                                        } catch (e) {
+                                            return 'N/A';
+                                        }
+                                    })()} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
                                 </p>
                             </div>
                         </div>

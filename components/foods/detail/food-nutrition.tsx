@@ -8,10 +8,72 @@ import { useFoodFilter } from '@/lib/context/food-filter-context';
 import { CompareView } from '@/components/admin/ingredients/compare-view';
 import { toast } from 'sonner';
 
+// Error boundary wrapper for CompareView
+class ErrorBoundaryComparator extends React.Component<
+    { food: any; onError: (error: string) => void },
+    { hasError: boolean; error: string | null }
+> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+
+    static getDerivedStateFromError(error: Error) {
+        return { hasError: true, error: error.message };
+    }
+
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        console.error('[ErrorBoundaryComparator] Caught error:', error, errorInfo);
+        this.props.onError(error.message || 'Unknown error in comparator');
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="p-4 rounded-lg bg-red-900/30 border border-red-500/50 space-y-2">
+                    <p className="text-sm font-bold text-red-400">Comparator Error</p>
+                    <p className="text-xs text-red-300 break-words">{this.state.error}</p>
+                </div>
+            );
+        }
+
+        try {
+            console.log('[ErrorBoundaryComparator] Rendering CompareView with food:', {
+                id: this.props.food.id,
+                name: this.props.food.name,
+            });
+            
+            return (
+                <CompareView 
+                    stats={{
+                        foods: 1,
+                        recipes: 0,
+                        nutrients: 35,
+                        mixes: 0
+                    }} 
+                    showStats={false}
+                    initialFood={this.props.food as any}
+                />
+            );
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            console.error('[ErrorBoundaryComparator] Error during render:', errorMsg, error);
+            this.props.onError(errorMsg);
+            return (
+                <div className="p-4 rounded-lg bg-red-900/30 border border-red-500/50 space-y-2">
+                    <p className="text-sm font-bold text-red-400">Comparator Error</p>
+                    <p className="text-xs text-red-300 break-words">{errorMsg}</p>
+                </div>
+            );
+        }
+    }
+}
+
 export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
     const [expandedPhyto, setExpandedPhyto] = useState<string | null>(null);
     const [showComparator, setShowComparator] = useState(false);
+    const [comparatorError, setComparatorError] = useState<string | null>(null);
     const { 
         food, amount, selectedPortion, energyUnit, userRDAs, nutrientDisplayMode,
         breakdownNutrient, setBreakdownNutrient
@@ -135,11 +197,16 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                     onClick={() => {
                         try {
                             console.log('[FoodNutrition] Comparator button clicked, food:', food);
-                            toast.info('🔬 Loading comparator...');
+                            setComparatorError(null);
+                            if (!showComparator) {
+                                toast.info('🔬 Loading comparator...');
+                            }
                             setShowComparator(!showComparator);
                         } catch (error) {
+                            const msg = error instanceof Error ? error.message : 'Unknown error';
                             console.error('[FoodNutrition] Error toggling comparator:', error);
-                            toast.error('Failed to load comparator');
+                            setComparatorError(msg);
+                            toast.error(`❌ Comparator error: ${msg}`);
                         }
                     }}
                     className="p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 hover:border-cyan-400/50 transition-colors flex flex-col items-center justify-center gap-3 group"
@@ -165,48 +232,37 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                             onClick={() => {
                                 console.log('[FoodNutrition] Closing comparator');
                                 setShowComparator(false);
+                                setComparatorError(null);
                             }}
                             className="text-slate-400 hover:text-slate-200 transition-colors"
                         >
                             <X size={20} />
                         </button>
                     </div>
-                    <div>
-                        {(() => {
-                            try {
-                                console.log('[FoodNutrition] Rendering CompareView with food:', {
-                                    id: food.id,
-                                    name: food.name,
-                                    common_name: food.common_name,
-                                    hasImage: !!food.image,
-                                    hasMicronutrients: !!food.micronutrients,
-                                });
-                                toast.success('✓ Comparator loaded');
-                                return (
-                                    <CompareView 
-                                        stats={{
-                                            foods: 1,
-                                            recipes: 0,
-                                            nutrients: 35,
-                                            mixes: 0
-                                        }} 
-                                        showStats={false}
-                                        initialFood={food as any}
-                                    />
-                                );
-                            } catch (error) {
-                                console.error('[FoodNutrition] Error rendering CompareView:', error);
-                                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-                                toast.error(`Failed to load comparator: ${errorMsg}`);
-                                return (
-                                    <div className="p-4 rounded-lg bg-red-900/20 border border-red-500/30">
-                                        <p className="text-sm text-red-400">Error loading comparator</p>
-                                        <p className="text-xs text-red-300 mt-1">{errorMsg}</p>
-                                    </div>
-                                );
-                            }
-                        })()}
-                    </div>
+
+                    {comparatorError ? (
+                        <div className="p-4 rounded-lg bg-red-900/30 border border-red-500/50 space-y-2">
+                            <p className="text-sm font-bold text-red-400">Error Loading Comparator</p>
+                            <p className="text-xs text-red-300 break-words">{comparatorError}</p>
+                            <button
+                                onClick={() => {
+                                    setComparatorError(null);
+                                    setShowComparator(false);
+                                }}
+                                className="text-xs px-3 py-1 rounded mt-2 bg-red-600 hover:bg-red-500 text-white transition-colors"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    ) : (
+                        <ErrorBoundaryComparator 
+                            food={food} 
+                            onError={(error) => {
+                                setComparatorError(error);
+                                toast.error(`Comparator Error: ${error}`);
+                            }}
+                        />
+                    )}
                 </div>
             )}
 
