@@ -5,6 +5,7 @@ import { FoodDetailContextType } from './types';
 import { useFoodNutrition } from '@/hooks/use-food-nutrition';
 import { NutritionDisplay } from '@/components/nutrients/NutritionDisplay';
 import { useFoodFilter } from '@/lib/context/food-filter-context';
+import { CompareView } from '@/components/admin/ingredients/compare-view';
 
 export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
     const [universalThreshold, setUniversalThreshold] = useState<50 | 75 | 100>(75);
@@ -144,8 +145,8 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
             </div>
 
             {/* Comparator View */}
-            {showComparator && (
-                <div className="p-6 rounded-3xl border bg-gradient-to-br bg-slate-900/50 border-slate-800 space-y-4">
+            {showComparator && food && (
+                <div className="space-y-4">
                     <div className="flex items-center justify-between mb-4">
                         <h4 className="font-black uppercase tracking-widest text-[12px] text-cyan-400">
                             Compare Nutrition
@@ -157,7 +158,16 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                             <X size={20} />
                         </button>
                     </div>
-                    <p className="text-sm text-slate-400">Comparator coming soon...</p>
+                    <CompareView 
+                        stats={{
+                            foods: 1,
+                            recipes: 0,
+                            nutrients: 35,
+                            mixes: 0
+                        }} 
+                        showStats={false}
+                        initialFood={food as any}
+                    />
                 </div>
             )}
 

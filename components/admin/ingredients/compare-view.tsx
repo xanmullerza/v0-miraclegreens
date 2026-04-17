@@ -118,11 +118,12 @@ interface CompareViewProps {
         nutrients: number;
         mixes: number;
     };
+    initialFood?: FoodItem;
 }
 
-export function CompareView({ showStats = false, stats }: CompareViewProps) {
+export function CompareView({ showStats = false, stats, initialFood }: CompareViewProps) {
     const router = useRouter();
-    const [selectedFoods, setSelectedFoods] = useState<(FoodItem | null)[]>([null, null, null]);
+    const [selectedFoods, setSelectedFoods] = useState<(FoodItem | null)[]>([initialFood || null, null, null]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [isSearching, setIsSearching] = useState(false);
