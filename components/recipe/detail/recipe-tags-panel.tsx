@@ -291,7 +291,7 @@ export function RecipeTagsPanel({ recipeId, onBack }: RecipeTagsPanelProps) {
                 </div>
 
                 {/* Footer Fix - Persistent Cancel/Save buttons */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-3">
+                <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-3">
                     <button
                         type="button"
                         onClick={onBack}
