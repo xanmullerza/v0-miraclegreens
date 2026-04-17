@@ -705,6 +705,7 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                     )}
                 </div>
             )}
+            </div>
         </div>
     );
 }
