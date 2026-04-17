@@ -383,124 +383,63 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
 
     return (
         <div className="space-y-12 animate-in fade-in duration-500">
+            {/* Comparison Table Container - will be repositioned above search results */}
+            <div className="relative">
+                {/* Stats Section */}
+                {showStats && stats && (
+                    <div className="w-full md:max-w-[900px] mx-auto relative px-0 group/stats mb-6">
+                        <div className="relative rounded-2xl bg-slate-900/40 border border-slate-800/60 p-5 px-8 w-full overflow-hidden backdrop-blur-md transition-all duration-500 hover:bg-slate-900/60 hover:border-slate-700/60">
+                            <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] pointer-events-none group-hover/stats:opacity-[0.05] transition-opacity duration-500">
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
+                            </div>
 
-            {/* Shared search hero */}
-            <div className="pt-6"> {/* extra padding to drop the viewer */}
-                <HeroSearch
-                    searchQuery={searchQuery}
-                    onQueryChange={handleSearchInput}
-                    results={searchResults}
-                    isLoading={isSearching}
-                    isActive={activeSlot !== null}
-                    setIsActive={(active) => {
-                        if (!active) setActiveSlot(null);
-                    }}
-                    onSelect={selectFood}
-                    onFocus={() => {
-                        if (activeSlot === null) {
-                            const firstEmpty = selectedFoods.findIndex(f => f === null);
-                            setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
-                        }
-                    }}
-                    theme="emerald"
-                    placeholder="SEARCH FOOD LIBRARY..."
-                    noResultsMessage="No matching items found"
-                    enterMessage="Enter item name to compare"
-                    searchingMessage="Searching Library..."
-                    idleExtra={
-                        activeSlot === null && selectedFoods.some(f => f !== null) ? (
-                            <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500 mt-4">
-                                <button
-                                    onClick={clearAll}
-                                    className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2 shadow-sm active:scale-95"
-                                >
-                                    <Trash2 size={14} /> Clear All
-                                </button>
-                            </div>
-                        ) : null
-                    }
-                    renderResult={(food: any) => (
-                        <>
-                        <div className="flex items-center gap-4 min-w-0">
-                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
-                                {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
-                            </div>
-                            <div className="min-w-0">
-                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                    {(() => {
-                                        try {
-                                            const kcal = food.energy_kcal || 0;
-                                            const value = energyUnit === 'kJ' ? (kcal * 4.184).toFixed(0) : kcal.toFixed(0);
-                                            return `${value} ${energyUnit}`;
-                                        } catch (e) {
-                                            return 'N/A';
-                                        }
-                                    })()} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
-                                </p>
-                            </div>
-                        </div>
-                        <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
-                    </>
-                )}
-            />
-            </div>
-
-            {/* Comparison Table */}
-            {showStats && stats && (
-                <div className="w-full md:max-w-[900px] mx-auto relative px-0 group/stats">
-                    <div className="relative rounded-2xl bg-slate-900/40 border border-slate-800/60 p-5 px-8 w-full overflow-hidden backdrop-blur-md transition-all duration-500 hover:bg-slate-900/60 hover:border-slate-700/60">
-                        <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] pointer-events-none group-hover/stats:opacity-[0.05] transition-opacity duration-500">
-                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
-                        </div>
-
-                        <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
-                            <div className="flex items-center gap-3 group/stat">
-                                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                    <Activity size={16} className="text-blue-400" />
+                            <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Activity size={16} className="text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
+                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Leaf size={16} className="text-emerald-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
-                            <div className="flex items-center gap-3 group/stat">
-                                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                    <Leaf size={16} className="text-emerald-400" />
+                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Beaker size={16} className="text-indigo-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.mixes}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Mixes</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
-                                </div>
-                            </div>
-                            <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
-                            <div className="flex items-center gap-3 group/stat">
-                                <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                    <Beaker size={16} className="text-indigo-400" />
-                                </div>
-                                <div>
-                                    <p className="text-lg font-black text-white leading-none">{stats.mixes}</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Mixes</p>
-                                </div>
-                            </div>
-                            <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
-                            <div className="flex items-center gap-3 group/stat">
-                                <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                    <ChefHat size={16} className="text-amber-400" />
-                                </div>
-                                <div>
-                                    <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Meals</p>
+                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <ChefHat size={16} className="text-amber-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Meals</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Comparison Table */}
-            <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+                {/* Comparison Table */}
+                <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden relative z-10">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full border-collapse table-fixed md:table-auto">
                         <thead className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
@@ -707,6 +646,69 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                     )}
                 </div>
             )}
-        </div >
+            
+            {/* Search Section - Positioned below the table and meals */}
+            <div className="pt-6 w-full md:max-w-[900px] mx-auto"> {/* extra padding to drop the viewer */}
+                <HeroSearch
+                    searchQuery={searchQuery}
+                    onQueryChange={handleSearchInput}
+                    results={searchResults}
+                    isLoading={isSearching}
+                    isActive={activeSlot !== null}
+                    setIsActive={(active) => {
+                        if (!active) setActiveSlot(null);
+                    }}
+                    onSelect={selectFood}
+                    onFocus={() => {
+                        if (activeSlot === null) {
+                            const firstEmpty = selectedFoods.findIndex(f => f === null);
+                            setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
+                        }
+                    }}
+                    theme="emerald"
+                    placeholder="SEARCH FOOD LIBRARY..."
+                    noResultsMessage="No matching items found"
+                    enterMessage="Enter item name to compare"
+                    searchingMessage="Searching Library..."
+                    idleExtra={
+                        activeSlot === null && selectedFoods.some(f => f !== null) ? (
+                            <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500 mt-4">
+                                <button
+                                    onClick={clearAll}
+                                    className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2 shadow-sm active:scale-95"
+                                >
+                                    <Trash2 size={14} /> Clear All
+                                </button>
+                            </div>
+                        ) : null
+                    }
+                    renderResult={(food: any) => (
+                        <>
+                        <div className="flex items-center gap-4 min-w-0">
+                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                                {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
+                            </div>
+                            <div className="min-w-0">
+                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                    {(() => {
+                                        try {
+                                            const kcal = food.energy_kcal || 0;
+                                            const value = energyUnit === 'kJ' ? (kcal * 4.184).toFixed(0) : kcal.toFixed(0);
+                                            return `${value} ${energyUnit}`;
+                                        } catch (e) {
+                                            return 'N/A';
+                                        }
+                                    })()} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                </p>
+                            </div>
+                        </div>
+                        <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+                    </>
+                )}
+            />
+            </div>
+            </div>
+        </div>
     );
 }
