@@ -3,6 +3,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useHeaderActions } from '@/lib/context/header-actions-context';
 import {
     useRecipeDetail,
     RecipeHeader,
@@ -25,6 +26,7 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
     toast.info(`📖 Loading recipe: ${recipeId}`);
     const ctx = useRecipeDetail({ recipeId, onBack, onShare, onRemix });
     const { recipe, loading, activeSection } = ctx;
+    const { hideAppChrome } = useHeaderActions();
 
     console.log('[RecipeDetail] Context state:', { recipe: !!recipe, loading, activeSection });
     if (recipe) {
@@ -66,8 +68,8 @@ export function RecipeDetail({ recipeId, onBack, onShare, onRemix }: RecipeDetai
     toast.info(`📋 Showing section: ${activeSection}`);
     return (
         <div className="flex-1 overflow-y-auto flex flex-col bg-white dark:bg-slate-900">
-            {/* Chatbot-style header (sticky title bar + image grid) */}
-            <RecipeHeader ctx={ctx} standalone={false} />
+            {/* Chatbot-style header (sticky title bar + image grid) - hidden when food detail is open */}
+            {!hideAppChrome && <RecipeHeader ctx={ctx} standalone={false} />}
 
             {/* Content area */}
             <div className="flex-1 overflow-y-auto p-4 pb-28 space-y-4">
