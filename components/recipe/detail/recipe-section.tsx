@@ -19,6 +19,25 @@ import type { useRecipeDetail } from './use-recipe-detail';
 
 type RecipeDetailCtx = ReturnType<typeof useRecipeDetail>;
 
+function formatItemMeasurement(amount: string): string {
+    const text = amount.trim();
+    if (!text) return text;
+
+    const normalized = text.replace(/\s+/g, ' ').trim();
+    const itemRegex = /\b(items?)\b/i;
+    if (!itemRegex.test(normalized)) return normalized;
+
+    const prefixMatch = normalized.match(/^(\d+(?:\.\d+)?|\d+\/\d+|\d+\s+\d+\/\d+)(?:\s*x)?\s*/i);
+    if (prefixMatch) {
+        const numberPart = prefixMatch[1];
+        const remainder = normalized.slice(prefixMatch[0].length).replace(itemRegex, '').trim();
+        return remainder ? `${numberPart} of ${remainder}` : `${numberPart} of`;
+    }
+
+    const remainder = normalized.replace(itemRegex, '').trim();
+    return remainder ? `each ${remainder}` : 'each';
+}
+
 interface RecipeSectionProps {
     ctx: RecipeDetailCtx;
 }
@@ -150,9 +169,10 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
                             const isFlipped = flippedCards[ing.id];
                             const isGenericItem = ing.amount?.toLowerCase().includes('item') || ing.amount?.toLowerCase().includes('unit');
-                            const cleanAmount = isGenericItem && displayWeight > 0 
+                            const rawAmount = isGenericItem && displayWeight > 0 
                                 ? `${displayWeight}g` 
                                 : scaleIngredient(ing.amount || '', weightScale);
+                            const cleanAmount = formatItemMeasurement(rawAmount);
 
                             return (
                                 <div
