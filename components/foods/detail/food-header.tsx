@@ -11,7 +11,7 @@ const TABS = [
 
 const ACTION_BUTTONS = [
     { key: 'recipes' as const, label: 'Recipes', icon: Salad, muted: 'text-emerald-400/50 border-emerald-500/30', activeGlow: 'text-emerald-400 border-emerald-400 shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20' },
-    { key: 'management' as const, label: 'Management', icon: ShoppingCart, muted: 'text-sky-400/50 border-sky-500/30', activeGlow: 'text-sky-400 border-sky-400 shadow-[0_0_22px_rgba(56,189,248,0.35)] ring-1 ring-sky-500/20' },
+    { key: 'management' as const, label: 'Manage', icon: ShoppingCart, muted: 'text-sky-400/50 border-sky-500/30', activeGlow: 'text-sky-400 border-sky-400 shadow-[0_0_22px_rgba(56,189,248,0.35)] ring-1 ring-sky-500/20' },
 ] as const;
 
 interface FoodHeaderProps {
