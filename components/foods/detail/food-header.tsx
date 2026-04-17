@@ -5,7 +5,7 @@ import { FoodDetailContextType } from './types';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 
 const TABS = [
-    { key: 'facts' as const, label: 'About', icon: BookOpen, muted: 'text-cyan-400/50 border-cyan-500/30', activeGlow: 'text-cyan-400 border-cyan-400 shadow-[0_0_22px_rgba(34,211,238,0.35)] ring-1 ring-cyan-500/20' },
+    { key: 'facts' as const, label: 'About', icon: BookOpen, muted: 'text-amber-400/50 border-amber-500/30', activeGlow: 'text-amber-400 border-amber-400 shadow-[0_0_22px_rgba(251,191,36,0.35)] ring-1 ring-amber-500/20' },
     { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, muted: 'text-violet-400/50 border-violet-500/30', activeGlow: 'text-violet-400 border-violet-400 shadow-[0_0_22px_rgba(167,139,250,0.35)] ring-1 ring-violet-500/20' },
 ] as const;
 
