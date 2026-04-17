@@ -520,7 +520,7 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
 
             {/* Food Detail Modal */}
             <Dialog open={showFoodDetail} onOpenChange={() => setShowFoodDetail(false)}>
-                <DialogContent className="max-w-full h-full w-full p-0">
+                <DialogContent className="max-w-full h-full w-full p-0 left-0 top-0 translate-x-0 translate-y-0 rounded-none overflow-auto">
                     <FoodDetail foodId={foodDetailId} onBack={() => setShowFoodDetail(false)} />
                 </DialogContent>
             </Dialog>
