@@ -52,11 +52,6 @@ const NUTRIENT_GROUPS = [
         title: "Vitamins",
         icon: Battery,
         keys: [
-            { label: 'Vitamin A', key: 'Vitamin A', unit: 'μg' },
-            { label: 'Vitamin C', key: 'Vitamin C', unit: 'mg' },
-            { label: 'Vitamin D', key: 'Vitamin D', unit: 'μg' },
-            { label: 'Vitamin E', key: 'Vitamin E', unit: 'mg' },
-            { label: 'Vitamin K', key: 'Vitamin K', unit: 'μg' },
             { label: 'Vitamin B1', key: 'B1 (Thiamine)', unit: 'mg' },
             { label: 'Vitamin B2', key: 'B2 (Riboflavin)', unit: 'mg' },
             { label: 'Vitamin B3', key: 'B3 (Niacin)', unit: 'mg' },
@@ -64,7 +59,12 @@ const NUTRIENT_GROUPS = [
             { label: 'Vitamin B6', key: 'B6 (Pyridoxine)', unit: 'mg' },
             { label: 'Vitamin B9', key: 'B9 (Folate)', unit: 'μg' },
             { label: 'Vitamin B12', key: 'B12 (Cobalamin)', unit: 'μg' },
-            { label: 'Choline', key: 'Choline', unit: 'mg' }
+            { label: 'Vitamin C', key: 'Vitamin C', unit: 'mg' },
+            { label: 'Choline', key: 'Choline', unit: 'mg' },
+            { label: 'Vitamin A', key: 'Vitamin A', unit: 'μg' },
+            { label: 'Vitamin D', key: 'Vitamin D', unit: 'μg' },
+            { label: 'Vitamin E', key: 'Vitamin E', unit: 'mg' },
+            { label: 'Vitamin K', key: 'Vitamin K', unit: 'μg' }
         ]
     }
 ];
