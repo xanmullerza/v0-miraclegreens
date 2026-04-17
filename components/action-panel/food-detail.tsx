@@ -36,7 +36,7 @@ export function FoodDetail({ foodId, onBack }: FoodDetailProps) {
                 <div className="bg-slate-50 dark:bg-slate-900/50 w-full">
                     <FoodHeader ctx={ctx} />
                     
-                    <div className="px-5 py-4 space-y-6 w-full">
+                    <div className="px-1 py-4 space-y-6 w-full">
                         {activeSection === 'management' && <FoodManagement ctx={ctx} user={ctx.user} />}
                         {activeSection === 'facts' && (food.details || FOOD_DETAILS[food.id]) && <FoodFacts ctx={ctx} />}
                         {activeSection === 'recipes' && <FoodRecipes ctx={ctx} />}
