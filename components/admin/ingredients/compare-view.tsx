@@ -689,7 +689,7 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                                             {meal.title}
                                         </h4>
                                         <div className="flex flex-wrap gap-1 justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            {meal.diet.slice(0, 2).map((d) => (
+                                            {(meal.diet || []).slice(0, 2).map((d) => (
                                                 <span key={d} className="text-[6px] font-black uppercase tracking-widest text-slate-400">
                                                     #{d}
                                                 </span>
