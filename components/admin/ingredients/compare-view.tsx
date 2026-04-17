@@ -123,7 +123,22 @@ interface CompareViewProps {
 
 export function CompareView({ showStats = false, stats, initialFood }: CompareViewProps) {
     const router = useRouter();
-    const [selectedFoods, setSelectedFoods] = useState<(FoodItem | null)[]>([initialFood || null, null, null]);
+    
+    // Initialize selectedFoods with error handling
+    const initializeSelectedFoods = () => {
+        try {
+            if (initialFood) {
+                console.log('[CompareView] Initializing with food:', initialFood.name);
+                return [initialFood, null, null];
+            }
+            return [null, null, null];
+        } catch (error) {
+            console.error('[CompareView] Error initializing selectedFoods:', error);
+            return [null, null, null];
+        }
+    };
+    
+    const [selectedFoods, setSelectedFoods] = useState<(FoodItem | null)[]>(initializeSelectedFoods());
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -139,6 +154,7 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
             setSearchResults([]);
             return;
         }
+        console.log('[CompareView] Searching for:', query);
         setIsSearching(true);
         try {
             const { data, error } = await supabase
@@ -148,10 +164,10 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                 .limit(8);
 
             if (error) throw error;
+            console.log('[CompareView] Search results:', data?.length || 0, 'items found');
             setSearchResults(data || []);
         } catch (error) {
-            console.error('Search error:', error);
-            // toast.error("Database search failed");
+            console.error('[CompareView] Search error:', error);
         } finally {
             setIsSearching(false);
         }
@@ -165,13 +181,22 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
     };
 
     const selectFood = (food: FoodItem) => {
-        if (activeSlot === null) return;
-        const next = [...selectedFoods];
-        next[activeSlot] = food;
-        setSelectedFoods(next);
-        setActiveSlot(null);
-        setSearchQuery('');
-        setSearchResults([]);
+        try {
+            console.log('[CompareView] Selecting food for slot', activeSlot, ':', food.name);
+            if (activeSlot === null) {
+                console.warn('[CompareView] No active slot selected');
+                return;
+            }
+            const next = [...selectedFoods];
+            next[activeSlot] = food;
+            setSelectedFoods(next);
+            setActiveSlot(null);
+            setSearchQuery('');
+            setSearchResults([]);
+            console.log('[CompareView] Food selected successfully');
+        } catch (error) {
+            console.error('[CompareView] Error selecting food:', error);
+        }
     };
 
     const clearAll = () => {
@@ -184,14 +209,19 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
     // Fetch meals containing selected ingredients
     useEffect(() => {
         const fetchRelatedMeals = async () => {
-            const foodIds = selectedFoods.filter(f => f !== null).map(f => f!.id);
-            if (foodIds.length === 0) {
-                setRelatedMeals([]);
-                return;
-            }
-
-            setIsLoadingMeals(true);
             try {
+                const foodIds = selectedFoods.filter(f => f !== null).map(f => f!.id);
+                console.log('[CompareView] FetchRelatedMeals - Food IDs:', foodIds);
+                
+                if (foodIds.length === 0) {
+                    console.log('[CompareView] No foods selected, clearing related meals');
+                    setRelatedMeals([]);
+                    return;
+                }
+
+                setIsLoadingMeals(true);
+                console.log('[CompareView] Fetching related meals for foods:', foodIds);
+                
                 // Find recipes that contain these food items
                 const { data: ingredientData, error: ingredientError } = await supabase
                     .from('ingredients')
@@ -201,13 +231,16 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                 if (ingredientError) throw ingredientError;
 
                 const recipeIds = Array.from(new Set(ingredientData?.map(i => i.recipe_id) || []));
+                console.log('[CompareView] Found recipe IDs:', recipeIds);
 
                 if (recipeIds.length === 0) {
+                    console.log('[CompareView] No recipes found');
                     setRelatedMeals([]);
                     return;
                 }
 
                 // Fetch recipe details
+                console.log('[CompareView] Fetching recipe details');
                 const { data: recipeData, error: recipeError } = await supabase
                     .from('recipes')
                     .select('id, title, image, diet, type')
@@ -215,11 +248,13 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
                     .limit(6);
 
                 if (recipeError) throw recipeError;
+                console.log('[CompareView] Related meals loaded:', recipeData?.length || 0);
                 setRelatedMeals(recipeData || []);
             } catch (error) {
-                console.error('Error fetching related meals:', error);
+                console.error('[CompareView] Error fetching related meals:', error);
             } finally {
                 setIsLoadingMeals(false);
+                console.log('[CompareView] Finished fetching related meals');
             }
         };
 
