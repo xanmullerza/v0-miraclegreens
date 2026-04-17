@@ -157,37 +157,40 @@ export function RecipeSection({ ctx }: RecipeSectionProps) {
                             return (
                                 <div
                                     key={ing.id || idx}
-                                    className="relative min-h-14 group"
+                                    className="relative h-14 group"
                                     onClick={() => setFlippedCards(prev => ({ ...prev, [ing.id]: !isFlipped }))}
                                 >
-                                    {/* Front Side - Slim Card */}
+                                    {/* Front Side - Combo Card */}
                                     <div className={cn(
-                                        "w-full px-3 py-2 flex items-center gap-3 rounded-2xl border-2 transition-all duration-300",
+                                        "w-full h-full grid grid-cols-3 rounded-2xl border-2 transition-all duration-300 overflow-hidden",
                                         "border-emerald-500/30",
-                                        isFlipped ? "hidden" : "block",
+                                        isFlipped ? "hidden" : "grid",
                                         "hover:border-emerald-400 hover:shadow-[0_0_22px_rgba(16,185,129,0.35)] hover:ring-1 hover:ring-emerald-500/20"
                                     )}>
-                                        <div className="shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest min-w-[60px] text-center">
-                                            {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
-                                        </div>
-                                        <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[13px] line-clamp-2 flex items-center gap-2">
-                                            <span>
-                                                {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                        {/* Left Third - Portion */}
+                                        <div className="col-span-1 px-3 py-2 flex items-center justify-center bg-emerald-500/10 dark:bg-emerald-500/20 border-r border-emerald-500/30">
+                                            <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-black uppercase tracking-widest text-center">
+                                                {cleanAmount || (displayWeight > 0 ? `${displayWeight}g` : '-')}
                                             </span>
+                                        </div>
+                                        {/* Right Two-Thirds - Description */}
+                                        <div className="col-span-2 px-3 py-2 flex items-center gap-2">
+                                            <p className="flex-1 font-bold text-slate-900 dark:text-slate-100 text-[12px] truncate">
+                                                {(ing.food_items?.common_name || ing.food_items?.name || ing.base_ingredient || ing.item || '').toLowerCase().split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                            </p>
                                             {ing.food_items?.source === 'usda' ? (
-                                                <Globe size={10} className="shrink-0 text-blue-500" title="From USDA API" />
+                                                <Globe size={9} className="shrink-0 text-blue-500" title="From USDA API" />
                                             ) : ing.food_items?.source === 'local' ? (
-                                                <Database size={10} className="shrink-0 text-green-500" title="From Local Database" />
+                                                <Database size={9} className="shrink-0 text-green-500" title="From Local Database" />
                                             ) : null}
-                                        </p>
+                                        </div>
                                     </div>
-
                                     {/* Back Side - Macro Breakdown */}
                                     <div className={cn(
-                                        "w-full px-4 py-2 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
+                                        "w-full h-full px-4 py-2 flex items-center justify-between rounded-2xl border-2 transition-all duration-300",
                                         "bg-transparent border-emerald-400 text-emerald-900 dark:text-emerald-100",
                                         "shadow-[0_0_22px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/20",
-                                        isFlipped ? "block" : "hidden"
+                                        isFlipped ? "grid" : "hidden"
                                     )}>
                                         {food ? (
                                             <>
