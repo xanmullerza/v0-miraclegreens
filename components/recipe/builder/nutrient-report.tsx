@@ -17,6 +17,13 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
 
     const useKilojoules = energyUnit === 'kJ';
 
+    const formatNutrientValue = (val: number) => {
+        if (val >= 1) {
+            return val % 1 === 0 ? val.toFixed(0) : val.toFixed(1);
+        }
+        return val.toFixed(2);
+    };
+
     const getVal = (keys: string[]) => {
         for (const k of keys) {
             if (totals.micronutrients[k] !== undefined) return totals.micronutrients[k];
@@ -59,7 +66,7 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-lg font-bold">
-                                        {nutrientDisplayMode === "percentage" && pct !== null && !forceRaw ? `${pct}%` : (val >= 1 ? val.toFixed(1) : val.toFixed(2))}
+                                        {nutrientDisplayMode === "percentage" && pct !== null && !forceRaw ? `${pct}%` : formatNutrientValue(val)}
                                     </span>
                                     {(nutrientDisplayMode !== "percentage" || forceRaw) && (
                                         <span className={cn("text-[10px] font-black opacity-60")}>

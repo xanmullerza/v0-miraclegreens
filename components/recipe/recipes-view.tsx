@@ -530,19 +530,19 @@ export function RecipesView({
                                                     <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
                                                         <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
                                                         <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">
-                                                            {(recipe.carbs * multiplier).toFixed(1)}g
+                                                            {((recipe.carbs * multiplier) % 1 === 0 ? (recipe.carbs * multiplier).toFixed(0) : (recipe.carbs * multiplier).toFixed(1))}g
                                                         </span>
                                                     </div>
                                                     <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
                                                         <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
                                                         <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">
-                                                            {(recipe.protein * multiplier).toFixed(1)}g
+                                                            {((recipe.protein * multiplier) % 1 === 0 ? (recipe.protein * multiplier).toFixed(0) : (recipe.protein * multiplier).toFixed(1))}g
                                                         </span>
                                                     </div>
                                                     <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
                                                         <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
                                                         <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">
-                                                            {(recipe.fat * multiplier).toFixed(1)}g
+                                                            {((recipe.fat * multiplier) % 1 === 0 ? (recipe.fat * multiplier).toFixed(0) : (recipe.fat * multiplier).toFixed(1))}g
                                                         </span>
                                                     </div>
                                                 </>

@@ -127,6 +127,10 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
     const { setCustomSegmentLabel } = useHeaderActions();
     const { deleteRecipe } = useDataPersistence();
 
+    const formatNutrientValue = (val: number) => {
+        return val % 1 === 0 ? val.toFixed(0) : val.toFixed(1);
+    };
+
     useEffect(() => {
         if (isStandalone && recipe?.title) {
             setCustomSegmentLabel(recipe.title);
@@ -748,13 +752,13 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                                 <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
                                             </div>
                                             <p className="text-[9px] font-bold text-muted-foreground">
-                                                {val.toFixed(1)}{unitStr}
+                                                {formatNutrientValue(val)}{unitStr}
                                             </p>
                                         </>
                                     ) : (
                                         <>
                                             <div className="flex items-baseline gap-1">
-                                                <span className={cn("text-lg font-bold", title === 'Biological Ratios' ? styles.text : "")}>{val.toFixed(1)}</span>
+                                                <span className={cn("text-lg font-bold", title === 'Biological Ratios' ? styles.text : "")}>{formatNutrientValue(val)}</span>
                                                 <span className={cn("text-[10px] font-bold", (unitStr === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitStr}</span>
                                             </div>
                                             {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (

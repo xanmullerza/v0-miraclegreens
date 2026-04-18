@@ -129,17 +129,17 @@ export const RecipeListItem = ({
                         <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
 
                             <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest leading-none mb-2">Carbs</span>
-                            <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayCarbs.toFixed(1)}g</span>
+                            <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayCarbs % 1 === 0 ? displayCarbs.toFixed(0) : displayCarbs.toFixed(1)}g</span>
                         </div>
                         <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
 
                             <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest leading-none mb-2">Protein</span>
-                            <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayProtein.toFixed(1)}g</span>
+                            <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayProtein % 1 === 0 ? displayProtein.toFixed(0) : displayProtein.toFixed(1)}g</span>
                         </div>
                         <div className="bg-transparent px-2 py-2 flex flex-col items-center flex-1 min-w-0">
 
                             <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest leading-none mb-2">Fat</span>
-                            <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayFat.toFixed(1)}g</span>
+                            <span className="font-black text-[11px] sm:text-xs tracking-tight text-slate-900 dark:text-white leading-none w-full text-center">{displayFat % 1 === 0 ? displayFat.toFixed(0) : displayFat.toFixed(1)}g</span>
                         </div>
                     </div>
                 </div>

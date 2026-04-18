@@ -119,7 +119,10 @@ export function NutritionDisplay({
         return 'mg';
     };
 
-    const displayValue = (value: number, label: string, fullName?: string) => `${value.toFixed(1)} ${nutrientUnit(label, fullName)}`;
+    const displayValue = (value: number, label: string, fullName?: string) => {
+        const formattedValue = value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
+        return `${formattedValue} ${nutrientUnit(label, fullName)}`;
+    };
 
     return (
         <div className="space-y-4">
