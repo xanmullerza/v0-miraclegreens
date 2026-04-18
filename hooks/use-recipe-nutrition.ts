@@ -95,6 +95,21 @@ export function useRecipeNutrition({
             return { label: l, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 };
         });
 
+        const vitaminKeys: Record<string, string[]> = {
+            B1: ['Thiamine', 'Vitamin B1'],
+            B2: ['Riboflavin', 'Vitamin B2'],
+            B3: ['Niacin', 'Vitamin B3'],
+            B5: ['Pantothenic Acid', 'Vitamin B5'],
+            B6: ['Pyridoxine', 'Vitamin B6'],
+            B9: ['Folate', 'Vitamin B9'],
+            B12: ['Cobalamin', 'Vitamin B12'],
+            C: ['Ascorbic Acid', 'Vitamin C'],
+            A: ['Retinol', 'Vitamin A'],
+            D: ['Calciferol', 'Vitamin D'],
+            E: ['Tocopherol', 'Vitamin E'],
+            K: ['Phylloquinone', 'Vitamin K'],
+        };
+
         const wsData = [
             { l: 'B1', fn: 'Thiamine', sub: 'Thiamine' },
             { l: 'B2', fn: 'Riboflavin', sub: 'Riboflavin' },
@@ -105,7 +120,7 @@ export function useRecipeNutrition({
             { l: 'B12', fn: 'Cobalamin', sub: 'Cobalamin' },
             { l: 'C', fn: 'Ascorbic Acid', sub: 'Immune & collagen' },
         ].map(({ l, fn, sub }) => {
-            const keys = l === 'C' ? ['Vitamin C', 'vitamin_c_mg', 'Ascorbic Acid'] : [l];
+            const keys = vitaminKeys[l] || [l];
             const v = findByKeys(keys) * sf;
             const r = userRDAs?.[l === 'C' ? 'Vitamin C' : l] || 0;
             return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 };
@@ -117,7 +132,8 @@ export function useRecipeNutrition({
             { l: 'E', fn: 'Tocopherol', sub: 'Tocopherol' },
             { l: 'K', fn: 'Phylloquinone', sub: 'Phylloquinone' },
         ].map(({ l, fn, sub }) => {
-            const v = findByKeys([l]) * sf;
+            const keys = vitaminKeys[l] || [l];
+            const v = findByKeys(keys) * sf;
             const r = userRDAs?.[l] || 0;
             return { label: l, fullName: fn, subtitle: sub, val: v, pct: r > 0 ? Math.round((v / r) * 100) : 0 };
         });
