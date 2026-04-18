@@ -215,8 +215,8 @@ export function PantryMatchDialog({ isOpen, initialQuery, onClose, onConfirm, kn
                                             </h4>
                                             <div className="flex items-center gap-3 mt-1 text-[10px] uppercase font-black tracking-wider text-slate-400">
                                                 <span className="flex items-center gap-1 text-orange-500"><Zap size={10} /> {Math.round(food.energy_kcal)}</span>
-                                                <span className="flex items-center gap-1 text-rose-500"><Beef size={10} /> {food.protein_g % 1 === 0 ? food.protein_g.toFixed(0) : food.protein_g.toFixed(1)}p</span>
-                                                <span className="flex items-center gap-1 text-amber-500"><Wheat size={10} /> {food.carbs_g % 1 === 0 ? food.carbs_g.toFixed(0) : food.carbs_g.toFixed(1)}c</span>
+                                                <span className="flex items-center gap-1 text-rose-500"><Beef size={10} /> {food.protein_g.toFixed(1)}p</span>
+                                                <span className="flex items-center gap-1 text-amber-500"><Wheat size={10} /> {food.carbs_g.toFixed(1)}c</span>
                                             </div>
                                         </div>
 

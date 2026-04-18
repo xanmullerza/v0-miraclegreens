@@ -131,7 +131,7 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
                                         <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-xl font-black">
-                                                {nutrientDisplayMode === 'percentage' ? `${pct}%` : formatNutrientValue(macro.val)}
+                                                {nutrientDisplayMode === 'percentage' ? `${pct}%` : (macro.val >= 1 ? macro.val.toFixed(1) : macro.val.toFixed(2))}
                                             </span>
                                             {nutrientDisplayMode !== 'percentage' && (
                                                 <span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span>
@@ -186,7 +186,7 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <span className="text-[10px] font-mono text-slate-500">{formatNutrientValue(val)}g</span>
+                                                <span className="text-[10px] font-mono text-slate-500">{val.toFixed(1)}g</span>
                                                 <span className="text-[10px] font-black text-orange-400 w-12 text-right">{share}%</span>
                                             </div>
                                         </div>
