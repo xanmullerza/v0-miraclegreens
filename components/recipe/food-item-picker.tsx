@@ -446,9 +446,9 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                                                     <div className="text-xs text-muted-foreground mt-2 flex gap-2">
                                                         <span>{Math.round(item.energy_kcal)} kcal</span>
                                                         <span>•</span>
-                                                        <span>P: {item.protein_g?.toFixed(1)}g</span>
-                                                        <span>F: {item.fat_g?.toFixed(1)}g</span>
-                                                        <span>C: {item.carbs_g?.toFixed(1)}g</span>
+                                                        <span>P: {item.protein_g && item.protein_g % 1 === 0 ? item.protein_g.toFixed(0) : item.protein_g?.toFixed(1)}g</span>
+                                                        <span>F: {item.fat_g && item.fat_g % 1 === 0 ? item.fat_g.toFixed(0) : item.fat_g?.toFixed(1)}g</span>
+                                                        <span>C: {item.carbs_g && item.carbs_g % 1 === 0 ? item.carbs_g.toFixed(0) : item.carbs_g?.toFixed(1)}g</span>
                                                     </div>
                                                 </button>
                                             );
@@ -655,9 +655,9 @@ export default function FoodItemPicker({ onSelect, onClose, onSkip, onDelete, mo
                                                         <div className="text-xs text-muted-foreground mt-2 flex gap-2">
                                                             <span>{Math.round(item.energy_kcal)} kcal</span>
                                                             <span>•</span>
-                                                            <span>P: {item.protein_g?.toFixed(1)}g</span>
-                                                            <span>F: {item.fat_g?.toFixed(1)}g</span>
-                                                            <span>C: {item.carbs_g?.toFixed(1)}g</span>
+                                                            <span>P: {item.protein_g && item.protein_g % 1 === 0 ? item.protein_g.toFixed(0) : item.protein_g?.toFixed(1)}g</span>
+                                                            <span>F: {item.fat_g && item.fat_g % 1 === 0 ? item.fat_g.toFixed(0) : item.fat_g?.toFixed(1)}g</span>
+                                                            <span>C: {item.carbs_g && item.carbs_g % 1 === 0 ? item.carbs_g.toFixed(0) : item.carbs_g?.toFixed(1)}g</span>
                                                         </div>
                                                     </button>
                                                 );

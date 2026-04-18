@@ -350,7 +350,7 @@ export function CompareView({ showStats = false, stats, initialFood }: CompareVi
             return kcal.toFixed(0);
         }
 
-        if (typeof val === 'number') return val.toFixed(1);
+        if (typeof val === 'number') return val % 1 === 0 ? val.toFixed(0) : val.toFixed(1);
         return val.toString();
     };
 

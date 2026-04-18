@@ -194,7 +194,7 @@ export function ScanConfirmDialog({ isOpen, barcode, onClose, onConfirm }: ScanC
                                             )}
                                             {product.nutrition.protein_g && (
                                                 <Badge className="text-[9px] bg-rose-500/10 text-rose-600 border-none">
-                                                    {product.nutrition.protein_g.toFixed(1)}g protein
+                                                    {product.nutrition.protein_g % 1 === 0 ? product.nutrition.protein_g.toFixed(0) : product.nutrition.protein_g.toFixed(1)}g protein
                                                 </Badge>
                                             )}
                                         </div>

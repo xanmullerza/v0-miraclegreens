@@ -139,7 +139,7 @@ export function InlineFoodSearch({ onSelect, isAdmin = false }: InlineFoodSearch
                                             {displayName}
                                         </div>
                                         <div className="text-[9px] text-slate-500 font-medium">
-                                            {Math.round(item.energy_kcal)} kcal • P: {item.protein_g?.toFixed(1)}g
+                                            {Math.round(item.energy_kcal)} kcal • P: {item.protein_g && item.protein_g % 1 === 0 ? item.protein_g.toFixed(0) : item.protein_g?.toFixed(1)}g
                                         </div>
                                     </div>
                                     <span className={`text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full ${item.source === 'local' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-sky-50 text-sky-700 border border-sky-100'}`}>
