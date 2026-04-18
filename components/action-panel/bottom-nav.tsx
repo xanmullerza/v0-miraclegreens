@@ -1,12 +1,13 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ChevronLeft, Salad } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ChevronLeft, Salad, Menu } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { HeaderLogo } from '@/components/ui/header-logo';
 
 interface ActionPanelBottomNavProps {
     activeView: ActionPanelView;
@@ -27,6 +28,7 @@ export function ActionPanelBottomNav({
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [showTopNavbar, setShowTopNavbar] = useState(false);
 
     // Reset expanded state when pathname or search modifiers change to allow auto-expansion on new pages
     useEffect(() => {
@@ -77,11 +79,21 @@ export function ActionPanelBottomNav({
     const showExpandedMenu = activeCategory && secondaryMenus[activeCategory as keyof typeof secondaryMenus];
 
     return (
-        <div className={cn(
-            isInline ? "sticky bottom-0 w-full" : isVertical ? `fixed top-0 bottom-0 ${orientation === 'left' ? 'left-0' : 'right-0'} w-20` : "fixed bottom-0 left-0 right-0",
-            "z-[100] flex justify-center pointer-events-none transition-all duration-500",
-            !isActionPanelOpen && !isVertical && "animate-in slide-in-from-bottom-8"
-        )}>
+        <div className="relative">
+            {/* Top Navbar Slideout */}
+            <div className={cn(
+                "absolute bottom-full left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+                showTopNavbar ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
+            )}>
+                <HeaderLogo />
+            </div>
+
+            {/* Bottom Navbar */}
+            <div className={cn(
+                isInline ? "sticky bottom-0 w-full" : isVertical ? `fixed top-0 bottom-0 ${orientation === 'left' ? 'left-0' : 'right-0'} w-20` : "fixed bottom-0 left-0 right-0",
+                "z-[100] flex justify-center pointer-events-none transition-all duration-500",
+                !isActionPanelOpen && !isVertical && "animate-in slide-in-from-bottom-8"
+            )}>
             {showExpandedMenu ? (
                 // Expanded secondary menu
                 <div className={cn(
@@ -283,19 +295,20 @@ export function ActionPanelBottomNav({
 
                     <button
                         onClick={() => {
-                            router.back();
+                            setShowTopNavbar(!showTopNavbar);
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            "text-slate-400 hover:text-slate-500"
+                            showTopNavbar ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-slate-500"
                         )}
-                        title="Back"
+                        title="Menu"
                     >
-                        <ChevronLeft size={20} className="transition-transform group-hover:scale-110" />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Back</span>
+                        <Menu size={20} className="transition-transform group-hover:scale-110" />
+                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Menu</span>
                     </button>
                 </div>
             )}
+            </div>
         </div>
     );
 }
