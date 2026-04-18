@@ -102,6 +102,7 @@ export function useRecipeNutrition({
             { l: 'B5 (Pantothenic Acid)', fn: 'Vitamin B5', sub: 'Pantothenic Acid' },
             { l: 'B6 (Pyridoxine)', fn: 'Vitamin B6', sub: 'Pyridoxine' },
             { l: 'B9 (Folate)', fn: 'Vitamin B9', sub: 'Folate' },
+            { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' },
             { l: 'C', fn: 'Ascorbic Acid', sub: 'Immune & collagen' },
         ].map(({ l, fn, sub }) => {
             const keys = l === 'C' ? ['Vitamin C', 'vitamin_c_mg', 'Ascorbic Acid'] : [l];
@@ -115,7 +116,6 @@ export function useRecipeNutrition({
             { l: 'Vitamin D', fn: 'Vitamin D', sub: 'Calciferol' },
             { l: 'Vitamin E', fn: 'Vitamin E', sub: 'Tocopherol' },
             { l: 'Vitamin K', fn: 'Vitamin K', sub: 'Phylloquinone' },
-            { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' },
         ].map(({ l, fn, sub }) => {
             const v = findByKeys([l]) * sf;
             const r = userRDAs?.[l] || 0;

@@ -140,6 +140,7 @@ export function usePlannerNutrition({
             { l: 'B5 (Pantothenic Acid)', fn: 'Vitamin B5', sub: 'Pantothenic Acid' },
             { l: 'B6 (Pyridoxine)', fn: 'Vitamin B6', sub: 'Pyridoxine' },
             { l: 'B9 (Folate)', fn: 'Vitamin B9', sub: 'Folate' },
+            { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' },
         ].map(({ l, fn, sub }) => {
             const v = findByKeys([l]);
             const r = userRDAs?.[l] || 0;
@@ -151,7 +152,6 @@ export function usePlannerNutrition({
             { l: 'Vitamin D', fn: 'Vitamin D', sub: 'Calciferol' },
             { l: 'Vitamin E', fn: 'Vitamin E', sub: 'Tocopherol' },
             { l: 'Vitamin K', fn: 'Vitamin K', sub: 'Phylloquinone' },
-            { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' },
         ].map(({ l, fn, sub }) => {
             const v = findByKeys([l]);
             const r = userRDAs?.[l] || 0;
