@@ -78,10 +78,44 @@ export function NutritionDisplay({
     const fullMinerals = micronutrients.electrolytes.concat(micronutrients.trace);
 
     const nutrientUnit = (label: string, fullName?: string) => {
-        const norm = `${label}${fullName ? ` ${fullName}` : ''}`;
-        if (/B12|Cobalamin/i.test(norm)) return 'mg';
-        if (/Vitamin|Thiamine|Riboflavin|Niacin|Pantothenic Acid|Pyridoxine|Biotin|Folate|Ascorbic Acid/i.test(norm)) return 'mg';
-        if (/Sodium|Potassium|Calcium|Magnesium|Phosphorus|Iron|Zinc|Copper|Manganese|Iodine|Selenium/i.test(norm)) return 'mg';
+        const normalizeLabel = (value: string) => value.replace(/\s*\(.*\)/, '').trim();
+        const normalizedLabel = normalizeLabel(label);
+        const normalizedFullName = fullName ? normalizeLabel(fullName) : '';
+
+        const microgramNutrients = [
+            'B9', 'Folate',
+            'B12', 'Cobalamin',
+            'A', 'Retinol',
+            'D', 'Calciferol',
+            'K', 'Phylloquinone',
+            'Selenium', 'Iodine',
+        ];
+
+        const milligramNutrients = [
+            'B1', 'Thiamine',
+            'B2', 'Riboflavin',
+            'B3', 'Niacin',
+            'B5', 'Pantothenic Acid',
+            'B6', 'Pyridoxine',
+            'C', 'Ascorbic Acid',
+            'E', 'Tocopherol',
+            'Sodium', 'Potassium', 'Calcium', 'Magnesium',
+            'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese',
+            'Choline',
+        ];
+
+        if (microgramNutrients.some(n => new RegExp(`^${n}$`, 'i').test(normalizedLabel) || new RegExp(`^${n}$`, 'i').test(normalizedFullName))) {
+            return 'µg';
+        }
+
+        if (milligramNutrients.some(n => new RegExp(`^${n}$`, 'i').test(normalizedLabel) || new RegExp(`^${n}$`, 'i').test(normalizedFullName))) {
+            return 'mg';
+        }
+
+        if (/^(Sodium|Potassium|Calcium|Magnesium|Phosphorus|Iron|Zinc|Copper|Manganese|Choline)$/i.test(normalizedLabel)) {
+            return 'mg';
+        }
+
         return 'mg';
     };
 
