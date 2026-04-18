@@ -241,33 +241,29 @@ export function ActionPanelBottomNav({
 
                     <button
                         onClick={() => {
-                            if (activeCategory === 'cookbook') {
-                                setExpandedButton('none');
-                            } else {
-                                setExpandedButton('cookbook');
-                            }
+                            setIsActionPanelOpen(false);
+                            setActiveMainTab('recipes');
+                            router.push('/');
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            (expandedButton === 'cookbook' || activeView === 'cookbook' || activeView === 'recipe-builder' || activeView === 'import' || activeView === 'recipe-detail') || (!isActionPanelOpen && pathname === '/' && activeMainTab === 'recipes') ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
+                            (!isActionPanelOpen && activeMainTab === 'recipes') ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
                         )}
                         title="Recipes"
                     >
-                        <Salad size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
+                        <Salad size={20} className="transition-transform group-hover:scale-110" />
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Recipes</span>
                     </button>
 
                     <button
                         onClick={() => {
-                            if (activeCategory === 'library') {
-                                setExpandedButton('none');
-                            } else {
-                                setExpandedButton('library');
-                            }
+                            setIsActionPanelOpen(false);
+                            setActiveMainTab('foods');
+                            router.push('/');
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            (expandedButton === 'library' || activeView === 'nutridex' || activeView === 'comparator') || (!isActionPanelOpen && activeMainTab === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
+                            (!isActionPanelOpen && activeMainTab === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
                         )}
                         title="Food"
                     >
