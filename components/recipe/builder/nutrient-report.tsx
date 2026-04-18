@@ -48,10 +48,11 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                     {Object.entries(items).map(([label, keys]) => {
                         const val = getVal(keys);
-                        const rda = userRDAs?.[label];
+                        const nutrientKey = label === 'C (Ascorbic Acid)' ? 'Vitamin C' : label === 'A (Retinol)' ? 'Vitamin A' : label === 'D (Calciferol)' ? 'Vitamin D' : label === 'E (Tocopherol)' ? 'Vitamin E' : label === 'K (Phylloquinone)' ? 'Vitamin K' : label;
+                        const rda = userRDAs?.[nutrientKey];
                         const pct = rda ? Math.round((val / rda) * 100) : null;
                         const styles = getNutrientLevelStyles(pct || 0, label);
-                        const unit = label === "Vitamin D" ? "IU" : (label.includes("Folate") || label.includes("Selenium") || label.includes("Iodine") || label.includes("B12") || label === "Vitamin A" || label === "Vitamin K") ? "µg" : "mg";
+                        const unit = label === "Vitamin D" || label === "D (Calciferol)" ? "IU" : (label.includes("Folate") || label.includes("Selenium") || label.includes("Iodine") || label.includes("B12") || label === "Vitamin A" || label === "A (Retinol)" || label === "Vitamin K" || label === "K (Phylloquinone)" || label.includes("µg")) ? "µg" : "mg";
                         
                         return (
                             <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-950 transition-all", t.itemBorder, pct !== null && !forceRaw ? `${styles.borderLight} ${styles.fade}` : "")}>
@@ -206,22 +207,22 @@ export function NutrientReport({ totals, userRDAs, ingredients, energyUnit, prof
                 'Selenium': ['Selenium', 'selenium_ug']
             }} />
 
-            <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="B-Complex & Vitamin C" items={{
+            <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="B-Complex & Ascorbic Acid" items={{
                 'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
                 'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
                 'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
                 'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
                 'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
                 'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                'C (Ascorbic Acid)': ['Vitamin C', 'vitamin_c_mg'],
             }} />
 
             <NutrientGrid title="Fat-Soluble Vitamins" icon={Sun} theme="amber" subtitle="A, D, E, K Bio-availability" items={{
-                'Vitamin A': ['Vitamin A', 'vitamin_a_rae_ug'],
-                'Vitamin D': ['Vitamin D', 'vitamin_d_iu'],
-                'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                'A (Retinol)': ['Vitamin A', 'vitamin_a_rae_ug'],
+                'D (Calciferol)': ['Vitamin D', 'vitamin_d_iu'],
+                'E (Tocopherol)': ['Vitamin E', 'vitamin_e_mg'],
+                'K (Phylloquinone)': ['Vitamin K', 'vitamin_k_ug']
             }} />
         </div>
     );

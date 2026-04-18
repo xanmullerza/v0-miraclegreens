@@ -52,19 +52,18 @@ const NUTRIENT_GROUPS = [
         title: "Vitamins",
         icon: Battery,
         keys: [
-            { label: 'Vitamin B1', key: 'B1 (Thiamine)', unit: 'mg' },
-            { label: 'Vitamin B2', key: 'B2 (Riboflavin)', unit: 'mg' },
-            { label: 'Vitamin B3', key: 'B3 (Niacin)', unit: 'mg' },
-            { label: 'Vitamin B5', key: 'B5 (Pantothenic Acid)', unit: 'mg' },
-            { label: 'Vitamin B6', key: 'B6 (Pyridoxine)', unit: 'mg' },
-            { label: 'Vitamin B9', key: 'B9 (Folate)', unit: 'μg' },
-            { label: 'Vitamin B12', key: 'B12 (Cobalamin)', unit: 'μg' },
-            { label: 'Vitamin C', key: 'Vitamin C', unit: 'mg' },
-            { label: 'Choline', key: 'Choline', unit: 'mg' },
-            { label: 'Vitamin A', key: 'Vitamin A', unit: 'μg' },
-            { label: 'Vitamin D', key: 'Vitamin D', unit: 'μg' },
-            { label: 'Vitamin E', key: 'Vitamin E', unit: 'mg' },
-            { label: 'Vitamin K', key: 'Vitamin K', unit: 'μg' }
+            { label: 'B1 (Thiamine)', key: 'B1 (Thiamine)', unit: 'mg' },
+            { label: 'B2 (Riboflavin)', key: 'B2 (Riboflavin)', unit: 'mg' },
+            { label: 'B3 (Niacin)', key: 'B3 (Niacin)', unit: 'mg' },
+            { label: 'B5 (Pantothenic Acid)', key: 'B5 (Pantothenic Acid)', unit: 'mg' },
+            { label: 'B6 (Pyridoxine)', key: 'B6 (Pyridoxine)', unit: 'mg' },
+            { label: 'B9 (Folate)', key: 'B9 (Folate)', unit: 'μg' },
+            { label: 'B12 (Cobalamin)', key: 'B12 (Cobalamin)', unit: 'μg' },
+            { label: 'C (Ascorbic Acid)', key: 'Vitamin C', unit: 'mg' },
+            { label: 'A (Retinol)', key: 'Vitamin A', unit: 'μg' },
+            { label: 'D (Calciferol)', key: 'Vitamin D', unit: 'μg' },
+            { label: 'E (Tocopherol)', key: 'Vitamin E', unit: 'mg' },
+            { label: 'K (Phylloquinone)', key: 'Vitamin K', unit: 'μg' }
         ]
     }
 ];

@@ -298,6 +298,7 @@ export function NutritionDisplay({
                     <div className="space-y-2">
                         {fullVitamins.map(v => {
                             const meetsThreshold = v.pct >= universalThreshold;
+                            const displayLabel = v.fullName ? `${v.label} (${v.fullName})` : v.label;
                             return (
                                 <Link 
                                     key={v.label} 
@@ -305,7 +306,7 @@ export function NutritionDisplay({
                                     className="flex items-center justify-between bg-transparent dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded-2xl transition-all duration-200 border border-slate-200 dark:border-slate-800 cursor-pointer group/nut"
                                 >
                                     <span className={cn('text-sm font-semibold group-hover/nut:text-violet-400', meetsThreshold ? 'text-violet-500' : 'text-slate-500 dark:text-slate-400')}>
-                                        {v.fullName === 'Ascorbic Acid' ? 'Vitamin C' : v.label}
+                                        {displayLabel}
                                     </span>
                                     <span
                                         className={cn(

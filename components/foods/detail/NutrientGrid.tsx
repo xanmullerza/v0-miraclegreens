@@ -83,11 +83,12 @@ export function NutrientGrid({
                             'Carbs': dailyTargets.carbs,
                             'Fat': dailyTargets.fat
                         };
-                        rda = userRDAs?.[label] || macroRDAs[label];
+                        const nutrientKey = label === 'C (Ascorbic Acid)' ? 'Vitamin C' : label === 'A (Retinol)' ? 'Vitamin A' : label === 'D (Calciferol)' ? 'Vitamin D' : label === 'E (Tocopherol)' ? 'Vitamin E' : label === 'K (Phylloquinone)' ? 'Vitamin K' : label;
+                        rda = userRDAs?.[nutrientKey] || macroRDAs[label];
                         unitStr = (label === 'Energy') ? energyUnit :
                             (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'Starch' || label === 'Omega-3' || label === 'Omega-6') ? 'g' :
-                                (label === 'Vitamin D') ? 'IU' :
-                                    (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                (label === 'Vitamin D' || label === 'D (Calciferol)') ? 'IU' :
+                                    (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'A (Retinol)' || label === 'Vitamin K' || label === 'K (Phylloquinone)' || label.includes('µg')) ? 'µg' : 'mg';
                     }
 
                     const pct = rda ? Math.round((val / rda) * 100) : 0;

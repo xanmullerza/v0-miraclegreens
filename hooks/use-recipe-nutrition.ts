@@ -96,13 +96,13 @@ export function useRecipeNutrition({
         });
 
         const wsData = [
-            { l: 'B1 (Thiamine)', fn: 'Vitamin B1', sub: 'Thiamine' },
-            { l: 'B2 (Riboflavin)', fn: 'Vitamin B2', sub: 'Riboflavin' },
-            { l: 'B3 (Niacin)', fn: 'Vitamin B3', sub: 'Niacin' },
-            { l: 'B5 (Pantothenic Acid)', fn: 'Vitamin B5', sub: 'Pantothenic Acid' },
-            { l: 'B6 (Pyridoxine)', fn: 'Vitamin B6', sub: 'Pyridoxine' },
-            { l: 'B9 (Folate)', fn: 'Vitamin B9', sub: 'Folate' },
-            { l: 'B12 (Cobalamin)', fn: 'Vitamin B12', sub: 'Cobalamin' },
+            { l: 'B1', fn: 'Thiamine', sub: 'Thiamine' },
+            { l: 'B2', fn: 'Riboflavin', sub: 'Riboflavin' },
+            { l: 'B3', fn: 'Niacin', sub: 'Niacin' },
+            { l: 'B5', fn: 'Pantothenic Acid', sub: 'Pantothenic Acid' },
+            { l: 'B6', fn: 'Pyridoxine', sub: 'Pyridoxine' },
+            { l: 'B9', fn: 'Folate', sub: 'Folate' },
+            { l: 'B12', fn: 'Cobalamin', sub: 'Cobalamin' },
             { l: 'C', fn: 'Ascorbic Acid', sub: 'Immune & collagen' },
         ].map(({ l, fn, sub }) => {
             const keys = l === 'C' ? ['Vitamin C', 'vitamin_c_mg', 'Ascorbic Acid'] : [l];
@@ -112,10 +112,10 @@ export function useRecipeNutrition({
         });
 
         const stData = [
-            { l: 'Vitamin A', fn: 'Vitamin A', sub: 'Retinol' },
-            { l: 'Vitamin D', fn: 'Vitamin D', sub: 'Calciferol' },
-            { l: 'Vitamin E', fn: 'Vitamin E', sub: 'Tocopherol' },
-            { l: 'Vitamin K', fn: 'Vitamin K', sub: 'Phylloquinone' },
+            { l: 'A', fn: 'Retinol', sub: 'Retinol' },
+            { l: 'D', fn: 'Calciferol', sub: 'Calciferol' },
+            { l: 'E', fn: 'Tocopherol', sub: 'Tocopherol' },
+            { l: 'K', fn: 'Phylloquinone', sub: 'Phylloquinone' },
         ].map(({ l, fn, sub }) => {
             const v = findByKeys([l]) * sf;
             const r = userRDAs?.[l] || 0;

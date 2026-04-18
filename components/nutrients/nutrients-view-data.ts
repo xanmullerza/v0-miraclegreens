@@ -135,7 +135,7 @@ export const ACCORDION_SECTIONS: AccordionSection[] = [
         theme: 'emerald',
         nutrients: [
             {
-                id: 'Vitamin A', label: 'Vitamin A', unit: 'µg', isParent: true,
+                id: 'Vitamin A', label: 'A (Retinol)', unit: 'µg', isParent: true,
                 theme: 'orange',
                 children: [
                     { id: 'Retinol', label: 'Retinol', unit: 'µg' },
@@ -145,7 +145,7 @@ export const ACCORDION_SECTIONS: AccordionSection[] = [
                 ]
             },
             {
-                id: 'Vitamin E', label: 'Vitamin E', unit: 'mg', isParent: true,
+                id: 'Vitamin E', label: 'E (Tocopherol)', unit: 'mg', isParent: true,
                 theme: 'pink',
                 children: [
                     { id: 'Alpha-tocopherol', label: 'Alpha-tocopherol', unit: 'mg' },
@@ -154,9 +154,9 @@ export const ACCORDION_SECTIONS: AccordionSection[] = [
                     { id: 'Gamma-tocopherol', label: 'Gamma-tocopherol', unit: 'mg' },
                 ]
             },
-            { id: 'Vitamin C', label: 'Vitamin C', unit: 'mg', theme: 'sky' },
-            { id: 'Vitamin D', label: 'Vitamin D', unit: 'µg', theme: 'amber' },
-            { id: 'Vitamin K', label: 'Vitamin K', unit: 'µg', theme: 'rose' },
+            { id: 'Vitamin C', label: 'C (Ascorbic Acid)', unit: 'mg', theme: 'sky' },
+            { id: 'Vitamin D', label: 'D (Calciferol)', unit: 'µg', theme: 'amber' },
+            { id: 'Vitamin K', label: 'K (Phylloquinone)', unit: 'µg', theme: 'rose' },
             {
                 id: '_b_vitamins', label: 'B Vitamins', unit: '', isParent: true,
                 theme: 'purple',

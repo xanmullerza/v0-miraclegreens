@@ -30,12 +30,12 @@ export function NutrientsPanel() {
         { id: 'Iron', label: 'Iron', group: 'Minerals' },
         { id: 'Zinc', label: 'Zinc', group: 'Minerals' },
         { id: 'Magnesium', label: 'Magnesium', group: 'Minerals' },
-        { id: 'Vitamin A', label: 'Vitamin A', group: 'Vitamins' },
-        { id: 'Vitamin C', label: 'Vitamin C', group: 'Vitamins' },
-        { id: 'Vitamin D', label: 'Vitamin D', group: 'Vitamins' },
-        { id: 'Vitamin E', label: 'Vitamin E', group: 'Vitamins' },
+        { id: 'Vitamin A', label: 'A (Retinol)', group: 'Vitamins' },
+        { id: 'Vitamin C', label: 'C (Ascorbic Acid)', group: 'Vitamins' },
+        { id: 'Vitamin D', label: 'D (Calciferol)', group: 'Vitamins' },
+        { id: 'Vitamin E', label: 'E (Tocopherol)', group: 'Vitamins' },
         { id: 'B12', label: 'B12 (Cobalamin)', group: 'Vitamins' },
-        { id: 'Folate', label: 'Folate', group: 'Vitamins' },
+        { id: 'Folate', label: 'B9 (Folate)', group: 'Vitamins' },
     ], []);
 
     const filteredNutrients = useMemo(() => {

@@ -693,11 +693,12 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                 'Carbs': dailyTargets.carbs,
                                 'Fat': dailyTargets.fat
                             };
-                            rda = userRDAs?.[label] || macroRDAs[label];
+                            const nutrientKey = label === 'C (Ascorbic Acid)' ? 'Vitamin C' : label === 'A (Retinol)' ? 'Vitamin A' : label === 'D (Calciferol)' ? 'Vitamin D' : label === 'E (Tocopherol)' ? 'Vitamin E' : label === 'K (Phylloquinone)' ? 'Vitamin K' : label;
+                            rda = userRDAs?.[nutrientKey] || macroRDAs[label];
                             unitStr = (label === 'Energy') ? energyUnit :
                                 (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'Starch' || label === 'Omega-3' || label === 'Omega-6') ? 'g' :
-                                    (label === 'Vitamin D') ? 'IU' :
-                                        (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                    (label === 'Vitamin D' || label === 'D (Calciferol)') ? 'IU' :
+                                        (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'A (Retinol)' || label === 'Vitamin K' || label === 'K (Phylloquinone)' || label.includes('µg')) ? 'µg' : 'mg';
                         }
 
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
@@ -1019,22 +1020,22 @@ export default function RecipeDetails({ recipeId, onClose, isStandalone = false 
                                         'Selenium': ['Selenium', 'selenium_ug']
                                     }} />
 
-                                    <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="B-Complex & Vitamin C" items={{
+                                    <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="B-Complex & Ascorbic Acid" items={{
                                         'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
                                         'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
                                         'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                                        'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                        'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
                                         'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
                                         'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
                                         'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                                        'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                        'C (Ascorbic Acid)': ['Vitamin C', 'vitamin_c_mg'],
                                     }} />
 
                                     <NutrientGrid title="Fat-Soluble Vitamins" icon={Sun} theme="amber" subtitle="A, D, E, K Bio-availability" items={{
-                                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                                        'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                                        'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                                        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                                        'A (Retinol)': ['Vitamin A', 'vitamin_a_ug'],
+                                        'D (Calciferol)': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                        'E (Tocopherol)': ['Vitamin E', 'vitamin_e_mg'],
+                                        'K (Phylloquinone)': ['Vitamin K', 'vitamin_k_ug'],
                                     }} />
                                 </>
                             )}

@@ -23,7 +23,7 @@ export function LifeguardSurvivalCalendar(props: SurvivalCalendarProps) {
       icon: '🔥' 
     },
     { 
-      label: 'Vitamin C', 
+      label: 'C (Ascorbic Acid)', 
       calc: () => Math.ceil((INITIAL_STORES.vit_c * SURVIVAL_PROFILES[props.profileType].vit_c_floor + props.adjustedInventory.reduce((acc: any, i: any) => acc + (i.nutrition?.micronutrients?.['Vitamin C'] || 0) * (i.weight_g / 100), 0)) / SURVIVAL_PROFILES[props.profileType].vit_c_floor), 
       color: 'from-orange-500 to-amber-500', 
       icon: '🍊' 

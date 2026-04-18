@@ -31,14 +31,14 @@ export function LifeguardDeficitAnalysis(props: DeficitAnalysisProps) {
         deficit: (profile.water_floor * props.simulationDay) - props.simStatus.results.water 
       },
       { 
-        label: 'Thiamine (B1)', 
+        label: 'B1 (Thiamine)', 
         required: profile.b1_floor * props.simulationDay, 
         actual: props.simStatus.results.b1, 
         unit: 'mg', 
         deficit: (profile.b1_floor * props.simulationDay) - props.simStatus.results.b1 
       },
       { 
-        label: 'Vitamin C', 
+        label: 'C (Ascorbic Acid)', 
         required: profile.vit_c_floor * props.simulationDay, 
         actual: props.simStatus.results.vit_c, 
         unit: 'mg', 
