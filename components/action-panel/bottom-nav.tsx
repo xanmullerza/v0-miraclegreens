@@ -227,7 +227,6 @@ export function ActionPanelBottomNav({
                         </span>
                     </button>
 
-                    {/* Cookbook Button - with dropdown */}
                     <button
                         onClick={() => {
                             if (activeCategory === 'cookbook') {
@@ -240,55 +239,48 @@ export function ActionPanelBottomNav({
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
                             (expandedButton === 'cookbook' || activeView === 'cookbook' || activeView === 'recipe-builder' || activeView === 'import' || activeView === 'recipe-detail') || (!isActionPanelOpen && pathname === '/' && activeMainTab === 'recipes') ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
                         )}
-                        title="Cookbook"
+                        title="Recipes"
                     >
-                        <BookOpen size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
-                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Cookbook</span>
+                        <Salad size={20} className={cn("transition-transform group-hover:scale-110", pathname === '/cookbook' && "animate-pulse")} />
+                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Recipes</span>
                     </button>
 
-                    {/* Library Button - Admin only */}
-                    {profile?.isAdmin && (
-                        <button
-                            onClick={() => {
-                                if (activeCategory === 'library') {
-                                    setExpandedButton('none');
-                                } else {
-                                    setExpandedButton('library');
-                                }
-                            }}
-                            className={cn(
-                                "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                                (expandedButton === 'library' || activeView === 'nutridex' || activeView === 'comparator') || (!isActionPanelOpen && activeMainTab === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
-                            )}
-                            title="Library"
-                        >
-                            <LibraryIcon size={20} className="transition-transform group-hover:scale-110" />
-                            <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Library</span>
-                        </button>
-                    )}
+                    <button
+                        onClick={() => {
+                            if (activeCategory === 'library') {
+                                setExpandedButton('none');
+                            } else {
+                                setExpandedButton('library');
+                            }
+                        }}
+                        className={cn(
+                            "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
+                            (expandedButton === 'library' || activeView === 'nutridex' || activeView === 'comparator') || (!isActionPanelOpen && activeMainTab === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
+                        )}
+                        title="Food"
+                    >
+                        <Leaf size={20} className="transition-transform group-hover:scale-110" />
+                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Food</span>
+                    </button>
 
-                    {/* Tracker Button - Admin only */}
-                    {profile?.isAdmin && (
-                        <button
-                            onClick={() => {
-                                if (activeCategory === 'tracker') {
-                                    setExpandedButton('none');
-                                } else {
-                                    setExpandedButton('tracker');
-                                }
-                            }}
-                            className={cn(
-                                "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                                (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && activeMainTab === 'planner') ? "text-violet-500 bg-violet-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-violet-500"
-                            )}
-                            title="Tracker"
-                        >
-                            <BarChart3 size={20} className="transition-transform group-hover:scale-110" />
-                            <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Tracker</span>
-                        </button>
-                    )}
+                    <button
+                        onClick={() => {
+                            if (activeCategory === 'tracker') {
+                                setExpandedButton('none');
+                            } else {
+                                setExpandedButton('tracker');
+                            }
+                        }}
+                        className={cn(
+                            "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
+                            (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && activeMainTab === 'planner') ? "text-violet-500 bg-violet-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-violet-500"
+                        )}
+                        title="Tracker"
+                    >
+                        <BarChart3 size={20} className="transition-transform group-hover:scale-110" />
+                        <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Tracker</span>
+                    </button>
 
-                    {/* Back Button - behaves like mobile back button */}
                     <button
                         onClick={() => {
                             router.back();
