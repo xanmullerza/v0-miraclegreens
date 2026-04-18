@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ChevronLeft } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ChevronLeft, Salad } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -56,7 +56,7 @@ export function ActionPanelBottomNav({
     // Secondary menu options for each button
     const secondaryMenus = {
         cookbook: [
-            { id: 'view', label: 'Recipes', icon: BookOpen, color: 'emerald', onClick: () => { navigateTo('cookbook'); } },
+            { id: 'view', label: 'Recipes', icon: Salad, color: 'emerald', onClick: () => { navigateTo('cookbook'); } },
             { id: 'create', label: 'Maker', icon: Plus, color: 'cyan', onClick: () => { navigateTo('recipe-builder'); } },
             { id: 'import', label: 'Importer', icon: Upload, color: 'violet', onClick: () => { navigateTo('import'); } },
             { id: 'back', label: 'Back', icon: ChevronLeft, color: 'slate', onClick: () => { router.back(); } },
