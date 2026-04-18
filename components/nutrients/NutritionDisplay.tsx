@@ -59,10 +59,14 @@ export function NutritionDisplay({
     const ndm = nutrientDisplayMode;
 
     const vitaminSortOrder = ['B1', 'B2', 'B3', 'B5', 'B6', 'B7', 'B9', 'B12', 'C', 'A', 'D', 'E', 'K'];
+    const normalizeVitaminLabel = (label: string) => label.replace(/\s*\(.*\)/, '').trim();
     const sortedVitamins = micronutrients.waterSoluble.concat(micronutrients.fatSoluble).slice().sort((a, b) => {
         const getOrder = (nutrient: { label: string; fullName?: string }) => {
-            const key = `${nutrient.label}`;
-            const orderIndex = vitaminSortOrder.findIndex(order => key === order || key.includes(order));
+            const key = normalizeVitaminLabel(nutrient.label);
+            const fullName = normalizeVitaminLabel(nutrient.fullName || '');
+            const orderIndex = vitaminSortOrder.findIndex(order =>
+                key === order || fullName === order
+            );
             return orderIndex !== -1 ? orderIndex : vitaminSortOrder.length;
         };
         const orderA = getOrder(a);
