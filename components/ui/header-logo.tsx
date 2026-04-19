@@ -16,6 +16,7 @@ import {
   HelpCircle,
   BookOpen,
   Shapes,
+  Plus,
 } from 'lucide-react';
 import { BookoFoodLogo } from '@/components/ui/bookofood-logo';
 import { cn } from '@/lib/utils';
@@ -318,6 +319,18 @@ export function HeaderLogo({
 
         {/* Profile Button */}
         <div className="flex flex-shrink-0 border-l lg:border-l border-border h-full overflow-hidden">
+          {/* Plus Button - Import Recipe */}
+          <button
+            onClick={() => {
+              setActiveView('import');
+              setIsActionPanelOpen(true);
+            }}
+            className="h-12 w-12 flex items-center justify-center hover:bg-muted dark:hover:bg-slate-800 transition-colors text-muted-foreground hover:text-emerald-500 active:scale-95"
+            title="Import Recipe"
+          >
+            <Plus size={18} />
+          </button>
+
           {pathname === '/profile' ? (
             <Link
               href="/dashboard"
