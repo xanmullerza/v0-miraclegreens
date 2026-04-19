@@ -67,6 +67,8 @@ interface ActionPanelContextType {
     setExpandedButton: (button: string | null) => void;
     activeMainTab: 'recipes' | 'foods' | 'planner';
     setActiveMainTab: (tab: 'recipes' | 'foods' | 'planner') => void;
+    showTopNavbar: boolean;
+    setShowTopNavbar: (show: boolean) => void;
 }
 
 const ActionPanelContext = createContext<ActionPanelContextType | undefined>(undefined);
@@ -88,6 +90,7 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
     const [ingredientMatch, setIngredientMatch] = useState<IngredientMatchState | null>(null);
     const [expandedButton, setExpandedButton] = useState<string | null>(null);
     const [activeMainTab, setActiveMainTab] = useState<'recipes' | 'foods' | 'planner'>('recipes');
+    const [showTopNavbar, setShowTopNavbar] = useState(false);
 
     const navigateTo = (view: ActionPanelView) => {
         if (view !== activeView) {
@@ -157,6 +160,8 @@ export function ActionPanelProvider({ children }: { children: ReactNode }) {
             setExpandedButton,
             activeMainTab,
             setActiveMainTab,
+            showTopNavbar,
+            setShowTopNavbar,
         }}>
             {children}
         </ActionPanelContext.Provider>
