@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Camera, Loader2, Save, Wand2 } from 'lucide-react';
+import { Camera, Loader2, Save, Wand2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ParsedRecipe } from '@/types/recipe';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
 import { RecipeBuilderPanel } from './recipe-builder-panel';
 import { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/builder/types';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface ImportViewProps {
     setActiveView: (view: ActionPanelView) => void;
@@ -276,25 +275,32 @@ export function ImportView({
             </div>
 
             {/* Maker Slide-out */}
-            <Sheet open={showMakerInline} onOpenChange={(open) => {
-                if (!open) {
-                    setShowMakerInline(false);
-                    setRecipeStep(1);
-                    setRecipeTitle('');
-                    setRecipeServings(4);
-                    setRecipeType('dinner');
-                    setRecipePrepTime(30);
-                    setRecipeCookTime(0);
-                    setRecipeIngredients([]);
-                    setRecipeInstructions(['']);
-                    setRecipeImage('');
-                }
-            }}>
-                <SheetContent side="right" hideOverlay>
+            <div className={cn(
+                'overflow-hidden transition-all duration-300',
+                showMakerInline ? 'max-h-[1500px] opacity-100' : 'max-h-0 opacity-0'
+            )}>
+                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-cyan-500/10 dark:bg-cyan-500/20 shadow-sm">
                     <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 className="text-lg font-black uppercase tracking-widest text-slate-400">Recipe Maker</h3>
+                        <button
+                            onClick={() => {
+                                setShowMakerInline(false);
+                                setRecipeStep(1);
+                                setRecipeTitle('');
+                                setRecipeServings(4);
+                                setRecipeType('dinner');
+                                setRecipePrepTime(30);
+                                setRecipeCookTime(0);
+                                setRecipeIngredients([]);
+                                setRecipeInstructions(['']);
+                                setRecipeImage('');
+                            }}
+                            className="rounded-full bg-slate-200 dark:bg-slate-800 p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
                     </div>
-                    <div className="px-6 pb-6 overflow-y-auto">
+                    <div className="px-6 pb-6 pt-4">
                         <RecipeBuilderPanel
                             recipeStep={recipeStep}
                             setRecipeStep={setRecipeStep}
@@ -324,8 +330,8 @@ export function ImportView({
                             handleSaveRecipe={handleSaveRecipe}
                         />
                     </div>
-                </SheetContent>
-            </Sheet>
+                </div>
+            </div>
         </div>
     );
 }
