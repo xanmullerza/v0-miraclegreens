@@ -5,6 +5,7 @@ import { ParsedRecipe } from '@/types/recipe';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
 import { RecipeBuilderPanel } from './recipe-builder-panel';
 import { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/builder/types';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface ImportViewProps {
     setActiveView: (view: ActionPanelView) => void;
@@ -108,64 +109,8 @@ export function ImportView({
 
     return (
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
-            {showMakerInline ? (
-                <>
-                    {/* Maker Inline Header */}
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Recipe Maker</h3>
-                        <button
-                            onClick={() => {
-                                setShowMakerInline(false);
-                                setRecipeStep(1);
-                                setRecipeTitle('');
-                                setRecipeServings(4);
-                                setRecipeType('dinner');
-                                setRecipePrepTime(30);
-                                setRecipeCookTime(0);
-                                setRecipeIngredients([]);
-                                setRecipeInstructions(['']);
-                                setRecipeImage('');
-                            }}
-                            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                        >
-                            <X size={18} />
-                        </button>
-                    </div>
-
-                    {/* Inline Recipe Builder */}
-                    <RecipeBuilderPanel
-                        recipeStep={recipeStep}
-                        setRecipeStep={setRecipeStep}
-                        recipeTitle={recipeTitle}
-                        setRecipeTitle={setRecipeTitle}
-                        recipeServings={recipeServings}
-                        setRecipeServings={setRecipeServings}
-                        recipeType={recipeType}
-                        setRecipeType={setRecipeType}
-                        recipePrepTime={recipePrepTime}
-                        setRecipePrepTime={setRecipePrepTime}
-                        recipeCookTime={recipeCookTime}
-                        setRecipeCookTime={setRecipeCookTime}
-                        recipeIngredients={recipeIngredients}
-                        setRecipeIngredients={setRecipeIngredients}
-                        recipeInstructions={recipeInstructions}
-                        setRecipeInstructions={setRecipeInstructions}
-                        recipeImage={recipeImage}
-                        setRecipeImage={setRecipeImage}
-                        recipeSaving={recipeSaving || false}
-                        handleAddInstruction={handleAddInstruction}
-                        handleUpdateInstruction={handleUpdateInstruction}
-                        handleRemoveInstruction={handleRemoveInstruction}
-                        builderRef={builderRef}
-                        recipeUploading={recipeUploading}
-                        handleRecipeImageUpload={handleRecipeImageUpload}
-                        handleSaveRecipe={handleSaveRecipe}
-                    />
-                </>
-            ) : (
-                <>
-                    {/* Vertical Stack Layout */}
-                    <div className="flex flex-col gap-4 flex-1">
+            {/* Vertical Stack Layout */}
+            <div className="flex flex-col gap-4 flex-1">
                 {/* Photo Upload Card */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-teal-500/20 dark:bg-teal-500/10">
                     <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
@@ -328,9 +273,57 @@ export function ImportView({
                     </div>
                 </div>
 
+            </div>
+
+            {/* Maker Dialog */}
+            <Dialog open={showMakerInline} onOpenChange={(open) => {
+                if (!open) {
+                    setShowMakerInline(false);
+                    setRecipeStep(1);
+                    setRecipeTitle('');
+                    setRecipeServings(4);
+                    setRecipeType('dinner');
+                    setRecipePrepTime(30);
+                    setRecipeCookTime(0);
+                    setRecipeIngredients([]);
+                    setRecipeInstructions(['']);
+                    setRecipeImage('');
+                }
+            }}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-black uppercase tracking-widest text-slate-400">Recipe Maker</h3>
                     </div>
-                </>
-            )}
+                    <RecipeBuilderPanel
+                        recipeStep={recipeStep}
+                        setRecipeStep={setRecipeStep}
+                        recipeTitle={recipeTitle}
+                        setRecipeTitle={setRecipeTitle}
+                        recipeServings={recipeServings}
+                        setRecipeServings={setRecipeServings}
+                        recipeType={recipeType}
+                        setRecipeType={setRecipeType}
+                        recipePrepTime={recipePrepTime}
+                        setRecipePrepTime={setRecipePrepTime}
+                        recipeCookTime={recipeCookTime}
+                        setRecipeCookTime={setRecipeCookTime}
+                        recipeIngredients={recipeIngredients}
+                        setRecipeIngredients={setRecipeIngredients}
+                        recipeInstructions={recipeInstructions}
+                        setRecipeInstructions={setRecipeInstructions}
+                        recipeImage={recipeImage}
+                        setRecipeImage={setRecipeImage}
+                        recipeSaving={recipeSaving || false}
+                        handleAddInstruction={handleAddInstruction}
+                        handleUpdateInstruction={handleUpdateInstruction}
+                        handleRemoveInstruction={handleRemoveInstruction}
+                        builderRef={builderRef}
+                        recipeUploading={recipeUploading}
+                        handleRecipeImageUpload={handleRecipeImageUpload}
+                        handleSaveRecipe={handleSaveRecipe}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
