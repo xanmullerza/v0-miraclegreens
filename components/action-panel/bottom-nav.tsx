@@ -234,7 +234,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            activeView === 'home' ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
+                            (isActionPanelOpen && activeView === 'home') ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
                         )}
                         title="Home"
                     >
