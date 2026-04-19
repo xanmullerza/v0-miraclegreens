@@ -156,7 +156,13 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
                         isDragging, setIsDragging, processRecipeImage,
                         fileInputRef, isRecording, recordingTime,
                         startAudioRecording, stopAudioRecording,
-                        videoURL, setVideoURL
+                        videoURL, setVideoURL,
+                        recipeStep, setRecipeStep, recipeTitle, setRecipeTitle,
+                        recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
+                        recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
+                        recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
+                        handleAddInstruction, handleUpdateInstruction, handleRemoveInstruction, builderRef,
+                        recipeUploading, handleRecipeImageUpload, handleSaveRecipe, recipeType, setRecipeType
                     }}
                 />
             );
@@ -177,7 +183,13 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
                             isDragging, setIsDragging, processRecipeImage,
                             fileInputRef, isRecording, recordingTime,
                             startAudioRecording, stopAudioRecording,
-                            videoURL, setVideoURL
+                            videoURL, setVideoURL,
+                            recipeStep, setRecipeStep, recipeTitle, setRecipeTitle,
+                            recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
+                            recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
+                            recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
+                            handleAddInstruction, handleUpdateInstruction, handleRemoveInstruction, builderRef,
+                            recipeUploading, handleRecipeImageUpload, handleSaveRecipe, recipeType, setRecipeType
                         }}
                     />
                 );

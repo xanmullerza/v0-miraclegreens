@@ -12,7 +12,14 @@ export function ImportWizardView({
     isDragging, setIsDragging, processRecipeImage,
     fileInputRef, isRecording, recordingTime,
     startAudioRecording, stopAudioRecording,
-    videoURL, setVideoURL
+    videoURL, setVideoURL,
+    // Recipe builder props
+    recipeStep, setRecipeStep, recipeTitle, setRecipeTitle,
+    recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
+    recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
+    recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
+    handleAddInstruction, handleUpdateInstruction, handleRemoveInstruction, builderRef,
+    recipeUploading, handleRecipeImageUpload, handleSaveRecipe, recipeType, setRecipeType
 }: any) {
     return (
         <PanelWrapper title="Recipe Import" noPadding>
@@ -41,6 +48,32 @@ export function ImportWizardView({
                 stopAudioRecording={stopAudioRecording}
                 videoURL={videoURL}
                 setVideoURL={setVideoURL}
+                // Recipe builder props
+                recipeStep={recipeStep}
+                setRecipeStep={setRecipeStep}
+                recipeTitle={recipeTitle}
+                setRecipeTitle={setRecipeTitle}
+                recipeServings={recipeServings}
+                setRecipeServings={setRecipeServings}
+                recipePrepTime={recipePrepTime}
+                setRecipePrepTime={setRecipePrepTime}
+                recipeCookTime={recipeCookTime}
+                setRecipeCookTime={setRecipeCookTime}
+                recipeIngredients={recipeIngredients}
+                setRecipeIngredients={setRecipeIngredients}
+                recipeInstructions={recipeInstructions}
+                setRecipeInstructions={setRecipeInstructions}
+                recipeImage={recipeImage}
+                setRecipeImage={setRecipeImage}
+                handleAddInstruction={handleAddInstruction}
+                handleUpdateInstruction={handleUpdateInstruction}
+                handleRemoveInstruction={handleRemoveInstruction}
+                builderRef={builderRef}
+                recipeUploading={recipeUploading}
+                handleRecipeImageUpload={handleRecipeImageUpload}
+                handleSaveRecipe={handleSaveRecipe}
+                recipeType={recipeType}
+                setRecipeType={setRecipeType}
             />
         </PanelWrapper>
     );

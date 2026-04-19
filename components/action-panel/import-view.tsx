@@ -1,8 +1,10 @@
-import React from 'react';
-import { Camera, Loader2, Save, Pencil, Wand2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Camera, Loader2, Save, Pencil, Wand2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ParsedRecipe } from '@/types/recipe';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
+import { RecipeBuilderPanel } from './recipe-builder-panel';
+import { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/builder/types';
 
 interface ImportViewProps {
     setActiveView: (view: ActionPanelView) => void;
@@ -31,6 +33,32 @@ interface ImportViewProps {
     setVideoURL?: (url: string) => void;
     toast?: (msg: string) => void;
     recipeContentRef?: React.RefObject<HTMLTextAreaElement | null>;
+    // Recipe builder props
+    recipeStep?: number;
+    setRecipeStep?: (step: number) => void;
+    recipeTitle?: string;
+    setRecipeTitle?: (title: string) => void;
+    recipeServings?: number;
+    setRecipeServings?: (servings: number) => void;
+    recipeType?: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement';
+    setRecipeType?: (type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'supplement') => void;
+    recipePrepTime?: number;
+    setRecipePrepTime?: (time: number) => void;
+    recipeCookTime?: number;
+    setRecipeCookTime?: (time: number) => void;
+    recipeIngredients?: RecipeIngredient[];
+    setRecipeIngredients?: (ingredients: RecipeIngredient[]) => void;
+    recipeInstructions?: string[];
+    setRecipeInstructions?: (instructions: string[]) => void;
+    recipeImage?: string;
+    setRecipeImage?: (image: string) => void;
+    handleAddInstruction?: () => void;
+    handleUpdateInstruction?: (index: number, value: string) => void;
+    handleRemoveInstruction?: (index: number) => void;
+    builderRef?: React.RefObject<IngredientBuilderHandle | null>;
+    recipeUploading?: boolean;
+    handleRecipeImageUpload?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleSaveRecipe?: (isMix: boolean, isRemix: boolean) => void;
 }
 
 export function ImportView({
@@ -49,11 +77,95 @@ export function ImportView({
     setIsDragging,
     processRecipeImage,
     fileInputRef,
+    // Recipe builder props
+    recipeStep = 1,
+    setRecipeStep = () => {},
+    recipeTitle = '',
+    setRecipeTitle = () => {},
+    recipeServings = 4,
+    setRecipeServings = () => {},
+    recipeType = 'dinner',
+    setRecipeType = () => {},
+    recipePrepTime = 30,
+    setRecipePrepTime = () => {},
+    recipeCookTime = 0,
+    setRecipeCookTime = () => {},
+    recipeIngredients = [],
+    setRecipeIngredients = () => {},
+    recipeInstructions = [''],
+    setRecipeInstructions = () => {},
+    recipeImage = '',
+    setRecipeImage = () => {},
+    handleAddInstruction = () => {},
+    handleUpdateInstruction = () => {},
+    handleRemoveInstruction = () => {},
+    builderRef,
+    recipeUploading = false,
+    handleRecipeImageUpload = () => {},
+    handleSaveRecipe = () => {},
 }: ImportViewProps) {
+    const [showMakerInline, setShowMakerInline] = useState(false);
+
     return (
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col animate-in fade-in duration-200">
-            {/* Vertical Stack Layout */}
-            <div className="flex flex-col gap-4 flex-1">
+            {showMakerInline ? (
+                <>
+                    {/* Maker Inline Header */}
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Recipe Maker</h3>
+                        <button
+                            onClick={() => {
+                                setShowMakerInline(false);
+                                setRecipeStep(1);
+                                setRecipeTitle('');
+                                setRecipeServings(4);
+                                setRecipeType('dinner');
+                                setRecipePrepTime(30);
+                                setRecipeCookTime(0);
+                                setRecipeIngredients([]);
+                                setRecipeInstructions(['']);
+                                setRecipeImage('');
+                            }}
+                            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    {/* Inline Recipe Builder */}
+                    <RecipeBuilderPanel
+                        recipeStep={recipeStep}
+                        setRecipeStep={setRecipeStep}
+                        recipeTitle={recipeTitle}
+                        setRecipeTitle={setRecipeTitle}
+                        recipeServings={recipeServings}
+                        setRecipeServings={setRecipeServings}
+                        recipeType={recipeType}
+                        setRecipeType={setRecipeType}
+                        recipePrepTime={recipePrepTime}
+                        setRecipePrepTime={setRecipePrepTime}
+                        recipeCookTime={recipeCookTime}
+                        setRecipeCookTime={setRecipeCookTime}
+                        recipeIngredients={recipeIngredients}
+                        setRecipeIngredients={setRecipeIngredients}
+                        recipeInstructions={recipeInstructions}
+                        setRecipeInstructions={setRecipeInstructions}
+                        recipeImage={recipeImage}
+                        setRecipeImage={setRecipeImage}
+                        recipeSaving={recipeSaving || false}
+                        handleAddInstruction={handleAddInstruction}
+                        handleUpdateInstruction={handleUpdateInstruction}
+                        handleRemoveInstruction={handleRemoveInstruction}
+                        builderRef={builderRef}
+                        recipeUploading={recipeUploading}
+                        handleRecipeImageUpload={handleRecipeImageUpload}
+                        handleSaveRecipe={handleSaveRecipe}
+                    />
+                </>
+            ) : (
+                <>
+                    {/* Vertical Stack Layout */}
+                    <div className="flex flex-col gap-4 flex-1">
                 {/* Photo Upload Card */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-teal-500/20 dark:bg-teal-500/10">
                     <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
@@ -207,7 +319,7 @@ export function ImportView({
                             Build your recipe from scratch using our guided recipe maker.
                         </p>
                         <button
-                            onClick={() => setActiveView('recipe-builder')}
+                            onClick={() => setShowMakerInline(true)}
                             className="w-full px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0 mt-auto"
                         >
                             <Wand2 size={14} />
@@ -216,7 +328,9 @@ export function ImportView({
                     </div>
                 </div>
 
-            </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
