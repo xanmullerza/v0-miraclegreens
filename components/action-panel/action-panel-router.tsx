@@ -60,6 +60,7 @@ export function ActionPanelRouter({ orchestrator, isInline = false }: ActionPane
         recipeServings, setRecipeServings, recipePrepTime, setRecipePrepTime,
         recipeCookTime, setRecipeCookTime, recipeIngredients, setRecipeIngredients,
         recipeInstructions, setRecipeInstructions, recipeImage, setRecipeImage,
+        recipeType, setRecipeType,
         handleCloseImporter, recipeSaving, handleAddInstruction,
         handleUpdateInstruction, handleRemoveInstruction, builderRef,
         recipeUploading, handleRecipeImageUpload, handleSaveRecipe,
