@@ -433,11 +433,13 @@ export function FoodsView({
             {/* Add Food Dialog */}
             {showAddFood && setShowAddFood && (
                 <Sheet open={showAddFood} onOpenChange={setShowAddFood}>
-                    <SheetContent className="w-full sm:max-w-2xl p-0 overflow-y-auto">
-                        <FoodFormDialog
-                            onClose={() => setShowAddFood(false)}
-                            foodIdToEdit={null}
-                        />
+                    <SheetContent className="w-full sm:max-w-2xl p-0 h-full overflow-hidden">
+                        <div className="h-full overflow-y-auto">
+                            <FoodFormDialog
+                                onClose={() => setShowAddFood(false)}
+                                foodIdToEdit={null}
+                            />
+                        </div>
                     </SheetContent>
                 </Sheet>
             )}
