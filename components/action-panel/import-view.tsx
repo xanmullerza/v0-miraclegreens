@@ -107,7 +107,7 @@ export function ImportView({
     const [showMakerInline, setShowMakerInline] = useState(false);
 
     return (
-        <div className="flex-1 flex flex-col animate-in fade-in duration-200">
+        <div className="w-full h-full flex flex-col animate-in fade-in duration-200">
             {/* Vertical Stack Layout */}
             <div className="px-4 py-4 flex flex-col gap-4 flex-1 overflow-y-auto">
                 {/* Photo Upload Card */}
