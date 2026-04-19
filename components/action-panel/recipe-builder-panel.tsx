@@ -67,7 +67,7 @@ export function RecipeBuilderPanel({
             {/* Step Title */}
             <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">
-                    {recipeStep === 1 ? 'Step 1: Add Ingredients' : recipeStep === 2 ? 'Step 2: Instructions' : 'Step 3: Finalize Recipe'}
+                    {recipeStep === 2 ? 'Step 2: Instructions' : recipeStep === 3 ? 'Step 3: Finalize Recipe' : ''}
                 </h3>
             </div>
 
