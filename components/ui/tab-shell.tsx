@@ -25,6 +25,8 @@ interface TabShellProps {
     sortOptions: SortOption[];
     showFilters?: boolean;
     onFilterClick?: () => void;
+    onPlusClick?: () => void;
+    showPlusButton?: boolean;
     isFiltersOpen?: boolean;
     hasActiveFilters?: boolean;
     activeFilterCount?: number;
@@ -37,7 +39,7 @@ interface TabShellProps {
     dropdownOptions?: { id: string; label: string; icon: React.ReactNode; onClick: () => void; active?: boolean }[];
     /** when true, the shell takes h-full and provides an internal scroller. useful for action panels. */
     fullHeight?: boolean;
-}
+
 
 const themeStyles = {
     emerald: {
@@ -101,6 +103,8 @@ export function TabShell({
     scaleMode = 'multiplier',
     filterChildren,
     dropdownOptions,
+    showPlusButton = false,
+    onPlusClick,
     fullHeight = false,
 }: TabShellProps) {
     const [showSortOptions, setShowSortOptions] = useState(false);
@@ -544,6 +548,21 @@ export function TabShell({
                                 {(hasActiveFilters && activeFilterCount === 0 && !isFiltersOpen) && (
                                     <span className={cn("absolute top-2.5 right-2.5 h-2 w-2 rounded-full animate-pulse border", t.borderPulse)} />
                                 )}
+                            </button>
+                        )}
+
+                        {showPlusButton && onPlusClick && (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onPlusClick();
+                                }}
+                                title="Import Recipe"
+                                className="shrink-0 h-11 w-11 rounded-2xl flex items-center justify-center transition-all shadow-lg ring-1 ring-white/10 bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:bg-emerald-500 hover:text-white"
+                            >
+                                <Plus size={14} />
                             </button>
                         )}
                     </div>

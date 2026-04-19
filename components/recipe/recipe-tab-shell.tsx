@@ -52,6 +52,11 @@ export function RecipeTabShell({ fullHeight, ...props }: RecipeTabShellProps & {
             theme="emerald"
             sortOptions={[...RECIPE_SORT_OPTIONS]}
             showFilters={true}
+            showPlusButton={true}
+            onPlusClick={() => {
+                setActiveView('import');
+                setIsActionPanelOpen(true);
+            }}
             isFiltersOpen={isFilterOpen}
             onFilterClick={() => {
                 if (isMobile) {
