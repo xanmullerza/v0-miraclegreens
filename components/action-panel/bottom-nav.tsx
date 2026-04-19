@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ChevronLeft, Salad, Menu } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, Salad, Menu } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -46,7 +46,7 @@ export function ActionPanelBottomNav({
         if (!isActionPanelOpen) return null;
         
         // Auto-expand based on active panel view for context
-        if (activeView === 'cookbook' || activeView === 'recipe-detail' || activeView === 'recipe-builder' || activeView === 'import') return 'cookbook';
+        // Removed cookbook submenu - recipes are now handled directly from the recipe page
         if (activeView === 'nutridex' || activeView === 'comparator') return 'library';
         if (activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') return 'tracker';
         
@@ -56,12 +56,6 @@ export function ActionPanelBottomNav({
 
     // Secondary menu options for each button
     const secondaryMenus = {
-        cookbook: [
-            { id: 'view', label: 'Recipes', icon: Salad, color: 'emerald', onClick: () => { navigateTo('cookbook'); } },
-            { id: 'create', label: 'Maker', icon: Plus, color: 'cyan', onClick: () => { navigateTo('recipe-builder'); } },
-            { id: 'import', label: 'Importer', icon: Upload, color: 'violet', onClick: () => { navigateTo('import'); } },
-            { id: 'back', label: 'Back', icon: ChevronLeft, color: 'slate', onClick: () => { router.back(); } },
-        ],
         library: [
             { id: 'foods', label: 'Foods', icon: Leaf, color: 'cyan', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
             { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'fuchsia', onClick: () => { navigateTo('nutridex'); } },
