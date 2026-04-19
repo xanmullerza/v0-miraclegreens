@@ -107,9 +107,9 @@ export function ImportView({
     const [showMakerInline, setShowMakerInline] = useState(false);
 
     return (
-        <div className="flex-1 p-4 flex flex-col animate-in fade-in duration-200">
+        <div className="flex-1 flex flex-col animate-in fade-in duration-200">
             {/* Vertical Stack Layout */}
-            <div className="flex flex-col gap-4 flex-1">
+            <div className="p-4 flex flex-col gap-4 flex-1">
                 {/* Photo Upload Card */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-teal-500/20 dark:bg-teal-500/10">
                     <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
@@ -255,22 +255,14 @@ export function ImportView({
                     )}
                 </div>
 
-                {/* Recipe Maker Card */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-cyan-500/20 dark:bg-cyan-500/10">
-                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Make a Recipe</h4>
-                    <div className="flex flex-col flex-1 gap-3">
-                        <p className="text-xs text-slate-600 dark:text-slate-400">
-                            Build your recipe from scratch using our guided recipe maker.
-                        </p>
-                        <button
-                            onClick={() => setShowMakerInline(true)}
-                            className="w-full px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0 mt-auto"
-                        >
-                            <Wand2 size={14} />
-                            Open Maker
-                        </button>
-                    </div>
-                </div>
+                {/* Recipe Maker Button */}
+                <button
+                    onClick={() => setShowMakerInline(!showMakerInline)}
+                    className="w-full px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                    <Wand2 size={14} />
+                    {showMakerInline ? 'Close Maker' : 'Open Maker'}
+                </button>
 
             </div>
 
@@ -280,8 +272,7 @@ export function ImportView({
                 showMakerInline ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
             )}>
                 <div className="mt-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-cyan-500/10 dark:bg-cyan-500/20 shadow-sm">
-                    <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                        <h3 className="text-lg font-black uppercase tracking-widest text-slate-400">Recipe Maker</h3>
+                    <div className="flex items-center justify-end px-6 pt-6 pb-4 border-b border-slate-200 dark:border-slate-800">
                         <button
                             onClick={() => {
                                 setShowMakerInline(false);
