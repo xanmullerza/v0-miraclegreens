@@ -429,5 +429,13 @@ export function FoodsView({
                 </div>
             )}
         </div>
+
+        {/* Add Food Dialog */}
+        {showAddFood && setShowAddFood && (
+            <FoodFormDialog
+                onClose={() => setShowAddFood(false)}
+                foodIdToEdit={null}
+            />
+        )}
     );
 }
