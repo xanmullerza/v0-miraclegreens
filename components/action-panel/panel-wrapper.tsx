@@ -26,7 +26,7 @@ export function PanelWrapper({
                     </h2>
                 </div>
             )}
-            <div className={noPadding ? "flex-1 overflow-hidden" : (headerVariant === 'none' ? "flex-1" : "-mt-8 pb-10")}>
+            <div className={noPadding ? "flex-1" : (headerVariant === 'none' ? "flex-1" : "-mt-8 pb-10")}>
                 {children}
             </div>
         </div>
