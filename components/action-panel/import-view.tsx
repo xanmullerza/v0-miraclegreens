@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Loader2, Save, Wand2, X } from 'lucide-react';
+import { Camera, Loader2, Save, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ParsedRecipe } from '@/types/recipe';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
@@ -258,7 +258,12 @@ export function ImportView({
                 {/* Recipe Maker Button */}
                 <button
                     onClick={() => setShowMakerInline(!showMakerInline)}
-                    className="w-full px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className={cn(
+                        "w-full px-4 py-2 rounded-lg text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2",
+                        showMakerInline 
+                            ? "bg-red-500 hover:bg-red-600" 
+                            : "bg-cyan-500 hover:bg-cyan-600"
+                    )}
                 >
                     <Wand2 size={14} />
                     {showMakerInline ? 'Close Maker' : 'Open Maker'}
@@ -272,25 +277,6 @@ export function ImportView({
                 showMakerInline ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
             )}>
                 <div className="mt-4">
-                    <div className="flex items-center justify-end p-4 border-b border-slate-200 dark:border-slate-800">
-                        <button
-                            onClick={() => {
-                                setShowMakerInline(false);
-                                setRecipeStep(1);
-                                setRecipeTitle('');
-                                setRecipeServings(4);
-                                setRecipeType('dinner');
-                                setRecipePrepTime(30);
-                                setRecipeCookTime(0);
-                                setRecipeIngredients([]);
-                                setRecipeInstructions(['']);
-                                setRecipeImage('');
-                            }}
-                            className="rounded-full bg-slate-200 dark:bg-slate-800 p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition"
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
-                    </div>
                     <div className="p-4">
                         <RecipeBuilderPanel
                             recipeStep={recipeStep}
