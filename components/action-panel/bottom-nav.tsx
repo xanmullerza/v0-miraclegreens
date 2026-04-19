@@ -226,9 +226,12 @@ export function ActionPanelBottomNav({
                     {/* Home Button - Left (Toggle behavior) */}
                     <button
                         onClick={() => {
-                            setIsActionPanelOpen(false);
-                            setActiveMainTab('recipes');
-                            router.push('/');
+                            if (isActionPanelOpen && activeView === 'home') {
+                                setIsActionPanelOpen(false);
+                            } else {
+                                setIsActionPanelOpen(true);
+                                navigateTo('home');
+                            }
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
