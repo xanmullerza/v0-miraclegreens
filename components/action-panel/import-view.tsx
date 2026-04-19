@@ -55,7 +55,7 @@ interface ImportViewProps {
     handleAddInstruction?: () => void;
     handleUpdateInstruction?: (index: number, value: string) => void;
     handleRemoveInstruction?: (index: number) => void;
-    builderRef?: React.RefObject<IngredientBuilderHandle | null>;
+    builderRef: React.RefObject<IngredientBuilderHandle | null>;
     recipeUploading?: boolean;
     handleRecipeImageUpload?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleSaveRecipe?: (isMix: boolean, isRemix: boolean) => void;
