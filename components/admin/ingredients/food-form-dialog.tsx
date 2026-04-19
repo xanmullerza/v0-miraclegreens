@@ -319,7 +319,7 @@ Fat: ${food.fat_g || 0}g
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full pb-24">
             {/* Header with Close Button */}
             <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between">
                 <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
