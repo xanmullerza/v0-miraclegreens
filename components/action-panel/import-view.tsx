@@ -271,8 +271,8 @@ export function ImportView({
                 'overflow-hidden transition-all duration-300',
                 showMakerInline ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
             )}>
-                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-cyan-500/10 dark:bg-cyan-500/20 shadow-sm">
-                    <div className="flex items-center justify-end px-6 pt-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="mt-4">
+                    <div className="flex items-center justify-end p-4 border-b border-slate-200 dark:border-slate-800">
                         <button
                             onClick={() => {
                                 setShowMakerInline(false);
@@ -291,7 +291,7 @@ export function ImportView({
                             <X className="h-4 w-4" />
                         </button>
                     </div>
-                    <div className="px-6 pb-6 pt-4">
+                    <div className="p-4">
                         <RecipeBuilderPanel
                             recipeStep={recipeStep}
                             setRecipeStep={setRecipeStep}
