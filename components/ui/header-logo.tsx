@@ -165,6 +165,17 @@ export function HeaderLogo({
 
           <button
             onClick={() => {
+              setActiveView('import');
+              setIsActionPanelOpen(true);
+            }}
+            title="Import Recipe"
+            className="flex h-12 w-12 items-center justify-center rounded-2xl transition-all bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+          >
+            <Plus size={18} />
+          </button>
+
+          <button
+            onClick={() => {
               if (pathname === '/profile') {
                 router.push('/dashboard');
                 return;
