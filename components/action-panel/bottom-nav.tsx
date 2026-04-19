@@ -85,7 +85,19 @@ export function ActionPanelBottomNav({
                 "absolute bottom-full left-0 right-0 z-50 transition-all duration-300 ease-in-out",
                 showTopNavbar ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
             )}>
-                <HeaderLogo />
+                <div className="relative">
+                    <HeaderLogo />
+                    <button
+                        onClick={() => {
+                            setIsActionPanelOpen(true);
+                            navigateTo('import');
+                        }}
+                        className="absolute top-3 right-3 h-10 w-10 rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 flex items-center justify-center transition hover:bg-emerald-400 focus:outline-none"
+                        title="Import Recipe"
+                    >
+                        <Plus size={18} />
+                    </button>
+                </div>
             </div>
 
             {/* Bottom Navbar */}
