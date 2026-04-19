@@ -109,7 +109,7 @@ export function ImportView({
     return (
         <div className="flex-1 flex flex-col animate-in fade-in duration-200">
             {/* Vertical Stack Layout */}
-            <div className="p-4 flex flex-col gap-4 flex-1">
+            <div className="px-4 py-4 flex flex-col gap-4 flex-1 overflow-y-auto">
                 {/* Photo Upload Card */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-teal-500/20 dark:bg-teal-500/10">
                     <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Upload a Photo</h4>
@@ -273,10 +273,10 @@ export function ImportView({
 
             {/* Maker Slide-out */}
             <div className={cn(
-                'overflow-hidden transition-all duration-300 px-[1px]',
+                'w-full overflow-hidden transition-all duration-300',
                 showMakerInline ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
             )}>
-                <div className="mt-4">
+                <div className="mt-4 px-[1px]">
                     <div className="p-4">
                         <RecipeBuilderPanel
                             recipeStep={recipeStep}
