@@ -2,7 +2,7 @@
 
 import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Upload, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, ChevronLeft, Salad, Menu } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 import { useActionPanel, ActionPanelView } from '@/lib/context/action-panel-context';
@@ -22,13 +22,12 @@ export function ActionPanelBottomNav({
     isInline = false,
     orientation = 'bottom'
 }: ActionPanelBottomNavProps) {
-    const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton, isActionPanelOpen, activeMainTab, setActiveMainTab } = useActionPanel();
+    const { navigateTo, setIsActionPanelOpen, expandedButton, setExpandedButton, isActionPanelOpen, activeMainTab, setActiveMainTab, showTopNavbar, setShowTopNavbar } = useActionPanel();
     const { profile } = useUserPreferences();
     const isVertical = orientation === 'left' || orientation === 'right';
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const [showTopNavbar, setShowTopNavbar] = useState(false);
 
     // Reset expanded state when pathname or search modifiers change to allow auto-expansion on new pages
     useEffect(() => {
@@ -306,11 +305,14 @@ export function ActionPanelBottomNav({
                             setShowTopNavbar(!showTopNavbar);
                         }}
                         className={cn(
-                            "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            showTopNavbar ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-slate-500"
+                            "relative flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
+                            showTopNavbar
+                                ? "text-emerald-600 bg-emerald-500/10 ring-1 ring-emerald-500/20 shadow-lg shadow-emerald-500/10 font-black uppercase tracking-widest"
+                                : "text-slate-400 hover:text-slate-500"
                         )}
                         title="Menu"
                     >
+                        {showTopNavbar && <span className="absolute top-2 right-3 h-2 w-2 rounded-full bg-emerald-500" />}
                         <Menu size={20} className="transition-transform group-hover:scale-110" />
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Menu</span>
                     </button>
