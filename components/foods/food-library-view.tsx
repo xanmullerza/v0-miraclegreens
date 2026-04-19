@@ -28,6 +28,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 const PAGE_SIZE = 20;
 
@@ -431,10 +432,14 @@ export function FoodsView({
 
             {/* Add Food Dialog */}
             {showAddFood && setShowAddFood && (
-                <FoodFormDialog
-                    onClose={() => setShowAddFood(false)}
-                    foodIdToEdit={null}
-                />
+                <Sheet open={showAddFood} onOpenChange={setShowAddFood}>
+                    <SheetContent className="w-full sm:max-w-2xl p-0 overflow-y-auto">
+                        <FoodFormDialog
+                            onClose={() => setShowAddFood(false)}
+                            foodIdToEdit={null}
+                        />
+                    </SheetContent>
+                </Sheet>
             )}
         </div>
     );
