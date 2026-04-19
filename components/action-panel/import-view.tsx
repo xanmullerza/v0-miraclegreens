@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Camera, Loader2, Save, Pencil, Wand2, X } from 'lucide-react';
+import { Camera, Loader2, Save, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ParsedRecipe } from '@/types/recipe';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
 import { RecipeBuilderPanel } from './recipe-builder-panel';
 import { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/builder/types';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface ImportViewProps {
     setActiveView: (view: ActionPanelView) => void;
@@ -275,8 +275,8 @@ export function ImportView({
 
             </div>
 
-            {/* Maker Dialog */}
-            <Dialog open={showMakerInline} onOpenChange={(open) => {
+            {/* Maker Slide-out */}
+            <Sheet open={showMakerInline} onOpenChange={(open) => {
                 if (!open) {
                     setShowMakerInline(false);
                     setRecipeStep(1);
@@ -290,40 +290,42 @@ export function ImportView({
                     setRecipeImage('');
                 }
             }}>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <div className="flex items-center justify-between mb-4">
+                <SheetContent side="right" hideOverlay>
+                    <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 className="text-lg font-black uppercase tracking-widest text-slate-400">Recipe Maker</h3>
                     </div>
-                    <RecipeBuilderPanel
-                        recipeStep={recipeStep}
-                        setRecipeStep={setRecipeStep}
-                        recipeTitle={recipeTitle}
-                        setRecipeTitle={setRecipeTitle}
-                        recipeServings={recipeServings}
-                        setRecipeServings={setRecipeServings}
-                        recipeType={recipeType}
-                        setRecipeType={setRecipeType}
-                        recipePrepTime={recipePrepTime}
-                        setRecipePrepTime={setRecipePrepTime}
-                        recipeCookTime={recipeCookTime}
-                        setRecipeCookTime={setRecipeCookTime}
-                        recipeIngredients={recipeIngredients}
-                        setRecipeIngredients={setRecipeIngredients}
-                        recipeInstructions={recipeInstructions}
-                        setRecipeInstructions={setRecipeInstructions}
-                        recipeImage={recipeImage}
-                        setRecipeImage={setRecipeImage}
-                        recipeSaving={recipeSaving || false}
-                        handleAddInstruction={handleAddInstruction}
-                        handleUpdateInstruction={handleUpdateInstruction}
-                        handleRemoveInstruction={handleRemoveInstruction}
-                        builderRef={builderRef}
-                        recipeUploading={recipeUploading}
-                        handleRecipeImageUpload={handleRecipeImageUpload}
-                        handleSaveRecipe={handleSaveRecipe}
-                    />
-                </DialogContent>
-            </Dialog>
+                    <div className="px-6 pb-6 overflow-y-auto">
+                        <RecipeBuilderPanel
+                            recipeStep={recipeStep}
+                            setRecipeStep={setRecipeStep}
+                            recipeTitle={recipeTitle}
+                            setRecipeTitle={setRecipeTitle}
+                            recipeServings={recipeServings}
+                            setRecipeServings={setRecipeServings}
+                            recipeType={recipeType}
+                            setRecipeType={setRecipeType}
+                            recipePrepTime={recipePrepTime}
+                            setRecipePrepTime={setRecipePrepTime}
+                            recipeCookTime={recipeCookTime}
+                            setRecipeCookTime={setRecipeCookTime}
+                            recipeIngredients={recipeIngredients}
+                            setRecipeIngredients={setRecipeIngredients}
+                            recipeInstructions={recipeInstructions}
+                            setRecipeInstructions={setRecipeInstructions}
+                            recipeImage={recipeImage}
+                            setRecipeImage={setRecipeImage}
+                            recipeSaving={recipeSaving || false}
+                            handleAddInstruction={handleAddInstruction}
+                            handleUpdateInstruction={handleUpdateInstruction}
+                            handleRemoveInstruction={handleRemoveInstruction}
+                            builderRef={builderRef}
+                            recipeUploading={recipeUploading}
+                            handleRecipeImageUpload={handleRecipeImageUpload}
+                            handleSaveRecipe={handleSaveRecipe}
+                        />
+                    </div>
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }
