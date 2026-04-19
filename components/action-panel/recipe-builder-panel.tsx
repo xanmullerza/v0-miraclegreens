@@ -64,13 +64,6 @@ export function RecipeBuilderPanel({
 
     return (
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-            {/* Step Title */}
-            <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">
-                    {recipeStep === 2 ? 'Step 2: Instructions' : recipeStep === 3 ? 'Step 3: Finalize Recipe' : ''}
-                </h3>
-            </div>
-
             {recipeStep === 1 && (
                 <>
                     <IngredientBuilder
