@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { TabHeader } from '@/components/ui/tab-header';
 import { RecipesCombinedView } from '@/components/recipe/recipes-combined-view';
-import { FoodsView } from '@/components/foods/food-library-view';
+import { FoodsCombinedView } from '@/components/foods/foods-combined-view';
 import MealPlannerContent from '@/components/tracker/planner-content';
 import { ShoppingListView } from '@/components/tracker/shopping-list-view';
 import { PantryView } from '@/components/tracker/pantry-view';
@@ -77,7 +77,7 @@ export function MainAppContent() {
                         {activeMainTab === 'foods' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 {inventoryView === 'foods' && (
-                                    <FoodsView onFoodClick={handleFoodClick} />
+                                    <FoodsCombinedView onFoodClick={handleFoodClick} />
                                 )}
                                 {inventoryView === 'list' && (
                                     <ShoppingListView

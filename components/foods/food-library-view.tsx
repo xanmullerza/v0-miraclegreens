@@ -428,14 +428,14 @@ export function FoodsView({
                     </button>
                 </div>
             )}
-        </div>
 
-        {/* Add Food Dialog */}
-        {showAddFood && setShowAddFood && (
-            <FoodFormDialog
-                onClose={() => setShowAddFood(false)}
-                foodIdToEdit={null}
-            />
-        )}
+            {/* Add Food Dialog */}
+            {showAddFood && setShowAddFood && (
+                <FoodFormDialog
+                    onClose={() => setShowAddFood(false)}
+                    foodIdToEdit={null}
+                />
+            )}
+        </div>
     );
 }
