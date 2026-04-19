@@ -255,28 +255,36 @@ export function ImportView({
                     )}
                 </div>
 
-                {/* Recipe Maker Button */}
-                <button
-                    onClick={() => setShowMakerInline(!showMakerInline)}
-                    className={cn(
-                        "w-full px-4 py-2 rounded-lg text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2",
-                        showMakerInline 
-                            ? "bg-red-500 hover:bg-red-600" 
-                            : "bg-cyan-500 hover:bg-cyan-600"
-                    )}
-                >
-                    <Wand2 size={14} />
-                    {showMakerInline ? 'Close Maker' : 'Open Maker'}
-                </button>
+                {/* Recipe Maker Card */}
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-cyan-500/20 dark:bg-cyan-500/10">
+                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Make a Recipe</h4>
+                    <div className="flex flex-col flex-1 gap-3">
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                            Build your recipe from scratch using our guided recipe maker.
+                        </p>
+                        <button
+                            onClick={() => setShowMakerInline(!showMakerInline)}
+                            className={cn(
+                                "w-full px-4 py-2 rounded-lg text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0 mt-auto",
+                                showMakerInline 
+                                    ? "bg-red-500 hover:bg-red-600" 
+                                    : "bg-cyan-500 hover:bg-cyan-600"
+                            )}
+                        >
+                            <Wand2 size={14} />
+                            {showMakerInline ? 'Close Maker' : 'Open Maker'}
+                        </button>
+                    </div>
+                </div>
 
             </div>
 
             {/* Maker Slide-out */}
             <div className={cn(
-                'w-full overflow-hidden transition-all duration-300',
+                'overflow-hidden transition-all duration-300 mx-4',
                 showMakerInline ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
             )}>
-                <div className="mt-4 px-[1px]">
+                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-cyan-500/10 dark:bg-cyan-500/20 shadow-sm">
                     <div className="p-4">
                         <RecipeBuilderPanel
                             recipeStep={recipeStep}
