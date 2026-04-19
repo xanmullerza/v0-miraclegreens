@@ -285,8 +285,7 @@ export function ImportView({
                 showMakerInline ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
             )}>
                 <div className="mt-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-cyan-500/10 dark:bg-cyan-500/20 shadow-sm">
-                    <div className="p-4">
-                        <RecipeBuilderPanel
+                    <RecipeBuilderPanel
                             recipeStep={recipeStep}
                             setRecipeStep={setRecipeStep}
                             recipeTitle={recipeTitle}
@@ -314,7 +313,6 @@ export function ImportView({
                             handleRecipeImageUpload={handleRecipeImageUpload}
                             handleSaveRecipe={handleSaveRecipe}
                         />
-                    </div>
                 </div>
             </div>
         </div>
