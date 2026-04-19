@@ -39,7 +39,7 @@ interface TabShellProps {
     dropdownOptions?: { id: string; label: string; icon: React.ReactNode; onClick: () => void; active?: boolean }[];
     /** when true, the shell takes h-full and provides an internal scroller. useful for action panels. */
     fullHeight?: boolean;
-
+}
 
 const themeStyles = {
     emerald: {
