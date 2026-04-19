@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Download, Leaf, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, Salad, Menu } from 'lucide-react';
+import { Home, BookOpen, BarChart3, Wand2, X, Library as LibraryIcon, Plus, Download, Carrot, Activity, Scale, LifeBuoy, ShoppingBasket, Shapes, Calendar, Salad, Menu } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -57,7 +57,7 @@ export function ActionPanelBottomNav({
     // Secondary menu options for each button
     const secondaryMenus = {
         library: [
-            { id: 'foods', label: 'Foods', icon: Leaf, color: 'cyan', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
+            { id: 'foods', label: 'Foods', icon: Carrot, color: 'orange', onClick: () => { setIsActionPanelOpen(false); setActiveMainTab('foods'); router.push('/'); } },
             { id: 'nutridex', label: 'Nutridex', icon: Activity, color: 'fuchsia', onClick: () => { navigateTo('nutridex'); } },
             { id: 'comparator', label: 'Comparator', icon: Scale, color: 'amber', onClick: () => { navigateTo('comparator'); } },
         ],
@@ -235,7 +235,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
-                            (isActionPanelOpen && activeView === 'home') ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
+                            (isActionPanelOpen && activeView === 'home') ? "text-purple-500 font-black uppercase tracking-widest" : "text-slate-400 hover:text-purple-500"
                         )}
                         title="Home"
                     >
@@ -253,7 +253,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            (!isActionPanelOpen && activeMainTab === 'recipes') ? "text-emerald-500 bg-emerald-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
+                            (!isActionPanelOpen && activeMainTab === 'recipes') ? "text-emerald-500 font-black uppercase tracking-widest" : "text-slate-400 hover:text-emerald-500"
                         )}
                         title="Recipes"
                     >
@@ -269,11 +269,11 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            (!isActionPanelOpen && activeMainTab === 'foods') ? "text-cyan-500 bg-cyan-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-cyan-500"
+                            (!isActionPanelOpen && activeMainTab === 'foods') ? "text-orange-500 font-black uppercase tracking-widest" : "text-slate-400 hover:text-orange-500"
                         )}
                         title="Food"
                     >
-                        <Leaf size={20} className="transition-transform group-hover:scale-110" />
+                        <Carrot size={20} className="transition-transform group-hover:scale-110" />
                         <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">Food</span>
                     </button>
 
@@ -287,7 +287,7 @@ export function ActionPanelBottomNav({
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group flex-1",
-                            (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && activeMainTab === 'planner') ? "text-violet-500 bg-violet-500/5 font-black uppercase tracking-widest" : "text-slate-400 hover:text-violet-500"
+                            (expandedButton === 'tracker' || activeView === 'planner' || activeView === 'shopping' || activeView === 'pantry') || (!isActionPanelOpen && activeMainTab === 'planner') ? "text-violet-500 font-black uppercase tracking-widest" : "text-slate-400 hover:text-violet-500"
                         )}
                         title="Tracker"
                     >
@@ -302,7 +302,7 @@ export function ActionPanelBottomNav({
                         className={cn(
                             "relative flex-1 flex flex-col items-center justify-center p-2 rounded-2xl transition-all active:scale-90 group",
                             showTopNavbar
-                                ? "text-emerald-600 bg-emerald-500/10 ring-1 ring-emerald-500/20 shadow-lg shadow-emerald-500/10 font-black uppercase tracking-widest"
+                                ? "text-emerald-600 font-black uppercase tracking-widest"
                                 : "text-slate-400 hover:text-slate-500"
                         )}
                         title="Menu"
