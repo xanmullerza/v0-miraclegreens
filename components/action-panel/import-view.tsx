@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Loader2, Save, Pencil } from 'lucide-react';
+import { Camera, Loader2, Save, Pencil, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ParsedRecipe } from '@/types/recipe';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
@@ -197,6 +197,23 @@ export function ImportView({
                             </button>
                         </div>
                     )}
+                </div>
+
+                {/* Recipe Maker Card */}
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-cyan-500/20 dark:bg-cyan-500/10">
+                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Make a Recipe</h4>
+                    <div className="flex flex-col flex-1 gap-3">
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                            Build your recipe from scratch using our guided recipe maker.
+                        </p>
+                        <button
+                            onClick={() => setActiveView('recipe-builder')}
+                            className="w-full px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0 mt-auto"
+                        >
+                            <Wand2 size={14} />
+                            Open Maker
+                        </button>
+                    </div>
                 </div>
 
             </div>
