@@ -3,7 +3,23 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search, X } from 'lucide-react';
+import {
+  Search,
+  X,
+  Smartphone,
+  TabletSmartphone,
+  Monitor as Computer,
+  Info,
+  ChefHat,
+  Calendar,
+  Shield,
+  HelpCircle,
+  BookOpen,
+  Home,
+  Plus,
+  User,
+  Shapes,
+} from 'lucide-react';
 import { useSearch } from '@/lib/context/search-context';
 import { BookoFoodLogo } from '@/components/ui/bookofood-logo';
 import { cn } from '@/lib/utils';
