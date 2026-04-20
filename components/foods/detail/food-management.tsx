@@ -120,42 +120,49 @@ export function FoodManagement({ ctx, user }: { ctx: FoodDetailContextType, user
                             onChange={(e) => setQuickAddQty(e.target.value)}
                             className="w-16 h-9 text-center text-sm font-bold bg-white dark:bg-slate-900 border-emerald-200 dark:border-emerald-800"
                         />
-                        {food.portions && food.portions.length > 0 ? (
-                            <select
-                                value={selectedPortion?.label || ''}
-                                onChange={(e) => {
-                                    const p = food.portions?.find(p => p.label === e.target.value);
+                        <select
+                            value={selectedPortion ? `portion-${selectedPortion.label}` : quickAddUnit ? `unit-${quickAddUnit}` : 'whole'}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === 'whole') {
+                                    setSelectedPortion(null);
+                                    setQuickAddUnit('');
+                                    setQuickAddWeight('');
+                                } else if (value.startsWith('portion-')) {
+                                    const portionLabel = value.replace('portion-', '');
+                                    const p = food.portions?.find(p => p.label === portionLabel);
                                     setSelectedPortion(p || null);
-                                }}
-                                className="flex-1 h-9 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-900 text-xs font-bold px-2"
-                            >
-                                <option value="">Whole</option>
-                                {food.portions.map(p => (
-                                    <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                ))}
-                            </select>
-                        ) : (
-                            <div className="flex items-center gap-1.5 flex-1">
-                                <Input
-                                    type="number"
-                                    placeholder="Weight"
-                                    value={quickAddWeight}
-                                    onChange={(e) => setQuickAddWeight(e.target.value)}
-                                    className="flex-1 h-9 text-sm font-bold bg-white dark:bg-slate-900 border-emerald-200 dark:border-emerald-800"
-                                />
-                                <select
-                                    value={quickAddUnit}
-                                    onChange={(e) => setQuickAddUnit(e.target.value)}
-                                    className="w-14 h-9 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-900 text-xs font-bold px-1"
-                                >
-                                    <option value="g">g</option>
-                                    <option value="kg">kg</option>
-                                    <option value="ml">ml</option>
-                                    <option value="L">L</option>
-                                    <option value="oz">oz</option>
-                                    <option value="lb">lb</option>
-                                </select>
-                            </div>
+                                    setQuickAddUnit('');
+                                    setQuickAddWeight('');
+                                } else if (value.startsWith('unit-')) {
+                                    const unit = value.replace('unit-', '');
+                                    setQuickAddUnit(unit);
+                                    setSelectedPortion(null);
+                                }
+                            }}
+                            className="flex-1 h-9 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-900 text-xs font-bold px-2"
+                        >
+                            <option value="whole">Whole</option>
+                            {food.portions && food.portions.map(p => (
+                                <option key={`portion-${p.label}`} value={`portion-${p.label}`}>{p.label} ({p.weight_g}g)</option>
+                            ))}
+                            <optgroup label="Units">
+                                <option value="unit-g">grams (g)</option>
+                                <option value="unit-kg">kilograms (kg)</option>
+                                <option value="unit-ml">milliliters (ml)</option>
+                                <option value="unit-L">liters (L)</option>
+                                <option value="unit-oz">ounces (oz)</option>
+                                <option value="unit-lb">pounds (lb)</option>
+                            </optgroup>
+                        </select>
+                        {quickAddUnit && (
+                            <Input
+                                type="number"
+                                placeholder="Weight"
+                                value={quickAddWeight}
+                                onChange={(e) => setQuickAddWeight(e.target.value)}
+                                className="w-20 h-9 text-sm font-bold bg-white dark:bg-slate-900 border-emerald-200 dark:border-emerald-800"
+                            />
                         )}
                     </div>
                     <div className="flex gap-2">
@@ -212,42 +219,49 @@ export function FoodManagement({ ctx, user }: { ctx: FoodDetailContextType, user
                             onChange={(e) => setQuickAddQty(e.target.value)}
                             className="w-16 h-9 text-center text-sm font-bold bg-white dark:bg-slate-900 border-violet-200 dark:border-violet-800"
                         />
-                        {food.portions && food.portions.length > 0 ? (
-                            <select
-                                value={selectedPortion?.label || ''}
-                                onChange={(e) => {
-                                    const p = food.portions?.find(p => p.label === e.target.value);
+                        <select
+                            value={selectedPortion ? `portion-${selectedPortion.label}` : quickAddUnit ? `unit-${quickAddUnit}` : 'whole'}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === 'whole') {
+                                    setSelectedPortion(null);
+                                    setQuickAddUnit('');
+                                    setQuickAddWeight('');
+                                } else if (value.startsWith('portion-')) {
+                                    const portionLabel = value.replace('portion-', '');
+                                    const p = food.portions?.find(p => p.label === portionLabel);
                                     setSelectedPortion(p || null);
-                                }}
-                                className="flex-1 h-9 rounded-lg border border-violet-200 dark:border-violet-800 bg-white dark:bg-slate-900 text-xs font-bold px-2"
-                            >
-                                <option value="">Whole</option>
-                                {food.portions.map(p => (
-                                    <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                ))}
-                            </select>
-                        ) : (
-                            <div className="flex items-center gap-1.5 flex-1">
-                                <Input
-                                    type="number"
-                                    placeholder="Weight"
-                                    value={quickAddWeight}
-                                    onChange={(e) => setQuickAddWeight(e.target.value)}
-                                    className="flex-1 h-9 text-sm font-bold bg-white dark:bg-slate-900 border-violet-200 dark:border-violet-800"
-                                />
-                                <select
-                                    value={quickAddUnit}
-                                    onChange={(e) => setQuickAddUnit(e.target.value)}
-                                    className="w-14 h-9 rounded-lg border border-violet-200 dark:border-violet-800 bg-white dark:bg-slate-900 text-xs font-bold px-1"
-                                >
-                                    <option value="g">g</option>
-                                    <option value="kg">kg</option>
-                                    <option value="ml">ml</option>
-                                    <option value="L">L</option>
-                                    <option value="oz">oz</option>
-                                    <option value="lb">lb</option>
-                                </select>
-                            </div>
+                                    setQuickAddUnit('');
+                                    setQuickAddWeight('');
+                                } else if (value.startsWith('unit-')) {
+                                    const unit = value.replace('unit-', '');
+                                    setQuickAddUnit(unit);
+                                    setSelectedPortion(null);
+                                }
+                            }}
+                            className="flex-1 h-9 rounded-lg border border-violet-200 dark:border-violet-800 bg-white dark:bg-slate-900 text-xs font-bold px-2"
+                        >
+                            <option value="whole">Whole</option>
+                            {food.portions && food.portions.map(p => (
+                                <option key={`portion-${p.label}`} value={`portion-${p.label}`}>{p.label} ({p.weight_g}g)</option>
+                            ))}
+                            <optgroup label="Units">
+                                <option value="unit-g">grams (g)</option>
+                                <option value="unit-kg">kilograms (kg)</option>
+                                <option value="unit-ml">milliliters (ml)</option>
+                                <option value="unit-L">liters (L)</option>
+                                <option value="unit-oz">ounces (oz)</option>
+                                <option value="unit-lb">pounds (lb)</option>
+                            </optgroup>
+                        </select>
+                        {quickAddUnit && (
+                            <Input
+                                type="number"
+                                placeholder="Weight"
+                                value={quickAddWeight}
+                                onChange={(e) => setQuickAddWeight(e.target.value)}
+                                className="w-20 h-9 text-sm font-bold bg-white dark:bg-slate-900 border-violet-200 dark:border-violet-800"
+                            />
                         )}
                     </div>
                     <div className="flex gap-2">
