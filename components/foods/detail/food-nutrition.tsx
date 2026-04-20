@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Scale } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 import { FoodDetailContextType } from './types';
 import { useFoodNutrition } from '@/hooks/use-food-nutrition';
 import { NutritionDisplay } from '@/components/nutrients/NutritionDisplay';
@@ -176,18 +177,42 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
                         <h4 className="font-black uppercase tracking-widest text-[10px] text-orange-400">
                             Adjust Portion
                         </h4>
-                        <div className="flex items-center gap-2 bg-slate-700 rounded-lg p-2 border border-slate-600 hover:border-orange-400/50 transition-colors cursor-pointer group" title="Click to adjust portion size">
-                            <input
+                        <div className="flex items-center gap-2">
+                            <Input
                                 type="number"
                                 min="1"
                                 max="9999"
-                                value={macroGrams}
-                                onChange={(e) => setMacroGrams(Math.max(1, parseInt(e.target.value) || 100))}
-                                className="w-full bg-slate-800 text-white text-center text-sm font-bold rounded px-2 py-1 border border-slate-600 focus:outline-none focus:border-orange-400 group-hover:border-orange-400/50 transition-colors cursor-pointer"
-                                title="Edit portion size (1-9999g)"
-                                aria-label="Portion size in grams"
+                                value={amount}
+                                onChange={(e) => ctx.setAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                                className="w-16 h-9 text-center text-sm font-bold bg-slate-800 text-white border-slate-600 focus:border-orange-400"
+                                title="Quantity"
                             />
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-orange-400/60 transition-colors whitespace-nowrap">g</span>
+                            <select
+                                value={selectedPortion ? `portion-${selectedPortion.label}` : 'whole'}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value === 'whole') {
+                                        ctx.setSelectedPortion(null);
+                                        setMacroGrams(100); // Default to 100g for whole items
+                                    } else if (value.startsWith('portion-')) {
+                                        const portionLabel = value.replace('portion-', '');
+                                        const p = food.portions?.find(p => p.label === portionLabel);
+                                        if (p) {
+                                            ctx.setSelectedPortion(p);
+                                            setMacroGrams(p.weight_g);
+                                        }
+                                    }
+                                }}
+                                className="flex-1 h-9 rounded-lg border border-slate-600 bg-slate-800 text-white text-xs font-bold px-2 focus:outline-none focus:border-orange-400 transition-colors"
+                            >
+                                <option value="whole">Whole (100g)</option>
+                                {food.portions && food.portions.map(p => (
+                                    <option key={`portion-${p.label}`} value={`portion-${p.label}`}>{p.label} ({p.weight_g}g)</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="text-[9px] text-slate-400 text-center">
+                            {selectedPortion ? `${amount} × ${selectedPortion.label} = ${macroGrams}g` : `${amount} × whole = ${macroGrams}g`}
                         </div>
                     </div>
                 </div>
