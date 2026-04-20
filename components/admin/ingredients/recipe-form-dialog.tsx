@@ -8,7 +8,7 @@ import {
     ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2,
     ArrowRight, Plus, ListOrdered, Beaker, X
 } from 'lucide-react';
-import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
+import { parseInstructionsOnly, parseRecipeText, parseIngredientsOnly } from '@/lib/utils/recipe-parser';
 import { downloadAndUploadRecipeImage } from '@/lib/utils/recipe-image-upload';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
