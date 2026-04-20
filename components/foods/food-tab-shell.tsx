@@ -40,7 +40,7 @@ export function FoodTabShell({
     setShowAddFood,
     fullHeight,
 }: FoodTabShellProps & { fullHeight?: boolean; children?: React.ReactNode }) {
-    const { setIsActionPanelOpen, setActiveView, activeView, showTopNavbar } = useActionPanel();
+    const { setIsActionPanelOpen, setActiveView, activeView } = useActionPanel();
     const { selectedCategories, setSelectedCategories, showFavoritesOnly, setShowFavoritesOnly, portionGrams, setPortionGrams } = useFoodFilter();
     
     const hasActiveFilters = showFavoritesOnly || selectedCategories.length < CATEGORIES.length;
@@ -63,10 +63,6 @@ export function FoodTabShell({
     
     // It's open if local state is open (mobile) or if the action panel view says so
     const isFilterOpen = localFiltersOpen || activeView === 'food-filters';
-
-    if (!showTopNavbar) {
-        return <>{children}</>;
-    }
 
     return (
         <TabShell 
