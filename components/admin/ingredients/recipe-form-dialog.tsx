@@ -8,7 +8,7 @@ import {
     ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2,
     ArrowRight, Plus, ListOrdered, Beaker, X
 } from 'lucide-react';
-import { parseInstructionsOnly, parseRecipeText, parseIngredientsOnly } from '@/lib/utils/recipe-parser';
+import { parseInstructionsOnly, parseRecipeText, parseIngredientsOnly, parseIngredientAmount } from '@/lib/utils/recipe-parser';
 import { downloadAndUploadRecipeImage } from '@/lib/utils/recipe-image-upload';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
@@ -73,33 +73,34 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
     useEffect(() => {
         if (initialData?.ingredients_text && ingredients.length === 0) {
             // Parse ingredients text into structured ingredients
-            const parsedIngredients = parseIngredientsOnly(initialData.ingredients_text);
-            // For now, create basic ingredients without full matching
-            // The user can then match them in the builder
-            const basicIngredients: RecipeIngredient[] = parsedIngredients.map((parsed, index) => ({
-                food_item_id: `temp-${index}`,
-                food_item_name: parsed.item,
-                weight_g: 100, // Default weight, will be adjusted when matched
-                quantity: parsed.quantity,
-                measure_label: parsed.measure,
-                modifier: '',
-                image: '',
-                source: 'parsed',
-                calories: 0,
-                energy_kj: 0,
-                protein: 0,
-                fat: 0,
-                carbs: 0,
-                micronutrients: {},
-                base_nutrition: {
+            const ingredientLines = initialData.ingredients_text.split('\n').filter(line => line.trim());
+            const basicIngredients: RecipeIngredient[] = ingredientLines.map((line, index) => {
+                const { quantity, measure, foodName } = parseIngredientAmount(line);
+                return {
+                    food_item_id: `temp-${index}`,
+                    food_item_name: foodName,
+                    weight_g: 100, // Default weight, will be adjusted when matched
+                    quantity,
+                    measure_label: measure,
+                    modifier: '',
+                    image: '',
+                    source: 'parsed',
                     calories: 0,
                     energy_kj: 0,
                     protein: 0,
                     fat: 0,
                     carbs: 0,
-                    micronutrients: {}
-                }
-            }));
+                    micronutrients: {},
+                    base_nutrition: {
+                        calories: 0,
+                        energy_kj: 0,
+                        protein: 0,
+                        fat: 0,
+                        carbs: 0,
+                        micronutrients: {}
+                    }
+                };
+            });
             setIngredients(basicIngredients);
         }
     }, [initialData, ingredients.length]);
