@@ -169,84 +169,79 @@ export function FoodNutrition({ ctx }: { ctx: FoodDetailContextType }) {
 
     return (
         <div className="space-y-6">
-            {/* Control Buttons - Two Column Layout */}
-            <div className="grid grid-cols-2 gap-4">
-                {/* Adjust Portion */}
-                <div className="p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800">
-                    <div className="flex flex-col gap-4">
-                        <h4 className="font-black uppercase tracking-widest text-[10px] text-orange-400">
-                            Adjust Portion
-                        </h4>
-                        <div className="flex items-center gap-2">
-                            <Input
-                                type="number"
-                                min="1"
-                                max="9999"
-                                value={amount}
-                                onChange={(e) => ctx.setAmount(Math.max(1, parseInt(e.target.value) || 1))}
-                                className="w-16 h-9 text-center text-sm font-bold bg-slate-800 text-white border-slate-600 focus:border-orange-400"
-                                title="Quantity"
-                            />
-                            <select
-                                value={selectedPortion ? `portion-${selectedPortion.label}` : 'whole'}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (value === 'whole') {
-                                        ctx.setSelectedPortion(null);
-                                        setMacroGrams(100); // Default to 100g for whole items
-                                    } else if (value.startsWith('portion-')) {
-                                        const portionLabel = value.replace('portion-', '');
-                                        const p = food.portions?.find(p => p.label === portionLabel);
-                                        if (p) {
-                                            ctx.setSelectedPortion(p);
-                                            setMacroGrams(p.weight_g);
-                                        }
+            {/* Adjust Portion - Full Width */}
+            <div className="p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800">
+                <div className="flex flex-col gap-4">
+                    <h4 className="font-black uppercase tracking-widest text-[10px] text-orange-400">
+                        Adjust Portion
+                    </h4>
+                    <div className="flex items-center gap-2">
+                        <Input
+                            type="number"
+                            min="1"
+                            max="9999"
+                            value={amount}
+                            onChange={(e) => ctx.setAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                            className="w-16 h-9 text-center text-sm font-bold bg-slate-800 text-white border-slate-600 focus:border-orange-400"
+                            title="Quantity"
+                        />
+                        <select
+                            value={selectedPortion ? `portion-${selectedPortion.label}` : 'whole'}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === 'whole') {
+                                    ctx.setSelectedPortion(null);
+                                    setMacroGrams(100); // Default to 100g for whole items
+                                } else if (value.startsWith('portion-')) {
+                                    const portionLabel = value.replace('portion-', '');
+                                    const p = food.portions?.find(p => p.label === portionLabel);
+                                    if (p) {
+                                        ctx.setSelectedPortion(p);
+                                        setMacroGrams(p.weight_g);
                                     }
-                                }}
-                                className="flex-1 h-9 rounded-lg border border-slate-600 bg-slate-800 text-white text-xs font-bold px-2 focus:outline-none focus:border-orange-400 transition-colors"
-                            >
-                                <option value="whole">Whole (100g)</option>
-                                {food.portions && food.portions.map(p => (
-                                    <option key={`portion-${p.label}`} value={`portion-${p.label}`}>{p.label} ({p.weight_g}g)</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="text-[9px] text-slate-400 text-center">
-                            {selectedPortion ? `${amount} × ${selectedPortion.label} = ${macroGrams}g` : `${amount} × whole = ${macroGrams}g`}
-                        </div>
+                                }
+                            }}
+                            className="flex-1 h-9 rounded-lg border border-slate-600 bg-slate-800 text-white text-xs font-bold px-2 focus:outline-none focus:border-orange-400 transition-colors"
+                        >
+                            <option value="whole">Whole (100g)</option>
+                            {food.portions && food.portions.map(p => (
+                                <option key={`portion-${p.label}`} value={`portion-${p.label}`}>{p.label} ({p.weight_g}g)</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="text-[9px] text-slate-400 text-center">
+                        {selectedPortion ? `${amount} × ${selectedPortion.label} = ${macroGrams}g` : `${amount} × whole = ${macroGrams}g`}
                     </div>
                 </div>
-
-                {/* Compare Nutrition */}
-                <button
-                    onClick={() => {
-                        try {
-                            console.log('[FoodNutrition] Comparator button clicked, food:', food);
-                            setComparatorError(null);
-                            if (!showComparator) {
-                                toast.info('🔬 Loading comparator...');
-                            }
-                            setShowComparator(!showComparator);
-                        } catch (error) {
-                            const msg = error instanceof Error ? error.message : 'Unknown error';
-                            console.error('[FoodNutrition] Error toggling comparator:', error);
-                            setComparatorError(msg);
-                            toast.error(`❌ Comparator error: ${msg}`);
-                        }
-                    }}
-                    className="p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 hover:border-cyan-400/50 transition-colors flex flex-col items-center justify-center gap-3 group"
-                >
-                    <div className="flex items-center gap-2">
-                        <Scale size={18} className="text-cyan-400 group-hover:text-cyan-300 transition-colors" />
-                        <h4 className="font-black uppercase tracking-widest text-[10px] text-cyan-400 group-hover:text-cyan-300 transition-colors">
-                            Compare
-                        </h4>
-                    </div>
-                    <span className="text-[8px] text-slate-400 group-hover:text-slate-300 transition-colors">Nutrition</span>
-                </button>
             </div>
 
-            {/* Comparator View */}
+            {/* Compare Nutrition */}
+            <button
+                onClick={() => {
+                    try {
+                        console.log('[FoodNutrition] Comparator button clicked, food:', food);
+                        setComparatorError(null);
+                        if (!showComparator) {
+                            toast.info('🔬 Loading comparator...');
+                        }
+                        setShowComparator(!showComparator);
+                    } catch (error) {
+                        const msg = error instanceof Error ? error.message : 'Unknown error';
+                        console.error('[FoodNutrition] Error toggling comparator:', error);
+                        setComparatorError(msg);
+                        toast.error(`❌ Comparator error: ${msg}`);
+                    }
+                }}
+                className="w-full p-6 pt-5 rounded-3xl border bg-gradient-to-br bg-slate-900 border-slate-800 hover:border-cyan-400/50 transition-colors flex flex-col items-center justify-center gap-3 group"
+            >
+                <div className="flex items-center gap-2">
+                    <Scale size={18} className="text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+                    <h4 className="font-black uppercase tracking-widest text-[10px] text-cyan-400 group-hover:text-cyan-300 transition-colors">
+                        Compare
+                    </h4>
+                </div>
+                <span className="text-[8px] text-slate-400 group-hover:text-slate-300 transition-colors">Nutrition</span>
+            </button>
             {showComparator && food && (
                 <div className="space-y-4">
                     <div className="flex items-center justify-between mb-4">
