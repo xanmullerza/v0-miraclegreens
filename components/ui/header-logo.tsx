@@ -9,6 +9,7 @@ import { BookoFoodLogo } from '@/components/ui/bookofood-logo';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
