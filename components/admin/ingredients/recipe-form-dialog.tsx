@@ -72,8 +72,35 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false,
     // Process initial ingredients if provided
     useEffect(() => {
         if (initialData?.ingredients_text && ingredients.length === 0) {
-            // Parse ingredients text later when builder is ready
-            // For now, we'll let the user manually add them or import from the text
+            // Parse ingredients text into structured ingredients
+            const parsedIngredients = parseIngredientsOnly(initialData.ingredients_text);
+            // For now, create basic ingredients without full matching
+            // The user can then match them in the builder
+            const basicIngredients: RecipeIngredient[] = parsedIngredients.map((parsed, index) => ({
+                food_item_id: `temp-${index}`,
+                food_item_name: parsed.item,
+                weight_g: 100, // Default weight, will be adjusted when matched
+                quantity: parsed.quantity,
+                measure_label: parsed.measure,
+                modifier: '',
+                image: '',
+                source: 'parsed',
+                calories: 0,
+                energy_kj: 0,
+                protein: 0,
+                fat: 0,
+                carbs: 0,
+                micronutrients: {},
+                base_nutrition: {
+                    calories: 0,
+                    energy_kj: 0,
+                    protein: 0,
+                    fat: 0,
+                    carbs: 0,
+                    micronutrients: {}
+                }
+            }));
+            setIngredients(basicIngredients);
         }
     }, [initialData, ingredients.length]);
 
