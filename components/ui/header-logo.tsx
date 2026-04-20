@@ -11,7 +11,7 @@ import { useSplitView } from '@/lib/context/split-view-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
-import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { supabase } from '@/lib/supabase';
 
 interface HeaderLogoProps {
   showSubtext?: boolean;
