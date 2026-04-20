@@ -3,26 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  Home,
-  User,
-  Smartphone,
-  TabletSmartphone,
-  Monitor as Computer,
-  ChefHat,
-  Calendar,
-  Info,
-  Shield,
-  HelpCircle,
-  BookOpen,
-  Shapes,
-  Plus,
-} from 'lucide-react';
+import { Search, X } from 'lucide-react';
+import { useSearch } from '@/lib/context/search-context';
 import { BookoFoodLogo } from '@/components/ui/bookofood-logo';
 import { cn } from '@/lib/utils';
 import { useSplitView } from '@/lib/context/split-view-context';
 import { useActionPanel } from '@/lib/context/action-panel-context';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
@@ -56,6 +43,9 @@ export function HeaderLogo({
   const [isMobile, setIsMobile] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const { searchQuery, setSearchQuery, isFocused, setIsFocused, results, setResults, isLoading, setIsLoading, onResultClickRef } = useSearch();
 
   useEffect(() => {
     setMounted(true);
@@ -69,6 +59,94 @@ export function HeaderLogo({
     window.addEventListener('resize', updateViewport);
     return () => window.removeEventListener('resize', updateViewport);
   }, []);
+
+  // Search functionality
+  useEffect(() => {
+    const performSearch = async () => {
+      if (!searchQuery.trim()) {
+        setResults([]);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        // Search foods
+        const { data: foods, error: foodsError } = await supabase
+          .from('food_items')
+          .select('id, name, common_name, category, image')
+          .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
+          .limit(5);
+
+        // Search recipes
+        const { data: recipes, error: recipesError } = await supabase
+          .from('recipes')
+          .select('id, title, description, image_url')
+          .ilike('title', `%${searchQuery}%`)
+          .limit(5);
+
+        const searchResults: any[] = [];
+
+        if (foods && !foodsError) {
+          foods.forEach(food => {
+            searchResults.push({
+              id: `food-${food.id}`,
+              title: food.name,
+              subtitle: food.common_name || food.category,
+              image: food.image,
+              data: { type: 'food', id: food.id }
+            });
+          });
+        }
+
+        if (recipes && !recipesError) {
+          recipes.forEach(recipe => {
+            searchResults.push({
+              id: `recipe-${recipe.id}`,
+              title: recipe.title,
+              subtitle: recipe.description || 'Recipe',
+              image: recipe.image_url,
+              data: { type: 'recipe', id: recipe.id }
+            });
+          });
+        }
+
+        setResults(searchResults);
+      } catch (error) {
+        console.error('Search error:', error);
+        setResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(performSearch, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery, setResults, setIsLoading]);
+
+  // Handle search result selection
+  useEffect(() => {
+    const handleResultClick = (result: any) => {
+      if (result.data.type === 'food') {
+        // Navigate to foods tab and open food detail
+        setActiveMainTab('foods');
+        router.push(`/?foodId=${result.data.id}`);
+        setIsActionPanelOpen(true);
+        setActiveView('food-detail');
+      } else if (result.data.type === 'recipe') {
+        // Navigate to recipes tab and open recipe detail
+        setActiveMainTab('recipes');
+        router.push(`/?recipeId=${result.data.id}`);
+      }
+      
+      // Clear search
+      setSearchQuery('');
+      setIsSearchExpanded(false);
+      setIsFocused(false);
+    };
+
+    onResultClickRef.current = handleResultClick;
+  }, [onResultClickRef, setActiveMainTab, router, setIsActionPanelOpen, setActiveView, setSearchQuery]);
 
   const getResizeIcon = () => {
     if (resizeMode === 'equal') return <Computer size={18} />;
@@ -203,7 +281,7 @@ export function HeaderLogo({
     <div
       suppressHydrationWarning
       className={cn(
-        'hidden md:flex items-center justify-between bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12',
+        'hidden md:flex items-center bg-background border-b border-border w-full transition-all duration-500 overflow-hidden h-12',
       )}
     >
       {/* Left - Logo Area */}
@@ -254,6 +332,114 @@ export function HeaderLogo({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* Center - Global Search */}
+      <div className="flex-1 flex justify-center px-4 relative">
+        <div className="relative w-full max-w-md">
+          <div
+            className={cn(
+              "relative w-full h-8 flex items-center bg-white/50 dark:bg-slate-900/50 rounded-xl shadow-sm ring-1 ring-white/10 transition-all duration-300",
+              (isSearchExpanded || searchQuery) ? "bg-white dark:bg-slate-800 ring-emerald-500/20" : "cursor-pointer hover:bg-white/70 dark:hover:bg-slate-900/70"
+            )}
+            onClick={() => {
+              if (!isSearchExpanded && !searchQuery) {
+                setIsSearchExpanded(true);
+                setIsFocused(true);
+              }
+            }}
+          >
+            <Search className={cn(
+              "absolute transition-all duration-300 pointer-events-none text-slate-400",
+              (isSearchExpanded || searchQuery) ? "left-3 text-emerald-500" : "left-1/2 -translate-x-1/2"
+            )} size={14} />
+
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => {
+                // Delay hiding to allow result clicks
+                setTimeout(() => {
+                  if (!searchQuery) {
+                    setIsSearchExpanded(false);
+                    setIsFocused(false);
+                  }
+                }, 150);
+              }}
+              placeholder="Search foods, recipes..."
+              className={cn(
+                "w-full h-full pl-9 pr-9 rounded-xl text-[11px] font-bold bg-transparent outline-none transition-all duration-300",
+                (isSearchExpanded || searchQuery) ? "opacity-100 placeholder:text-slate-400 dark:placeholder:text-slate-500" : "opacity-0 pointer-events-none"
+              )}
+            />
+
+            {(isSearchExpanded || searchQuery) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSearchQuery('');
+                  setIsSearchExpanded(false);
+                  setIsFocused(false);
+                  searchInputRef.current?.blur();
+                }}
+                className="absolute right-3 p-1 transition-all duration-300 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Search Results Dropdown */}
+          {(isSearchExpanded || searchQuery) && (results.length > 0 || isLoading) && (
+            <div className="absolute top-full mt-2 w-full bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 max-h-80 overflow-y-auto">
+              {isLoading ? (
+                <div className="p-4 text-center text-slate-500">
+                  <div className="animate-spin w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                  Searching...
+                </div>
+              ) : results.length > 0 ? (
+                <div className="py-2">
+                  {results.map((result) => (
+                    <button
+                      key={result.id}
+                      onClick={() => {
+                        if (onResultClickRef.current) {
+                          onResultClickRef.current(result);
+                        }
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-3"
+                    >
+                      {result.image && (
+                        <img 
+                          src={result.image} 
+                          alt={result.title} 
+                          className="w-8 h-8 rounded-lg object-cover flex-shrink-0" 
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                          {result.title}
+                        </div>
+                        {result.subtitle && (
+                          <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {result.subtitle}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : searchQuery && !isLoading ? (
+                <div className="p-4 text-center text-slate-500">
+                  No results found for "{searchQuery}"
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
       </div>
 
