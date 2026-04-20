@@ -1,7 +1,12 @@
 # Recipe URL Upload Implementation - Complete Guide
 
 ## 🎯 Overview
-You can now add recipes to your library directly from recipe URLs! The system supports two methods:
+You can now add recipes to your library directly from recipe URLs! The system supports parsing from:
+- **Schema.org JSON-LD sites** (AllRecipes, BBC Good Food, etc.)
+- **WP Recipe Maker (WPRM) sites** (WordPress sites with WPRM plugin)
+- **Generic recipe sites** (with fallback HTML parsing)
+
+The system supports two methods:
 1. **Via Chatbot**: Paste a recipe URL in your Q&A Assistant
 2. **Via Recipe Builder**: Use the "Import from Recipe URL" field to scrape and parse recipes
 
@@ -9,7 +14,7 @@ You can now add recipes to your library directly from recipe URLs! The system su
 
 ### Core Features
 ✅ **URL Detection in Chatbot**: Automatically detects recipe URLs in chat messages  
-✅ **Recipe Scraping**: Parses recipe data from website URLs using schema.org JSON-LD  
+✅ **Recipe Scraping**: Parses recipe data from website URLs using schema.org JSON-LD and WPRM-specific markup  
 ✅ **Image Download & Upload**: Automatically downloads recipe images and uploads to Supabase  
 ✅ **Recipe Editor Integration**: Parsed data opens in the recipe editor for final adjustments  
 ✅ **Ingredient Matching**: Leverages existing ingredient database for automatic matching  
@@ -88,6 +93,11 @@ See [N8N_RECIPE_URL_SETUP.md](N8N_RECIPE_URL_SETUP.md) for complete code example
 - NYT Cooking ✅
 - NYTimes.com recipes ✅
 - Any site with schema.org Recipe markup ✅
+
+**WP Recipe Maker (WPRM) Support**
+- Any WordPress site using WPRM plugin ✅
+- Sites with `.wprm-recipe` HTML classes ✅
+- Enhanced parsing for WPRM-specific markup ✅
 
 **Fallback HTML Parsing**
 - Generic recipe pages with common HTML patterns

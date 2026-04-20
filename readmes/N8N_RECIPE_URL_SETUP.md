@@ -65,7 +65,58 @@ if (jsonLdMatch) {
   }
 }
 
-// Fallback: Simple regex parsing if JSON-LD not found
+// Check if this is a WPRM (WP Recipe Maker) site and parse accordingly
+if (!recipeData && html.includes('wprm-recipe')) {
+  try {
+    // WPRM-specific parsing
+    const titleMatch = html.match(/<h2[^>]*class="[^"]*wprm-recipe-name[^"]*"[^>]*>([^<]+)<\/h2>/i) ||
+                       html.match(/<h1[^>]*class="[^"]*wprm-recipe-name[^"]*"[^>]*>([^<]+)<\/h1>/i) ||
+                       html.match(/<h3[^>]*class="[^"]*wprm-recipe-name[^"]*"[^>]*>([^<]+)<\/h3>/i);
+    
+    // Extract ingredients from WPRM structure
+    const ingredientsMatch = html.match(/<div[^>]*class="[^"]*wprm-recipe-ingredients[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+    let ingredients_text = '';
+    if (ingredientsMatch) {
+      const ingredientsHtml = ingredientsMatch[1];
+      const ingredientMatches = ingredientsHtml.match(/<li[^>]*>([\s\S]*?)<\/li>/gi) || [];
+      ingredients_text = ingredientMatches.map(li => li.replace(/<[^>]*>/g, '').trim()).join('\n');
+    }
+    
+    // Extract instructions from WPRM structure
+    const instructionsMatch = html.match(/<div[^>]*class="[^"]*wprm-recipe-instructions[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+    let instructions_text = '';
+    if (instructionsMatch) {
+      const instructionsHtml = instructionsMatch[1];
+      const instructionMatches = instructionsHtml.match(/<div[^>]*class="[^"]*wprm-recipe-instruction[^"]*"[^>]*>([\s\S]*?)<\/div>/gi) || [];
+      instructions_text = instructionMatches.map(div => div.replace(/<[^>]*>/g, '').trim()).join('\n');
+    }
+    
+    // Extract metadata
+    const servingsMatch = html.match(/<span[^>]*class="[^"]*wprm-recipe-servings[^"]*"[^>]*>([\s\S]*?)<\/span>/i) ||
+                          html.match(/<span[^>]*class="[^"]*wprm-recipe-yield[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
+    const prepTimeMatch = html.match(/<span[^>]*class="[^"]*wprm-recipe-prep-time[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
+    const cookTimeMatch = html.match(/<span[^>]*class="[^"]*wprm-recipe-cook-time[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
+    
+    // Extract image
+    const imageMatch = html.match(/<img[^>]*class="[^"]*wprm-recipe-image[^"]*"[^>]*src="([^"]+)"/i) ||
+                       html.match(/<div[^>]*class="[^"]*wprm-recipe-image[^"]*"[^>]*>[\s\S]*?<img[^>]*src="([^"]+)"/i);
+    
+    recipeData = {
+      title: titleMatch?.[1]?.trim() || 'WPRM Recipe',
+      ingredients_text: ingredients_text,
+      instructions_text: instructions_text,
+      servings: servingsMatch ? parseInt(servingsMatch[1].replace(/\D/g, '')) || 4 : 4,
+      prep_time: prepTimeMatch ? parseInt(prepTimeMatch[1].replace(/\D/g, '')) || 30 : 
+                 cookTimeMatch ? parseInt(cookTimeMatch[1].replace(/\D/g, '')) || 30 : 30,
+      image_url: imageMatch?.[1],
+      source_url: $('Webhook').item.json.body.message
+    };
+  } catch (error) {
+    console.error('WPRM parsing error:', error);
+  }
+}
+
+// Fallback: Simple regex parsing if JSON-LD and WPRM parsing not found
 if (!recipeData) {
   try {
     // Extract from common HTML patterns
