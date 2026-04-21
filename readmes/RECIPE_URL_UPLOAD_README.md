@@ -15,6 +15,7 @@ The system supports two methods:
 ### Core Features
 ✅ **URL Detection in Chatbot**: Automatically detects recipe URLs in chat messages  
 ✅ **Recipe Scraping**: Parses recipe data from website URLs using schema.org JSON-LD and WPRM-specific markup  
+✅ **Advanced Ingredient Parsing**: Supports multiple ingredient formats including traditional ("2 cups flour") and bracketed ("flour (2 cups)") portions  
 ✅ **Image Download & Upload**: Automatically downloads recipe images and uploads to Supabase  
 ✅ **Recipe Editor Integration**: Parsed data opens in the recipe editor for final adjustments  
 ✅ **Ingredient Matching**: Leverages existing ingredient database for automatic matching  
@@ -102,6 +103,24 @@ See [N8N_RECIPE_URL_SETUP.md](N8N_RECIPE_URL_SETUP.md) for complete code example
 **Fallback HTML Parsing**
 - Generic recipe pages with common HTML patterns
 - Success rate varies by site structure
+
+## 🥘 Supported Ingredient Formats
+
+The parser intelligently handles multiple ingredient listing formats:
+
+**Traditional Format** (most common)
+- `2 cups all-purpose flour`
+- `1 (15 oz) can black beans`
+- `3 cloves garlic, minced`
+
+**Bracketed Portions** (newly supported)
+- `all-purpose flour (2 cups)`
+- `black beans (1 x 400g can)`
+- `garlic (3 cloves)`
+
+**Mixed Formats**
+- Recipes can use both formats interchangeably
+- Parser automatically detects and extracts portions from either style
 
 ## 🔄 Data Flow
 

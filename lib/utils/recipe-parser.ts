@@ -5,6 +5,7 @@ const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
  * Parses an ingredient line to extract quantity, measure, and food name.
+ * Handles both traditional format ("2 cups flour") and bracketed format ("flour (2 cups)").
  */
 export const parseIngredientAmount = (ingredientLine: string) => {
     let line = ingredientLine.trim();
@@ -14,17 +15,17 @@ export const parseIngredientAmount = (ingredientLine: string) => {
     line = line.replace(/\s*\(optional\)\s*$/i, '').trim();
     line = line.replace(/\s+(to taste|optional)\s*$/i, '').trim();
     
-    // Step 2: Extract amount at the START of the line
-    const amountRegex = /^([\d¼½¾⅛⅜⅝⅞]+(?:\s*[-\/]\s*[\d¼½¾⅛⅜⅝⅞]+)?)\s*([a-z]*)/i;
-    const match = line.match(amountRegex);
-    
     let quantity = 1;
     let measure = 'item';
     let foodName = line;
     
-    if (match) {
-        const amountStr = match[1].trim();
-        const possibleUnit = match[2].trim().toLowerCase();
+    // Step 2: Try to extract amount at the START of the line (traditional format)
+    const amountRegex = /^([\d¼½¾⅛⅜⅝⅞]+(?:\s*[-\/]\s*[\d¼½¾⅛⅜⅝⅞]+)?)\s*([a-z]*)/i;
+    const startMatch = line.match(amountRegex);
+    
+    if (startMatch) {
+        const amountStr = startMatch[1].trim();
+        const possibleUnit = startMatch[2].trim().toLowerCase();
         
         const unitMap: Record<string, string> = {
             'g': 'g', 'gram': 'g', 'grams': 'g', 'kg': 'g', 'kilogram': 'g', 'kilograms': 'g',
@@ -60,6 +61,59 @@ export const parseIngredientAmount = (ingredientLine: string) => {
                 quantity = 1;
             }
             foodName = line.replace(new RegExp(`^${escapeRegex(amountStr)}\\s*`), '').trim();
+        }
+    } else {
+        // Step 3: If no amount at start, check for bracketed amount at the END (e.g., "flour (2 cups)")
+        const bracketRegex = /\s*\(([^)]+)\)\s*$/;
+        const bracketMatch = line.match(bracketRegex);
+        
+        if (bracketMatch) {
+            const bracketContent = bracketMatch[1].trim();
+            // Try to parse the bracketed content as an amount
+            const bracketAmountMatch = bracketContent.match(/^([\d¼½¾⅛⅜⅝⅞]+(?:\s*[-\/]\s*[\d¼½¾⅛⅜⅝⅞]+)?)\s*([a-z]*)/i);
+            
+            if (bracketAmountMatch) {
+                const amountStr = bracketAmountMatch[1].trim();
+                const possibleUnit = bracketAmountMatch[2].trim().toLowerCase();
+                
+                const unitMap: Record<string, string> = {
+                    'g': 'g', 'gram': 'g', 'grams': 'g', 'kg': 'g', 'kilogram': 'g', 'kilograms': 'g',
+                    'ml': 'ml', 'milliliter': 'ml', 'milliliters': 'ml', 'l': 'ml', 'liter': 'ml', 'liters': 'ml',
+                    'oz': 'oz', 'ounce': 'oz', 'ounces': 'oz',
+                    'lb': 'lb', 'lbs': 'lb', 'pound': 'lb', 'pounds': 'lb',
+                    'cup': 'cup', 'cups': 'cup', 'c': 'cup',
+                    'tbsp': 'tbsp', 'tbs': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp',
+                    'tsp': 'tsp', 'teaspoon': 'tsp', 'teaspoons': 'tsp',
+                    'clove': 'clove', 'cloves': 'clove',
+                    'sprig': 'sprig', 'sprigs': 'sprig',
+                    'leaf': 'leaf', 'leaves': 'leaf',
+                    'stalk': 'stalk', 'stalks': 'stalk',
+                    'breast': 'breast', 'breasts': 'breast',
+                };
+                
+                if (possibleUnit && unitMap[possibleUnit]) {
+                    measure = unitMap[possibleUnit];
+                    let qtyStr = amountStr;
+                    if (amountStr.includes('-') || amountStr.includes('/')) {
+                        qtyStr = amountStr.split(/[-\/]/)[0].trim();
+                    }
+                    try {
+                        quantity = parseFloat(qtyStr) || 1;
+                    } catch (e) {
+                        quantity = 1;
+                    }
+                } else {
+                    try {
+                        quantity = parseFloat(amountStr) || 1;
+                    } catch (e) {
+                        quantity = 1;
+                    }
+                    measure = 'item';
+                }
+                
+                // Remove the bracketed part from the food name
+                foodName = line.replace(bracketRegex, '').trim();
+            }
         }
     }
     
