@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { calculateRecipeNutritionImproved, getAccuracyReport } from '@/lib/utils/nutrition-validation-improved';
 
 export interface Recipe {
     id: string;
@@ -149,6 +150,33 @@ export function useDataPersistence() {
             if (user) {
                 // SAVE TO CLOUD
                 const recipeId = recipe.id || generateId();
+                
+                // IMPROVED: Calculate and validate nutrition before saving
+                let nutritionSummary = null;
+                let accuracyReport = null;
+                if (ingredients && ingredients.length > 0) {
+                    try {
+                        nutritionSummary = await calculateRecipeNutritionImproved(
+                            ingredients,
+                            recipe.servings || 4
+                        );
+                        accuracyReport = getAccuracyReport(nutritionSummary);
+                        
+                        // Show accuracy report to user
+                        console.log('📊 Nutrition Accuracy:', accuracyReport);
+                        toast({
+                            title: accuracyReport.message,
+                            description: 
+                                accuracyReport.details.length > 0 
+                                    ? accuracyReport.details.join('\n') 
+                                    : 'Recipe nutrition calculated successfully',
+                            variant: accuracyReport.color === 'green' ? 'default' : accuracyReport.color === 'yellow' ? 'default' : 'destructive'
+                        });
+                    } catch (error) {
+                        console.warn('Nutrition calculation failed, proceeding without validation', error);
+                    }
+                }
+                
                 // Strip fields that don't exist on the 'recipes' table before saving
                 const { 
                     phytonutrients, 
@@ -163,6 +191,11 @@ export function useDataPersistence() {
                     user_id: user.id,
                     is_curated: false,
                     type: recipe.type || recipe.meal_type || 'dinner',
+                    // Use calculated nutrition if available, otherwise use recipe values
+                    calories: nutritionSummary?.per_serving.calories || recipe.calories || 0,
+                    protein: nutritionSummary?.per_serving.protein_g || recipe.protein || 0,
+                    carbs: nutritionSummary?.per_serving.carbs_g || recipe.carbs || 0,
+                    fat: nutritionSummary?.per_serving.fat_g || recipe.fat || 0,
                     // Only set defaults if NOT provided
                     tags: recipe.tags !== undefined ? recipe.tags : [],
                     difficulty: recipe.difficulty !== undefined ? recipe.difficulty : 'Medium'
@@ -174,7 +207,13 @@ export function useDataPersistence() {
                     prep_time: recipeData.prep_time,
                     cook_time: recipeData.cook_time,
                     difficulty: recipeData.difficulty,
-                    tags: recipeData.tags
+                    tags: recipeData.tags,
+                    calculatedNutrition: {
+                        calories: recipeData.calories,
+                        protein: recipeData.protein,
+                        carbs: recipeData.carbs,
+                        fat: recipeData.fat
+                    }
                 });
 
                 // 1. Save main recipe

@@ -4,8 +4,98 @@ import { parseRecipeAmount } from './parsing-utils';
 const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
+ * Convert Unicode fractions to decimal
+ */
+function parseUnicodeFraction(char: string): number | null {
+    const unicodeMap: Record<string, number> = {
+        '½': 0.5, '⅓': 0.333, '⅔': 0.667, '¼': 0.25, '¾': 0.75,
+        '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875,
+    };
+    return unicodeMap[char] || null;
+}
+
+/**
+ * Parse word-based amounts like "a cup", "some", "a handful"
+ */
+function parseWordAmount(text: string): { quantity: number; wordForm: boolean } {
+    const wordMap: Record<string, number> = {
+        'a ': 1,
+        'an ': 1,
+        'half': 0.5,
+        'quarter': 0.25,
+        'handful': 1,
+        'pinch': 0.25,
+        'dash': 0.125,
+        'splash': 0.5,
+        'some': 1,
+        'few': 3,
+        'several': 5,
+        'most': 0.8,
+        'drizzle': 0.25,
+    };
+
+    for (const [word, qty] of Object.entries(wordMap)) {
+        if (text.toLowerCase().startsWith(word)) {
+            return { quantity: qty, wordForm: true };
+        }
+    }
+    
+    return { quantity: 1, wordForm: false };
+}
+
+/**
+ * Parse quantities with ranges like "2-3 cups" or "1 1/2 to 2"
+ */
+function parseQuantityWithRange(quantityStr: string): {
+    quantity: number;
+    range?: { min: number; max: number };
+} {
+    const rangePatterns = [
+        /^(\d+(?:\.\d+)?)\s*[-–to]\s*(\d+(?:\.\d+)?)/i, // "2-3" or "2 to 3"
+        /^(\d+)\s+(\d+)\/(\d+)\s*[-–to]\s*(\d+)\s+(\d+)\/(\d+)/i, // "1 1/2 to 2 1/2"
+    ];
+
+    for (const pattern of rangePatterns) {
+        const match = quantityStr.match(pattern);
+        if (match) {
+            const min = parseFloat(match[1]);
+            const max = parseFloat(match[2]);
+            const mid = (min + max) / 2;
+            return { quantity: mid, range: { min, max } };
+        }
+    }
+
+    // Single quantity - try to parse
+    try {
+        let result = 1;
+
+        // Check for Unicode fractions
+        for (const char of quantityStr) {
+            const frac = parseUnicodeFraction(char);
+            if (frac !== null) {
+                result = frac;
+                break;
+            }
+        }
+
+        // Try standard fraction/decimal
+        if (result === 1) {
+            result = parseFloat(quantityStr) || 1;
+        }
+
+        return { quantity: result };
+    } catch {
+        return { quantity: 1 };
+    }
+}
+
+/**
  * Parses an ingredient line to extract quantity, measure, and food name.
+<<<<<<< HEAD
  * Handles both traditional format ("2 cups flour") and bracketed format ("flour (2 cups)").
+=======
+ * IMPROVED: Now handles ranges ("2-3 cups"), word amounts ("a pinch"), and Unicode fractions.
+>>>>>>> 7debded3 (feat: improve recipe import accuracy with better parsing, fuzzy matching, and nutrition validation)
  */
 export const parseIngredientAmount = (ingredientLine: string) => {
     let line = ingredientLine.trim();
@@ -14,6 +104,7 @@ export const parseIngredientAmount = (ingredientLine: string) => {
     line = line.replace(/\s*\(to taste\)\s*$/i, '').trim();
     line = line.replace(/\s*\(optional\)\s*$/i, '').trim();
     line = line.replace(/\s+(to taste|optional)\s*$/i, '').trim();
+<<<<<<< HEAD
     
     let quantity = 1;
     let measure = 'item';
@@ -27,40 +118,67 @@ export const parseIngredientAmount = (ingredientLine: string) => {
         const amountStr = startMatch[1].trim();
         const possibleUnit = startMatch[2].trim().toLowerCase();
         
+=======
+
+    // Step 2: Try to extract amount at START
+    let quantity = 1;
+    let measure = 'item';
+    let foodName = line;
+
+    // Attempt 1: Numeric amount pattern
+    const numericPattern = /^([\d+\s.,½⅓⅔¼¾⅛⅜⅝⅞/-]+)\s*([a-z]*)/i;
+    let numMatch = line.match(numericPattern);
+
+    // Attempt 2: Word-based amount
+    if (!numMatch) {
+        const wordMatch = line.match(/^(a|an|some|few|several|handful|pinch|dash|splash)\s+/i);
+        if (wordMatch) {
+            const { quantity: wordQty } = parseWordAmount(wordMatch[1]);
+            quantity = wordQty;
+            foodName = line.substring(wordMatch[0].length);
+            return { quantity, measure, foodName };
+        }
+    }
+
+    if (numMatch) {
+        const amountStr = numMatch[1].trim();
+        const possibleUnit = numMatch[2].trim().toLowerCase();
+
+>>>>>>> 7debded3 (feat: improve recipe import accuracy with better parsing, fuzzy matching, and nutrition validation)
         const unitMap: Record<string, string> = {
-            'g': 'g', 'gram': 'g', 'grams': 'g', 'kg': 'g', 'kilogram': 'g', 'kilograms': 'g',
-            'ml': 'ml', 'milliliter': 'ml', 'milliliters': 'ml', 'l': 'ml', 'liter': 'ml', 'liters': 'ml',
+            'g': 'g', 'gram': 'g', 'grams': 'g', 'kg': 'kg', 'kilogram': 'kg', 'kilograms': 'kg',
+            'ml': 'ml', 'milliliter': 'ml', 'milliliters': 'ml', 'l': 'l', 'liter': 'l', 'liters': 'l',
             'oz': 'oz', 'ounce': 'oz', 'ounces': 'oz',
             'lb': 'lb', 'lbs': 'lb', 'pound': 'lb', 'pounds': 'lb',
             'cup': 'cup', 'cups': 'cup', 'c': 'cup',
-            'tbsp': 'tbsp', 'tbs': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp',
+            'tbsp': 'tbsp', 'tbs': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'tblsp': 'tbsp',
             'tsp': 'tsp', 'teaspoon': 'tsp', 'teaspoons': 'tsp',
             'clove': 'clove', 'cloves': 'clove',
             'sprig': 'sprig', 'sprigs': 'sprig',
             'leaf': 'leaf', 'leaves': 'leaf',
             'stalk': 'stalk', 'stalks': 'stalk',
             'breast': 'breast', 'breasts': 'breast',
+            'slice': 'slice', 'slices': 'slice',
+            'head': 'head', 'heads': 'head',
         };
-        
+
         if (possibleUnit && unitMap[possibleUnit]) {
             measure = unitMap[possibleUnit];
-            let qtyStr = amountStr;
-            if (amountStr.includes('-') || amountStr.includes('/')) {
-                qtyStr = amountStr.split(/[-\/]/)[0].trim();
-            }
-            try {
-                quantity = parseFloat(qtyStr) || 1;
-            } catch (e) {
-                quantity = 1;
-            }
-            foodName = line.replace(new RegExp(`^${escapeRegex(amountStr)}\\s*${escapeRegex(possibleUnit)}\\s*`), '').trim();
+            
+            // Parse quantity with range support
+            const parsed = parseQuantityWithRange(amountStr);
+            quantity = parsed.quantity;
+
+            // Remove amount + unit from line to get food name
+            const pattern = new RegExp(`^${amountStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*${possibleUnit}\\s*`, 'i');
+            foodName = line.replace(pattern, '').trim();
         } else {
-            try {
-                quantity = parseFloat(amountStr) || 1;
-            } catch (e) {
-                quantity = 1;
-            }
-            foodName = line.replace(new RegExp(`^${escapeRegex(amountStr)}\\s*`), '').trim();
+            // No unit found, just parse the amount
+            const parsed = parseQuantityWithRange(amountStr);
+            quantity = parsed.quantity;
+
+            const pattern = new RegExp(`^${amountStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*`, 'i');
+            foodName = line.replace(pattern, '').trim();
         }
     } else {
         // Step 3: If no amount at start, check for bracketed amount at the END (e.g., "flour (2 cups)")
@@ -116,16 +234,20 @@ export const parseIngredientAmount = (ingredientLine: string) => {
             }
         }
     }
-    
-    // Clean up prep descriptions
-    foodName = foodName.replace(/\s+(crushed or finely grated|drained and roughly chopped|finely chopped|roughly chopped|torn to serve|torn, to serve).*$/i, '').trim();
+
+    // Step 3: Clean up prep descriptions from food name
+    foodName = foodName
+        .replace(/\s+(crushed or finely grated|drained and roughly chopped|finely chopped|roughly chopped|torn to serve|torn, to serve).*$/i, '')
+        .replace(/\s*,\s*(drained|chopped|sliced|peeled).*$/i, '')
+        .trim();
     
     return { quantity, measure, foodName: foodName || line };
 };
 
 /**
  * Robustly parses a full recipe text string into structured components.
- * Tries to identify title, servings, prep time, ingredients and instructions.
+ * Tries to identify title, servings, prep/cook time, ingredients and instructions.
+ * IMPROVED: Now handles cook time and better time parsing.
  */
 export const parseRecipeText = (text: string) => {
     const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -133,6 +255,7 @@ export const parseRecipeText = (text: string) => {
     const result = {
         title: '',
         prepTime: 30,
+        cookTime: 0,
         servings: 4,
         ingredients: [] as { item: string; amount: string; weightG?: number; modifier?: string }[],
         instructions: [] as string[]
@@ -159,12 +282,17 @@ export const parseRecipeText = (text: string) => {
             continue;
         }
 
-        // Parse servings/prep time if found
+        // Parse servings if found
         const servingsMatch = lower.match(/(?:servings|yields?|makes?):\s*(\d+)/i);
         if (servingsMatch) result.servings = parseInt(servingsMatch[1]);
 
-        const timeMatch = lower.match(/(?:prep|preparation|cook|total)\s*time:\s*(\d+)\s*(?:min|hour|hr)/i);
-        if (timeMatch) result.prepTime = parseInt(timeMatch[1]);
+        // Parse prep time
+        const prepTimeMatch = lower.match(/(?:prep|preparation)\s*time:\s*(\d+)\s*(?:min|hour|hr)/i);
+        if (prepTimeMatch) result.prepTime = parseInt(prepTimeMatch[1]);
+
+        // Parse cook time
+        const cookTimeMatch = lower.match(/(?:cook)\s*time:\s*(\d+)\s*(?:min|hour|hr)/i);
+        if (cookTimeMatch) result.cookTime = parseInt(cookTimeMatch[1]);
 
         // Process based on mode
         if (mode === 'ingredients') {
