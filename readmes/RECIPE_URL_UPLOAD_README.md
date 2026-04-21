@@ -16,6 +16,7 @@ The system supports two methods:
 ✅ **URL Detection in Chatbot**: Automatically detects recipe URLs in chat messages  
 ✅ **Recipe Scraping**: Parses recipe data from website URLs using schema.org JSON-LD and WPRM-specific markup  
 ✅ **Advanced Ingredient Parsing**: Supports multiple ingredient formats including traditional ("2 cups flour") and bracketed ("flour (2 cups)") portions  
+✅ **Smart Servings Handling**: Automatically chooses the lower number from serving ranges (e.g., "6-8 servings" → 6 servings)
 ✅ **Image Download & Upload**: Automatically downloads recipe images and uploads to Supabase  
 ✅ **Recipe Editor Integration**: Parsed data opens in the recipe editor for final adjustments  
 ✅ **Ingredient Matching**: Leverages existing ingredient database for automatic matching  
@@ -121,6 +122,24 @@ The parser intelligently handles multiple ingredient listing formats:
 **Mixed Formats**
 - Recipes can use both formats interchangeably
 - Parser automatically detects and extracts portions from either style
+
+## 🍽️ Supported Serving Formats
+
+The parser intelligently handles various serving size formats:
+
+**Single Numbers**
+- `4 servings`
+- `6 people`
+- `Serves 8`
+
+**Ranges (Lower Number Selected)**
+- `6-8 servings` → 6 servings
+- `4 to 6 people` → 4 servings
+- `Serves 6-8` → 6 servings
+
+**Automatic Fallback**
+- If no serving information found, defaults to 4 servings
+- Invalid ranges default to 4 servings
 
 ## 🔄 Data Flow
 

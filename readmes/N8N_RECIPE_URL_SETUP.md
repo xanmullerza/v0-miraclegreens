@@ -36,6 +36,32 @@ This will route recipe URLs to the new recipe scraper nodes.
 ```javascript
 const html = items[0].json;
 
+// Helper function to parse serving ranges and choose the lower number
+function parseServings(servingsText) {
+  if (!servingsText) return 4;
+  
+  // Remove non-numeric characters except hyphens, spaces, and "to"
+  const cleaned = servingsText.toString().replace(/[^\d\s\-to]/gi, '').trim();
+  
+  // Look for ranges like "6-8", "4 to 6", "6 - 8"
+  const rangeMatch = cleaned.match(/(\d+)\s*[-to]+\s*(\d+)/i);
+  if (rangeMatch) {
+    // Return the lower number from the range
+    const num1 = parseInt(rangeMatch[1]);
+    const num2 = parseInt(rangeMatch[2]);
+    return Math.min(num1, num2);
+  }
+  
+  // Look for single numbers
+  const singleMatch = cleaned.match(/(\d+)/);
+  if (singleMatch) {
+    return parseInt(singleMatch[1]);
+  }
+  
+  // Fallback
+  return 4;
+}
+
 // Try to extract JSON-LD recipe data
 const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/i);
 let recipeData = null;
@@ -54,7 +80,7 @@ if (jsonLdMatch) {
                           (Array.isArray(recipe.recipeInstructions) 
                             ? recipe.recipeInstructions.map(i => i.text || i).join('\n') 
                             : recipe.recipeInstructions || ''),
-        servings: recipe.recipeYield?.replace(/\D/g, '') || 4,
+        servings: parseServings(recipe.recipeYield),
         prep_time: recipe.prepTime?.match(/\d+/)?.[0] || recipe.cookTime?.match(/\d+/)?.[0] || 30,
         image_url: recipe.image?.url || recipe.image?.[0]?.url || recipe.image || undefined,
         source_url: $('Webhook').item.json.body.message
@@ -105,7 +131,7 @@ if (!recipeData && html.includes('wprm-recipe')) {
       title: titleMatch?.[1]?.trim() || 'WPRM Recipe',
       ingredients_text: ingredients_text,
       instructions_text: instructions_text,
-      servings: servingsMatch ? parseInt(servingsMatch[1].replace(/\D/g, '')) || 4 : 4,
+      servings: servingsMatch ? parseServings(servingsMatch[1]) : 4,
       prep_time: prepTimeMatch ? parseInt(prepTimeMatch[1].replace(/\D/g, '')) || 30 : 
                  cookTimeMatch ? parseInt(cookTimeMatch[1].replace(/\D/g, '')) || 30 : 30,
       image_url: imageMatch?.[1],
