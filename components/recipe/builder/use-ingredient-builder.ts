@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { RecipeIngredient, FoodItemData, IngredientBuilderProps, PendingIngredient } from './types';
-import { FoodItemMatch } from '@/lib/services/nutrition';
+import { FoodItemMatch, searchFoodItem } from '@/lib/services/nutrition';
+import { parseIngredientAmount } from '@/lib/utils/recipe-parser';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 export function useIngredientBuilder(props: IngredientBuilderProps, externalShowPicker?: boolean, externalSetShowPicker?: (show: boolean) => void) {
@@ -133,9 +134,81 @@ export function useIngredientBuilder(props: IngredientBuilderProps, externalShow
     }, [ingredients]);
 
     const handleMagicParse = async () => { 
+        if (!magicText.trim()) return;
+        
         setIsParsing(true);
-        // Placeholder as in original, but functional enough for the step
-        setIsParsing(false); 
+        setPendingIngredients([]);
+        
+        try {
+            const lines = magicText.split('\n').filter(line => line.trim());
+            const newPendingIngredients: PendingIngredient[] = [];
+            
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) continue;
+                
+                const { quantity, measure, foodName } = parseIngredientAmount(trimmedLine);
+                
+                const pendingIngredient: PendingIngredient = {
+                    raw: {
+                        amount: quantity,
+                        item: foodName,
+                        unit: measure,
+                        modifier: '',
+                        weightG: undefined
+                    },
+                    status: 'searching',
+                    matches: [],
+                    selectedMatch: null
+                };
+                
+                newPendingIngredients.push(pendingIngredient);
+            }
+            
+            setPendingIngredients(newPendingIngredients);
+            
+            // Search for matches for each ingredient
+            for (let i = 0; i < newPendingIngredients.length; i++) {
+                const ingredient = newPendingIngredients[i];
+                try {
+                    const matches = await searchFoodItem(ingredient.raw.item);
+                    
+                    setPendingIngredients(prev => {
+                        const updated = [...prev];
+                        if (matches.length > 0) {
+                            updated[i] = {
+                                ...updated[i],
+                                status: 'matched',
+                                matches,
+                                selectedMatch: matches[0] // Auto-select first match
+                            };
+                        } else {
+                            updated[i] = {
+                                ...updated[i],
+                                status: 'no-match-local',
+                                matches: []
+                            };
+                        }
+                        return updated;
+                    });
+                } catch (error) {
+                    console.error('Error searching for ingredient:', ingredient.raw.item, error);
+                    setPendingIngredients(prev => {
+                        const updated = [...prev];
+                        updated[i] = {
+                            ...updated[i],
+                            status: 'no-match-local',
+                            matches: []
+                        };
+                        return updated;
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing ingredients:', error);
+        } finally {
+            setIsParsing(false);
+        }
     };
 
     const confirmPendingIngredient = (index: number) => {

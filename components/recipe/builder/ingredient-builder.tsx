@@ -2,18 +2,24 @@ import React, { forwardRef, useImperativeHandle } from 'react';
 import { useIngredientBuilder } from './use-ingredient-builder';
 import { IngredientRow } from './ingredient-row';
 import { InlineFoodSearch } from './inline-food-search';
+import { MagicPasteSection } from './magic-paste-section';
 import { IngredientBuilderProps, IngredientBuilderHandle } from './types';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Utensils } from 'lucide-react';
 
 export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>((props, ref) => {
     const { ingredients, onNext, showPicker: externalShowPicker, onShowPickerChange } = props;
     const {
         showPicker, setShowPicker,
+        showMagicPaste, setShowMagicPaste,
+        magicText, setMagicText,
+        isParsing, pendingIngredients, setPendingIngredients,
         editingNameIndex, setEditingNameIndex,
         isAdmin, handleAddIngredient,
         handleUpdateQuantity, handleRemoveIngredient,
-        handleUpdateName, handleUpdateMeasure, totals, userRDAs, energyUnit
+        handleUpdateName, handleUpdateMeasure, totals, userRDAs, energyUnit,
+        handleMagicParse, confirmPendingIngredient, confirmAllIngredients,
+        handleUSDASearchForPending, rejectPendingIngredient
     } = useIngredientBuilder(props, externalShowPicker, onShowPickerChange);
 
     useImperativeHandle(ref, () => ({
@@ -53,6 +59,18 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                 )}
 
                 <div className="pt-4">
+                    {!showMagicPaste && (
+                        <div className="flex justify-center mb-4">
+                            <Button
+                                onClick={() => setShowMagicPaste(true)}
+                                variant="outline"
+                                className="gap-2 text-[10px] uppercase tracking-widest h-8 rounded-lg border-slate-300 hover:border-slate-400"
+                            >
+                                <Utensils size={12} />
+                                Paste Ingredients
+                            </Button>
+                        </div>
+                    )}
                     <InlineFoodSearch
                         onSelect={(food: any) => {
                             handleAddIngredient(food);
@@ -60,6 +78,26 @@ export const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientB
                         isAdmin={isAdmin}
                     />
                 </div>
+
+                {showMagicPaste && (
+                    <div className="pt-4">
+                        <MagicPasteSection
+                            magicText={magicText}
+                            setMagicText={setMagicText}
+                            isParsing={isParsing}
+                            handleMagicParse={handleMagicParse}
+                            pendingIngredients={pendingIngredients}
+                            setPendingIngredients={setPendingIngredients}
+                            setShowMagicPaste={setShowMagicPaste}
+                            confirmPendingIngredient={confirmPendingIngredient}
+                            confirmAllIngredients={confirmAllIngredients}
+                            handleUSDASearchForPending={handleUSDASearchForPending}
+                            rejectPendingIngredient={rejectPendingIngredient}
+                            setShowPicker={setShowPicker}
+                            isAdmin={isAdmin}
+                        />
+                    </div>
+                )}
 
                 {hasIngredients && onNext && (
                     <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800">

@@ -680,8 +680,8 @@ export async function searchFoodItem(query: string): Promise<FoodItemMatch[]> {
 }
 
 /**
- * Detects if an ingredient is a flavoring (spice, herb, seasoning, etc.)
- * These contribute minimal nutrition and are used in tiny amounts.
+ * Detects if an ingredient is a flavoring or non-nutritive (spice, herb, seasoning, water, etc.)
+ * These contribute minimal or zero nutrition and are used in varying amounts.
  */
 export function isFlavoringIngredient(food: FoodItemMatch): boolean {
     // Check category field from local DB
@@ -689,7 +689,7 @@ export function isFlavoringIngredient(food: FoodItemMatch): boolean {
         return true;
     }
 
-    // Fallback: check ingredient name for common flavoring keywords
+    // Fallback: check ingredient name for common flavoring and non-nutritive keywords
     const name = (food.name || "").toLowerCase();
     const flavoringKeywords = [
         // Generic
@@ -707,7 +707,9 @@ export function isFlavoringIngredient(food: FoodItemMatch): boolean {
         // Bay & leaves
         'bay leaf', 'bay',
         // Color/flavor agents (minimal nutrition)
-        'saffron', 'turmeric', 'food coloring', 'food colour'
+        'saffron', 'turmeric', 'food coloring', 'food colour',
+        // Non-nutritive
+        'water'
     ];
 
     return flavoringKeywords.some(keyword => name.includes(keyword));
