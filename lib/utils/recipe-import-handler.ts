@@ -20,6 +20,14 @@ export interface ImportResult {
 }
 
 /**
+ * Type-safe version: when success is true, recipe is guaranteed to exist
+ */
+export type SuccessfulImportResult = ImportResult & {
+  success: true;
+  recipe: ParsedRecipe;
+};
+
+/**
  * Smart import handler: tries Cheerio first, falls back to LLM
  */
 export async function importRecipeFromURL(

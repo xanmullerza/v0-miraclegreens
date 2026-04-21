@@ -544,7 +544,7 @@ export async function parseRecipeURL(
 
 // ========== NORMALIZATION ==========
 
-function normalizeToParseRecipe(data: StructuredRecipeData, url: string): ParsedRecipe {
+export function normalizeToParseRecipe(data: StructuredRecipeData, url: string): ParsedRecipe {
   return {
     title: (data.title || 'Recipe').trim(),
     ingredients_text: normalizeIngredients(data.ingredients || []),

@@ -370,11 +370,11 @@ export function useZumAssistant() {
                 setMessages(prev => [...prev, {
                     id: (Date.now() + 1).toString(),
                     type: 'bot',
-                    content: `✅ Imported "${result.recipe.title}"!`,
+                    content: `✅ Imported "${result.recipe!.title}"!`,
                     timestamp: new Date(),
-                    recipeData: result.recipe,
+                    recipeData: result.recipe!,
                 }]);
-                return result.recipe;
+                return result.recipe!;
             } else {
                 throw new Error(result.errorMessage || 'Failed to extract recipe');
             }
