@@ -36,10 +36,11 @@ export async function importRecipeFromURL(
   userId?: string
 ): Promise<ImportResult> {
   const startTime = Date.now();
+  console.log(`[RECIPE_IMPORTER] Starting import for URL: ${url}`);
 
   // Step 1: Try Cheerio parsing first (fast, local)
   try {
-    console.log(`[Week 1] Attempting Cheerio parse for: ${url}`);
+    console.log(`[RECIPE_IMPORTER] Attempting Cheerio DOM parsing...`);
     const result = await parseRecipeURL(url, {
       timeout: 8000,
       fallbackToGeneric: true,
@@ -51,9 +52,11 @@ export async function importRecipeFromURL(
       result.recipe.title !== 'Recipe' &&
       result.recipe.ingredients_text.split('\n').filter((l) => l.trim()).length >= 2
     ) {
-      console.log(
-        `[Week 1] ✅ Cheerio parse succeeded (method: ${result.method}, confidence: ${result.confidence})`
-      );
+      console.log(`[RECIPE_IMPORTER] ✅ SUCCESS: Cheerio parsed "${result.recipe.title}"`);
+      console.log(`[RECIPE_IMPORTER]   - Method: ${result.method}`);
+      console.log(`[RECIPE_IMPORTER]   - Confidence: ${(result.confidence * 100).toFixed(1)}%`);
+      console.log(`[RECIPE_IMPORTER]   - Ingredients: ${result.recipe.ingredients_text.split('\n').filter(l => l.trim()).length}`);
+      console.log(`[RECIPE_IMPORTER]   - Instructions: ${result.recipe.instructions_text.split('\n').filter(l => l.trim()).length}`);
       return {
         success: true,
         recipe: result.recipe,
@@ -63,17 +66,13 @@ export async function importRecipeFromURL(
       };
     }
 
-    console.log(
-      `[Week 1] ⚠️ Cheerio parse incomplete (title: ${result.recipe.title}, ingredients: ${result.recipe.ingredients_text.split('\n').length})`
-    );
+    console.log(`[RECIPE_IMPORTER] ⚠️ Cheerio incomplete - title: "${result.recipe.title}", ingredients: ${result.recipe.ingredients_text.split('\n').length}`);
   } catch (error) {
-    console.log(
-      `[Week 1] ❌ Cheerio parse failed: ${error instanceof Error ? error.message : String(error)}`
-    );
+    console.log(`[RECIPE_IMPORTER] ❌ Cheerio failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   // Step 2: Fall back to LLM webhook
-  console.log(`[Week 1] Falling back to LLM webhook...`);
+  console.log(`[RECIPE_IMPORTER] Falling back to LLM webhook...`);
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -93,6 +92,9 @@ export async function importRecipeFromURL(
     const recipe = data.recipe || data.data;
 
     if (recipe && recipe.title) {
+      console.log(`[RECIPE_IMPORTER] ✅ SUCCESS: LLM parsed "${recipe.title}"`);
+      console.log(`[RECIPE_IMPORTER]   - Ingredients: ${recipe.ingredients_text?.split('\n').length || 0}`);
+      console.log(`[RECIPE_IMPORTER]   - Instructions: ${recipe.instructions_text?.split('\n').length || 0}`);
       const parsedRecipe: ParsedRecipe = {
         title: recipe.title,
         ingredients_text: recipe.ingredients_text || recipe.ingredients || '',
@@ -107,7 +109,6 @@ export async function importRecipeFromURL(
         meal_type: recipe.meal_type || undefined,
       };
 
-      console.log(`[Week 1] ✅ LLM parse succeeded for: ${parsedRecipe.title}`);
       return {
         success: true,
         recipe: parsedRecipe,
@@ -119,9 +120,7 @@ export async function importRecipeFromURL(
 
     throw new Error('LLM returned no recipe data');
   } catch (error) {
-    console.error(
-      `[Week 1] ❌ LLM fallback failed: ${error instanceof Error ? error.message : String(error)}`
-    );
+    console.error(`[RECIPE_IMPORTER] ❌ LLM fallback failed: ${error instanceof Error ? error.message : String(error)}`);
     return {
       success: false,
       method: 'error',

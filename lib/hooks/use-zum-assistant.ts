@@ -349,6 +349,7 @@ export function useZumAssistant() {
 
     const handlePasteRecipeURL = async (url: string) => {
         if (!url.trim()) return;
+        console.log(`[UI] Recipe URL pasted: ${url}`);
         setMessages(prev => [...prev, {
             id: Date.now().toString(),
             type: 'user',
@@ -362,10 +363,12 @@ export function useZumAssistant() {
             const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) throw new Error('Assistant service is not configured');
 
+            console.log(`[UI] Starting recipe import process...`);
             // Week 1: Use intelligent importer with Cheerio fallback
             const result = await importRecipeFromURL(url, webhookUrl, user?.id);
 
             if (result.success && result.recipe) {
+                console.log(`[UI] ✅ Recipe import successful: "${result.recipe.title}" (${result.method})`);
                 setSuccessRecipe(result.recipe);
                 setMessages(prev => [...prev, {
                     id: (Date.now() + 1).toString(),
@@ -376,10 +379,11 @@ export function useZumAssistant() {
                 }]);
                 return result.recipe!;
             } else {
+                console.log(`[UI] ❌ Recipe import failed: ${result.errorMessage}`);
                 throw new Error(result.errorMessage || 'Failed to extract recipe');
             }
         } catch (error) {
-            console.error('Error importing recipe:', error);
+            console.error(`[UI] Recipe import error:`, error);
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 type: 'bot',

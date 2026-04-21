@@ -475,6 +475,7 @@ export async function parseRecipeURL(
   let html: string;
   let siteDetected: string | null = null;
 
+  console.log(`[RECIPE_PARSER] Fetching URL: ${url}`);
   try {
     // Fetch HTML
     const controller = new AbortController();
@@ -492,38 +493,68 @@ export async function parseRecipeURL(
     }
 
     html = await response.text();
+    console.log(`[RECIPE_PARSER] Fetched ${html.length} characters of HTML`);
 
     // Detect site
     siteDetected = await detectRecipeSite(url, html);
+    console.log(`[RECIPE_PARSER] Detected site: ${siteDetected || 'unknown'}`);
   } catch (error) {
     throw new Error(`Failed to fetch recipe: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   // Strategy 1: Try JSON-LD (most structured)
+  console.log(`[RECIPE_PARSER] Trying JSON-LD extraction...`);
   let data = extractSchemaOrg(html);
   let method = 'schema-org';
   let confidence = 0.95;
 
+  if (data) {
+    console.log(`[RECIPE_PARSER] ✅ JSON-LD found: "${data.title}"`);
+  } else {
+    console.log(`[RECIPE_PARSER] ❌ No JSON-LD found`);
+  }
+
   // Strategy 2: Try microdata (fallback)
   if (!data || (data.ingredients && data.ingredients.length < 2)) {
+    console.log(`[RECIPE_PARSER] Trying microdata extraction...`);
     data = extractMicrodata(html);
     method = 'microdata';
     confidence = 0.85;
+
+    if (data) {
+      console.log(`[RECIPE_PARSER] ✅ Microdata found: "${data.title}"`);
+    } else {
+      console.log(`[RECIPE_PARSER] ❌ No microdata found`);
+    }
   }
 
   // Strategy 3: Try site-specific CSS selectors
   if (!data || (data.ingredients && data.ingredients.length < 2)) {
+    console.log(`[RECIPE_PARSER] Trying CSS selector extraction...`);
     data = extractWithSelectors(html, url);
     method = siteDetected ? `selectors-${siteDetected}` : 'selectors-generic';
     confidence = 0.80;
+
+    if (data && data.ingredients && data.ingredients.length > 0) {
+      console.log(`[RECIPE_PARSER] ✅ CSS selectors found: "${data.title}", ${data.ingredients.length} ingredients`);
+    } else {
+      console.log(`[RECIPE_PARSER] ❌ CSS selectors failed`);
+    }
   }
 
   // Strategy 4: Fallback to generic DOM analysis
   if (!data || (data.ingredients && data.ingredients.length < 2)) {
     if (fallbackToGeneric) {
+      console.log(`[RECIPE_PARSER] Trying generic DOM analysis...`);
       data = extractGenericDOM(html);
       method = 'generic-dom';
       confidence = 0.60;
+
+      if (data && data.ingredients && data.ingredients.length > 0) {
+        console.log(`[RECIPE_PARSER] ✅ Generic DOM found: "${data.title}", ${data.ingredients.length} ingredients`);
+      } else {
+        console.log(`[RECIPE_PARSER] ❌ Generic DOM failed`);
+      }
     } else {
       throw new Error('Could not extract recipe data');
     }
@@ -534,6 +565,7 @@ export async function parseRecipeURL(
   }
 
   const recipe = normalizeToParseRecipe(data, url);
+  console.log(`[RECIPE_PARSER] Final result: "${recipe.title}" (${recipe.ingredients_text.split('\n').filter(l => l.trim()).length} ingredients, ${recipe.instructions_text.split('\n').filter(l => l.trim()).length} steps)`);
 
   return {
     recipe,
