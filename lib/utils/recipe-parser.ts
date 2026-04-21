@@ -96,11 +96,11 @@ export const parseRecipeText = (text: string) => {
         const lower = line.toLowerCase();
 
         // Detect sections
-        if (lower.match(/^(ingredients|protocol components|list of components|what you'll need):?\s*$/i)) {
+        if (lower.match(/^(ingredients|protocol components|list of components|what you'll need|recipe ingredients|shopping list|ingredient list):?\s*$/i)) {
             mode = 'ingredients';
             continue;
         }
-        if (lower.match(/^(instructions|method|steps|preparation|directions|how to make):?\s*$/i)) {
+        if (lower.match(/^(instructions|method|steps|preparation|directions|how to make|recipe instructions|recipe method|recipe directions|cooking instructions|cooking method|cooking directions|recipe steps):?\s*$/i)) {
             mode = 'instructions';
             continue;
         }
