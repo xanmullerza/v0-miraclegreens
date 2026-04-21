@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 import { ParsedRecipe } from '@/types/recipe';
+import { importRecipeFromURL } from '@/lib/utils/recipe-import-handler';
 
 export interface Message {
     id: string;
@@ -354,47 +355,39 @@ export function useZumAssistant() {
             content: `🔗 Pasted recipe URL`,
             timestamp: new Date(),
         }]);
-        setIsLoading(true);
+        setRecipeLoading(true);
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
             const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL;
             if (!webhookUrl) throw new Error('Assistant service is not configured');
 
-            const response = await fetch(webhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: url, userId: user?.id || 'anonymous', contentType: 'recipe-url' })
-            });
+            // Week 1: Use intelligent importer with Cheerio fallback
+            const result = await importRecipeFromURL(url, webhookUrl, user?.id);
 
-            const data = await response.json();
-            const recipe = data.recipe || data.data;
-            if (recipe && recipe.title) {
-                const recipeData: ParsedRecipe = {
-                    title: recipe.title,
-                    ingredients_text: recipe.ingredients_text || recipe.ingredients || '',
-                    instructions_text: recipe.instructions_text || recipe.instructions || '',
-                    servings: recipe.servings || 4,
-                    prep_time: recipe.prep_time || 30,
-                    cook_time: recipe.cook_time || 0,
-                    source_url: url,
-                    image_url: recipe.image_url || recipe.image || undefined,
-                    image: recipe.image || recipe.image_url || undefined,
-                    type: recipe.type || recipe.meal_type || 'dinner',
-                    meal_type: recipe.meal_type || undefined,
-                };
-                setSuccessRecipe(recipeData);
+            if (result.success && result.recipe) {
+                setSuccessRecipe(result.recipe);
                 setMessages(prev => [...prev, {
                     id: (Date.now() + 1).toString(),
                     type: 'bot',
-                    content: `✅ Imported "${recipeData.title}"!`,
+                    content: `✅ Imported "${result.recipe.title}"!`,
                     timestamp: new Date(),
-                    recipeData,
+                    recipeData: result.recipe,
                 }]);
-                return recipeData;
+                return result.recipe;
+            } else {
+                throw new Error(result.errorMessage || 'Failed to extract recipe');
             }
+        } catch (error) {
+            console.error('Error importing recipe:', error);
+            setMessages(prev => [...prev, {
+                id: (Date.now() + 1).toString(),
+                type: 'bot',
+                content: '❌ Could not extract recipe from this URL. Try uploading a photo or entering ingredients manually.',
+                timestamp: new Date(),
+            }]);
         } finally {
-            setIsLoading(false);
+            setRecipeLoading(false);
         }
     };
 
