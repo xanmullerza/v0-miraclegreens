@@ -1,3 +1,14 @@
+export interface CookwareItem {
+    name: string;
+    quantity?: string;
+}
+
+export interface TimerItem {
+    name?: string;
+    duration: string;
+    unit?: string;
+}
+
 export interface ParsedRecipe {
     title: string;
     ingredients_text: string;
@@ -12,6 +23,9 @@ export interface ParsedRecipe {
     image?: string;
     type?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
     meal_type?: string;
+    metadata?: Record<string, string | number | string[]>;
+    cookware?: CookwareItem[];
+    timers?: TimerItem[];
 }
 
 export interface Recipe {

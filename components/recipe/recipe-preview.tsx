@@ -7,14 +7,30 @@ import { cn } from '@/lib/utils';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { toast } from 'sonner';
 
+interface CookwareItem {
+    name: string;
+    quantity?: string;
+}
+
+interface TimerItem {
+    name?: string;
+    duration: string;
+    unit?: string;
+}
+
 interface ParsedRecipe {
     title: string;
     ingredients_text: string;
     instructions_text: string;
     servings?: number;
     prep_time?: number;
+    cook_time?: number;
     source_url: string;
     image_url?: string;
+    image?: string;
+    metadata?: Record<string, string | number | string[]>;
+    cookware?: CookwareItem[];
+    timers?: TimerItem[];
 }
 
 interface RecipePreviewProps {
@@ -35,6 +51,8 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
     }
 
     // Parse ingredients into array
+    const [activeTab, setActiveTab] = useState<'details' | 'ingredients' | 'instructions' | 'nutrition'>('details');
+
     const ingredientsList = recipe.ingredients_text
         .split('\n')
         .filter((line: string) => line.trim())
@@ -43,7 +61,6 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
             text: line.trim()
         }));
 
-    // Parse instructions into array
     const instructionsList = recipe.instructions_text
         .split('\n')
         .filter((line: string) => line.trim())
@@ -51,6 +68,22 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
             id: idx,
             text: line.trim()
         }));
+
+    const nutritionEntries = recipe.metadata
+        ? Object.entries(recipe.metadata)
+            .filter(([key, value]) => ['calories', 'energy', 'protein', 'fat', 'carbs', 'carbohydrates', 'sugar', 'fiber', 'sodium'].includes(key.toLowerCase()))
+            .map(([key, value]) => ({
+                key,
+                value: String(value)
+            }))
+        : [];
+
+    const equipmentList = recipe.cookware || [];
+    const timerList = recipe.timers || [];
+
+    const metadataEntries = recipe.metadata
+        ? Object.entries(recipe.metadata).filter(([key]) => !['calories', 'energy', 'protein', 'fat', 'carbs', 'carbohydrates', 'sugar', 'fiber', 'sodium'].includes(key.toLowerCase()))
+        : [];
 
     const handleSave = async () => {
         setSaving(true);
@@ -176,122 +209,163 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                         </div>
                     </div>
 
-                    {/* Quick Info */}
-                    <div className="grid grid-cols-3 gap-4">
-                        <div className="bg-muted/50 rounded-xl p-4 text-center">
-                            <div className="flex items-center justify-center mb-2">
-                                <Users size={20} className="text-emerald-600 dark:text-emerald-400" />
-                            </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-                                Servings
-                            </p>
-                            <p className="text-2xl font-black text-foreground">
-                                {recipe.servings || 4}
-                            </p>
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                            {[
+                                { id: 'details', label: 'Details' },
+                                { id: 'ingredients', label: 'Ingredients' },
+                                { id: 'instructions', label: 'Instructions' },
+                                { id: 'nutrition', label: 'Nutrition' },
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                                    className={cn(
+                                        'py-3 px-3 rounded-2xl text-sm font-black uppercase tracking-[0.25em] transition-all border',
+                                        activeTab === tab.id
+                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20'
+                                            : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800'
+                                    )}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
                         </div>
-                        <div className="bg-muted/50 rounded-xl p-4 text-center">
-                            <div className="flex items-center justify-center mb-2">
-                                <Clock size={20} className="text-amber-600 dark:text-amber-400" />
-                            </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-                                Prep Time
-                            </p>
-                            <p className="text-2xl font-black text-foreground">
-                                {recipe.prep_time || 30}
-                                <span className="text-sm"> min</span>
-                            </p>
-                        </div>
-                        <div className="bg-muted/50 rounded-xl p-4 text-center">
-                            <div className="flex items-center justify-center mb-2">
-                                <ChefHat size={20} className="text-violet-600 dark:text-violet-400" />
-                            </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-                                Status
-                            </p>
-                            <p className="text-2xl font-black text-foreground">
-                                ✓ Ready
-                            </p>
-                        </div>
-                    </div>
 
-                    {/* Ingredients */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                                <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">📝</span>
-                            </div>
-                            <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
-                                Ingredients
-                            </h3>
-                            <span className="ml-auto text-sm font-bold text-muted-foreground">
-                                {ingredientsList.length} items
-                            </span>
-                        </div>
-                        <div className="space-y-2 pl-4 border-l-2 border-emerald-200 dark:border-emerald-900/30">
-                            {ingredientsList.length > 0 ? (
-                                ingredientsList.map((ingredient) => (
-                                    <div
-                                        key={ingredient.id}
-                                        className="flex gap-3 p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                                    >
-                                        <span className="text-emerald-600 dark:text-emerald-400 font-bold flex-shrink-0">•</span>
-                                        <span className="text-foreground/80">
-                                            {ingredient.text}
-                                        </span>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-slate-400 italic">No ingredients parsed yet</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Instructions */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                                <span className="text-sm font-black text-amber-700 dark:text-amber-400">👨‍🍳</span>
-                            </div>
-                            <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
-                                Instructions
-                            </h3>
-                            <span className="ml-auto text-sm font-bold text-muted-foreground">
-                                {instructionsList.length} steps
-                            </span>
-                        </div>
-                        <div className="space-y-3 pl-4 border-l-2 border-amber-200 dark:border-amber-900/30">
-                            {instructionsList.length > 0 ? (
-                                instructionsList.map((instruction) => (
-                                    <div
-                                        key={instruction.id}
-                                        className="flex gap-4 p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                                    >
-                                        <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
-                                            <span className="text-xs font-black text-amber-700 dark:text-amber-400">
-                                                {instruction.id + 1}
-                                            </span>
+                        <div className="rounded-[2rem] border border-border bg-card p-6 space-y-6">
+                            {activeTab === 'details' && (
+                                <div className="space-y-6">
+                                    <div className="grid gap-4 sm:grid-cols-3">
+                                        <div className="rounded-3xl bg-slate-50 dark:bg-slate-950 p-4">
+                                            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Servings</p>
+                                            <p className="text-3xl font-black text-foreground">{recipe.servings || 4}</p>
                                         </div>
-                                        <span className="text-foreground/80 pt-1">
-                                            {instruction.text}
-                                        </span>
+                                        <div className="rounded-3xl bg-slate-50 dark:bg-slate-950 p-4">
+                                            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Prep Time</p>
+                                            <p className="text-3xl font-black text-foreground">{recipe.prep_time || 30}</p>
+                                            <p className="text-xs uppercase tracking-widest text-muted-foreground">minutes</p>
+                                        </div>
+                                        <div className="rounded-3xl bg-slate-50 dark:bg-slate-950 p-4">
+                                            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Cook Time</p>
+                                            <p className="text-3xl font-black text-foreground">{recipe.cook_time ?? '-'}</p>
+                                            <p className="text-xs uppercase tracking-widest text-muted-foreground">minutes</p>
+                                        </div>
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-slate-400 italic">No instructions parsed yet</p>
+
+                                    {equipmentList.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h3 className="text-base font-bold uppercase tracking-[0.25em] text-foreground">Equipment</h3>
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                {equipmentList.map((cw, index) => (
+                                                    <div key={index} className="rounded-3xl border border-slate-200 dark:border-slate-800 p-4">
+                                                        <p className="font-semibold text-foreground">{cw.name}</p>
+                                                        {cw.quantity && <p className="text-sm text-muted-foreground">{cw.quantity}</p>}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {timerList.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h3 className="text-base font-bold uppercase tracking-[0.25em] text-foreground">Timers</h3>
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                {timerList.map((timer, index) => (
+                                                    <div key={index} className="rounded-3xl border border-slate-200 dark:border-slate-800 p-4">
+                                                        <p className="font-semibold text-foreground">
+                                                            {timer.name ? `${timer.name}` : 'Timer'}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {timer.duration}{timer.unit ? ` ${timer.unit}` : ''}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {metadataEntries.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h3 className="text-base font-bold uppercase tracking-[0.25em] text-foreground">Recipe Details</h3>
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                {metadataEntries.map(([key, value]) => (
+                                                    <div key={key} className="rounded-3xl border border-slate-200 dark:border-slate-800 p-4">
+                                                        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">{key.replace(/_/g, ' ')}</p>
+                                                        <p className="text-sm text-foreground break-words">{String(value)}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {activeTab === 'ingredients' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <h3 className="text-lg font-bold uppercase tracking-[0.25em]">Ingredients</h3>
+                                        <span className="text-sm text-muted-foreground">{ingredientsList.length} item{ingredientsList.length === 1 ? '' : 's'}</span>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {ingredientsList.length > 0 ? (
+                                            ingredientsList.map((ingredient) => (
+                                                <div key={ingredient.id} className="rounded-3xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-950">
+                                                    {ingredient.text}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-slate-400 italic">No ingredients parsed yet.</p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'instructions' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <h3 className="text-lg font-bold uppercase tracking-[0.25em]">Instructions</h3>
+                                        <span className="text-sm text-muted-foreground">{instructionsList.length} step{instructionsList.length === 1 ? '' : 's'}</span>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {instructionsList.length > 0 ? (
+                                            instructionsList.map((instruction) => (
+                                                <div key={instruction.id} className="rounded-3xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-950">
+                                                    <div className="flex items-center gap-3 mb-3">
+                                                        <div className="h-8 w-8 rounded-2xl bg-emerald-600 text-white grid place-items-center font-black">{instruction.id + 1}</div>
+                                                        <p className="text-sm text-muted-foreground uppercase tracking-[0.3em]">Step</p>
+                                                    </div>
+                                                    <p className="text-sm leading-relaxed text-foreground">{instruction.text}</p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-slate-400 italic">No instructions parsed yet.</p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'nutrition' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <h3 className="text-lg font-bold uppercase tracking-[0.25em]">Nutrition</h3>
+                                        <span className="text-sm text-muted-foreground">Metadata view</span>
+                                    </div>
+                                    {nutritionEntries.length > 0 ? (
+                                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                            {nutritionEntries.map((entry) => (
+                                                <div key={entry.key} className="rounded-3xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-50 dark:bg-slate-950">
+                                                    <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">{entry.key.replace(/_/g, ' ')}</p>
+                                                    <p className="text-xl font-black text-foreground">{entry.value}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-slate-400 italic">No nutrition metadata found in this recipe.</p>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>
-
-                    {/* Info Banner */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-2">
-                        <p className="text-sm font-bold text-blue-900 dark:text-blue-300 flex items-start gap-2">
-                            <span>ℹ️</span>
-                            <span>
-                                You can adjust servings, add more ingredients, and modify instructions after saving to your library.
-                            </span>
-                        </p>
-                    </div>
-                </div>
 
                 {/* Footer */}
                 <div className="sticky bottom-0 bg-card border-t border-border px-6 py-4 flex gap-3">
@@ -341,5 +415,6 @@ export function RecipePreview({ isOpen, recipe, onClose, onSave }: RecipePreview
                 </div>
             </div>
         </div>
+    </div>
     );
 }

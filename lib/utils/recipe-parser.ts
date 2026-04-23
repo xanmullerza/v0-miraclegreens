@@ -1,5 +1,6 @@
 import { ParsedRecipe } from '@/types/recipe';
 import { parseRecipeAmount } from './parsing-utils';
+import { parseCooklangComprehensive, type CooklangParsedRecipe } from './cooklang-parser';
 
 const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -197,79 +198,65 @@ const isCooklangIngredientLine = (line: string) => {
     return trimmed.includes('@') && afterTokens.length === 0;
 };
 
-export const parseCooklang = (text: string): ParsedRecipe => {
-    const lines = text.split('\n');
-    const metadata: Record<string, string> = {};
-    const textLines: string[] = [];
+const formatCooklangIngredientLine = (ingredient: { name: string; quantity?: string; unit?: string; preparation?: string }) => {
+    const quantity = ingredient.quantity ? ingredient.quantity : '';
+    const unit = ingredient.unit ? ` ${ingredient.unit}` : '';
+    const preparation = ingredient.preparation ? `, ${ingredient.preparation}` : '';
+    return `${quantity}${unit}`.trim() ? `${quantity}${unit} ${ingredient.name}${preparation}` : `${ingredient.name}${preparation}`;
+};
 
-    for (const rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line) continue;
-        if (line.startsWith('#')) {
-            const trimmed = line.slice(1).trim();
-            const metadataMatch = trimmed.match(/^([^:]+?):\s*(.*)$/);
-            if (metadataMatch) {
-                const key = normalizeCooklangKey(metadataMatch[1]);
-                metadata[key] = metadataMatch[2].trim();
-                continue;
-            }
-            if (!metadata.title) {
-                metadata.title = trimmed;
-                continue;
-            }
-            continue;
-        }
-        textLines.push(rawLine);
-    }
+const formatCooklangStep = (tokens: { type: string; value: string }[]) => {
+    return tokens.map(token => token.value).join('').replace(/\s+/g, ' ').trim();
+};
 
-    const title = metadata.title || metadata.name || textLines.find(line => line.trim() && !line.trim().match(/^(ingredients|instructions|method|steps|servings)\b/i))?.trim() || 'Untitled Cooklang Recipe';
-    const servings = maybeParseNumber(metadata.servings || metadata.yield || metadata.yields) || 4;
-    const prepTime = maybeParseNumber(metadata.prep_time || metadata.preparation_time || metadata.prep_time_minutes) || 30;
-    const cookTime = maybeParseNumber(metadata.cook_time || metadata.cooking_time || metadata.total_time) || 0;
-    const type = metadata.type || metadata.meal_type || 'dinner';
-    const tags = (metadata.tags || metadata.categories || metadata.keywords || '').split(',').map(tag => tag.trim()).filter(Boolean);
-    const imageUrl = metadata.image || metadata.image_url;
-    const difficulty = metadata.difficulty;
+type CooklangType = CooklangParsedRecipe;
 
-    const ingredientTokens = new Map<string, string>();
-    for (const match of text.matchAll(COOKLANG_TOKEN_REGEX)) {
-        const name = (match[1] || match[2] || '').trim();
-        const amount = match[3]?.trim() || '';
-        if (!name) continue;
-        if (!ingredientTokens.has(name.toLowerCase())) {
-            ingredientTokens.set(name.toLowerCase(), amount);
-        }
-    }
+const mapCooklangToParsedRecipe = (cooklang: CooklangType): ParsedRecipe => {
+    const metadata = cooklang.metadata || {};
+    const title = (metadata.title as string) || (metadata.name as string) || 'Untitled Cooklang Recipe';
+    const servings = metadata.servings ? Number(metadata.servings) : undefined;
+    const prep_time = metadata.prep_time ? Number(metadata.prep_time) : metadata.prepTime ? Number(metadata.prepTime) : undefined;
+    const cook_time = metadata.cook_time ? Number(metadata.cook_time) : metadata.cookTime ? Number(metadata.cookTime) : undefined;
+    const image_url = (metadata.image as string) || (metadata.photo as string) || (metadata.picture as string) || undefined;
+    const tags = Array.isArray(metadata.tags)
+        ? metadata.tags.map(String)
+        : typeof metadata.tags === 'string'
+        ? (metadata.tags as string).split(',').map(tag => tag.trim()).filter(Boolean)
+        : undefined;
+    const type = (metadata.type as ParsedRecipe['type']) || (metadata.meal_type as ParsedRecipe['type']) || undefined;
 
-    const ingredients_text = Array.from(ingredientTokens.entries()).map(([name, amount]) => {
-        return amount ? `${amount} ${name}` : name;
-    }).join('\n');
+    const ingredients_text = cooklang.ingredients
+        .map(formatCooklangIngredientLine)
+        .filter(Boolean)
+        .join('\n');
 
-    const instructions = textLines
-        .filter(line => {
-            const trimmed = line.trim();
-            if (!trimmed) return false;
-            if (trimmed.match(/^(ingredients|components|what you'll need|shopping list|instructions|method|steps|directions)\b/i)) return false;
-            if (isCooklangIngredientLine(trimmed)) return false;
-            return true;
-        })
-        .map(cleanCooklangLine)
-        .filter(Boolean);
+    const instructions_text = cooklang.sections
+        .map(section => section.steps.map(step => formatCooklangStep(step)).filter(Boolean).join('\n'))
+        .filter(Boolean)
+        .join('\n\n');
 
     return {
         title,
         ingredients_text,
-        instructions_text: instructions.join('\n'),
+        instructions_text,
         servings,
-        prep_time: prepTime,
-        cook_time: cookTime,
-        source_url: 'cooklang',
-        image_url: imageUrl,
-        type: type as ParsedRecipe['type'],
-        meal_type: metadata.meal_type,
-        difficulty,
+        prep_time,
+        cook_time,
+        source_url: (metadata.source as string) || 'cooklang',
+        image_url,
+        type,
+        meal_type: metadata.meal_type as string,
+        difficulty: metadata.difficulty as string,
         tags,
+        metadata,
+        cookware: cooklang.cookware,
+        timers: cooklang.timers,
     };
+};
+
+export const parseCooklang = (text: string): ParsedRecipe => {
+    const parsed = parseCooklangComprehensive(text);
+    return mapCooklangToParsedRecipe(parsed);
 };
 
 /**
