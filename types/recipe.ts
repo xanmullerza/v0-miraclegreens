@@ -23,9 +23,12 @@ export interface ParsedRecipe {
     image?: string;
     type?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
     meal_type?: string;
-    metadata?: Record<string, string | number | string[]>;
+    metadata?: Record<string, any>;
     cookware?: CookwareItem[];
     timers?: TimerItem[];
+    // New fields for token-based display
+    sections?: any[];
+    ingredients?: any[];
 }
 
 export interface Recipe {

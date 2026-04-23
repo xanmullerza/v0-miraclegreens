@@ -3,6 +3,7 @@ import { Camera, Loader2, Save, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ParsedRecipe } from '@/types/recipe';
 import { ActionPanelView } from '@/lib/context/action-panel-context';
+import { CooklangRecipeDisplay } from '@/components/recipe/cooklang-recipe-display';
 import { RecipeBuilderPanel } from './recipe-builder-panel';
 import { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/builder/types';
 
@@ -312,9 +313,8 @@ export function ImportView({
                         </>
                     ) : (
                         <div className="flex flex-col flex-1">
-                            <div className="bg-amber-500/10 dark:bg-amber-500/20 rounded-xl p-3 border border-amber-500/20 mb-3 flex-1">
-                                <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{successRecipe.title}</h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400">Cooklang recipe parsed successfully!</p>
+                            <div className="bg-amber-500/10 dark:bg-amber-500/20 rounded-xl p-4 border border-amber-500/20 mb-3 flex-1 max-h-96 overflow-y-auto">
+                                <CooklangRecipeDisplay recipe={successRecipe} />
                             </div>
                             <button
                                 onClick={() => handleSaveAndViewRecipe(successRecipe)}
