@@ -17,11 +17,18 @@ export interface TimerItem {
 
 export interface ParsedRecipe {
     title: string;
-    ingredients_text: string;
-    instructions_text: string;
+    description?: string;
+    author?: string;
+    source?: string;
     servings?: number;
+    time?: string;
     prep_time?: number;
     cook_time?: number;
+    prepTime?: number;
+    cookTime?: number;
+    cuisine?: string;
+    course?: string;
+    yields?: string;
     difficulty?: string;
     tags?: string[];
     source_url: string;
@@ -30,12 +37,16 @@ export interface ParsedRecipe {
     type?: 'breakfast' | 'lunch' | 'dinner' | 'snack';
     meal_type?: string;
     metadata?: Record<string, string | number | string[]>;
-    cookware?: CookwareItem[];
-    timers?: TimerItem[];
+    cookware: CookwareItem[];
+    timers: TimerItem[];
+    notes?: string | string[];
     // New fields for token-based display
-    sections?: any[];
-    ingredients?: Ingredient[];
+    sections: any[];
+    ingredients: Ingredient[];
+    steps: Array<{ text: string }>;
 }
+
+export type Recipe = ParsedRecipe;
 
 // Convert miniapp ParsedRecipe to main app ParsedRecipe
 function convertParsedRecipe(miniAppRecipe: MiniAppParsedRecipe): ParsedRecipe {
@@ -107,14 +118,26 @@ function convertParsedRecipe(miniAppRecipe: MiniAppParsedRecipe): ParsedRecipe {
                  tags.some(tag => tag.toLowerCase().includes('dinner')) ? 'dinner' :
                  tags.some(tag => tag.toLowerCase().includes('snack')) ? 'snack' : 'dinner';
 
+    const steps = miniAppRecipe.sections
+        .flatMap((section) =>
+            section.steps.map((step: any[]) => ({ text: step.map((token: any) => token.value).join('') }))
+        );
+
     return {
         title,
-        ingredients_text,
-        instructions_text,
+        description: metadata.description ? String(metadata.description) : undefined,
+        author: metadata.author ? String(metadata.author) : undefined,
+        source: metadata.source ? String(metadata.source) : undefined,
         servings,
+        time: metadata.time ? String(metadata.time) : undefined,
         prep_time,
         cook_time,
-        difficulty: String(metadata.difficulty || 'Medium'),
+        prepTime: prep_time,
+        cookTime: cook_time,
+        cuisine: metadata.cuisine ? String(metadata.cuisine) : undefined,
+        course: metadata.course ? String(metadata.course) : undefined,
+        yields: metadata.yields ? String(metadata.yields) : undefined,
+        difficulty: metadata.difficulty ? String(metadata.difficulty) : 'Medium',
         tags,
         source_url: String(metadata.source || ''),
         image_url: String(metadata.image || metadata.photo || metadata.picture || ''),
@@ -124,14 +147,23 @@ function convertParsedRecipe(miniAppRecipe: MiniAppParsedRecipe): ParsedRecipe {
         metadata: metadata as Record<string, any>,
         cookware,
         timers,
+        notes: metadata.notes as string | string[] | undefined,
         sections: miniAppRecipe.sections,
-        ingredients: miniAppRecipe.ingredients
+        ingredients: miniAppRecipe.ingredients,
+        steps,
     };
 }
 
 export function parseCooklang(input: string): ParsedRecipe {
     const miniAppRecipe = miniAppParseCooklang(input);
     return convertParsedRecipe(miniAppRecipe);
+}
+
+// Backward compatibility class for existing code
+export class CooklangParser {
+    parse(input: string): ParsedRecipe {
+        return parseCooklang(input);
+    }
 }
 
 // Export the miniapp types and functions for use in display components

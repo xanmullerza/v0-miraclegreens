@@ -314,7 +314,7 @@ export function ImportView({
                     ) : (
                         <div className="flex flex-col flex-1">
                             <div className="bg-amber-500/10 dark:bg-amber-500/20 rounded-xl p-4 border border-amber-500/20 mb-3 flex-1 max-h-96 overflow-y-auto">
-                                <CooklangRecipeDisplay recipe={successRecipe} />
+                                <CooklangRecipeDisplay recipe={successRecipe} originalCooklang={cooklangText} />
                             </div>
                             <button
                                 onClick={() => handleSaveAndViewRecipe(successRecipe)}

@@ -18,19 +18,7 @@ import { SplitViewProvider, useSplitView } from '@/lib/context/split-view-contex
 import { RecipeFilterProvider } from '@/lib/context/recipe-filter-context';
 import { FoodFilterProvider } from '@/lib/context/food-filter-context';
 import { supabase } from '@/lib/supabase';
-
-interface ParsedRecipe {
-    title: string;
-    ingredients_text: string;
-    instructions_text: string;
-    servings?: number;
-    prep_time?: number;
-    cook_time?: number;
-    difficulty?: string;
-    tags?: string[];
-    source_url: string;
-    image_url?: string;
-}
+import type { ParsedRecipe } from '@/types/recipe';
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter();

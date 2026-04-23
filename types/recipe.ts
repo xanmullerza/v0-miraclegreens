@@ -13,9 +13,18 @@ export interface ParsedRecipe {
     title: string;
     ingredients_text: string;
     instructions_text: string;
+    description?: string;
+    author?: string;
+    source?: string;
     servings?: number;
+    time?: string;
     prep_time?: number;
     cook_time?: number;
+    prepTime?: number;
+    cookTime?: number;
+    cuisine?: string;
+    course?: string;
+    yields?: string;
     difficulty?: string;
     tags?: string[];
     source_url: string;
@@ -26,9 +35,11 @@ export interface ParsedRecipe {
     metadata?: Record<string, any>;
     cookware?: CookwareItem[];
     timers?: TimerItem[];
+    notes?: string | string[];
     // New fields for token-based display
     sections?: any[];
     ingredients?: any[];
+    steps?: Array<{ text: string }>;
 }
 
 export interface Recipe {

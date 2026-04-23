@@ -1,16 +1,24 @@
 "use client";
 
-import React from 'react';
-import { Clock, Users, ChefHat, Timer, Utensils, Apple } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, Users, ChefHat, Timer, Utensils, Copy, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { ParsedRecipe, StepToken } from '@/lib/cooklang-parser';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import type { ParsedRecipe } from '@/types/recipe';
+import type { StepToken } from '@/lib/cooklang-parser';
 
 interface CooklangRecipeDisplayProps {
   recipe: ParsedRecipe;
+  originalCooklang?: string; // Optional original cooklang text for copying
 }
 
-function TokenRenderer({ tokens }: { tokens: StepToken[] }) {
+interface TokenRendererProps {
+  tokens: StepToken[];
+}
+
+function TokenRenderer({ tokens }: TokenRendererProps) {
   return (
     <span>
       {tokens.map((token, index) => {
@@ -70,7 +78,22 @@ function isValidImageUrl(url: unknown): url is string {
   }
 }
 
-export function CooklangRecipeDisplay({ recipe }: CooklangRecipeDisplayProps) {
+export function CooklangRecipeDisplay({ recipe, originalCooklang }: CooklangRecipeDisplayProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCooklang = async () => {
+    if (!originalCooklang) return;
+
+    try {
+      await navigator.clipboard.writeText(originalCooklang);
+      setCopied(true);
+      toast.success('Cooklang recipe copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast.error('Failed to copy to clipboard');
+    }
+  };
+
   const { metadata = {}, sections = [], ingredients = [], cookware = [] } = recipe;
   const title = metadata.title || "Untitled Recipe";
 
@@ -107,9 +130,26 @@ export function CooklangRecipeDisplay({ recipe }: CooklangRecipeDisplayProps) {
             </div>
           )}
           <div className="min-w-0 flex-1 space-y-2">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              {title}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {title}
+              </h1>
+              {originalCooklang && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyCooklang}
+                  className="ml-auto"
+                >
+                  {copied ? (
+                    <Check className="size-4" />
+                  ) : (
+                    <Copy className="size-4" />
+                  )}
+                  <span className="ml-1">{copied ? 'Copied!' : 'Copy Cooklang'}</span>
+                </Button>
+              )}
+            </div>
             {description && (
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 {description}
