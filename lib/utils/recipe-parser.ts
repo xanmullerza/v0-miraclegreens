@@ -248,7 +248,7 @@ const mapCooklangToParsedRecipe = (cooklang: CooklangType): ParsedRecipe => {
         meal_type: metadata.meal_type as string,
         difficulty: metadata.difficulty as string,
         tags,
-        metadata,
+        metadata: metadata as Record<string, string | number | string[]>,
         cookware: cooklang.cookware,
         timers: cooklang.timers,
     };
