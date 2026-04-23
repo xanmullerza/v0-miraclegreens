@@ -2,7 +2,9 @@
 // Temporary global declarations to help the TypeScript server resolve imports
 // Remove this file once the root cause (missing packages / VSCode TS config) is fixed
 
-declare module 'next';
+declare module 'next' {
+  export type Metadata = any;
+}
 declare module 'next/image';
 declare module 'next/link';
 declare module 'next/font/google';
