@@ -17,6 +17,10 @@ interface ImportViewProps {
     setpastedRecipeURL: (url: string) => void;
     pastedRecipeContent?: string;
     setPastedRecipeContent?: (content: string) => void;
+    cooklangText: string;
+    setCooklangText: (content: string) => void;
+    handleImportCooklangContent: () => void;
+    handleCooklangFileUpload: (file: File) => void;
     handlePasteRecipeContent?: () => void;
     handlePasteRecipeURL: () => void;
     handleSaveAndViewRecipe: (recipe: ParsedRecipe) => void;
@@ -70,6 +74,10 @@ export function ImportView({
     setSuccessRecipe,
     pastedRecipeURL,
     setpastedRecipeURL,
+    cooklangText = '',
+    setCooklangText = () => {},
+    handleImportCooklangContent = () => {},
+    handleCooklangFileUpload = () => {},
     handlePasteRecipeURL,
     handleSaveAndViewRecipe,
     handleManualRecipeCreation,
@@ -246,6 +254,89 @@ export function ImportView({
                                 onClick={() => {
                                     setSuccessRecipe(null);
                                     setpastedRecipeURL('');
+                                }}
+                                className="w-full px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors hover:bg-slate-300 dark:hover:bg-slate-700"
+                            >
+                                Try Another
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Cooklang Import Card */}
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col bg-amber-500/20 dark:bg-amber-500/10">
+                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">Cooklang Recipe</h4>
+                    {!successRecipe ? (
+                        <>
+                            <div className="flex flex-col gap-3 mb-3">
+                                <input
+                                    id="cooklang-upload"
+                                    type="file"
+                                    accept=".cook,text/plain"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            handleCooklangFileUpload(file);
+                                        }
+                                    }}
+                                    className="hidden"
+                                />
+                                <label
+                                    htmlFor="cooklang-upload"
+                                    className="w-full px-4 py-3 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/20 text-amber-900 dark:text-amber-100 text-sm font-semibold text-center cursor-pointer hover:bg-amber-500/20 transition-colors"
+                                >
+                                    Upload .cook file
+                                </label>
+                                <textarea
+                                    value={cooklangText}
+                                    onChange={(e) => setCooklangText(e.target.value)}
+                                    rows={5}
+                                    placeholder="Paste Cooklang file text here..."
+                                    className="w-full px-3 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                />
+                            </div>
+                            <button
+                                onClick={handleImportCooklangContent}
+                                disabled={!cooklangText.trim() || recipeLoading}
+                                className="w-full px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {recipeLoading ? (
+                                    <>
+                                        <Loader2 size={12} className="animate-spin" />
+                                        Parsing...
+                                    </>
+                                ) : (
+                                    'Import Cooklang'
+                                )}
+                            </button>
+                        </>
+                    ) : (
+                        <div className="flex flex-col flex-1">
+                            <div className="bg-amber-500/10 dark:bg-amber-500/20 rounded-xl p-3 border border-amber-500/20 mb-3 flex-1">
+                                <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{successRecipe.title}</h4>
+                                <p className="text-xs text-slate-600 dark:text-slate-400">Cooklang recipe parsed successfully!</p>
+                            </div>
+                            <button
+                                onClick={() => handleSaveAndViewRecipe(successRecipe)}
+                                disabled={recipeSaving}
+                                className="w-full px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-2"
+                            >
+                                {recipeSaving ? (
+                                    <>
+                                        <Loader2 size={12} className="animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save size={12} />
+                                        Save
+                                    </>
+                                )}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setSuccessRecipe(null);
+                                    setCooklangText('');
                                 }}
                                 className="w-full px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors hover:bg-slate-300 dark:hover:bg-slate-700"
                             >

@@ -7,6 +7,8 @@ export function ImportWizardView({
     recipeSaving, successRecipe, setSuccessRecipe,
     pastedRecipeURL, setPastedRecipeURL,
     pastedRecipeContent, setPastedRecipeContent,
+    cooklangText, setCooklangText,
+    handleImportCooklangContent, handleCooklangFileUpload,
     handlePasteRecipeContent, handlePasteRecipeURL,
     handleSaveAndViewRecipe, handleManualRecipeCreation,
     isDragging, setIsDragging, processRecipeImage,
@@ -34,6 +36,10 @@ export function ImportWizardView({
                 setpastedRecipeURL={setPastedRecipeURL}
                 pastedRecipeContent={pastedRecipeContent}
                 setPastedRecipeContent={setPastedRecipeContent}
+                cooklangText={cooklangText}
+                setCooklangText={setCooklangText}
+                handleImportCooklangContent={handleImportCooklangContent}
+                handleCooklangFileUpload={handleCooklangFileUpload}
                 handlePasteRecipeContent={handlePasteRecipeContent}
                 handlePasteRecipeURL={handlePasteRecipeURL}
                 handleSaveAndViewRecipe={handleSaveAndViewRecipe}

@@ -373,7 +373,10 @@ export function useActionPanelOrchestrator({ onClose, onRecipeDetected }: Action
         expandedAppsMenu, setExpandedAppsMenu, expandedWidgetsMenu, setExpandedWidgetsMenu,
         isCreatingRecipe: importer.isCreatingRecipe, setIsCreatingRecipe: importer.setIsCreatingRecipe,
         pastedRecipeContent: importer.pastedRecipeContent, setPastedRecipeContent: importer.setPastedRecipeContent,
-        pastedRecipeURL: importer.pastedRecipeURL, setPastedRecipeURL: importer.setPastedRecipeURL, 
+        pastedRecipeURL: importer.pastedRecipeURL, setPastedRecipeURL: importer.setPastedRecipeURL,
+        cooklangText: importer.cooklangText, setCooklangText: importer.setCooklangText,
+        handleImportCooklangContent: importer.handleImportCooklangContent,
+        handleCooklangFileUpload: importer.handleCooklangFileUpload,
         videoURL: importer.videoURL, setVideoURL: importer.setVideoURL, isDragging: importer.isDragging, 
         setIsDragging: importer.setIsDragging, showOnlyMyRecipes, setShowOnlyMyRecipes, selectedRecipeId,
         

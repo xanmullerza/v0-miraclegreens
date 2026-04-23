@@ -168,6 +168,110 @@ export const parseInstructionsOnly = (text: string) => {
         .filter(step => step.length > 2);
 };
 
+const COOKLANG_TOKEN_REGEX = /@(?:\{([^}]+)\}|([^\s{@]+))(?:\{([^}]*)\})?/g;
+
+const normalizeCooklangKey = (input: string) => input.trim().toLowerCase().replace(/[-_ ]+/g, '_');
+
+const maybeParseNumber = (value?: string) => {
+    if (!value) return undefined;
+    const parsed = Number(value.replace(/[a-zA-Z\s]+/g, '').trim());
+    return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const cleanCooklangLine = (line: string) => {
+    return line
+        .replace(COOKLANG_TOKEN_REGEX, (_match, bracedName, bareName, amount) => {
+            const name = (bracedName || bareName || '').trim();
+            if (!name) return '';
+            return amount ? `${name} ${amount.trim()}` : name;
+        })
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
+const isCooklangIngredientLine = (line: string) => {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+    if (trimmed.match(/^(ingredients|components|shopping list|what you'll need)\b/i)) return true;
+    const afterTokens = trimmed.replace(COOKLANG_TOKEN_REGEX, '').replace(/[\s\-•*,:;]+/g, '');
+    return trimmed.includes('@') && afterTokens.length === 0;
+};
+
+export const parseCooklang = (text: string): ParsedRecipe => {
+    const lines = text.split('\n');
+    const metadata: Record<string, string> = {};
+    const textLines: string[] = [];
+
+    for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line) continue;
+        if (line.startsWith('#')) {
+            const trimmed = line.slice(1).trim();
+            const metadataMatch = trimmed.match(/^([^:]+?):\s*(.*)$/);
+            if (metadataMatch) {
+                const key = normalizeCooklangKey(metadataMatch[1]);
+                metadata[key] = metadataMatch[2].trim();
+                continue;
+            }
+            if (!metadata.title) {
+                metadata.title = trimmed;
+                continue;
+            }
+            continue;
+        }
+        textLines.push(rawLine);
+    }
+
+    const title = metadata.title || metadata.name || textLines.find(line => line.trim() && !line.trim().match(/^(ingredients|instructions|method|steps|servings)\b/i))?.trim() || 'Untitled Cooklang Recipe';
+    const servings = maybeParseNumber(metadata.servings || metadata.yield || metadata.yields) || 4;
+    const prepTime = maybeParseNumber(metadata.prep_time || metadata.preparation_time || metadata.prep_time_minutes) || 30;
+    const cookTime = maybeParseNumber(metadata.cook_time || metadata.cooking_time || metadata.total_time) || 0;
+    const type = metadata.type || metadata.meal_type || 'dinner';
+    const tags = (metadata.tags || metadata.categories || metadata.keywords || '').split(',').map(tag => tag.trim()).filter(Boolean);
+    const imageUrl = metadata.image || metadata.image_url;
+    const difficulty = metadata.difficulty;
+
+    const ingredientTokens = new Map<string, string>();
+    for (const match of text.matchAll(COOKLANG_TOKEN_REGEX)) {
+        const name = (match[1] || match[2] || '').trim();
+        const amount = match[3]?.trim() || '';
+        if (!name) continue;
+        if (!ingredientTokens.has(name.toLowerCase())) {
+            ingredientTokens.set(name.toLowerCase(), amount);
+        }
+    }
+
+    const ingredients_text = Array.from(ingredientTokens.entries()).map(([name, amount]) => {
+        return amount ? `${amount} ${name}` : name;
+    }).join('\n');
+
+    const instructions = textLines
+        .filter(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return false;
+            if (trimmed.match(/^(ingredients|components|what you'll need|shopping list|instructions|method|steps|directions)\b/i)) return false;
+            if (isCooklangIngredientLine(trimmed)) return false;
+            return true;
+        })
+        .map(cleanCooklangLine)
+        .filter(Boolean);
+
+    return {
+        title,
+        ingredients_text,
+        instructions_text: instructions.join('\n'),
+        servings,
+        prep_time: prepTime,
+        cook_time: cookTime,
+        source_url: 'cooklang',
+        image_url: imageUrl,
+        type: type as ParsedRecipe['type'],
+        meal_type: metadata.meal_type,
+        difficulty,
+        tags,
+    };
+};
+
 /**
  * Converts a ParsedRecipe into structured data ready for saving.
  * This is used by the Chatbot to finalize a recipe before database insertion.
