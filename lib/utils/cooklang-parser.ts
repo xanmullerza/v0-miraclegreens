@@ -114,37 +114,6 @@ function removeComments(text: string): string {
   return result;
 }
 
-function extractHashMetadata(text: string): { metadata: RecipeMetadata; content: string } {
-  const metadata: RecipeMetadata = {};
-  const lines = text.split("\n");
-  const remaining: string[] = [];
-
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-    if (!line.startsWith("#")) {
-      remaining.push(rawLine);
-      continue;
-    }
-
-    const trimmed = line.slice(1).trim();
-    if (!trimmed) continue;
-
-    const metadataMatch = trimmed.match(/^([^:]+?):\s*(.*)$/);
-    if (metadataMatch) {
-      const key = metadataMatch[1].trim().toLowerCase().replace(/[-_ ]+/g, "_");
-      const value = metadataMatch[2].trim();
-      metadata[key] = value;
-      continue;
-    }
-
-    if (!metadata.title) {
-      metadata.title = trimmed;
-    }
-  }
-
-  return { metadata, content: remaining.join("\n") };
-}
-
 // Parse quantity and unit from within braces: {quantity%unit} or {quantity}
 function parseQuantityUnit(content: string): {
   quantity?: string;
@@ -604,12 +573,10 @@ function extractTimers(sections: Section[]): Timer[] {
 // Main parse function
 export function parseCooklangComprehensive(input: string): CooklangParsedRecipe {
   // Parse metadata
-  const { metadata: frontMatterMetadata, content: afterFrontMatter } = parseMetadata(input);
-  const { metadata: hashMetadata, content: afterHashMetadata } = extractHashMetadata(afterFrontMatter);
-  const metadata = { ...hashMetadata, ...frontMatterMetadata };
+  const { metadata, content } = parseMetadata(input);
 
   // Remove comments
-  const cleanContent = removeComments(afterHashMetadata);
+  const cleanContent = removeComments(content);
 
   // Parse sections and steps
   const sections = parseSections(cleanContent);
