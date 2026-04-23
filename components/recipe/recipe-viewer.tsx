@@ -149,21 +149,40 @@ export default function RecipeViewer({ recipeId }: RecipeViewerProps) {
             {/* Ingredients */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                 <h2 className="text-xl font-semibold mb-4">Ingredients</h2>
-                <ul className="space-y-2">
-                    {recipe.ingredients?.map((ing: any, index: number) => (
-                        <li key={index} className="flex items-start gap-3">
-                            <span className="text-green-600 mt-1">•</span>
-                            <div className="flex-1">
-                                <span className="font-medium">{ing.amount}</span> {ing.item}
-                                {ing.food_item && (
-                                    <div className="text-xs text-gray-500 mt-1">
-                                        {Math.round((ing.food_item.energy_kcal * ing.weight_g) / 100)} kcal
-                                    </div>
-                                )}
+                <div className="space-y-2">
+                    {recipe.ingredients?.map((ing: any, index: number) => {
+                        const name = ing.name || ing.item || ing.base_ingredient || 'Ingredient';
+                        const quantity = ing.quantity ?? ing.amount;
+                        const unit = ing.unit || ing.measure_label;
+                        const preparation = ing.preparation;
+
+                        return (
+                            <div key={index} className="flex items-start gap-3 pb-2 border-b border-slate-100">
+                                <div className="w-4 h-4 rounded-full bg-orange-200 mt-1 flex-shrink-0"></div>
+                                <div className="flex-1">
+                                    <p className="text-slate-900">
+                                        {quantity && (
+                                            <>
+                                                <span className="font-semibold">{quantity}</span>
+                                                {unit && <span className="text-slate-600"> {unit}</span>}
+                                                <span className="text-slate-600"> - </span>
+                                            </>
+                                        )}
+                                        <span className="font-medium">{name}</span>
+                                        {preparation && (
+                                            <span className="text-slate-600">, {preparation}</span>
+                                        )}
+                                    </p>
+                                    {ing.food_item && (
+                                        <div className="text-xs text-gray-500 mt-1">
+                                            {Math.round((ing.food_item.energy_kcal * ing.weight_g) / 100)} kcal
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </li>
-                    ))}
-                </ul>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Instructions */}
